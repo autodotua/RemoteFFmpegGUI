@@ -52,19 +52,8 @@ namespace SimpleFFmpegGUI.Host
 
         public void CreateCodeTask(IEnumerable<string> path, string outputPath, CodeArguments arg, bool start)
         {
-            using (FFmpegDbContext db = new FFmpegDbContext())
-            {
-                var task = new TaskInfo()
-                {
-                    Type = TaskType.Code,
-                    Inputs = path.ToList(),
-                    Output = outputPath,
-                    Arguments = arg
-                };
-                Logger.Info(task, "新建任务");
-                db.Tasks.Add(task);
-                db.SaveChanges();
-            }
+            FFmpegTaskManager.AddTask(TaskType.Code, path, outputPath, arg);
+
             if (start)
             {
                 manager.StartQueue();
@@ -128,6 +117,21 @@ namespace SimpleFFmpegGUI.Host
         public void DeleteTasks(IEnumerable<int> ids)
         {
             FFmpegTaskManager.TryDeleteTasks(ids, manager);
+        }
+
+        public void AddOrUpdatePreset(string name, TaskType type, CodeArguments arguments)
+        {
+            FFmpegPresetManager.AddOrUpdatePreset(name, type, arguments);
+        }
+
+        public void DeletePreset(int id)
+        {
+            FFmpegPresetManager.DeletePreset(id);
+        }
+
+        public List<CodePreset> GetPresets()
+        {
+            return FFmpegPresetManager.GetPresets();
         }
     }
 }

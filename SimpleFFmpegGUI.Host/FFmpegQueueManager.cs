@@ -111,7 +111,7 @@ namespace SimpleFFmpegGUI.Host
                 a => ApplyOutputArguments(a, task.Arguments));
             p.NotifyOnOutput((data, type) =>
             {
-                Logger.Info("FFmpeg输出：" + data);
+                Logger.Output("FFmpeg输出：" + data);
                 FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(type == Instances.DataType.Error, data));
             });
 

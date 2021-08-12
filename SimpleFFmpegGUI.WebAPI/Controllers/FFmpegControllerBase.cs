@@ -30,11 +30,19 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             return path;
         }
 
-        protected void CheckNull(string path)
+        protected void CheckFileNameNull(string path)
         {
             if (path == null || path is string s && s == "")
             {
                 throw Oops.Oh("文件名为空");
+            }
+        }
+
+        protected void CheckNull(object obj, string objName)
+        {
+            if (obj == null || obj is string s && s == "")
+            {
+                throw Oops.Oh(objName + "为空");
             }
         }
 

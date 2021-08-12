@@ -276,6 +276,11 @@ export default Vue.extend({
       this.addCode(true);
     },
     addCode(start: boolean) {
+      if(this.file=="")
+      {
+        showError("请选择输入文件");
+        return;
+      }
       const video = this.code.video;
       let videoArg = this.code.enableVideo
         ? {
@@ -310,6 +315,8 @@ export default Vue.extend({
           start: start,
         })
         .then((response) => {
+          (this.$refs.files as any).file="";
+          this.file="";
           showSuccess("已加入队列");
         })
         .catch(showError);

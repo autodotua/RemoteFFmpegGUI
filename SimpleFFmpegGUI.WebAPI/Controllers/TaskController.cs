@@ -43,7 +43,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 CheckFileExist(file);
             }
-            CheckNull(request.Output);
+            CheckFileNameNull(request.Output);
             CheckFileExist(request.Output);
             await FFmpegManager.Instance.InvokeAsync(p =>
              p.CreateCodeTask(request.Input.Select(p => Path.Combine(GetMediaFolder(), p)),
@@ -58,6 +58,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             await FFmpegManager.Instance.InvokeAsync(p => p.ResetTask(id));
         }
+
         [HttpPost]
         [Route("Reset/List")]
         public async Task ResetTasksAsync(IEnumerable<int> ids)
@@ -71,18 +72,21 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             await FFmpegManager.Instance.InvokeAsync(p => p.CancelTask(id));
         }
+
         [HttpPost]
         [Route("Cancel/List")]
         public async Task CancelTasksAsync(IEnumerable<int> ids)
         {
             await FFmpegManager.Instance.InvokeAsync(p => p.CancelTasks(ids));
         }
+
         [HttpPost]
         [Route("Delete")]
         public async Task DeleteTaskAsync(int id)
         {
             await FFmpegManager.Instance.InvokeAsync(p => p.DeleteTask(id));
         }
+
         [HttpPost]
         [Route("Delete/List")]
         public async Task DeleteTasksAsync(IEnumerable<int> ids)

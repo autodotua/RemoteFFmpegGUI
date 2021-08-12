@@ -7,7 +7,7 @@
         type="primary"
         v-on:click="query"
         :disabled="file == ''"
-        style=""
+        style="margin-left: 24px"
         >查询</el-button
       >
     </div>
@@ -106,7 +106,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Cookies from "js-cookie";
-import { withToken,  showError, jump, formatDateTime } from "../common";
+import { withToken, showError, jump, formatDateTime } from "../common";
 import * as net from "../net";
 import FileSelect from "@/components/FileSelect.vue";
 export default Vue.extend({
@@ -125,7 +125,8 @@ export default Vue.extend({
       console.log(item);
     },
     query() {
-    net.getMediaInfo(this.file)
+      net
+        .getMediaInfo(this.file)
         .then((response) => {
           this.info = response.data;
           console.log(response.data);

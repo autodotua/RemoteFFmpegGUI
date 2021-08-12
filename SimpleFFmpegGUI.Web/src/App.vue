@@ -5,10 +5,10 @@
         class="header one-line"
         :class="status != null && status.isProcessing ? 'header-tall' : ''"
       >
-        <h2>FFmpeg工具</h2>
+        <h2>远程FFmpeg工具箱</h2>
         <div class="status-bar" v-if="status != null && status.isProcessing">
           <el-row>
-            <el-col :span="5">
+            <el-col :span="7">
               <el-row><b>码率：</b>{{ status.bitrate }}</el-row>
               <el-row
                 >已用：{{
@@ -16,7 +16,7 @@
                 }}</el-row
               >
             </el-col>
-            <el-col :span="5">
+            <el-col :span="7">
               <el-row
                 >速度：{{ status.fps }}FPS{{ "   " }}
                 {{ status.speed }}X</el-row
@@ -27,32 +27,32 @@
                 }}</el-row
               >
             </el-col>
-            <el-col :span="5">
+            <el-col :span="7">
               <el-row
                 >进度：{{ status.f }}帧
                 {{ formatCSharpTimeSpan(status.time, true) }}
               </el-row>
               <el-row
-                >预计完成： {{ formatDateTime(finishTime, false) }}</el-row
+                >预计完成： {{ formatDateTime(finishTime(), false) }}</el-row
               >
             </el-col>
 
-            <el-col :span="6"
-              ><el-progress
-                style="width: 80%; margin-top: 4px"
-                :text-inside="true"
-                :stroke-width="30"
-                :percentage="Math.round(status.progress.percent * 10000) / 100"
-              ></el-progress
-            ></el-col>
             <el-col :span="3">
-              <el-button
-                type="danger"
-                icon="el-icon-close"
-                circle
-                @click="cancel"
-              ></el-button>
+              <el-popconfirm title="真的要取消任务吗？" @onConfirm="cancel">
+                <el-button
+                  type="danger"
+                  icon="el-icon-close"
+                  circle
+                  slot="reference"
+                ></el-button
+              ></el-popconfirm>
             </el-col>
+          </el-row>
+          <el-row style="padding-bottom: 4px">
+            <el-progress
+              style="margin-right: 24px"
+              :percentage="Math.round(status.progress.percent * 10000) / 100"
+            ></el-progress>
           </el-row></div
       ></el-header>
       <el-container class="center">
@@ -145,18 +145,12 @@ export default Vue.extend({
       return new Date((this.status as any).progress.finishTime);
     },
     cancel() {
-      this.$confirm("是否终止队列？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
-        net
-          .postCancelQueue()
-          .then((r) => {
-            return;
-          })
-          .catch(showError);
-      });
+      net
+        .postCancelQueue()
+        .then((r) => {
+          return;
+        })
+        .catch(showError);
     },
     getStatus() {
       net
@@ -213,7 +207,7 @@ header a {
   color: #606266;
 }
 .header-tall {
-  height: 126px !important;
+  height: 140px !important;
 }
 .status-bar {
   background-color: lightgreen;

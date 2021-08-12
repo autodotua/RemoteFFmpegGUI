@@ -15,6 +15,16 @@ export function postResetTasks(ids: number[]): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .post(getUrl("Task/Reset/List"), ids);
 }
+
+export function postCancelTasks(ids: number[]): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .post(getUrl("Task/Cancel/List"), ids);
+}
+
+export function postDeleteTasks(ids: number[]): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .post(getUrl("Task/Delete/List"), ids);
+}
 export function postCancelTask(id: number): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .post(getUrl("Task/Cancel?id=" + id));

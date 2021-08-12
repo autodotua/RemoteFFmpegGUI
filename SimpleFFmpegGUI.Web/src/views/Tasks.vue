@@ -4,14 +4,24 @@
       <el-button v-if="isProcessing == false" type="primary" @click="start"
         >开始队列</el-button
       >
-      <el-button v-if="isProcessing" @click="cancel" type="danger"
-        >停止队列</el-button
+      <el-popconfirm
+        v-if="isProcessing"
+        title="真的要取消任务吗？"
+        @onConfirm="cancel"
       >
-      <el-button v-if="selection.length > 0" type="warn">删除</el-button>
+        <el-button type="danger" slot="reference"
+          >停止队列</el-button
+        ></el-popconfirm
+      >
+      <el-button v-if="selection.length > 0" type="warn" @click="deleteTasks"
+        >删除</el-button
+      >
       <el-button v-if="selection.length > 0" @click="resetTasks" type="warn"
         >重置</el-button
       >
-      <el-button v-if="selection.length > 0" type="warn">取消</el-button>
+      <el-button v-if="selection.length > 0" type="warn" @click="cancelTasks"
+        >取消</el-button
+      >
     </div>
     <el-table
       ref="table"
@@ -80,6 +90,12 @@
           >
         </template>
       </el-table-column>
+
+      <el-table-column align="right">
+        <template slot="header">
+          <el-button type="text" @click="fillData()">刷新</el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -137,6 +153,22 @@ export default Vue.extend({
         })
         .catch(showError);
     },
+    deleteTasks() {
+      net
+        .postDeleteTasks(this.getSelectionIds())
+        .then((r) => {
+          this.fillData();
+        })
+        .catch(showError);
+    },
+    cancelTasks() {
+      net
+        .postCancelTasks(this.getSelectionIds())
+        .then((r) => {
+          this.fillData();
+        })
+        .catch(showError);
+    },
     cancelTask(item: any) {
       net
         .postCancelTask(item.id)
@@ -156,19 +188,13 @@ export default Vue.extend({
         .catch(showError);
     },
     cancel() {
-      this.$confirm("是否终止队列？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
-        net
-          .postCancelQueue()
-          .then((r) => {
-            this.isProcessing = false;
-            this.fillData();
-          })
-          .catch(showError);
-      });
+      net
+        .postCancelQueue()
+        .then((r) => {
+          this.isProcessing = false;
+          this.fillData();
+        })
+        .catch(showError);
     },
     fillData() {
       let selection = this.selection;
@@ -201,11 +227,11 @@ export default Vue.extend({
   mounted: function () {
     this.$nextTick(function () {
       this.fillData();
-      setInterval(() => {
-        if (this.selection.length == 0) {
-          this.fillData();
-        }
-      }, 5000);
+      // setInterval(() => {
+      //   if (this.selection.length == 0) {
+      //     this.fillData();
+      //   }
+      // }, 5000);
     });
   },
   components: {},

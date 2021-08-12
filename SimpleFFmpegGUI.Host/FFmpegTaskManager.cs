@@ -6,8 +6,25 @@ using System.Linq;
 
 namespace SimpleFFmpegGUI.Host
 {
-    public class FFmpegTaskManager
+    public static class FFmpegTaskManager
     {
+        public static void AddTask(TaskType type, IEnumerable<string> path, string outputPath, CodeArguments arg)
+        {
+            using (FFmpegDbContext db = new FFmpegDbContext())
+            {
+                var task = new TaskInfo()
+                {
+                    Type = type,
+                    Inputs = path.ToList(),
+                    Output = outputPath,
+                    Arguments = arg
+                };
+                Logger.Info(task, "新建任务");
+                db.Tasks.Add(task);
+                db.SaveChanges();
+            }
+        }
+
         public static PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)
         {
             using var db = new FFmpegDbContext();

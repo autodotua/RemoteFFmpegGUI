@@ -26,7 +26,6 @@ export function formatDateTime(time: Date | string, includeDate = true, includeT
     }
     time = time as Date;
 
-
     const strDate = time.getFullYear().toString().padStart(4, '0') + "-"
         + (time.getMonth() + 1).toString().padStart(2, '0') + "-"
         + time.getDate().toString().padStart(2, '0');
