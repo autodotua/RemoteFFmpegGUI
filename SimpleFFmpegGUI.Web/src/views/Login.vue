@@ -34,7 +34,7 @@
 import Vue from "vue";
 import Cookies from "js-cookie";
 import { Notification } from "element-ui";
-import { showError, getUrl, jump ,showSuccess} from "../common";
+import { showError,  jump ,showSuccess} from "../common";
 import { AxiosResponse } from "axios";
 export default Vue.extend({
   data: function() {
@@ -55,15 +55,15 @@ export default Vue.extend({
       }
     },
     login() {
-      Vue.axios
-        .post(getUrl("User/Login"), {
-          UserName: this.username,
-          Password: this.password
-        })
-        .then(response => {
-          this.afterLogin(response, false);
-        })
-        .catch(showError);
+      // Vue.axios
+      //   .post(getUrl("User/Login"), {
+      //     UserName: this.username,
+      //     Password: this.password
+      //   })
+      //   .then(response => {
+      //     this.afterLogin(response, false);
+      //   })
+      //   .catch(showError);
     },
   },
   mounted: function() {

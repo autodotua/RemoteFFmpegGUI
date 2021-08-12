@@ -28,7 +28,7 @@ namespace SimpleFFmpegGUI.Host
             return Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
                     .ConfigureServices(services =>
                     {
-                        services.AddScoped<IPipeService, PipeService>();
+                        services.AddSingleton<IPipeService, PipeService>();
                     })
                     .ConfigureIpcHost(builder =>
                     {

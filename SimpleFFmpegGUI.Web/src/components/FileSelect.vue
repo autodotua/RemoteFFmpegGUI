@@ -8,7 +8,8 @@
 <script >
 import Vue from "vue";
 import Cookies from "js-cookie";
-import { withToken, getUrl, showError, jump, formatDateTime } from "../common";
+import * as net from "../net";
+import { withToken, showError, jump, formatDateTime } from "../common";
 export default Vue.component("file-select", {
   data() {
     return {
@@ -28,13 +29,8 @@ export default Vue.component("file-select", {
   components: {},
   mounted: function () {
     this.$nextTick(function () {
-      // if (Cookies.get("userID") == undefined) {
-      //   return;
-      // }
-      Vue.axios
-        .get(getUrl("MediaDir", ""))
+    net.getMediaNames()
         .then((response) => {
-          console.log(response.data);
           this.files = response.data;
         })
         .catch(showError);

@@ -28,10 +28,17 @@ namespace SimpleFFmpegGUI
 
         void StartQueue();
 
-        List<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0);
+        PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0);
 
         public StatusDto GetStatus();
 
         void ResetTask(int id);
+        void ResetTasks(IEnumerable<int> ids);
+
+        void CancelTask(int id);
+        void CancelTasks(IEnumerable<int> ids);
+
+        void DeleteTask(int id);
+        void DeleteTasks(IEnumerable<int> ids);
     }
 }

@@ -106,7 +106,8 @@
 <script lang="ts">
 import Vue from "vue";
 import Cookies from "js-cookie";
-import { withToken, getUrl, showError, jump, formatDateTime } from "../common";
+import { withToken,  showError, jump, formatDateTime } from "../common";
+import * as net from "../net";
 import FileSelect from "@/components/FileSelect.vue";
 export default Vue.extend({
   name: "Home",
@@ -124,8 +125,7 @@ export default Vue.extend({
       console.log(item);
     },
     query() {
-      Vue.axios
-        .get(getUrl("MediaInfo") + "?name=" + this.file)
+    net.getMediaInfo(this.file)
         .then((response) => {
           this.info = response.data;
           console.log(response.data);

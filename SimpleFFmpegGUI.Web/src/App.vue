@@ -106,11 +106,11 @@ import Vue from "vue";
 import Cookies from "js-cookie";
 import {
   jump,
-  getUrl,
   showError,
   formatDateTime,
   formatCSharpTimeSpan,
 } from "./common";
+import * as net from "./net";
 export default Vue.extend({
   name: "App",
   data: function () {
@@ -122,9 +122,6 @@ export default Vue.extend({
   computed: {
     username() {
       return Cookies.get("username");
-    },
-    finishTime() {
-      return new Date((this.status as any).progress.finishTime);
     },
   },
   mounted: function () {
@@ -144,14 +141,17 @@ export default Vue.extend({
     jump: jump,
     formatCSharpTimeSpan: formatCSharpTimeSpan,
     formatDateTime: formatDateTime,
+    finishTime() {
+      return new Date((this.status as any).progress.finishTime);
+    },
     cancel() {
       this.$confirm("是否终止队列？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        Vue.axios
-          .post(getUrl("Task/Cancel"))
+        net
+          .postCancelQueue()
           .then((r) => {
             return;
           })
@@ -159,8 +159,8 @@ export default Vue.extend({
       });
     },
     getStatus() {
-      Vue.axios
-        .get(getUrl("Task/Status"))
+      net
+        .getQueueStatus()
         .then((response) => {
           this.status = response.data;
         })

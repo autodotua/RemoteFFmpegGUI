@@ -43,9 +43,6 @@ export function formatDateTime(time: Date | string, includeDate = true, includeT
     return strTime;
 }
 
-export function getUrl(controller: string) {
-    return `https://localhost:44305/${controller}`;
-}
 
 export function showError(r: any) {
     console.log(r);

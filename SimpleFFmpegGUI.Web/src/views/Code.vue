@@ -10,7 +10,7 @@
         <el-switch v-model="code.enableAudio"> </el-switch>
       </el-form-item>
       <el-form-item label="视频参数" v-show="code.enableVideo">
-        <el-form-item label="编码">
+        <el-form-item label="编码" size="small">
           <el-select v-model="code.video.code">
             <el-option
               v-for="c in videoCodes"
@@ -19,7 +19,7 @@
               :value="c"
             ></el-option> </el-select
         ></el-form-item>
-        <el-form-item label="预设">
+        <el-form-item label="预设" class="with-slider">
           <el-slider
             style="width: 90%"
             :max="9"
@@ -29,10 +29,10 @@
           >
           </el-slider
         ></el-form-item>
-        <el-form-item label="CRF" style="margin-top: 24px">
-          <el-switch v-model="code.enableCrf"> </el-switch>
+        <el-form-item label="CRF" class="with-slider">
+          <el-switch v-model="code.video.enableCrf"> </el-switch>
           <el-slider
-            v-show="code.enableCrf"
+            v-show="code.video.enableCrf"
             style="width: 90%"
             :max="40"
             :min="10"
@@ -43,38 +43,109 @@
           >
           </el-slider
         ></el-form-item>
-        <el-form-item label="分辨率" style="margin-top: 24px">
-          <el-switch v-model="code.enableScale"> </el-switch>
+        <el-form-item label="平均码率" class="with-slider">
+          <el-switch v-model="code.video.enableBitrate"> </el-switch>
+          <el-slider
+            v-show="code.video.enableBitrate"
+            style="width: 90%"
+            :max="500"
+            :min="0.1"
+            show-input
+            :step="0.1"
+            v-model="code.video.bitrate"
+          >
+          </el-slider
+        ></el-form-item>
+        <el-form-item label="最大码率" class="with-slider">
+          <el-switch v-model="code.video.enableMaxBitrate"> </el-switch>
+          <el-slider
+            v-show="code.video.enableMaxBitrate"
+            style="width: 90%"
+            :max="500"
+            :min="0.1"
+            show-input
+            :step="0.1"
+            v-model="code.video.maxBitrate"
+          >
+          </el-slider
+        ></el-form-item>
+        <el-form-item
+          label="缓冲倍率"
+          class="with-slider"
+          v-show="code.video.enableMaxBitrate"
+        >
+          <el-slider
+            style="width: 90%"
+            :max="10"
+            :min="1"
+            show-input
+            show-stops
+            :step="0.5"
+            v-model="code.video.maxBitrateBuffer"
+          >
+          </el-slider
+        ></el-form-item>
+        <el-form-item label="帧率"
+          ><el-switch v-model="code.video.enableFps"> </el-switch>
+          <div v-show="code.video.enableFps" style="display: inline">
+            <el-input-number
+              size="small"
+              class="left24"
+              v-model="code.video.fps"
+              :precision="3"
+              :min="1"
+              :max="120"
+            >
+            </el-input-number>
+            <el-button type="text" class="left24" @click="code.video.fps = 10"
+              >10帧</el-button
+            >
+            <el-button type="text" class="left24" @click="code.video.fps = 24"
+              >24帧</el-button
+            >
+            <el-button type="text" class="left24" @click="code.video.fps = 25"
+              >25帧</el-button
+            >
+            <el-button type="text" class="left24" @click="code.video.fps = 30"
+              >30帧</el-button
+            >
+            <el-button type="text" class="left24" @click="code.video.fps = 60"
+              >60帧</el-button
+            >
+          </div>
+        </el-form-item>
+        <el-form-item label="分辨率">
+          <el-switch v-model="code.video.enableScale"> </el-switch>
           <el-input-number
             size="small"
-            style="margin-left: 24px"
+            class="left24"
             :min="1"
             :max="20000"
             placeholder="宽度"
-            v-model="width"
+            v-model="code.video.width"
             :controls="false"
-            v-show="code.enableScale"
+            v-show="code.video.enableScale"
           ></el-input-number>
           <a
-            v-show="code.enableScale"
+            v-show="code.video.enableScale"
             style="margin-left: 24px; margin-right: 0px"
             >×</a
           >
           <el-input-number
             size="small"
-            style="margin-left: 24px"
+            class="left24"
             :min="1"
             :max="20000"
             placeholder="高度"
-            v-model="width"
+            v-model="code.video.height"
             :controls="false"
-            v-show="code.enableScale"
+            v-show="code.video.enableScale"
           ></el-input-number>
         </el-form-item>
       </el-form-item>
-          <el-form-item label="音频参数" v-show="code.enableAudio">
+      <el-form-item label="音频参数" v-show="code.enableAudio">
         <el-form-item label="编码">
-          <el-select v-model="code.audio.code">
+          <el-select v-model="code.audio.code" size="small">
             <el-option
               v-for="c in audioCodes"
               :key="c"
@@ -82,16 +153,36 @@
               :value="c"
             ></el-option> </el-select
         ></el-form-item>
-        <el-form-item label="码率">
+        <el-form-item label="码率" class="with-slider">
+          <el-switch v-model="code.audio.enableBitrate"> </el-switch>
           <el-slider
+            v-show="code.audio.enableBitrate"
             style="width: 90%"
-            :max="320" :min="32"
-            :show-tooltip="false" :step="32"
+            :max="320"
+            :min="32"
+            :show-tooltip="false"
+            :step="32"
             v-model="code.audio.bitrate"
             :marks="audioBitrates"
           >
           </el-slider
-        ></el-form-item></el-form-item>
+        ></el-form-item>
+        <el-form-item label="采样率" style="margin-top: 24px">
+          <el-switch v-model="code.audio.enableSample"> </el-switch>
+          <el-select
+            class="left24"
+            v-model="code.audio.sample"
+            v-show="code.audio.enableSample"
+          >
+            <el-option
+              v-for="c in audioSamples"
+              :key="c"
+              :label="c"
+              :value="c"
+            ></el-option
+          ></el-select>
+        </el-form-item>
+      </el-form-item>
       <el-form-item style="margin-top: 36px">
         <el-button type="primary" @click="add">加入队列</el-button>
         <el-button @click="addAndStart">加入队列并立即开始</el-button>
@@ -102,7 +193,14 @@
 <script lang="ts">
 import Vue from "vue";
 import Cookies from "js-cookie";
-import { withToken, getUrl, showError, jump, formatDateTime, showSuccess } from "../common";
+import {
+  withToken,
+  showError,
+  jump,
+  formatDateTime,
+  showSuccess,
+} from "../common";
+import * as net from "../net";
 export default Vue.extend({
   name: "Home",
   data() {
@@ -123,10 +221,19 @@ export default Vue.extend({
         7: "超快",
         8: "",
       },
-      audioBitrates:{32:"32",64:"64",96:"96",128:"128",192:"192",256:"256",320:"320"},
+      audioBitrates: {
+        32: "32",
+        64: "64",
+        96: "96",
+        128: "128",
+        192: "192",
+        256: "256",
+        320: "320",
+      },
       file: "",
       videoCodes: ["H264", "H265"],
       audioCodes: ["AAC"],
+      audioSamples: [8000, 16000, 32000, 44100, 48000, 96000],
       code: {
         enableVideo: true,
         enableAudio: true,
@@ -135,52 +242,75 @@ export default Vue.extend({
           preset: 3,
           crf: 23,
           enableCrf: true,
-          width: null,
-          height: null,
+          width: 1920,
+          height: 1080,
           enableScale: false,
+          bitrate: 6,
+          enableBitrate: false,
+          maxBitrate: 24,
+          maxBitrateBuffer: 2,
+          enableMaxBitrate: false,
+          fps: 30,
+          enableFps: false,
         },
-        audio:{
-          code:"AAC",
-          bitrate:128
-        }
+        audio: {
+          code: "AAC",
+          enableBitrate: true,
+          bitrate: 128,
+          enableSample: false,
+          sample: 48000,
+        },
       },
     };
   },
   computed: {},
   methods: {
     jump: jump,
-    selectFile(file:string){
-      this.file=file
+    selectFile(file: string) {
+      this.file = file;
     },
-    add(){
-      this.addCode(false)
+    add() {
+      this.addCode(false);
     },
-    addAndStart(){
-      this.addCode(true)
+    addAndStart() {
+      this.addCode(true);
     },
-    addCode(start:boolean) {
-      let videoArg=this.code.enableVideo?{
-        code:this.code.video.code,
-        preset:this.code.video.preset,
-        crf: this.code.video.enableCrf?this.code.video.crf:null,
-        width: this.code.video.enableScale?this.code.video.width:null,
-        height: this.code.video.enableScale?this.code.video.height:null,
-      }:null
-      let audioArg=this.code.enableAudio?{
-code:this.code.audio.code,
-bitrate:this.code.audio.bitrate
-      }:null
-      let arg={video:videoArg,audio:audioArg,input:null}
-   
-      Vue.axios
-        .post(getUrl("Task/Add/Code"), {
+    addCode(start: boolean) {
+      const video = this.code.video;
+      let videoArg = this.code.enableVideo
+        ? {
+            code: video.code,
+            preset: video.preset,
+            crf: video.enableCrf ? video.crf : null,
+            width: video.enableScale ? video.width : null,
+            height: video.enableScale ? video.height : null,
+            fps: video.enableFps ? video.fps : null,
+            averageBitrate: video.enableBitrate ? video.bitrate : null,
+            maxBitrate: video.enableMaxBitrate ? video.maxBitrate : null,
+            maxBitrateBuffer: video.enableMaxBitrate
+              ? video.maxBitrateBuffer
+              : null,
+          }
+        : null;
+      const audio = this.code.audio;
+      let audioArg = this.code.enableAudio
+        ? {
+            code: audio.code,
+            bitrate: audio.enableBitrate ? audio.bitrate : null,
+            samplingRate: audio.enableSample ? audio.sample : null,
+          }
+        : null;
+      let arg = { video: videoArg, audio: audioArg, input: null };
+
+      net
+        .postAddCodeTask({
           input: [this.file],
           output: this.file,
           argument: arg,
-          start:start
+          start: start,
         })
         .then((response) => {
-          showSuccess("已加入队列")
+          showSuccess("已加入队列");
         })
         .catch(showError);
     },
@@ -193,3 +323,12 @@ bitrate:this.code.audio.bitrate
   },
 });
 </script>
+<style scoped>
+.with-slider {
+  margin-bottom: 24px;
+}
+
+.left24 {
+  margin-left: 24px;
+}
+</style>

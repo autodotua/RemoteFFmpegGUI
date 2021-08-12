@@ -21,7 +21,7 @@ namespace SimpleFFmpegGUI.Host
             };
         }
 
-        private static FFmpegTaskManager manager = new FFmpegTaskManager();
+        private static FFmpegQueueManager manager = new FFmpegQueueManager();
 
         public PipeService()
         {
@@ -87,25 +87,9 @@ namespace SimpleFFmpegGUI.Host
             manager.Cancel();
         }
 
-        public List<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)
+        public PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)
         {
-            using (var db = new FFmpegDbContext())
-            {
-                IQueryable<TaskInfo> tasks = db.Tasks;
-                if (status.HasValue)
-                {
-                    tasks = tasks.Where(p => p.Status == status);
-                }
-                if (skip > 0)
-                {
-                    tasks = tasks.Skip(skip);
-                }
-                if (take > 0)
-                {
-                    tasks = tasks.Take(take);
-                }
-                return tasks.ToList();
-            }
+            return FFmpegTaskManager.GetTasks(status, skip, take);
         }
 
         public StatusDto GetStatus()
@@ -118,21 +102,32 @@ namespace SimpleFFmpegGUI.Host
 
         public void ResetTask(int id)
         {
-            using (var db = new FFmpegDbContext())
-            {
-                TaskInfo task = db.Tasks.Find(id);
-                if (task == null)
-                {
-                    throw new ArgumentException($"找不到ID为{id}的任务");
-                }
-                if (manager.ProcessingTask?.ID == id)
-                {
-                    throw new Exception("ID为{id}的任务正在进行中");
-                }
-                task.Status = TaskStatus.Queue;
-                db.Update(task);
-                db.SaveChanges();
-            }
+            FFmpegTaskManager.ResetTask(id, manager);
+        }
+
+        public void CancelTask(int id)
+        {
+            FFmpegTaskManager.CancelTask(id, manager);
+        }
+
+        public void ResetTasks(IEnumerable<int> ids)
+        {
+            FFmpegTaskManager.TryResetTasks(ids, manager);
+        }
+
+        public void CancelTasks(IEnumerable<int> ids)
+        {
+            FFmpegTaskManager.TryCancelTasks(ids, manager);
+        }
+
+        public void DeleteTask(int id)
+        {
+            FFmpegTaskManager.DeleteTask(id, manager);
+        }
+
+        public void DeleteTasks(IEnumerable<int> ids)
+        {
+            FFmpegTaskManager.TryDeleteTasks(ids, manager);
         }
     }
 }

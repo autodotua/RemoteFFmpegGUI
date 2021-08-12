@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <Reference Include="FzStandardLib">
-      <HintPath>..\..\模块\Release\AnyCPU\netcoreapp3.1\FzStandardLib.dll</HintPath>
+      <HintPath>..\libs\FzStandardLib.dll</HintPath>
     </Reference>
   </ItemGroup>
 

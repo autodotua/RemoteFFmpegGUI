@@ -7,8 +7,17 @@
       <el-button v-if="isProcessing" @click="cancel" type="danger"
         >停止队列</el-button
       >
+      <el-button v-if="selection.length > 0" type="warn">删除</el-button>
+      <el-button v-if="selection.length > 0" @click="resetTasks" type="warn"
+        >重置</el-button
+      >
+      <el-button v-if="selection.length > 0" type="warn">取消</el-button>
     </div>
-    <el-table :data="list">
+    <el-table
+      ref="table"
+      :data="list"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-form label-position="left" class="demo-table-expand">
@@ -58,7 +67,17 @@
             :disabled="scope.row.status == 1 || scope.row.status == 2"
             >重置</el-button
           >
-          <el-button type="text" size="small">编辑</el-button>
+          <el-button
+            type="text"
+            size="small"
+            @click="cancelTask(scope.row)"
+            :disabled="
+              scope.row.status == 3 ||
+              scope.row.status == 4 ||
+              scope.row.status == 5
+            "
+            >取消</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -67,35 +86,60 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  withToken,
-  getUrl,
-  showError,
-  showSuccess,
-  formatDateTime,
-} from "../common";
-import { Notification } from "element-ui";
+import { withToken, showError, showSuccess, formatDateTime } from "../common";
+
+import * as net from "../net";
+import { Notification, Table } from "element-ui";
+import { ElTable } from "element-ui/types/table";
 export default Vue.extend({
   name: "Home",
   data() {
     return {
       list: [],
       isProcessing: false,
+      totalCount: 0,
+      selection: [],
     };
   },
   props: ["status"],
   watch: {
     status(value) {
-      console.log(value);
       this.isProcessing = value.isProcessing;
     },
   },
   methods: {
+    getSelectionIds(): number[] {
+      return this.toIdList(this.selection as []);
+    },
+    toIdList(items: []): number[] {
+      let list: number[] = [];
+      items.forEach((item: any) => {
+        list.push(item.id);
+      });
+      return list;
+    },
+    handleSelectionChange(val: any) {
+      this.selection = val;
+    },
     resetTask(item: any) {
-      console.log(item);
-
-      Vue.axios
-        .post(getUrl("Task/Reset?id=" + item.id))
+      net
+        .postResetTask(item.id)
+        .then((r) => {
+          this.fillData();
+        })
+        .catch(showError);
+    },
+    resetTasks() {
+      net
+        .postResetTasks(this.getSelectionIds())
+        .then((r) => {
+          this.fillData();
+        })
+        .catch(showError);
+    },
+    cancelTask(item: any) {
+      net
+        .postCancelTask(item.id)
         .then((r) => {
           this.fillData();
           console.log(r);
@@ -103,8 +147,8 @@ export default Vue.extend({
         .catch(showError);
     },
     start() {
-      Vue.axios
-        .post(getUrl("Task/Start"))
+      net
+        .postStartQueue()
         .then((r) => {
           this.isProcessing = true;
           this.fillData();
@@ -117,8 +161,8 @@ export default Vue.extend({
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        Vue.axios
-          .post(getUrl("Task/Cancel"))
+        net
+          .postCancelQueue()
           .then((r) => {
             this.isProcessing = false;
             this.fillData();
@@ -127,9 +171,12 @@ export default Vue.extend({
       });
     },
     fillData() {
-      Vue.axios
-        .get(getUrl("Task"))
+      let selection = this.selection;
+
+      net
+        .getTaskList()
         .then((response) => {
+          this.totalCount = response.data.totalCount;
           response.data.forEach((element: any) => {
             switch (element.type) {
               case 0:
@@ -138,7 +185,14 @@ export default Vue.extend({
             }
             element.input = element.inputs.join("、");
           });
+          let ids = this.getSelectionIds();
           this.list = response.data;
+          let table: any = this.$refs.table;
+          // this.list.forEach((element: any) => {
+          //   if (ids.indexOf((element as any).id) >= 0) {
+          //     table.toggleRowSelection(element);
+          //   }
+          // });
         })
         .catch(showError);
     },
@@ -147,7 +201,11 @@ export default Vue.extend({
   mounted: function () {
     this.$nextTick(function () {
       this.fillData();
-      setInterval(this.fillData, 5000);
+      setInterval(() => {
+        if (this.selection.length == 0) {
+          this.fillData();
+        }
+      }, 5000);
     });
   },
   components: {},
