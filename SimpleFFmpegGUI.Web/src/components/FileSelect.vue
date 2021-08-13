@@ -1,6 +1,6 @@
 
 <template>
-  <el-select style="width:300px" filterable v-model="file" @change="selectChanged" :placeholder="'请选择文件（共'+files.length+'个）'">
+  <el-select style="width:300px" filterable v-model="file" @change="selectChanged" :placeholder="files==null?'请选择文件':'请选择文件（共'+files.length+'个）'">
     <el-option v-for="item in files" :key="item" :label="item" :value="item">
     </el-option>
   </el-select>

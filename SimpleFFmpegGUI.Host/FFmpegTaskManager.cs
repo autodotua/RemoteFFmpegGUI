@@ -8,21 +8,20 @@ namespace SimpleFFmpegGUI
 {
     public static class FFmpegTaskManager
     {
-        public static void AddTask(TaskType type, IEnumerable<string> path, string outputPath, CodeArguments arg)
+        public static int AddTask(TaskType type, IEnumerable<string> path, string outputPath, CodeArguments arg)
         {
-            using (FFmpegDbContext db = new FFmpegDbContext())
+            using FFmpegDbContext db = new FFmpegDbContext();
+            var task = new TaskInfo()
             {
-                var task = new TaskInfo()
-                {
-                    Type = type,
-                    Inputs = path.ToList(),
-                    Output = outputPath,
-                    Arguments = arg
-                };
-                Logger.Info(task, "新建任务");
-                db.Tasks.Add(task);
-                db.SaveChanges();
-            }
+                Type = type,
+                Inputs = path.ToList(),
+                Output = outputPath,
+                Arguments = arg
+            };
+            Logger.Info(task, "新建任务");
+            db.Tasks.Add(task);
+            db.SaveChanges();
+            return task.ID;
         }
 
         public static PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)

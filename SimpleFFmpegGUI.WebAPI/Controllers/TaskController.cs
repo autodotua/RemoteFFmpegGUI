@@ -36,7 +36,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 
         [HttpPost]
         [Route("Add/Code")]
-        public async Task CreateCodeTaskAsync([FromBody] CodeTaskDto request)
+        public async Task<int> AddCodeTaskAsync([FromBody] CodeTaskDto request)
         {
             if (request.Input == null || request.Input.Count() == 0 || request.Input.Any(p => p == null))
             {
@@ -48,11 +48,11 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             CheckFileNameNull(request.Output);
             CheckFileExist(request.Output);
-            await FFmpegManager.Instance.InvokeAsync(p =>
-             p.CreateCodeTask(request.Input.Select(p => Path.Combine(GetMediaFolder(), p)),
-             Path.Combine(GetMediaFolder(), request.Output),
-             request.Argument,
-             request.Start));
+            return await FFmpegManager.Instance.InvokeAsync(p =>
+              p.AddCodeTask(request.Input.Select(p => Path.Combine(GetMediaFolder(), p)),
+              Path.Combine(GetMediaFolder(), request.Output),
+              request.Argument,
+              request.Start));
         }
 
         [HttpPost]

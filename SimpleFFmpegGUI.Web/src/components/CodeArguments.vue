@@ -181,9 +181,13 @@
         ></el-select>
       </el-form-item>
     </el-form-item>
+
+    <el-form-item label="额外参数">
+      <el-input v-model="code.extra"  placeholder="请输入ffmpeg的运行参数"></el-input>
+    </el-form-item>
   </el-form>
 </template>
-<script >
+<script lang="ts">
 import Vue from "vue";
 import Cookies from "js-cookie";
 import * as net from "../net";
@@ -245,6 +249,7 @@ export default Vue.component("code-arguments", {
           enableSample: false,
           sample: 48000,
         },
+        extra:""
       },
     };
   },
@@ -276,8 +281,80 @@ export default Vue.component("code-arguments", {
             samplingRate: audio.enableSample ? audio.sample : null,
           }
         : null;
-      let arg = { video: videoArg, audio: audioArg, input: null };
+      let arg = { video: videoArg, audio: audioArg, input: null,extra:this.code.extra };
       return arg;
+    },
+    updateFromArgs(args: any) {
+      console.log(args);
+
+      const video = args.video;
+      const audio = args.audio;
+      const extra = args.extra;
+
+      if (video != null) {
+        this.code.enableVideo = true;
+        const uiV = this.code.video;
+        uiV.code = video.code;
+        uiV.preset = video.preset;
+
+        if (video.crf != null) {
+          uiV.enableCrf = true;
+          uiV.crf = video.crf;
+        } else {
+          uiV.enableCrf = false;
+        }
+
+        if (video.width != null && video.height != null) {
+          uiV.enableScale = true;
+          uiV.width = video.width;
+          uiV.height = video.height;
+        } else {
+          uiV.enableScale = false;
+        }
+
+        if (video.fps != null) {
+          uiV.enableFps = true;
+          uiV.fps = video.fps;
+        } else {
+          uiV.enableFps = false;
+        }
+
+        if (video.averageBitrate != null) {
+          uiV.enableBitrate = true;
+          uiV.bitrate = video.averageBitrate;
+        } else {
+          uiV.enableBitrate = false;
+        }
+
+        if (video.maxBitrate != null) {
+          uiV.enableMaxBitrate = true;
+          uiV.maxBitrate = video.maxBitrate;
+          uiV.maxBitrateBuffer = video.maxBitrateBuffer;
+        } else {
+          uiV.enableMaxBitrate = false;
+        }
+      } else {
+        this.code.enableVideo = false;
+      }
+
+      if (audio != null) {
+        const uiA = this.code.audio;
+        uiA.code = audio.code;
+        if (audio.bitrate != null) {
+          uiA.enableBitrate = true;
+          uiA.bitrate = audio.bitrate;
+        } else {
+          uiA.enableBitrate = false;
+        }
+        if (audio.samplingRate != null) {
+          uiA.enableSample = true;
+          uiA.sample = audio.samplingRate;
+        } else {
+          uiA.enableSample = false;
+        }
+      }
+
+      this.code.extra=extra;
     },
   },
   components: {},

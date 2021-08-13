@@ -59,3 +59,12 @@ export function getMediaNames(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("MediaDir"))
 }
+
+export function getPresets(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .get(getUrl("Preset/List"))
+}
+export function postAddOrUpdatePreset(item: any): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .post(getUrl("Preset/Add"), item);
+}

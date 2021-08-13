@@ -26,7 +26,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 
         [HttpPost]
         [Route("Add")]
-        public Task AddAsync([FromBody] CodePresetDto request)
+        public Task<int> AddAsync([FromBody] CodePresetDto request)
         {
             CheckNull(request, "请求");
             return FFmpegManager.Instance.InvokeAsync(p => p.AddOrUpdatePreset(request.Name, TaskType.Code, request.Arguments));

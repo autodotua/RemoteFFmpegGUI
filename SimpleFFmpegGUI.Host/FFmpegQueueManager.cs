@@ -356,6 +356,11 @@ namespace SimpleFFmpegGUI
                     fa.WithAudioSamplingRate(a.Audio.SamplingRate.Value);
                 }
             }
+
+            if(!string.IsNullOrEmpty(a.Extra))
+            {
+                fa.WithArguments(a.Extra);
+            }
         }
     }
 }

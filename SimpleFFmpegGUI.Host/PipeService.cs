@@ -50,14 +50,15 @@ namespace SimpleFFmpegGUI
             manager.Resume();
         }
 
-        public void CreateCodeTask(IEnumerable<string> path, string outputPath, CodeArguments arg, bool start)
+        public int AddCodeTask(IEnumerable<string> path, string outputPath, CodeArguments arg, bool start)
         {
-            FFmpegTaskManager.AddTask(TaskType.Code, path, outputPath, arg);
+            int id = FFmpegTaskManager.AddTask(TaskType.Code, path, outputPath, arg);
 
             if (start)
             {
                 manager.StartQueue();
             }
+            return id;
         }
 
         public MediaInfoDto GetInfo(string path)
@@ -119,9 +120,9 @@ namespace SimpleFFmpegGUI
             FFmpegTaskManager.TryDeleteTasks(ids, manager);
         }
 
-        public void AddOrUpdatePreset(string name, TaskType type, CodeArguments arguments)
+        public int AddOrUpdatePreset(string name, TaskType type, CodeArguments arguments)
         {
-            FFmpegPresetManager.AddOrUpdatePreset(name, type, arguments);
+            return FFmpegPresetManager.AddOrUpdatePreset(name, type, arguments);
         }
 
         public void DeletePreset(int id)

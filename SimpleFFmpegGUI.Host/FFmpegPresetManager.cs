@@ -7,7 +7,7 @@ namespace SimpleFFmpegGUI
 {
     public static class FFmpegPresetManager
     {
-        public static void AddOrUpdatePreset(string name, TaskType type, CodeArguments arguments)
+        public static int AddOrUpdatePreset(string name, TaskType type, CodeArguments arguments)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -20,12 +20,13 @@ namespace SimpleFFmpegGUI
                 Arguments = arguments
             };
             using var db = new FFmpegDbContext();
-            if (db.Presets.Any(p => p.Name == name))
+            if (db.Presets.Any(p => p.Name == name && p.Type == type))
             {
-                db.Presets.RemoveRange(db.Presets.Where(p => p.Name == name).ToArray());
+                db.Presets.RemoveRange(db.Presets.Where(p => p.Name == name && p.Type == type).ToArray());
             }
             db.Presets.Add(preset);
             db.SaveChanges();
+            return preset.ID;
         }
 
         public static void DeletePreset(int id)

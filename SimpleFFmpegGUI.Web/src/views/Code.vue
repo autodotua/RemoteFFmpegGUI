@@ -64,7 +64,7 @@
               v-model="inputArgs.timeFromS"
               controls-position="right"
               :min="0"
-              precision="3"
+              :precision="3"
               :max="59.999"
               size="small"
               class="time"
@@ -94,7 +94,7 @@
               v-model="inputArgs.timeToS"
               controls-position="right"
               :min="0"
-              precision="3"
+              :precision="3"
               :max="59.999"
               size="small"
               class="time"
@@ -102,12 +102,47 @@
           </div>
         </el-form-item>
       </el-form-item>
+      <el-form-item label="预设">
+        <div>
+          <el-select
+            @change="selectPreset"
+            placeholder="加载预设"
+            v-model="preset"
+          >
+            <el-option
+              v-for="p in presets"
+              :key="p.id"
+              :label="p.name"
+              :value="p.id"
+            ></el-option
+          ></el-select>
+          <el-button
+            class="left24"
+            :disabled="preset == null"
+            @click="updatePreset"
+            >更新</el-button
+          >
+        </div>
+        <div style="margin-top: 12px">
+          <el-input v-model="newPresetName" style="width: 128px"></el-input>
+          <el-button
+            class="left24"
+            style="display: inline"
+            :disabled="newPresetName == null || newPresetName.trim() == ''"
+            @click="savePreset"
+            >保存或更新“{{ newPresetName }}”</el-button
+          >
+        </div>
+      </el-form-item>
     </el-form>
+
     <code-arguments ref="args" />
     <el-form label-width="120px">
-      <el-form-item style="margin-top: 36px">
-        <el-button type="primary" @click="add">加入队列</el-button>
-        <el-button @click="addAndStart">加入队列并立即开始</el-button>
+      <el-form-item>
+        <div class="bottom-div">
+          <el-button type="primary" @click="add">加入队列</el-button>
+          <el-button @click="addAndStart">加入队列并立即开始</el-button>
+        </div>
       </el-form-item>
     </el-form>
   </div>
@@ -115,13 +150,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Cookies from "js-cookie";
-import {
-  withToken,
-  showError,
-  jump,
-  formatDateTime,
-  showSuccess,
-} from "../common";
+import { showError, jump, showSuccess } from "../common";
 import * as net from "../net";
 import CodeArguments from "@/components/CodeArguments.vue";
 export default Vue.extend({
@@ -144,6 +173,9 @@ export default Vue.extend({
         timeToM: 0,
         timeToS: 0,
       },
+      presets: [],
+      preset: null,
+      newPresetName: "新预设",
     };
   },
   computed: {},
@@ -163,6 +195,55 @@ export default Vue.extend({
     },
     addAndStart() {
       this.addCode(true);
+    },
+    updatePreset() {
+      let args = (this.$refs.args as any).getArgs();
+      const name = (
+        this.presets.filter((p) => (p as any).id == this.preset)[0] as any
+      ).name;
+      net
+        .postAddOrUpdatePreset({ name: name, arguments: args })
+        .then((r) => {
+          showSuccess("更新预设成功");
+          this.fillPresetsAnd((p) => {
+            this.preset = r.data as any;
+          });
+        })
+        .catch(showError);
+    },
+    selectPreset(preset: number) {
+      (this.$refs.args as any).updateFromArgs(
+        (this.presets.filter((p) => (p as any).id == preset)[0] as any)
+          .arguments
+      );
+    },
+    fillPresets() {
+      this.fillPresetsAnd((id) => {
+        return;
+      });
+    },
+    fillPresetsAnd(action: (id: number) => void) {
+      net
+        .getPresets()
+        .then((r) => {
+          this.presets = r.data;
+          console.log(r.data);
+
+          action(r.data);
+        })
+        .catch(showError);
+    },
+    savePreset() {
+      let args = (this.$refs.args as any).getArgs();
+      net
+        .postAddOrUpdatePreset({ name: this.newPresetName, arguments: args })
+        .then((r) => {
+          showSuccess("新建或更新预设成功");
+          this.fillPresetsAnd((p) => {
+            this.preset = r.data as any;
+          });
+        })
+        .catch(showError);
     },
     addCode(start: boolean) {
       if (this.files.filter((p) => p.path != "").length == 0) {
@@ -193,9 +274,10 @@ export default Vue.extend({
           start: start,
         })
         .then((response) => {
-          (this.$refs.files as any).file = "";
-          this.files.length = 1;
-          this.files[0].path = "";
+          this.files=[];
+          this.files.push({ index: 0, path: "" });
+          (this.$refs.files as any)[0].file = "";
+          this.output="";
           showSuccess("已加入队列");
         })
         .catch(showError);
@@ -204,7 +286,7 @@ export default Vue.extend({
   components: { CodeArguments },
   mounted: function () {
     this.$nextTick(function () {
-      return;
+      this.fillPresets();
     });
   },
 });
@@ -222,5 +304,10 @@ export default Vue.extend({
   width: 108px;
   margin-left: 12px;
   margin-right: 12px;
+}
+.bottom-div {
+  display: inline-block;
+  margin-top: 36px;
+  margin-right: 24px;
 }
 </style>
