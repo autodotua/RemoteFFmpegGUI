@@ -12,7 +12,7 @@
               color: red;
               display: inline-block;
               float: right;
-              margin-top: 18px;
+              margin-top: 20px;
             "
             >获取状态失败</a
           >
@@ -24,7 +24,7 @@
                 <el-row><b>码率：</b>{{ status.bitrate }}</el-row>
                 <el-row
                   >已用：{{
-                    formatCSharpTimeSpan(status.progress.duration)
+                    formatDoubleTimeSpan(status.progress.duration)
                   }}</el-row
                 >
               </el-col>
@@ -35,14 +35,14 @@
                 >
                 <el-row
                   >剩余：{{
-                    formatCSharpTimeSpan(status.progress.lastTime)
+                    formatDoubleTimeSpan(status.progress.lastTime)
                   }}</el-row
                 >
               </el-col>
               <el-col :span="7">
                 <el-row
                   >进度：{{ status.f }}帧
-                  {{ formatCSharpTimeSpan(status.time, true) }}
+                  {{ formatDoubleTimeSpan(status.time, true) }}
                 </el-row>
                 <el-row
                   >预计完成： {{ formatDateTime(finishTime(), false) }}</el-row
@@ -143,7 +143,7 @@ import {
   jump,
   showError,
   formatDateTime,
-  formatCSharpTimeSpan,
+  formatDoubleTimeSpan,
 } from "./common";
 import * as net from "./net";
 export default Vue.extend({
@@ -175,7 +175,7 @@ export default Vue.extend({
   },
   methods: {
     jump: jump,
-    formatCSharpTimeSpan: formatCSharpTimeSpan,
+    formatDoubleTimeSpan: formatDoubleTimeSpan,
     formatDateTime: formatDateTime,
     finishTime() {
       return new Date((this.status as any).progress.finishTime);

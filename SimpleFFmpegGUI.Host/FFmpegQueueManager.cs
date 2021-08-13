@@ -3,6 +3,7 @@ using FFMpegCore.Enums;
 using FzLib.IO;
 using Instances;
 using SimpleFFmpegGUI.Dto;
+using SimpleFFmpegGUI.FFMpegArgumentExtension;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Threading;
 using Task = System.Threading.Tasks.Task;
 using Tasks = System.Threading.Tasks;
 
-namespace SimpleFFmpegGUI.Host
+namespace SimpleFFmpegGUI
 {
     public class FFmpegQueueManager
     {
@@ -279,7 +280,8 @@ namespace SimpleFFmpegGUI.Host
             }
             if (a.Input.From.HasValue && a.Input.To.HasValue)
             {
-                fa.Seek(TimeSpan.FromSeconds(a.Input.From.Value)).WithDuration(TimeSpan.FromSeconds(a.Input.To.Value));
+                fa.Seek(TimeSpan.FromSeconds(a.Input.From.Value))
+                    .WithDuration(TimeSpan.FromSeconds(a.Input.To.Value - a.Input.From.Value));
             }
         }
 

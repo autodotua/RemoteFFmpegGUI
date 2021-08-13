@@ -37,6 +37,71 @@
           >输出文件名在处理时会自动重命名为首个不存在重复文件的文件名</a
         >
       </el-form-item>
+
+      <el-form-item label="输入文件参数">
+        <el-form-item label="裁剪">
+          <el-switch v-model="inputArgs.enableClip"> </el-switch>
+          <div v-show="inputArgs.enableClip">
+            <el-input-number
+              v-model="inputArgs.timeFromH"
+              controls-position="right"
+              :min="0"
+              :max="100"
+              size="small"
+              class="time"
+            ></el-input-number>
+            <a>:</a>
+            <el-input-number
+              v-model="inputArgs.timeFromM"
+              controls-position="right"
+              :min="0"
+              :max="59"
+              size="small"
+              class="time"
+            ></el-input-number>
+            <a>:</a>
+            <el-input-number
+              v-model="inputArgs.timeFromS"
+              controls-position="right"
+              :min="0"
+              precision="3"
+              :max="59.999"
+              size="small"
+              class="time"
+            ></el-input-number>
+          </div>
+          <div v-show="inputArgs.enableClip">
+            <a style="margin-left: -28px">到：</a>
+            <el-input-number
+              v-model="inputArgs.timeToH"
+              controls-position="right"
+              :min="0"
+              :max="100"
+              size="small"
+              class="time"
+            ></el-input-number>
+            <a>:</a>
+            <el-input-number
+              v-model="inputArgs.timeToM"
+              controls-position="right"
+              :min="0"
+              :max="59"
+              size="small"
+              class="time"
+            ></el-input-number>
+            <a>:</a>
+            <el-input-number
+              v-model="inputArgs.timeToS"
+              controls-position="right"
+              :min="0"
+              precision="3"
+              :max="59.999"
+              size="small"
+              class="time"
+            ></el-input-number>
+          </div>
+        </el-form-item>
+      </el-form-item>
     </el-form>
     <code-arguments ref="args" />
     <el-form label-width="120px">
@@ -70,6 +135,15 @@ export default Vue.extend({
         },
       ],
       output: "",
+      inputArgs: {
+        enableClip: false,
+        timeFromH: 0,
+        timeFromM: 0,
+        timeFromS: 0,
+        timeToH: 0,
+        timeToM: 0,
+        timeToS: 0,
+      },
     };
   },
   computed: {},
@@ -95,12 +169,27 @@ export default Vue.extend({
         showError("请选择输入文件");
         return;
       }
-
+      let args = (this.$refs.args as any).getArgs();
+      if (this.inputArgs.enableClip) {
+        args.input = {};
+        args.input.from =
+          this.inputArgs.timeFromH * 3600 +
+          this.inputArgs.timeFromM * 60 +
+          this.inputArgs.timeFromS;
+        args.input.to =
+          this.inputArgs.timeToH * 3600 +
+          this.inputArgs.timeToM * 60 +
+          this.inputArgs.timeToS;
+        if (args.input.to <= args.input.from) {
+          showError("结束时间需要小于开始时间");
+          return;
+        }
+      }
       net
         .postAddCodeTask({
           input: this.files.filter((p) => p.path != "").map((p) => p.path),
           output: this.output,
-          argument: (this.$refs.args as any).getArgs(),
+          argument: args,
           start: start,
         })
         .then((response) => {
@@ -127,5 +216,11 @@ export default Vue.extend({
 
 .left24 {
   margin-left: 24px;
+}
+
+.time {
+  width: 108px;
+  margin-left: 12px;
+  margin-right: 12px;
 }
 </style>

@@ -1,6 +1,6 @@
 ﻿using FFMpegCore.Arguments;
 
-namespace SimpleFFmpegGUI.Host
+namespace SimpleFFmpegGUI.FFMpegArgumentExtension
 {
     public class VideoMBitrateArgument : IArgument
     {

@@ -1,12 +1,10 @@
 
 <template>
-  <el-form  label-width="120px">
-    <el-form-item label="">
-      <a>视频编码： </a> <el-switch v-model="code.enableVideo"> </el-switch>
-      <a style="margin-left: 24px"> 音频编码：</a>
-      <el-switch v-model="code.enableAudio"> </el-switch>
+  <el-form label-width="120px">
+    <el-form-item label="视频编码">
+      <el-switch v-model="code.enableVideo"> </el-switch>
     </el-form-item>
-    <el-form-item label="视频参数" v-show="code.enableVideo">
+    <el-form-item label="" v-show="code.enableVideo">
       <el-form-item label="编码" size="small">
         <el-select v-model="code.video.code">
           <el-option
@@ -140,7 +138,10 @@
         ></el-input-number>
       </el-form-item>
     </el-form-item>
-    <el-form-item label="音频参数" v-show="code.enableAudio">
+    <el-form-item label=" 音频编码">
+      <el-switch v-model="code.enableAudio"> </el-switch>
+    </el-form-item>
+    <el-form-item label="" v-show="code.enableAudio">
       <el-form-item label="编码">
         <el-select v-model="code.audio.code" size="small">
           <el-option

@@ -6,11 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
+using SimpleFFmpegGUI.WebAPI.Converter;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.WebAPI
@@ -31,10 +29,10 @@ namespace SimpleFFmpegGUI.WebAPI
             services.AddControllers().AddJsonOptions(o =>
             {
                 o.JsonSerializerOptions.Converters.Add(new DoubleConverter());
+                o.JsonSerializerOptions.Converters.Add(new TimeSpanConverter());
             })
                 .AddInject()
-                .AddFriendlyException()
-                ;
+                .AddFriendlyException();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,35 +53,6 @@ namespace SimpleFFmpegGUI.WebAPI
             {
                 endpoints.MapControllers();
             });
-        }
-    }
-
-    public class DoubleConverter : JsonConverter<double>
-    {
-        public override double Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            if (reader.TokenType == JsonTokenType.String && reader.GetString() == "NaN")
-            {
-                return double.NaN;
-            }
-
-            return reader.GetDouble(); // JsonException thrown if reader.TokenType != JsonTokenType.Number
-        }
-
-        public override void Write(Utf8JsonWriter writer, double value, JsonSerializerOptions options)
-        {
-            if (double.IsNaN(value))
-            {
-                writer.WriteNullValue();
-            }
-            if (double.IsInfinity(value))
-            {
-                writer.WriteNullValue();
-            }
-            else
-            {
-                writer.WriteNumberValue(value);
-            }
         }
     }
 }

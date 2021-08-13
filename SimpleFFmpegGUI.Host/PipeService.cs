@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace SimpleFFmpegGUI.Host
+namespace SimpleFFmpegGUI
 {
     public class PipeService : IPipeService
     {

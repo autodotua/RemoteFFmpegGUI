@@ -11,14 +11,23 @@ export function withToken(obj: any): any {
     return request;
 }
 
-export function formatCSharpTimeSpan(time: any, includeMs = false): string {
-    let str = String(time.days * 24 + time.hours).padStart(2, '0') + ":"
-        + String(time.minutes).padStart(2, '0') + ":"
-        + String(time.seconds).padStart(2, '0')
+export function formatDoubleTimeSpan(seconds: number, includeMs = false): string {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds / 60 % 60));
+    const s = seconds -m*60-h*3600;
+    console.log(s);
+    
     if (includeMs) {
-        str += "." + String(time.milliseconds).substr(0,2)
+    return String(h).padStart(2, '0') + ":"
+        + String(m).padStart(2, '0') + ":"
+        + String(Math.floor(s)).padStart(2, '0')+"."
+        + String(s-Math.floor(s)).substr(2,2)
     } 
-    return str;
+    else{
+        return String(h).padStart(2, '0') + ":"
+        + String(m).padStart(2, '0') + ":"
+        + String(Math.floor(s)).padStart(2, '0');
+    }
 }
 export function formatDateTime(time: Date | string, includeDate = true, includeTime = true): string {
     if (typeof time == "string") {

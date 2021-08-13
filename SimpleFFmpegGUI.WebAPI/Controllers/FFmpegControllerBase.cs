@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SimpleFFmpegGUI.Model;
 using System.IO;
+using System.Linq;
 
 namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
@@ -52,6 +54,16 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 throw Oops.Oh("不存在文件" + name);
             }
+        }
+
+        protected void HideAbsolutePath(TaskInfo task)
+        {
+            if (task == null)
+            {
+                return;
+            }
+            task.Inputs = task.Inputs.Select(p => Path.GetFileName(p)).ToList();
+            task.Output = Path.GetFileName(task.Output);
         }
     }
 }

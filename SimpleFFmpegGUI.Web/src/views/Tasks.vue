@@ -40,8 +40,10 @@
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-form label-position="left" label-width="120px">
-            <el-form-item label="输入"
-              >{{ props.row.inputs.join("\n") }}
+            <el-form-item label="输入">
+              <div v-for="file in props.row.inputs" :key="file">
+                {{ file }}
+              </div>
             </el-form-item>
             <el-form-item label="输出">{{ props.row.output }} </el-form-item>
             <el-form-item label="创建时间"
@@ -56,12 +58,16 @@
             <el-form-item label="错误信息"
               >{{ props.row.message }}
             </el-form-item>
-            <el-form-item label="参数">{{ props.row.arguments }} </el-form-item>
+            <el-form-item label="参数"
+              ><div style="white-space: pre-wrap">
+                {{ JSON.stringify(props.row.arguments, null, 4) }}
+              </div></el-form-item
+            >
           </el-form>
         </template>
       </el-table-column>
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="type" label="类型" width="60" />
+      <el-table-column prop="typeText" label="类型" width="60" />
       <el-table-column label="状态" width="80">
         <template slot-scope="scope">
           <span style="" v-if="scope.row.status == 1">待处理</span>
@@ -75,7 +81,7 @@
           <span style="color: gray" v-if="scope.row.status == 5">取消</span>
         </template></el-table-column
       >
-      <el-table-column prop="input" label="输入" width="180" />
+      <el-table-column prop="inputText" label="输入" width="180" />
       <el-table-column prop="output" label="输出" width="180" />
 
       <el-table-column label="操作" width="100">
@@ -140,10 +146,12 @@ export default Vue.extend({
     status(value) {
       if (
         this.isProcessing != value.isProcessing ||
-        this.taskID != value.task.id
-      )
+        this.taskID != (value.task == null ? 0 : value.task.id)
+      ) {
         this.isProcessing = value.isProcessing;
-      this.fillData();
+        this.taskID = value.task == null ? 0 : value.task.id;
+        this.fillData();
+      }
     },
   },
   methods: {
@@ -229,19 +237,15 @@ export default Vue.extend({
           response.data.forEach((element: any) => {
             switch (element.type) {
               case 0:
-                element.type = "转码";
+                element.typeText = "转码";
                 break;
             }
-            element.input = element.inputs.join("、");
+            element.inputText =
+              element.inputs.length == 1
+                ? element.inputs[0]
+                : element.inputs[0] + " 等";
           });
-          let ids = this.getSelectionIds();
           this.list = response.data;
-          let table: any = this.$refs.table;
-          // this.list.forEach((element: any) => {
-          //   if (ids.indexOf((element as any).id) >= 0) {
-          //     table.toggleRowSelection(element);
-          //   }
-          // });
         })
         .catch(showError);
     },

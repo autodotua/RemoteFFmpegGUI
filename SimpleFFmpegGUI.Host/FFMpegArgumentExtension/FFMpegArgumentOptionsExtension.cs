@@ -1,6 +1,6 @@
 ﻿using FFMpegCore;
 
-namespace SimpleFFmpegGUI.Host
+namespace SimpleFFmpegGUI.FFMpegArgumentExtension
 {
     public static class FFMpegArgumentOptionsExtension
     {

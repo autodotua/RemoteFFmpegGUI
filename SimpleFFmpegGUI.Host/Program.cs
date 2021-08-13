@@ -5,7 +5,7 @@ using SimpleFFmpegGUI.Model;
 using System;
 using System.Linq;
 
-namespace SimpleFFmpegGUI.Host
+namespace SimpleFFmpegGUI
 {
     internal class Program
     {
@@ -25,7 +25,7 @@ namespace SimpleFFmpegGUI.Host
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            return Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
+            return Host.CreateDefaultBuilder(args)
                     .ConfigureServices(services =>
                     {
                         services.AddSingleton<IPipeService, PipeService>();

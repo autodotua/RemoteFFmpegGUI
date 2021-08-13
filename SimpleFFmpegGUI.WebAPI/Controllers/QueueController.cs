@@ -16,6 +16,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         public async Task<StatusDto> GetStatus()
         {
             var status = await FFmpegManager.Instance.InvokeAsync(p => p.GetStatus());
+            HideAbsolutePath(status.Task);
             return status;
         }
 
@@ -46,8 +47,5 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             await FFmpegManager.Instance.InvokeAsync(p => p.CancelQueue());
         }
-
     }
-
-
 }

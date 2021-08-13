@@ -26,9 +26,12 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("List")]
-        public Task<PagedListDto<TaskInfo>> GetTasks(int status = 0, int skip = 0, int take = 0)
+        public async Task<PagedListDto<TaskInfo>> GetTasks(int status = 0, int skip = 0, int take = 0)
         {
-            return FFmpegManager.Instance.InvokeAsync(p => p.GetTasks(status == 0 ? null : (Model.TaskStatus)status, skip, take));
+            var tasks = await FFmpegManager.Instance.InvokeAsync(p => p.GetTasks(status == 0 ? null : (Model.TaskStatus)status, skip, take));
+
+            tasks.ForEach(p => HideAbsolutePath(p));
+            return tasks;
         }
 
         [HttpPost]

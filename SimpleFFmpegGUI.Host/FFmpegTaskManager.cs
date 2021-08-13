@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SimpleFFmpegGUI.Host
+namespace SimpleFFmpegGUI
 {
     public static class FFmpegTaskManager
     {
