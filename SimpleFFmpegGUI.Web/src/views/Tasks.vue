@@ -19,8 +19,17 @@
       <el-button v-if="selection.length > 0" @click="resetTasks" type="warn"
         >重置</el-button
       >
-      <el-button v-if="selection.length > 0" type="warn" @click="cancelTasks"
-        >取消</el-button
+      <el-popconfirm
+        title="真的要取消所选任务吗？正在执行的任务会被终止"
+        @onConfirm="cancelTask(scope.row)"
+      >
+        <el-button
+          v-if="selection.length > 0"
+          type="warn"
+          @click="cancelTasks"
+          slot="reference"
+          >取消</el-button
+        ></el-popconfirm
       >
     </div>
     <el-table
@@ -30,7 +39,7 @@
     >
       <el-table-column type="expand">
         <template slot-scope="props">
-          <el-form label-position="left" class="demo-table-expand">
+          <el-form label-position="left" label-width="120px">
             <el-form-item label="输入"
               >{{ props.row.inputs.join("\n") }}
             </el-form-item>
@@ -47,6 +56,7 @@
             <el-form-item label="错误信息"
               >{{ props.row.message }}
             </el-form-item>
+            <el-form-item label="参数">{{ props.row.arguments }} </el-form-item>
           </el-form>
         </template>
       </el-table-column>
@@ -77,16 +87,23 @@
             :disabled="scope.row.status == 1 || scope.row.status == 2"
             >重置</el-button
           >
-          <el-button
-            type="text"
-            size="small"
-            @click="cancelTask(scope.row)"
-            :disabled="
-              scope.row.status == 3 ||
-              scope.row.status == 4 ||
-              scope.row.status == 5
+          <el-popconfirm
+            :title="
+              '真的要取消任务吗？' + (scope.row.status == 2 ? '任务会终止' : '')
             "
-            >取消</el-button
+            @onConfirm="cancelTask(scope.row)"
+          >
+            <el-button
+              slot="reference"
+              type="text"
+              size="small"
+              :disabled="
+                scope.row.status == 3 ||
+                scope.row.status == 4 ||
+                scope.row.status == 5
+              "
+              >取消</el-button
+            ></el-popconfirm
           >
         </template>
       </el-table-column>
@@ -115,12 +132,18 @@ export default Vue.extend({
       isProcessing: false,
       totalCount: 0,
       selection: [],
+      taskID: 0,
     };
   },
   props: ["status"],
   watch: {
     status(value) {
-      this.isProcessing = value.isProcessing;
+      if (
+        this.isProcessing != value.isProcessing ||
+        this.taskID != value.task.id
+      )
+        this.isProcessing = value.isProcessing;
+      this.fillData();
     },
   },
   methods: {

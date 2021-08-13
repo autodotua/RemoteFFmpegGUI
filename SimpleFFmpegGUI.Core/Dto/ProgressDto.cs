@@ -4,6 +4,7 @@ namespace SimpleFFmpegGUI.Dto
 {
     public class ProgressDto
     {
+        public string Name { get; set; }
         public TimeSpan VideoDuration { get; set; } = TimeSpan.Zero;
         public TimeSpan VideoLength { get; set; }
 

@@ -76,6 +76,10 @@ namespace SimpleFFmpegGUI.WebAPI
             {
                 writer.WriteNullValue();
             }
+            if (double.IsInfinity(value))
+            {
+                writer.WriteNullValue();
+            }
             else
             {
                 writer.WriteNumberValue(value);

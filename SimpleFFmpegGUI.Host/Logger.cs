@@ -12,6 +12,7 @@ namespace SimpleFFmpegGUI
 
         static Logger()
         {
+            db = new FFmpegDbContext();
             Timer timer = new Timer(o =>
             {
                 if (needSave)
@@ -21,7 +22,7 @@ namespace SimpleFFmpegGUI
             }, null, 10000, 10000);
         }
 
-        private static FFmpegDbContext db = new FFmpegDbContext();
+        private static FFmpegDbContext db;
         private static ConsoleColor DefaultColor = Console.ForegroundColor;
 
         public static void Info(TaskInfo task, string message)

@@ -1,5 +1,7 @@
 ﻿using FFMpegCore;
 using FFMpegCore.Enums;
+using FzLib.IO;
+using Instances;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Model;
 using System;
@@ -9,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
+using Tasks = System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.Host
 {
@@ -46,40 +49,21 @@ namespace SimpleFFmpegGUI.Host
 
                 var task = tasks[0];
 
-                Progress = new ProgressDto();
-                if (task.Inputs.Count == 1)
-                {
-                    try
-                    {
-                        if (task.Arguments.Input != null && task.Arguments.Input.From.HasValue && task.Arguments.Input.To.HasValue)
-                        {
-                            Progress.VideoLength = TimeSpan.FromSeconds(task.Arguments.Input.To.Value - task.Arguments.Input.From.Value);
-                        }
-                        else
-                        {
-                            Progress.VideoLength = FFProbe.Analyse(task.Inputs[0]).Duration;
-                        }
-                    }
-                    catch
-                    {
-                    }
-                    Progress.StartTime = DateTime.Now;
-                }
                 ProcessingTask = task;
-                task.Status = Model.TaskStatus.Processing;
+                task.Status = TaskStatus.Processing;
                 try
                 {
                     task.StartTime = DateTime.Now;
                     db.SaveChanges();
                     await StartNewAsync(task);
-                    task.Status = Model.TaskStatus.Done;
+                    task.Status = TaskStatus.Done;
                 }
                 catch (Exception ex)
                 {
-                    if (task.Status != Model.TaskStatus.Cancel)
+                    if (task.Status != TaskStatus.Cancel)
                     {
                         Logger.Error("运行错误：" + ex.Message);
-                        task.Status = Model.TaskStatus.Error;
+                        task.Status = TaskStatus.Error;
                         task.Message = ex.Message;
                     }
                     else
@@ -100,25 +84,130 @@ namespace SimpleFFmpegGUI.Host
             Logger.Info("队列完成");
         }
 
+        private ProgressDto GetProgress(TaskInfo task)
+        {
+            var p = new ProgressDto();
+            if (task.Inputs.Count == 1)
+            {
+                p.Name = task.Inputs[0];
+                try
+                {
+                    if (task.Arguments.Input != null && task.Arguments.Input.From.HasValue && task.Arguments.Input.To.HasValue)
+                    {
+                        p.VideoLength = TimeSpan.FromSeconds(task.Arguments.Input.To.Value - task.Arguments.Input.From.Value);
+                    }
+                    else
+                    {
+                        p.VideoLength = FFProbe.Analyse(task.Inputs[0]).Duration;
+                    }
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                p.Name = task.Inputs[0] + "等";
+                try
+                {
+                    if (task.Arguments.Input != null && task.Arguments.Input.From.HasValue && task.Arguments.Input.To.HasValue)
+                    {
+                        p.VideoLength = TimeSpan.FromSeconds(task.Arguments.Input.To.Value - task.Arguments.Input.From.Value);
+                    }
+                    else
+                    {
+                        p.VideoLength = TimeSpan.FromTicks(task.Inputs.Select(p => FFProbe.Analyse(p).Duration.Ticks).Sum());
+                    }
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            p.StartTime = DateTime.Now;
+            return p;
+        }
+
+        private ProgressDto GetProgress(params string[] files)
+        {
+            var p = new ProgressDto();
+            p.Name = files.Length == 1 ? files[0] : files[0] + "等";
+            try
+            {
+                p.VideoLength = TimeSpan.FromTicks(files.Select(p => FFProbe.Analyse(p).Duration.Ticks).Sum());
+                p.StartTime = DateTime.Now;
+                return p;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private async Tasks.Task<List<string>> ConvertToTsAsync(IEnumerable<string> files, string tempFolder)
+        {
+            List<string> tsFiles = new List<string>();
+            if (!Directory.Exists(tempFolder))
+            {
+                Directory.CreateDirectory(tempFolder);
+            }
+            foreach (var file in files)
+            {
+                Progress = GetProgress(file);
+                string path = FileSystem.GetNoDuplicateFile(Path.Combine(tempFolder, "join.ts"));
+                tsFiles.Add(path);
+                await FFMpegArguments.FromFileInput(file)
+                          .OutputToFile(path, true, p =>
+                              p.CopyChannel()
+                              .WithBitStreamFilter(Channel.Video, Filter.H264_Mp4ToAnnexB)
+                              .ForceFormat(VideoType.Ts))
+                          .NotifyOnOutput(Output)
+                          .ProcessAsynchronously();
+            }
+            return tsFiles;
+        }
+
         public async Task StartNewAsync(TaskInfo task)
         {
             Logger.Info(task, "开始任务"); ProcessingTask = task;
 
-            FFMpegArguments f = task.Inputs.Count() == 1 ?
-             FFMpegArguments.FromFileInput(task.Inputs.First(), true, a => ApplyInputArguments(a, task.Arguments))
-             : FFMpegArguments.FromConcatInput(task.Inputs);
+            FFMpegArguments f = null;
+            string tempPath = null;
+            if (!task.Inputs.Any())
+            {
+                throw new ArgumentException("没有输入文件");
+            }
+            if (task.Inputs.Count() == 1)
+            {
+                f = FFMpegArguments.FromFileInput(task.Inputs.First(), true, a => ApplyInputArguments(a, task.Arguments));
+
+                Progress = GetProgress(task);
+            }
+            else
+            {
+                tempPath = Path.Combine(Path.GetDirectoryName(task.Output), "temp");
+                var tsFiles = await ConvertToTsAsync(task.Inputs, tempPath);
+                f = FFMpegArguments.FromConcatInput(tsFiles, a => ApplyInputArguments(a, task.Arguments));
+                Progress = GetProgress(task);
+            }
             FFMpegArgumentProcessor p = f.OutputToFile(FzLib.IO.FileSystem.GetNoDuplicateFile(task.Output), true,
                 a => ApplyOutputArguments(a, task.Arguments));
-            p.NotifyOnOutput((data, type) =>
-            {
-                Logger.Output("FFmpeg输出：" + data);
-                FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(type == Instances.DataType.Error, data));
-            });
+            p.NotifyOnOutput(Output);
 
             Logger.Info("FFmpeg参数为：" + p.Arguments);
             await p.ProcessAsynchronously();
-
+            if (Directory.Exists(tempPath))
+            {
+                Directory.Delete(tempPath, true);
+            }
             Logger.Info(task, "完成任务");
+        }
+
+        private void Output(string data, DataType type)
+        {
+            Logger.Output("FFmpeg输出：" + data);
+            FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(type == Instances.DataType.Error, data));
         }
 
         public void Suspend()

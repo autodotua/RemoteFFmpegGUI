@@ -1,74 +1,109 @@
 <template>
   <div id="app">
     <el-container>
-      <el-header
-        class="header one-line"
-        :class="status != null && status.isProcessing ? 'header-tall' : ''"
-      >
-        <h2>远程FFmpeg工具箱</h2>
+      <el-header class="header one-line" :class="(status != null && status.isProcessing) ? 'header-tall' : ''">
+        <div>
+          <h2 style="display: inline-block; margin-top: 12px">
+            远程FFmpeg工具箱
+          </h2>
+          <a
+            v-show="netError"
+            style="
+              color: red;
+              display: inline-block;
+              float: right;
+              margin-top: 18px;
+            "
+            >获取状态失败</a
+          >
+        </div>
         <div class="status-bar" v-if="status != null && status.isProcessing">
-          <el-row>
-            <el-col :span="7">
-              <el-row><b>码率：</b>{{ status.bitrate }}</el-row>
-              <el-row
-                >已用：{{
-                  formatCSharpTimeSpan(status.progress.duration)
-                }}</el-row
-              >
-            </el-col>
-            <el-col :span="7">
-              <el-row
-                >速度：{{ status.fps }}FPS{{ "   " }}
-                {{ status.speed }}X</el-row
-              >
-              <el-row
-                >剩余：{{
-                  formatCSharpTimeSpan(status.progress.lastTime)
-                }}</el-row
-              >
-            </el-col>
-            <el-col :span="7">
-              <el-row
-                >进度：{{ status.f }}帧
-                {{ formatCSharpTimeSpan(status.time, true) }}
-              </el-row>
-              <el-row
-                >预计完成： {{ formatDateTime(finishTime(), false) }}</el-row
-              >
-            </el-col>
+          <div v-if="status.hasDetail">
+            <el-row>
+              <el-col :span="7">
+                <el-row><b>码率：</b>{{ status.bitrate }}</el-row>
+                <el-row
+                  >已用：{{
+                    formatCSharpTimeSpan(status.progress.duration)
+                  }}</el-row
+                >
+              </el-col>
+              <el-col :span="7">
+                <el-row
+                  >速度：{{ status.fps }}FPS{{ "   " }}
+                  {{ status.speed }}X</el-row
+                >
+                <el-row
+                  >剩余：{{
+                    formatCSharpTimeSpan(status.progress.lastTime)
+                  }}</el-row
+                >
+              </el-col>
+              <el-col :span="7">
+                <el-row
+                  >进度：{{ status.f }}帧
+                  {{ formatCSharpTimeSpan(status.time, true) }}
+                </el-row>
+                <el-row
+                  >预计完成： {{ formatDateTime(finishTime(), false) }}</el-row
+                >
+              </el-col>
 
-            <el-col :span="3">
-              <el-popconfirm title="真的要取消任务吗？" @onConfirm="cancel">
-                <el-button
-                  type="danger"
-                  icon="el-icon-close"
-                  circle
-                  slot="reference"
-                ></el-button
-              ></el-popconfirm>
-            </el-col>
-          </el-row>
-          <el-row style="padding-bottom: 4px">
-            <el-progress
-              style="margin-right: 24px"
-              :percentage="Math.round(status.progress.percent * 10000) / 100"
-            ></el-progress>
-          </el-row></div
-      ></el-header>
+              <el-col :span="3">
+                <el-popconfirm title="真的要取消任务吗？" @onConfirm="cancel">
+                  <el-button
+                    type="danger"
+                    icon="el-icon-close"
+                    circle
+                    slot="reference"
+                  ></el-button
+                ></el-popconfirm>
+              </el-col>
+            </el-row>
+            <el-row style="padding-bottom: 4px">
+              <el-progress
+                style="margin-right: 24px"
+                :percentage="Math.round(status.progress.percent * 10000) / 100"
+              ></el-progress>
+            </el-row>
+          </div>
+          <div v-else style="height: 60px">
+            <i
+              class="el-icon-loading"
+              style="
+                font-size: 24px;
+                position: absolute;
+                left: 50%;
+                margin-left: -12px;
+              "
+            ></i>
+            <a
+              style="
+                position: absolute;
+                left: 50%;
+                margin-left: -46px;
+                margin-top: 32px;
+              "
+              >正在执行任务</a
+            >
+            <el-popconfirm
+              title="真的要取消任务吗？"
+              style="float: right; margin-right: 24px; margin-top: 8px"
+              @onConfirm="cancel"
+            >
+              <el-button
+                type="danger"
+                icon="el-icon-close"
+                circle
+                slot="reference"
+              ></el-button
+            ></el-popconfirm>
+          </div>
+        </div>
+      </el-header>
       <el-container class="center">
         <el-aside width="200px">
           <el-menu router default-active="1">
-            <!-- <el-submenu index="1"    router="true">
-              <template #title>
-                <i class="el-icon-location"></i>
-                <span>工具</span>
-              </template>
-              <el-menu-item-group>
-                <template #title>工具</template>
-                <el-menu-item index="info">媒体信息查询</el-menu-item>
-              </el-menu-item-group>
-       
-            </el-submenu> -->
             <el-menu-item index="/">
               <i class="el-icon-s-home"></i>
               <template #title>欢迎</template>
@@ -117,6 +152,7 @@ export default Vue.extend({
     return {
       showHeader: true,
       status: null,
+      netError: false,
     };
   },
   computed: {
@@ -156,9 +192,10 @@ export default Vue.extend({
       net
         .getQueueStatus()
         .then((response) => {
+          this.netError = false;
           this.status = response.data;
         })
-        .catch(showError);
+        .catch((e) => (this.netError = true));
     },
     clickUsername() {
       this.$confirm("是否注销账户？", "提示", {
@@ -207,7 +244,7 @@ header a {
   color: #606266;
 }
 .header-tall {
-  height: 140px !important;
+  height: 130px !important;
 }
 .status-bar {
   background-color: lightgreen;

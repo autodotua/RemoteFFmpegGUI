@@ -12,7 +12,6 @@ namespace SimpleFFmpegGUI.Model
         public FFmpegDbContext()
         {
             Database.EnsureCreated();
-            Logger.Info("数据库已建立");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -31,7 +30,9 @@ namespace SimpleFFmpegGUI.Model
             modelBuilder.Entity<TaskInfo>()
                 .Property(p => p.Arguments)
                 .HasConversion(argConverter);
-            Logger.Info("数据库已初始化");
+            modelBuilder.Entity<CodePreset>()
+                .Property(p => p.Arguments)
+                .HasConversion(argConverter);
         }
 
         public DbSet<TaskInfo> Tasks { get; set; }

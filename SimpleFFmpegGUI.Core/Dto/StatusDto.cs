@@ -33,6 +33,7 @@ namespace SimpleFFmpegGUI.Dto
                     Q = double.Parse(match.Groups["q"].Value);
                     Progress = progress;
                     progress.Update(Time);
+                    HasDetail = true;
                 }
                 catch
                 {
@@ -40,6 +41,7 @@ namespace SimpleFFmpegGUI.Dto
             }
         }
 
+        public bool HasDetail { get; set; } = false;
         public TaskInfo Task { get; set; }
         public ProgressDto Progress { get; set; }
         public bool IsProcessing { get; set; }
