@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -7,7 +7,14 @@
 
   <ItemGroup>
     <PackageReference Include="FFMpegCore" Version="4.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FzStandardLib">
+      <HintPath>..\libs\FzStandardLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SimpleFFmpegGUI
+namespace SimpleFFmpegGUI.Manager
 {
-    public static class FFmpegPresetManager
+    public static class PresetManager
     {
         public static int AddOrUpdatePreset(string name, TaskType type, CodeArguments arguments)
         {
@@ -19,7 +19,7 @@ namespace SimpleFFmpegGUI
                 Type = type,
                 Arguments = arguments
             };
-            using var db = new FFmpegDbContext();
+            var db = FFmpegDbContext.Get();
             if (db.Presets.Any(p => p.Name == name && p.Type == type))
             {
                 db.Presets.RemoveRange(db.Presets.Where(p => p.Name == name && p.Type == type).ToArray());
@@ -31,7 +31,7 @@ namespace SimpleFFmpegGUI
 
         public static void DeletePreset(int id)
         {
-            using var db = new FFmpegDbContext();
+            var db = FFmpegDbContext.Get();
             CodePreset preset = db.Presets.Find(id);
             if (preset == null)
             {
@@ -43,7 +43,7 @@ namespace SimpleFFmpegGUI
 
         public static List<CodePreset> GetPresets()
         {
-            using var db = new FFmpegDbContext();
+            var db = FFmpegDbContext.Get();
             return db.Presets.Where(p => !p.IsDeleted).ToList();
         }
     }

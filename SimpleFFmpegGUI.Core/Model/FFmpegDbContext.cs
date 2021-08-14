@@ -1,17 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SimpleFFmpegGUI.Model
 {
     public class FFmpegDbContext : DbContext
     {
-        public FFmpegDbContext()
+        private static FFmpegDbContext db;
+
+        public static FFmpegDbContext Get()
+        {
+            if (db == null)
+            {
+                db = new FFmpegDbContext();
+            }
+            return db;
+        }
+
+        private FFmpegDbContext()
         {
             Database.EnsureCreated();
+            Console.WriteLine("数据库已建立");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -38,12 +49,20 @@ namespace SimpleFFmpegGUI.Model
         public DbSet<TaskInfo> Tasks { get; set; }
         public DbSet<Log> Logs { get; set; }
         public DbSet<CodePreset> Presets { get; set; }
-    }
 
-    public class EfJsonConverter<T> : ValueConverter<T, string>
-    {
-        public EfJsonConverter() : base(p => JsonConvert.SerializeObject(p), p => JsonConvert.DeserializeObject<T>(p))
+        public void Check()
         {
+            var changed = false;
+            foreach (var item in Tasks.Where(p => p.Status == TaskStatus.Processing))
+            {
+                changed = true;
+                item.Status = TaskStatus.Error;
+                item.Message = "状态异常：启动时处于正在运行状态";
+            }
+            if (changed)
+            {
+                SaveChanges();
+            }
         }
     }
 }

@@ -48,7 +48,7 @@ namespace SimpleFFmpegGUI.WebAPI
             app.UseRouting();
             app.UseCorsAccessor();
             app.UseAuthorization();
-            app.UseInject();
+            app.UseInject(string.Empty);
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

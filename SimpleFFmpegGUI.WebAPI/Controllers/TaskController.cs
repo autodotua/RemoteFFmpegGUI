@@ -28,7 +28,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("List")]
         public async Task<PagedListDto<TaskInfo>> GetTasks(int status = 0, int skip = 0, int take = 0)
         {
-            var tasks = await FFmpegManager.Instance.InvokeAsync(p => p.GetTasks(status == 0 ? null : (Model.TaskStatus)status, skip, take));
+            var tasks = await PipeClient.Instance.InvokeAsync(p => p.GetTasks(status == 0 ? null : (Model.TaskStatus)status, skip, take));
 
             tasks.ForEach(p => HideAbsolutePath(p));
             return tasks;
@@ -44,13 +44,12 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             foreach (var file in request.Input)
             {
-                CheckFileExist(file);
+                CheckInputFileExist(file);
             }
             CheckFileNameNull(request.Output);
-            CheckFileExist(request.Output);
-            return await FFmpegManager.Instance.InvokeAsync(p =>
-              p.AddCodeTask(request.Input.Select(p => Path.Combine(GetMediaFolder(), p)),
-              Path.Combine(GetMediaFolder(), request.Output),
+            return await PipeClient.Instance.InvokeAsync(p =>
+              p.AddCodeTask(request.Input.Select(p => Path.Combine(GetInputDir(), p)),
+              Path.Combine(GetOutputDir(), request.Output),
               request.Argument,
               request.Start));
         }
@@ -59,42 +58,42 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("Reset")]
         public async Task ResetTaskAsync(int id)
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.ResetTask(id));
+            await PipeClient.Instance.InvokeAsync(p => p.ResetTask(id));
         }
 
         [HttpPost]
         [Route("Reset/List")]
         public async Task ResetTasksAsync(IEnumerable<int> ids)
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.ResetTasks(ids));
+            await PipeClient.Instance.InvokeAsync(p => p.ResetTasks(ids));
         }
 
         [HttpPost]
         [Route("Cancel")]
         public async Task CancelTaskAsync(int id)
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.CancelTask(id));
+            await PipeClient.Instance.InvokeAsync(p => p.CancelTask(id));
         }
 
         [HttpPost]
         [Route("Cancel/List")]
         public async Task CancelTasksAsync(IEnumerable<int> ids)
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.CancelTasks(ids));
+            await PipeClient.Instance.InvokeAsync(p => p.CancelTasks(ids));
         }
 
         [HttpPost]
         [Route("Delete")]
         public async Task DeleteTaskAsync(int id)
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.DeleteTask(id));
+            await PipeClient.Instance.InvokeAsync(p => p.DeleteTask(id));
         }
 
         [HttpPost]
         [Route("Delete/List")]
         public async Task DeleteTasksAsync(IEnumerable<int> ids)
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.DeleteTasks(ids));
+            await PipeClient.Instance.InvokeAsync(p => p.DeleteTasks(ids));
         }
     }
 }

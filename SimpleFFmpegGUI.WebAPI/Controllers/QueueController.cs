@@ -15,7 +15,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("Status")]
         public async Task<StatusDto> GetStatus()
         {
-            var status = await FFmpegManager.Instance.InvokeAsync(p => p.GetStatus());
+            var status = await PipeClient.Instance.InvokeAsync(p => p.GetStatus());
             HideAbsolutePath(status.Task);
             return status;
         }
@@ -24,28 +24,28 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("Start")]
         public async Task StartAsync()
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.StartQueue());
+            await PipeClient.Instance.InvokeAsync(p => p.StartQueue());
         }
 
         [HttpPost]
         [Route("Pause")]
         public async Task PauseAsync()
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.PauseQueue());
+            await PipeClient.Instance.InvokeAsync(p => p.PauseQueue());
         }
 
         [HttpPost]
         [Route("Resume")]
         public async Task ResumeAsync()
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.ResumeQueue());
+            await PipeClient.Instance.InvokeAsync(p => p.ResumeQueue());
         }
 
         [HttpPost]
         [Route("Cancel")]
         public async Task CancelAsync()
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.CancelQueue());
+            await PipeClient.Instance.InvokeAsync(p => p.CancelQueue());
         }
     }
 }

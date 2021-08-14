@@ -4,6 +4,7 @@ using FzLib.IO;
 using Instances;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.FFMpegArgumentExtension;
+using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
@@ -14,16 +15,16 @@ using System.Threading;
 using Task = System.Threading.Tasks.Task;
 using Tasks = System.Threading.Tasks;
 
-namespace SimpleFFmpegGUI
+namespace SimpleFFmpegGUI.Manager
 {
-    public class FFmpegQueueManager
+    public class QueueManager
     {
         private DateTime pauseStartTime;
         public TaskInfo ProcessingTask { get; private set; }
         public ProgressDto Progress { get; private set; }
         private bool cancelQueue = false;
 
-        public FFmpegQueueManager()
+        public QueueManager()
         {
         }
 
@@ -42,7 +43,7 @@ namespace SimpleFFmpegGUI
                 return;
             }
             Logger.Info("开始队列");
-            using FFmpegDbContext db = new FFmpegDbContext();
+            FFmpegDbContext db = FFmpegDbContext.Get();
             List<TaskInfo> tasks;
             while (!cancelQueue && GetQueueTasks(db).Any())
             {
@@ -192,7 +193,7 @@ namespace SimpleFFmpegGUI
                 f = FFMpegArguments.FromConcatInput(tsFiles, a => ApplyInputArguments(a, task.Arguments));
                 Progress = GetProgress(task);
             }
-            FFMpegArgumentProcessor p = f.OutputToFile(FzLib.IO.FileSystem.GetNoDuplicateFile(task.Output), true,
+            FFMpegArgumentProcessor p = f.OutputToFile(FileSystem.GetNoDuplicateFile(task.Output), true,
                 a => ApplyOutputArguments(a, task.Arguments));
             p.NotifyOnOutput(Output);
 
@@ -357,7 +358,7 @@ namespace SimpleFFmpegGUI
                 }
             }
 
-            if(!string.IsNullOrEmpty(a.Extra))
+            if (!string.IsNullOrEmpty(a.Extra))
             {
                 fa.WithArguments(a.Extra);
             }

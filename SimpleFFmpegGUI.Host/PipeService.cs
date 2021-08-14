@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using FFMpegCore;
+﻿using FFMpegCore;
 using Mapster;
 using Newtonsoft.Json;
 using SimpleFFmpegGUI.Dto;
+using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace SimpleFFmpegGUI
             };
         }
 
-        private static FFmpegQueueManager manager = new FFmpegQueueManager();
+        private static QueueManager manager = new QueueManager();
 
         public PipeService()
         {
@@ -52,7 +52,7 @@ namespace SimpleFFmpegGUI
 
         public int AddCodeTask(IEnumerable<string> path, string outputPath, CodeArguments arg, bool start)
         {
-            int id = FFmpegTaskManager.AddTask(TaskType.Code, path, outputPath, arg);
+            int id = TaskManager.AddTask(TaskType.Code, path, outputPath, arg);
 
             if (start)
             {
@@ -79,7 +79,7 @@ namespace SimpleFFmpegGUI
 
         public PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)
         {
-            return FFmpegTaskManager.GetTasks(status, skip, take);
+            return TaskManager.GetTasks(status, skip, take);
         }
 
         public StatusDto GetStatus()
@@ -92,47 +92,47 @@ namespace SimpleFFmpegGUI
 
         public void ResetTask(int id)
         {
-            FFmpegTaskManager.ResetTask(id, manager);
+            TaskManager.ResetTask(id, manager);
         }
 
         public void CancelTask(int id)
         {
-            FFmpegTaskManager.CancelTask(id, manager);
+            TaskManager.CancelTask(id, manager);
         }
 
         public void ResetTasks(IEnumerable<int> ids)
         {
-            FFmpegTaskManager.TryResetTasks(ids, manager);
+            TaskManager.TryResetTasks(ids, manager);
         }
 
         public void CancelTasks(IEnumerable<int> ids)
         {
-            FFmpegTaskManager.TryCancelTasks(ids, manager);
+            TaskManager.TryCancelTasks(ids, manager);
         }
 
         public void DeleteTask(int id)
         {
-            FFmpegTaskManager.DeleteTask(id, manager);
+            TaskManager.DeleteTask(id, manager);
         }
 
         public void DeleteTasks(IEnumerable<int> ids)
         {
-            FFmpegTaskManager.TryDeleteTasks(ids, manager);
+            TaskManager.TryDeleteTasks(ids, manager);
         }
 
         public int AddOrUpdatePreset(string name, TaskType type, CodeArguments arguments)
         {
-            return FFmpegPresetManager.AddOrUpdatePreset(name, type, arguments);
+            return PresetManager.AddOrUpdatePreset(name, type, arguments);
         }
 
         public void DeletePreset(int id)
         {
-            FFmpegPresetManager.DeletePreset(id);
+            PresetManager.DeletePreset(id);
         }
 
         public List<CodePreset> GetPresets()
         {
-            return FFmpegPresetManager.GetPresets();
+            return PresetManager.GetPresets();
         }
     }
 }

@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "SimpleFFmpegGUI.Host": {
+      "commandName": "Project"
+    }
+  }
+}

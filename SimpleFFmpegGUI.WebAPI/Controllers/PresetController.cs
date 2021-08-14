@@ -21,7 +21,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("List")]
         public Task<List<CodePreset>> GetPresets()
         {
-            return FFmpegManager.Instance.InvokeAsync(p => p.GetPresets());
+            return PipeClient.Instance.InvokeAsync(p => p.GetPresets());
         }
 
         [HttpPost]
@@ -29,14 +29,14 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         public Task<int> AddAsync([FromBody] CodePresetDto request)
         {
             CheckNull(request, "请求");
-            return FFmpegManager.Instance.InvokeAsync(p => p.AddOrUpdatePreset(request.Name, TaskType.Code, request.Arguments));
+            return PipeClient.Instance.InvokeAsync(p => p.AddOrUpdatePreset(request.Name, TaskType.Code, request.Arguments));
         }
 
         [HttpPost]
         [Route("Delete")]
         public async Task DeleteAsync(int id)
         {
-            await FFmpegManager.Instance.InvokeAsync(p => p.DeletePreset(id));
+            await PipeClient.Instance.InvokeAsync(p => p.DeletePreset(id));
         }
     }
 }

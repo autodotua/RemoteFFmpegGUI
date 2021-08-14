@@ -18,7 +18,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return Directory.EnumerateFiles(GetMediaFolder()).Select(p => Path.GetFileName(p));
+            return Directory.EnumerateFiles(GetInputDir()).Select(p => Path.GetFileName(p));
         }
     }
 }

@@ -14,9 +14,8 @@
     <div v-if="info != null">
       <el-form ref="form" :model="info" label-width="80px">
         <el-form-item label="持续时间">
-          {{ info.duration.hours }}小时{{ info.duration.minutes }}分{{
-            info.duration.seconds
-          }}.{{ info.duration.milliseconds }}秒
+          {{formatDoubleTimeSpan(info.duration,true)}}
+      
         </el-form-item>
         <el-form-item label="格式">{{
           info.format.formatLongName
@@ -106,7 +105,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Cookies from "js-cookie";
-import { withToken, showError, jump, formatDateTime } from "../common";
+import { withToken, showError, jump, formatDateTime,formatDoubleTimeSpan } from "../common";
 import * as net from "../net";
 import FileSelect from "@/components/FileSelect.vue";
 export default Vue.extend({
@@ -120,6 +119,7 @@ export default Vue.extend({
   computed: {},
   methods: {
     jump: jump,
+    formatDoubleTimeSpan,
     fileSelect(item: string) {
       this.file = item;
       console.log(item);

@@ -9,15 +9,24 @@ using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.WebAPI
 {
-    public class FFmpegManager
+    public class PipeClient
     {
-        public static FFmpegManager Instance { get; } = new FFmpegManager();
+        public static PipeClient Instance { get; private set; }
+
+        public static void EnsureInstance(string pipeName)
+        {
+            if (Instance == null)
+            {
+                Instance = new PipeClient(pipeName);
+            }
+        }
+
         private IIpcClient<IPipeService> mediaInfoClient;
 
-        public FFmpegManager()
+        public PipeClient(string pipeName)
         {
             ServiceProvider serviceProvider = new ServiceCollection()
-.AddNamedPipeIpcClient<IPipeService>("m", pipeName: "pipeinternal")
+.AddNamedPipeIpcClient<IPipeService>("m", pipeName: pipeName)
 .BuildServiceProvider();
 
             // resolve IPC client factory

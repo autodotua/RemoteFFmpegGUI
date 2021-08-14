@@ -12,17 +12,15 @@ namespace SimpleFFmpegGUI
 
         static Logger()
         {
-            db = new FFmpegDbContext();
             Timer timer = new Timer(o =>
             {
                 if (needSave)
                 {
-                    db.SaveChanges();
+                    FFmpegDbContext.Get().SaveChanges();
                 }
             }, null, 10000, 10000);
         }
 
-        private static FFmpegDbContext db;
         private static ConsoleColor DefaultColor = Console.ForegroundColor;
 
         public static void Info(TaskInfo task, string message)
@@ -63,7 +61,7 @@ namespace SimpleFFmpegGUI
                 Type = type,
                 Message = message
             };
-            db.Logs.Add(log);
+            FFmpegDbContext.Get().Logs.Add(log);
             needSave = true;
         }
     }
