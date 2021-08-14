@@ -84,7 +84,7 @@
       <el-table-column prop="inputText" label="输入" width="180" />
       <el-table-column prop="output" label="输出" width="180" />
 
-      <el-table-column label="操作" width="100">
+      <el-table-column label="操作"  >
         <template slot-scope="scope">
           <el-button
             @click="resetTask(scope.row)"
@@ -94,9 +94,9 @@
             >重置</el-button
           >
           <el-popconfirm
-            :title="
-              '真的要取消任务吗？' + (scope.row.status == 2 ? '任务会终止' : '')
-            "
+            v-if="scope.row.status == 2"
+            title="真的要取消任务吗？任务会终止"
+            style="margin-left: 10px"
             @onConfirm="cancelTask(scope.row)"
           >
             <el-button
@@ -110,6 +110,27 @@
               "
               >取消</el-button
             ></el-popconfirm
+          >
+          <el-button
+            v-else
+            slot="reference"
+            type="text"
+            size="small"
+            :disabled="
+              scope.row.status == 3 ||
+              scope.row.status == 4 ||
+              scope.row.status == 5
+            "
+            @click="cancelTask(scope.row)"
+            >取消</el-button
+          >
+
+          <el-button
+            slot="reference"
+            type="text"
+            size="small"
+            @click="remake(scope.row)"
+            >重制</el-button
           >
         </template>
       </el-table-column>
@@ -125,7 +146,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { withToken, showError, showSuccess, formatDateTime } from "../common";
+import {
+  withToken,
+  showError,
+  showSuccess,
+  formatDateTime,
+  jump,
+} from "../common";
 
 import * as net from "../net";
 import { Notification, Table } from "element-ui";
@@ -155,6 +182,11 @@ export default Vue.extend({
     },
   },
   methods: {
+    remake(item: any) {
+      localStorage.setItem("codeArgs",JSON.stringify(item.arguments));
+      jump("code");
+       
+    },
     getSelectionIds(): number[] {
       return this.toIdList(this.selection as []);
     },
@@ -254,11 +286,11 @@ export default Vue.extend({
   mounted: function () {
     this.$nextTick(function () {
       this.fillData();
-      // setInterval(() => {
-      //   if (this.selection.length == 0) {
-      //     this.fillData();
-      //   }
-      // }, 5000);
+      setInterval(() => {
+        if (this.selection.length == 0) {
+          this.fillData();
+        }
+      }, 20000);
     });
   },
   components: {},

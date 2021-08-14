@@ -5,13 +5,15 @@
         <a class="el-form-item__label">{{ value.index + 1 }}</a>
         <file-select
           ref="files"
-          @select="(f) => selectFile(f, value.index)" class="right24"
+          @select="(f) => selectFile(f, value.index)"
+          class="right24"
         ></file-select>
         <el-button
           @click="addFile"
           icon="el-icon-plus"
           circle
-          v-if="value.index == files.length - 1" class="right24"
+          v-if="value.index == files.length - 1"
+          class="right24"
         ></el-button>
         <el-button
           @click="files.splice(-1)"
@@ -105,7 +107,8 @@
           <el-select
             @change="selectPreset"
             placeholder="加载预设"
-            v-model="preset" class="right24"
+            v-model="preset"
+            class="right24"
           >
             <el-option
               v-for="p in presets"
@@ -114,14 +117,16 @@
               :value="p.id"
             ></el-option
           ></el-select>
-          <el-button
-            :disabled="preset == null"
-            @click="updatePreset"
+          <el-button :disabled="preset == null" @click="updatePreset"
             >更新</el-button
           >
         </div>
         <div style="margin-top: 12px">
-          <el-input v-model="newPresetName" style="width: 128px" class="right24"></el-input>
+          <el-input
+            v-model="newPresetName"
+            style="width: 128px"
+            class="right24"
+          ></el-input>
           <el-button
             style="display: inline"
             :disabled="newPresetName == null || newPresetName.trim() == ''"
@@ -136,8 +141,12 @@
     <el-form label-width="120px">
       <el-form-item>
         <div class="bottom-div">
-          <el-button type="primary" @click="add" class="right24 bottom12">加入队列</el-button>
-          <el-button @click="addAndStart" style="margin-left:0">加入队列并立即开始</el-button>
+          <el-button type="primary" @click="add" class="right24 bottom12"
+            >加入队列</el-button
+          >
+          <el-button @click="addAndStart" style="margin-left: 0"
+            >加入队列并立即开始</el-button
+          >
         </div>
       </el-form-item>
     </el-form>
@@ -270,10 +279,10 @@ export default Vue.extend({
           start: start,
         })
         .then((response) => {
-          this.files=[];
+          this.files = [];
           this.files.push({ index: 0, path: "" });
           (this.$refs.files as any)[0].file = "";
-          this.output="";
+          this.output = "";
           showSuccess("已加入队列");
         })
         .catch(showError);
@@ -283,6 +292,12 @@ export default Vue.extend({
   mounted: function () {
     this.$nextTick(function () {
       this.fillPresets();
+      if (localStorage.getItem("codeArgs") != null) {
+        const args = JSON.parse(localStorage.getItem("codeArgs") as string);
+        (this.$refs.args as any).updateFromArgs(args);
+        showSuccess("已加载参数");
+        localStorage.removeItem("codeArgs");
+      }
     });
   },
 });
