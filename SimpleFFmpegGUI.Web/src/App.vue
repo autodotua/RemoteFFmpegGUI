@@ -1,7 +1,10 @@
 <template>
   <div id="app">
     <el-container>
-      <el-header class="header one-line" :class="(status != null && status.isProcessing) ? 'header-tall' : ''">
+      <el-header
+        class="header one-line"
+        :class="status != null && status.isProcessing ? 'header-tall' : ''"
+      >
         <div>
           <h2 style="display: inline-block; margin-top: 12px">
             远程FFmpeg工具箱
@@ -115,14 +118,21 @@
 
             <el-submenu index="new">
               <template #title>
-                <i class="el-icon-location"></i>
+                <i class="el-icon-document-add"></i>
                 <span>新建任务</span>
               </template>
-              <el-menu-item index="code">转码</el-menu-item>
+              <el-menu-item index="code">
+                <i class="el-icon-circle-plus-outline"></i>
+                <span>转码</span></el-menu-item
+              >
             </el-submenu>
             <el-menu-item index="tasks">
               <i class="el-icon-document"></i>
               <template #title>任务列表</template>
+            </el-menu-item>
+            <el-menu-item index="ftp">
+              <i class="el-icon-folder-opened"></i>
+              <template #title>FTP服务</template>
             </el-menu-item>
             <el-menu-item index="about">
               <i class="el-icon-info"></i>

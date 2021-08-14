@@ -6,6 +6,7 @@ import Welcome from '../views/Welcome.vue'
 import MediaInfo from '../views/MediaInfo.vue'
 import Code from '../views/Code.vue'
 import Tasks from '../views/Tasks.vue'
+import Ftp from '../views/Ftp.vue'
 
 Vue.use(VueRouter)
 
@@ -19,6 +20,11 @@ Vue.use(VueRouter)
     path: '/info',
     name: 'MediaInfo',
     component: MediaInfo
+  },
+  {
+    path: '/ftp',
+    name: 'Ftp',
+    component: Ftp
   },
   {
     path: '/tasks',

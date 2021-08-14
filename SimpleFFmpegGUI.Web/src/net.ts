@@ -69,3 +69,14 @@ export function postAddOrUpdatePreset(item: any): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .post(getUrl("Preset/Add"), item);
 }
+
+
+export function getFtpStatus(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .get(getUrl("Ftp/Status"))
+}
+
+export function postFtp(input: boolean, on: boolean): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .post(getUrl("Ftp/" + (input ? "Input" : "Output") + "/" + (on ? "On" : "Off")))
+}

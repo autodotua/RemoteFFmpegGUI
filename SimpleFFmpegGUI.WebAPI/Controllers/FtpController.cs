@@ -14,27 +14,27 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
     public class FtpController : FFmpegControllerBase
     {
-        private FtpManager inputFtp;
-        private FtpManager outputFtp;
+        private static FtpManager inputFtp;
+        private static FtpManager outputFtp;
 
         public FtpController(ILogger<MediaInfoController> logger,
             IConfiguration config) : base(logger, config) { }
 
         [HttpPost]
         [Route("Input/On")]
-        public async Task OpenInput(int id)
+        public async Task OpenInput()
         {
             if (inputFtp != null)
             {
                 return;
             }
-            inputFtp = new FtpManager(GetInputDir(), config.GetValue<int>("FtpPort", FtpManager.FreeTcpPort()));
+            inputFtp = new FtpManager(GetInputDir(), config.GetValue<int>("InputFtpPort", FtpManager.FreeTcpPort()));
             await inputFtp.StartAsync();
         }
 
         [HttpPost]
         [Route("Input/Off")]
-        public async Task CloseInput(int id)
+        public async Task CloseInput()
         {
             if (inputFtp == null)
             {
@@ -46,19 +46,19 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 
         [HttpPost]
         [Route("Output/On")]
-        public async Task OpenOutput(int id)
+        public async Task OpenOutput()
         {
             if (outputFtp != null)
             {
                 return;
             }
-            outputFtp = new FtpManager(GetOutputDir(), config.GetValue<int>("FtpPort", FtpManager.FreeTcpPort()));
+            outputFtp = new FtpManager(GetOutputDir(), config.GetValue<int>("OutputFtpPort", FtpManager.FreeTcpPort()));
             await outputFtp.StartAsync();
         }
 
         [HttpPost]
         [Route("Output/Off")]
-        public async Task CloseOutput(int id)
+        public async Task CloseOutput()
         {
             if (outputFtp == null)
             {
@@ -66,6 +66,25 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             await outputFtp.StopAsync();
             outputFtp = null;
+        }
+
+        /// <summary>
+        /// 获取FTP状态
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Status")]
+        public FtpStatusDto GetStatus(int id)
+        {
+            var status = new FtpStatusDto()
+            {
+                InputOn = inputFtp != null,
+                OutputOn = outputFtp != null,
+                InputPort = inputFtp?.Port ?? 0,
+                OutputPort = outputFtp?.Port ?? 0
+            };
+            return status;
         }
     }
 }
