@@ -1,13 +1,12 @@
 <template>
   <div>
     <div>
-      <file-select ref="files" @select="fileSelect"></file-select>
+      <file-select ref="files" @select="fileSelect" class="right24 bottom12"></file-select>
 
       <el-button
         type="primary"
         v-on:click="query"
         :disabled="file == ''"
-        style="margin-left: 24px"
         >查询</el-button
       >
     </div>

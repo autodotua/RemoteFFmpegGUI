@@ -1,5 +1,5 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <a href="https://github.com/autodotua/RemoteFFmpegGUI" target="_blank">Github</a>
   </div>
 </template>

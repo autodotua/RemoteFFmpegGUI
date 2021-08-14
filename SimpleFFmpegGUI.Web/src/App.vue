@@ -105,8 +105,12 @@
         </div>
       </el-header>
       <el-container class="center">
-        <el-aside width="200px">
-          <el-menu router default-active="1">
+        <el-aside :width="(menuCollapse ? 68 : 200) + 'px'">
+          <el-button @click="changeMenuSize"
+            :icon="menuCollapse?'el-icon-s-unfold':'el-icon-s-fold'"
+            style="color: #909399; font-size: 24px; font-weight: 400;border:0"
+          ></el-button>
+          <el-menu router default-active="1" :collapse="menuCollapse">
             <el-menu-item index="/">
               <i class="el-icon-s-home"></i>
               <template #title>欢迎</template>
@@ -156,6 +160,7 @@ import {
   formatDoubleTimeSpan,
 } from "./common";
 import * as net from "./net";
+
 export default Vue.extend({
   name: "App",
   data: function () {
@@ -163,6 +168,7 @@ export default Vue.extend({
       showHeader: true,
       status: null,
       netError: false,
+      menuCollapse: true,
     };
   },
   computed: {
@@ -183,10 +189,20 @@ export default Vue.extend({
       // }
     });
   },
+  created() {
+    this.resizeMenu();
+    window.addEventListener("resize", this.resizeMenu);
+  },
   methods: {
     jump: jump,
     formatDoubleTimeSpan: formatDoubleTimeSpan,
     formatDateTime: formatDateTime,
+    changeMenuSize(){
+      this.menuCollapse=!this.menuCollapse;
+    },
+    resizeMenu() {
+      this.menuCollapse = window.innerWidth < 500;
+    },
     finishTime() {
       return new Date((this.status as any).progress.finishTime);
     },

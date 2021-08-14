@@ -1,6 +1,14 @@
 
 <template>
-  <el-select style="width:300px" filterable v-model="file" @change="selectChanged" :placeholder="files==null?'请选择文件':'请选择文件（共'+files.length+'个）'">
+  <el-select
+    style="width: 280px"
+    filterable
+    v-model="file"
+    @change="selectChanged"
+    :placeholder="
+      files == null ? '请选择文件' : '请选择文件（共' + files.length + '个）'
+    "
+  >
     <el-option v-for="item in files" :key="item" :label="item" :value="item">
     </el-option>
   </el-select>
@@ -14,12 +22,10 @@ export default Vue.component("file-select", {
   data() {
     return {
       files: null,
-      file:null
+      file: null,
     };
   },
-  props: {
-   
-  },
+  props: {},
   computed: {},
   methods: {
     selectChanged(e) {
@@ -29,7 +35,8 @@ export default Vue.component("file-select", {
   components: {},
   mounted: function () {
     this.$nextTick(function () {
-    net.getMediaNames()
+      net
+        .getMediaNames()
         .then((response) => {
           this.files = response.data;
         })

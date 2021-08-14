@@ -14,17 +14,17 @@
             :value="c"
           ></el-option> </el-select
       ></el-form-item>
-      <el-form-item label="预设" class="with-slider">
+      <el-form-item label="预设" class="bottom24">
         <el-slider
           style="width: 90%"
-          :max="9"
+          :max="8"
           :show-tooltip="false"
           v-model="code.video.preset"
           :marks="presets"
         >
         </el-slider
       ></el-form-item>
-      <el-form-item label="CRF" class="with-slider">
+      <el-form-item label="CRF" class="top24">
         <el-switch v-model="code.video.enableCrf"> </el-switch>
         <el-slider
           v-show="code.video.enableCrf"
@@ -32,13 +32,13 @@
           :max="40"
           :min="10"
           show-input
-          :step="1"
+          :step="2"
           show-stops
           v-model="code.video.crf"
         >
         </el-slider
       ></el-form-item>
-      <el-form-item label="平均码率" class="with-slider">
+      <el-form-item label="平均码率" class="bottom24">
         <el-switch v-model="code.video.enableBitrate"> </el-switch>
         <el-slider
           v-show="code.video.enableBitrate"
@@ -51,7 +51,7 @@
         >
         </el-slider
       ></el-form-item>
-      <el-form-item label="最大码率" class="with-slider">
+      <el-form-item label="最大码率" class="bottom24">
         <el-switch v-model="code.video.enableMaxBitrate"> </el-switch>
         <el-slider
           v-show="code.video.enableMaxBitrate"
@@ -66,7 +66,7 @@
       ></el-form-item>
       <el-form-item
         label="缓冲倍率"
-        class="with-slider"
+        class="bottom24"
         v-show="code.video.enableMaxBitrate"
       >
         <el-slider
@@ -81,39 +81,37 @@
         </el-slider
       ></el-form-item>
       <el-form-item label="帧率"
-        ><el-switch v-model="code.video.enableFps"> </el-switch>
+        ><el-switch v-model="code.video.enableFps" class="right24"> </el-switch>
         <div v-show="code.video.enableFps" style="display: inline">
           <el-input-number
             size="small"
-            class="left24"
             v-model="code.video.fps"
             :precision="3"
-            :min="1"
+            :min="1"  class="right24"
             :max="120"
           >
           </el-input-number>
-          <el-button type="text" class="left24" @click="code.video.fps = 10"
+          <el-button type="text" class="right24" @click="code.video.fps = 10"
             >10帧</el-button
           >
-          <el-button type="text" class="left24" @click="code.video.fps = 24"
+          <el-button type="text"  class="right24" @click="code.video.fps = 24"
             >24帧</el-button
           >
-          <el-button type="text" class="left24" @click="code.video.fps = 25"
+          <el-button type="text" class="right24" @click="code.video.fps = 25"
             >25帧</el-button
           >
-          <el-button type="text" class="left24" @click="code.video.fps = 30"
+          <el-button type="text"  class="right24" @click="code.video.fps = 30"
             >30帧</el-button
           >
-          <el-button type="text" class="left24" @click="code.video.fps = 60"
+          <el-button type="text"  @click="code.video.fps = 60"
             >60帧</el-button
           >
         </div>
       </el-form-item>
       <el-form-item label="分辨率">
-        <el-switch v-model="code.video.enableScale"> </el-switch>
+        <el-switch v-model="code.video.enableScale"  class="right24"> </el-switch>
         <el-input-number
-          size="small"
-          class="left24"
+          size="small" class="right24 width80"
           :min="1"
           :max="20000"
           placeholder="宽度"
@@ -122,13 +120,11 @@
           v-show="code.video.enableScale"
         ></el-input-number>
         <a
-          v-show="code.video.enableScale"
-          style="margin-left: 24px; margin-right: 0px"
+          v-show="code.video.enableScale" class="right24"
           >×</a
         >
         <el-input-number
-          size="small"
-          class="left24"
+          size="small" class="width80"
           :min="1"
           :max="20000"
           placeholder="高度"
@@ -151,7 +147,7 @@
             :value="c"
           ></el-option> </el-select
       ></el-form-item>
-      <el-form-item label="码率" class="with-slider">
+      <el-form-item label="码率" class="bottom24">
         <el-switch v-model="code.audio.enableBitrate"> </el-switch>
         <el-slider
           v-show="code.audio.enableBitrate"
@@ -166,9 +162,8 @@
         </el-slider
       ></el-form-item>
       <el-form-item label="采样率" style="margin-top: 24px">
-        <el-switch v-model="code.audio.enableSample"> </el-switch>
+        <el-switch v-model="code.audio.enableSample" class="right24"> </el-switch>
         <el-select
-          class="left24"
           v-model="code.audio.sample"
           v-show="code.audio.enableSample"
         >
@@ -366,11 +361,12 @@ export default Vue.component("code-arguments", {
 });
 </script>
 <style scoped>
-.with-slider {
-  margin-bottom: 24px;
+div[role=slider]{
+  min-width: 240px;
 }
 
-.left24 {
-  margin-left: 24px;
+.el-select{
+  min-width:160px;
 }
+
 </style>
