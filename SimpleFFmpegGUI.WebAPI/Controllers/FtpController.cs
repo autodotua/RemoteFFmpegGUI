@@ -18,7 +18,8 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         private static FtpManager outputFtp;
 
         public FtpController(ILogger<MediaInfoController> logger,
-            IConfiguration config) : base(logger, config) { }
+            IConfiguration config,
+        PipeClient pipeClient) : base(logger, config, pipeClient) { }
 
         [HttpPost]
         [Route("Input/On")]

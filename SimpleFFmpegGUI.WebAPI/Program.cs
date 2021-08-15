@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -18,6 +19,10 @@ namespace SimpleFFmpegGUI.WebAPI
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+            .ConfigureServices(c =>
+            {
+                c.AddSingleton<PipeClient>();
+            })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.Inject().UseStartup<Startup>();

@@ -31,38 +31,51 @@ namespace SimpleFFmpegGUI
         public static void Info(string message)
         {
             Console.ForegroundColor = DefaultColor;
-            Log('I', message);
+            AddLog('I', message);
         }
 
         public static void Output(string message)
         {
             Console.ForegroundColor = ConsoleColor.Gray;
-            Log('O', message);
+            AddLog('O', message);
         }
 
         public static void Error(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Log('E', message);
+            AddLog('E', message);
         }
 
         public static void Warn(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Log('W', message);
+            AddLog('W', message);
         }
 
-        private static void Log(char type, string message)
+        private static void AddLog(char type, string message)
         {
-            Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}  ——  {message}");
+            //Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}  ——  {message}");
             Log log = new Log()
             {
                 Time = DateTime.Now,
                 Type = type,
                 Message = message
             };
+            Log?.Invoke(null, new LogEventArgs(log));
             FFmpegDbContext.Get().Logs.Add(log);
             needSave = true;
         }
+
+        public static event EventHandler<LogEventArgs> Log;
+    }
+
+    public class LogEventArgs : EventArgs
+    {
+        public LogEventArgs(Log log)
+        {
+            Log = log;
+        }
+
+        public Log Log { get; set; }
     }
 }

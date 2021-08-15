@@ -13,7 +13,8 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
     public class MediaDirController : FFmpegControllerBase
     {
         public MediaDirController(ILogger<MediaInfoController> logger,
-            IConfiguration config) : base(logger, config) { }
+            IConfiguration config,
+        PipeClient pipeClient) : base(logger, config, pipeClient) { }
 
         [HttpGet]
         public IEnumerable<string> Get()

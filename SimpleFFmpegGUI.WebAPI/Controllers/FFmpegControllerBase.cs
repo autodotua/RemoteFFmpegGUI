@@ -14,13 +14,15 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
     {
         protected readonly ILogger<MediaInfoController> logger;
         protected readonly IConfiguration config;
+        protected readonly PipeClient pipeClient;
 
         public FFmpegControllerBase(ILogger<MediaInfoController> logger,
-        IConfiguration config)
+        IConfiguration config,
+        PipeClient pipeClient)
         {
-            PipeClient.EnsureInstance(config.GetValue<string>("PipeName") ?? throw new System.Exception("不存在PipeName配置项"));
             this.logger = logger;
             this.config = config;
+            this.pipeClient = pipeClient;
         }
 
         protected string GetInputDir()

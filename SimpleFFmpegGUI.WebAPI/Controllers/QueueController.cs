@@ -9,13 +9,14 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
     public class QueueController : FFmpegControllerBase
     {
         public QueueController(ILogger<MediaInfoController> logger,
-            IConfiguration config) : base(logger, config) { }
+            IConfiguration config,
+        PipeClient pipeClient) : base(logger, config, pipeClient) { }
 
         [HttpGet]
         [Route("Status")]
         public async Task<StatusDto> GetStatus()
         {
-            var status = await PipeClient.Instance.InvokeAsync(p => p.GetStatus());
+            var status = await pipeClient.InvokeAsync(p => p.GetStatus());
             HideAbsolutePath(status.Task);
             return status;
         }
@@ -24,28 +25,28 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("Start")]
         public async Task StartAsync()
         {
-            await PipeClient.Instance.InvokeAsync(p => p.StartQueue());
+            await pipeClient.InvokeAsync(p => p.StartQueue());
         }
 
         [HttpPost]
         [Route("Pause")]
         public async Task PauseAsync()
         {
-            await PipeClient.Instance.InvokeAsync(p => p.PauseQueue());
+            await pipeClient.InvokeAsync(p => p.PauseQueue());
         }
 
         [HttpPost]
         [Route("Resume")]
         public async Task ResumeAsync()
         {
-            await PipeClient.Instance.InvokeAsync(p => p.ResumeQueue());
+            await pipeClient.InvokeAsync(p => p.ResumeQueue());
         }
 
         [HttpPost]
         [Route("Cancel")]
         public async Task CancelAsync()
         {
-            await PipeClient.Instance.InvokeAsync(p => p.CancelQueue());
+            await pipeClient.InvokeAsync(p => p.CancelQueue());
         }
     }
 }

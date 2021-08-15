@@ -145,7 +145,9 @@
           </el-menu></el-aside
         >
 
-        <el-main> <router-view :status="status"></router-view> </el-main>
+        <el-main :style="{height:'calc(100% - '+(status != null && status.isProcessing?130:60)+'px)'}"> 
+          
+          <router-view :status="status"></router-view> </el-main>
       </el-container>
     </el-container>
   </div>
@@ -286,7 +288,5 @@ header a {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* .center {
-  height: calc(100% - 120px)!important;
-} */
+
 </style>
