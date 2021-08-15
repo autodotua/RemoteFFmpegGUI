@@ -46,9 +46,19 @@ export function getQueueStatus(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("Queue/Status"))
 }
-export function getTaskList(): Promise<AxiosResponse<any>> {
+export function getTaskList(status: number | null, skip: number | null, take: number | null): Promise<AxiosResponse<any>> {
+        let url = "Task/List?";
+        if (status) {
+                url = url + `status=${status}&`
+        }
+        if (skip) {
+                url = url + `skip=${skip}&`
+        }
+        if (take) {
+                url = url + `take=${take}&`
+        }
         return Vue.axios
-                .get(getUrl("Task/List"))
+                .get(getUrl(url))
 }
 
 export function getMediaInfo(name: string): Promise<AxiosResponse<any>> {

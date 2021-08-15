@@ -81,10 +81,10 @@
           <span style="color: gray" v-if="scope.row.status == 5">取消</span>
         </template></el-table-column
       >
-      <el-table-column prop="inputText" label="输入" width="180" />
-      <el-table-column prop="output" label="输出" width="180" />
+      <el-table-column prop="inputText" label="输入" min-width="360" />
+      <!-- <el-table-column prop="output" label="输出" width="180" /> -->
 
-      <el-table-column label="操作"  >
+      <el-table-column label="操作" width="140">
         <template slot-scope="scope">
           <el-button
             @click="resetTask(scope.row)"
@@ -141,6 +141,27 @@
         </template>
       </el-table-column>
     </el-table>
+    <div>
+      <div class="top12">
+      <el-pagination style="float:left" 
+        @size-change="fillData"
+        @current-change="fillData"
+        layout="sizes,prev, pager, next"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size.sync="countPerPage"
+        :current-page.sync="page"
+        :total="totalCount"
+      >
+      </el-pagination>
+        <el-radio-group v-model="statusFilter" size="small" @change="fillData" style="float:right">
+      <el-radio-button :label="null"><b>全部</b></el-radio-button>
+      <el-radio-button :label="1">排队中</el-radio-button>
+      <el-radio-button :label="2">进行中</el-radio-button>
+      <el-radio-button :label="3">已完成</el-radio-button>
+      <el-radio-button :label="4">错误</el-radio-button>
+      <el-radio-button :label="5">取消</el-radio-button>
+    </el-radio-group></div>
+    </div>
   </div>
 </template>
 
@@ -166,6 +187,10 @@ export default Vue.extend({
       totalCount: 0,
       selection: [],
       taskID: 0,
+      pageCount: 1,
+      page: 1,
+      countPerPage: 10,
+      statusFilter:null
     };
   },
   props: ["status"],
@@ -183,9 +208,8 @@ export default Vue.extend({
   },
   methods: {
     remake(item: any) {
-      localStorage.setItem("codeArgs",JSON.stringify(item.arguments));
+      localStorage.setItem("codeArgs", JSON.stringify(item.arguments));
       jump("code");
-       
     },
     getSelectionIds(): number[] {
       return this.toIdList(this.selection as []);
@@ -263,10 +287,15 @@ export default Vue.extend({
       let selection = this.selection;
 
       net
-        .getTaskList()
+        .getTaskList(
+          this.statusFilter,
+          (this.page - 1) * this.countPerPage,
+          this.countPerPage
+        )
         .then((response) => {
           this.totalCount = response.data.totalCount;
-          response.data.forEach((element: any) => {
+          this.pageCount = Math.ceil(this.totalCount / this.countPerPage);
+          response.data.list.forEach((element: any) => {
             switch (element.type) {
               case 0:
                 element.typeText = "转码";
@@ -277,7 +306,7 @@ export default Vue.extend({
                 ? element.inputs[0]
                 : element.inputs[0] + " 等";
           });
-          this.list = response.data;
+          this.list = response.data.list;
         })
         .catch(showError);
     },

@@ -31,7 +31,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             var tasks = await pipeClient.InvokeAsync(p => p.GetTasks(status == 0 ? null : (Model.TaskStatus)status, skip, take));
 
-            tasks.ForEach(p => HideAbsolutePath(p));
+            tasks.List.ForEach(p => HideAbsolutePath(p));
             return tasks;
         }
 

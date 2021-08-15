@@ -24,6 +24,9 @@ namespace SimpleFFmpegGUI.WebAPI
             pipeName = config.GetValue<string>("PipeName") ?? throw new Exception("不存在PipeName配置项");
             hostName = config.GetValue<string>("HostName", null);
             hostPath = config.GetValue<string>("HostPath", null);
+
+            EnsureHost();
+
             ServiceProvider serviceProvider = new ServiceCollection()
 .AddNamedPipeIpcClient<IPipeService>("m", pipeName: pipeName)
 .BuildServiceProvider();
@@ -39,13 +42,11 @@ namespace SimpleFFmpegGUI.WebAPI
 
         public Task<TResult> InvokeAsync<TResult>(Expression<Func<IPipeService, TResult>> exp)
         {
-            EnsureHost();
             return mediaInfoClient.InvokeAsync(exp);
         }
 
         public Task InvokeAsync(Expression<Action<IPipeService>> exp)
         {
-            EnsureHost();
             return mediaInfoClient.InvokeAsync(exp);
         }
 

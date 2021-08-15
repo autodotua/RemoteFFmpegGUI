@@ -26,13 +26,31 @@ namespace SimpleFFmpegGUI.Manager
 
         public static PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)
         {
-            var db = FFmpegDbContext.Get();
+            using var db = FFmpegDbContext.GetNew();
             IQueryable<TaskInfo> tasks = db.Tasks
-                .Where(p => p.IsDeleted == false)
-                .OrderByDescending(p => p.CreateTime);
+                .Where(p => p.IsDeleted == false);
             if (status.HasValue)
             {
                 tasks = tasks.Where(p => p.Status == status);
+                switch (status.Value)
+                {
+                    case TaskStatus.Queue:
+                        tasks = tasks.OrderBy(p => p.CreateTime);
+                        break;
+
+                    case TaskStatus.Processing:
+                    case TaskStatus.Done:
+                        tasks = tasks.OrderByDescending(p => p.StartTime);
+                        break;
+
+                    default:
+                        tasks = tasks.OrderByDescending(p => p.CreateTime);
+                        break;
+                }
+            }
+            else
+            {
+                tasks = tasks.OrderByDescending(p => p.CreateTime);
             }
             int count = tasks.Count();
             if (skip > 0)

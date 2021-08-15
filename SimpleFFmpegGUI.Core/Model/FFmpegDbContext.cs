@@ -9,6 +9,7 @@ namespace SimpleFFmpegGUI.Model
     public class FFmpegDbContext : DbContext
     {
         private static FFmpegDbContext db;
+        private bool hasDb = false;
 
         public static FFmpegDbContext Get()
         {
@@ -19,10 +20,19 @@ namespace SimpleFFmpegGUI.Model
             return db;
         }
 
+        public static FFmpegDbContext GetNew()
+        {
+            return new FFmpegDbContext();
+        }
+
         private FFmpegDbContext()
         {
-            Database.EnsureCreated();
-            Console.WriteLine("数据库已建立");
+            if (!hasDb)
+            {
+                Database.EnsureCreated();
+                hasDb = true;
+                Console.WriteLine("数据库已建立");
+            }
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
