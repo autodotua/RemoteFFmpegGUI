@@ -109,6 +109,8 @@ import {
   jump,
   formatDateTime,
   formatDoubleTimeSpan,
+  showLoading,
+  closeLoading,
 } from "../common";
 import * as net from "../net";
 import FileSelect from "@/components/FileSelect.vue";
@@ -129,13 +131,15 @@ export default Vue.extend({
       console.log(item);
     },
     query() {
+      showLoading();
       net
         .getMediaInfo(this.file)
         .then((response) => {
           this.info = response.data;
           console.log(response.data);
         })
-        .catch(showError);
+        .catch(showError)
+        .finally(closeLoading);
     },
   },
   components: { FileSelect },

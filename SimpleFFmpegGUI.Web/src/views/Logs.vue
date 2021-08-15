@@ -77,6 +77,8 @@ import {
   formatDateTime,
   jump,
   getTaskTypeDescription,
+  showLoading,
+  closeLoading,
 } from "../common";
 
 import * as net from "../net";
@@ -97,10 +99,11 @@ export default Vue.extend({
   },
   methods: {
     fillData() {
+      showLoading();
       const from=this.timeRange&&this.timeRange.length==2?(this.timeRange[0] as Date).toJSON():null;
       const to=this.timeRange&&this.timeRange.length==2?(this.timeRange[1] as Date).toJSON():null;
       
-      net
+    return  net
         .getLogs(
           this.typeFilter,
           from,
@@ -116,21 +119,17 @@ export default Vue.extend({
           });
           this.list = response.data.list;
         })
-        .catch(showError);
+        .catch(showError).finally(closeLoading);
     },
   },
   computed: {},
   mounted: function () {
+    showLoading();
     this.$nextTick(function () {
       this.fillData();
     });
   },
   components: {},
-  // mounted: function() {
-  //   this.$nextTick(function() {
-
-  //   });
-  // }
 });
 </script>
 

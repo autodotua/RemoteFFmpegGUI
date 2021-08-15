@@ -55,6 +55,8 @@ import {
   formatDateTime,
   jump,
   getTaskTypeDescription,
+  showLoading,
+  closeLoading,
 } from "../common";
 
 import * as net from "../net";
@@ -84,7 +86,8 @@ export default Vue.extend({
     },
 
     fillData() {
-      net
+      showLoading();
+     return net
         .getPresets()
         .then((response) => {
           response.data.forEach((element: any) => {
@@ -92,21 +95,18 @@ export default Vue.extend({
           });
           this.list = response.data;
         })
-        .catch(showError);
+        .catch(showError)
+        .finally(closeLoading);
     },
   },
   computed: {},
   mounted: function () {
+    showLoading();
     this.$nextTick(function () {
       this.fillData();
     });
   },
   components: {},
-  // mounted: function() {
-  //   this.$nextTick(function() {
-
-  //   });
-  // }
 });
 </script>
 

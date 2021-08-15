@@ -143,24 +143,31 @@
     </el-table>
     <div>
       <div class="top12">
-      <el-pagination style="float:left" 
-        @size-change="fillData"
-        @current-change="fillData"
-        layout="sizes,prev, pager, next"
-        :page-sizes="[10, 20, 50, 100]"
-        :page-size.sync="countPerPage"
-        :current-page.sync="page"
-        :total="totalCount"
-      >
-      </el-pagination>
-        <el-radio-group v-model="statusFilter" size="small" @change="fillData" style="float:right">
-      <el-radio-button :label="null"><b>全部</b></el-radio-button>
-      <el-radio-button :label="1">排队中</el-radio-button>
-      <el-radio-button :label="2">进行中</el-radio-button>
-      <el-radio-button :label="3">已完成</el-radio-button>
-      <el-radio-button :label="4">错误</el-radio-button>
-      <el-radio-button :label="5">取消</el-radio-button>
-    </el-radio-group></div>
+        <el-pagination
+          style="float: left"
+          @size-change="fillData"
+          @current-change="fillData"
+          layout="sizes,prev, pager, next"
+          :page-sizes="[10, 20, 50, 100]"
+          :page-size.sync="countPerPage"
+          :current-page.sync="page"
+          :total="totalCount"
+        >
+        </el-pagination>
+        <el-radio-group
+          v-model="statusFilter"
+          size="small"
+          @change="fillData"
+          style="float: right"
+        >
+          <el-radio-button :label="null"><b>全部</b></el-radio-button>
+          <el-radio-button :label="1">排队中</el-radio-button>
+          <el-radio-button :label="2">进行中</el-radio-button>
+          <el-radio-button :label="3">已完成</el-radio-button>
+          <el-radio-button :label="4">错误</el-radio-button>
+          <el-radio-button :label="5">取消</el-radio-button>
+        </el-radio-group>
+      </div>
     </div>
   </div>
 </template>
@@ -174,6 +181,8 @@ import {
   formatDateTime,
   jump,
   getTaskTypeDescription,
+  showLoading,
+  closeLoading,
 } from "../common";
 
 import * as net from "../net";
@@ -191,7 +200,7 @@ export default Vue.extend({
       pageCount: 1,
       page: 1,
       countPerPage: 10,
-      statusFilter:null
+      statusFilter: null,
     };
   },
   props: ["status"],
@@ -285,9 +294,8 @@ export default Vue.extend({
         .catch(showError);
     },
     fillData() {
-      let selection = this.selection;
-
-      net
+      showLoading();
+      return net
         .getTaskList(
           this.statusFilter,
           (this.page - 1) * this.countPerPage,
@@ -297,8 +305,7 @@ export default Vue.extend({
           this.totalCount = response.data.totalCount;
           this.pageCount = Math.ceil(this.totalCount / this.countPerPage);
           response.data.list.forEach((element: any) => {
-         
-            element.typeText =getTaskTypeDescription(element.type);
+            element.typeText = getTaskTypeDescription(element.type);
             element.inputText =
               element.inputs.length == 1
                 ? element.inputs[0]
@@ -306,11 +313,13 @@ export default Vue.extend({
           });
           this.list = response.data.list;
         })
-        .catch(showError);
+        .catch(showError)
+        .finally(closeLoading);
     },
   },
   computed: {},
   mounted: function () {
+    showLoading();
     this.$nextTick(function () {
       this.fillData();
       setInterval(() => {
@@ -321,11 +330,6 @@ export default Vue.extend({
     });
   },
   components: {},
-  // mounted: function() {
-  //   this.$nextTick(function() {
-
-  //   });
-  // }
 });
 </script>
 

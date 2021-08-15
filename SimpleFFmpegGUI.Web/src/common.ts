@@ -1,5 +1,13 @@
 import Cookies from "js-cookie"
-import { Notification } from "element-ui"
+import { Notification,Loading } from "element-ui"
+import {  ElLoadingComponent } from "element-ui/types/loading";
+let loadingInstance:ElLoadingComponent|null = null;
+export function showLoading():void{
+    loadingInstance=  Loading.service({});
+}
+export function closeLoading():void{
+  (  loadingInstance as ElLoadingComponent).close();
+}
 export function withToken(obj: any): any {
     console.log(Cookies.get("token"))
     const request = {

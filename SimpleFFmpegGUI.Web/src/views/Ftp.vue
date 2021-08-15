@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="status!=null">
     <h2>输入文件夹</h2>
     <a>{{ status.inputOn ? "已启动，端口号" + status.inputPort : "未启动" }}</a>
     <el-button
@@ -29,6 +29,8 @@ import {
   jump,
   formatDateTime,
   formatDoubleTimeSpan,
+  showLoading,
+  closeLoading,
 } from "../common";
 import * as net from "../net";
 import FileSelect from "@/components/FileSelect.vue";
@@ -42,7 +44,7 @@ export default Vue.extend({
   computed: {},
   methods: {
     getStatus() {
-      net
+    return  net
         .getFtpStatus()
         .then((r) => {
           this.status = r.data;
@@ -60,8 +62,9 @@ export default Vue.extend({
   },
   components: {},
   mounted: function () {
+    showLoading();
     this.$nextTick(function () {
-      this.getStatus();
+      this.getStatus().finally(closeLoading);
     });
   },
 });
