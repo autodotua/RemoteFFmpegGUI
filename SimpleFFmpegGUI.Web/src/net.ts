@@ -3,8 +3,8 @@ import { AxiosResponse } from "axios";
 
 
 function getUrl(controller: string): string {
-        // return `/api/${controller}`;//发布
-        return `https://localhost:44305/${controller}`;//调试
+        return `/api/${controller}`;//发布
+        // return `https://localhost:44305/${controller}`;//调试
 }
 
 export function postResetTask(id: number): Promise<AxiosResponse<any>> {

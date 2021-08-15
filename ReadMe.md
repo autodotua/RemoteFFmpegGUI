@@ -19,3 +19,9 @@
 4. 确保安装了.Net 5 Hosting Bundle，并在Windows中启用了IIS
 4. 在IIS中新建网站，指定物理目录为之前新建的目录，设置api为虚拟应用程序
 7. 运行Host的exe，然后打开设置的url即可使用
+
+- 若要在IIS中启用自动启动Host功能，还需要：
+    1. IIS > 应用程序池
+    2. 为网站选择高级设置
+    3. 将标识（Identity）更改为 LocalSystem
+    4. 重启 IIS

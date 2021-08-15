@@ -1,4 +1,5 @@
-﻿using JKang.IpcServiceFramework.Client;
+﻿using JKang.IpcServiceFramework;
+using JKang.IpcServiceFramework.Client;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,9 +25,13 @@ namespace SimpleFFmpegGUI.WebAPI
             pipeName = config.GetValue<string>("PipeName") ?? throw new Exception("不存在PipeName配置项");
             hostName = config.GetValue<string>("HostName", null);
             hostPath = config.GetValue<string>("HostPath", null);
-
-            EnsureHost();
-
+            try
+            {
+                EnsureHost();
+            }
+            catch (Exception ex)
+            {
+            }
             ServiceProvider serviceProvider = new ServiceCollection()
 .AddNamedPipeIpcClient<IPipeService>("m", pipeName: pipeName)
 .BuildServiceProvider();
@@ -40,14 +45,28 @@ namespace SimpleFFmpegGUI.WebAPI
             this.config = config;
         }
 
-        public Task<TResult> InvokeAsync<TResult>(Expression<Func<IPipeService, TResult>> exp)
+        public async Task<TResult> InvokeAsync<TResult>(Expression<Func<IPipeService, TResult>> exp)
         {
-            return mediaInfoClient.InvokeAsync(exp);
+            try
+            {
+                return await mediaInfoClient.InvokeAsync(exp);
+            }
+            catch (IpcFaultException ex)
+            {
+                throw (ex.InnerException ?? ex).InnerException ?? ex.InnerException ?? ex;
+            }
         }
 
-        public Task InvokeAsync(Expression<Action<IPipeService>> exp)
+        public async Task InvokeAsync(Expression<Action<IPipeService>> exp)
         {
-            return mediaInfoClient.InvokeAsync(exp);
+            try
+            {
+                await mediaInfoClient.InvokeAsync(exp);
+            }
+            catch (IpcFaultException ex)
+            {
+                throw (ex.InnerException ?? ex).InnerException ?? ex.InnerException ?? ex;
+            }
         }
 
         private void EnsureHost()

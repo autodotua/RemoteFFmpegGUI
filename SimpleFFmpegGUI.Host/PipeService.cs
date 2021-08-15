@@ -63,7 +63,15 @@ namespace SimpleFFmpegGUI
 
         public MediaInfoDto GetInfo(string path)
         {
-            var result = FFProbe.Analyse(path);
+            IMediaAnalysis result = null;
+            try
+            {
+                result = FFProbe.Analyse(path);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("查询信息失败");
+            }
             return result.Adapt<MediaInfoDto>();
         }
 

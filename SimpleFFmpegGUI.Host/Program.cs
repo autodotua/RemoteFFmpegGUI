@@ -53,7 +53,11 @@ namespace SimpleFFmpegGUI
                     })
                     .ConfigureIpcHost(builder =>
                     {
-                        builder.AddNamedPipeEndpoint<IPipeService>(pipeName: pipeName);
+                        builder.AddNamedPipeEndpoint<IPipeService>(p=> {
+
+                            p.PipeName = pipeName;
+                            p.IncludeFailureDetailsInResponse = true;
+                        });
                     })
                     .ConfigureLogging(builder =>
                     {
