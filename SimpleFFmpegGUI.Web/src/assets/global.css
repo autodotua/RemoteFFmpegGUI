@@ -26,3 +26,9 @@
 .width80 {
     width: 80px;
 }
+
+.single-line {
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+}

@@ -63,3 +63,12 @@ export function showSuccess(msg: any): void {
 export function jump(url: string): void {
     window.location.href = process.env.BASE_URL + "#/" + url;
 }
+
+export function getTaskTypeDescription(type:number):string{
+    switch (type) {
+        case 0:
+         return "转码";
+          
+      }
+      throw new Error("未知类型："+type)
+}

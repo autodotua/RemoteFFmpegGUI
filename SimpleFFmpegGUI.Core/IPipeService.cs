@@ -49,5 +49,7 @@ namespace SimpleFFmpegGUI
         void ResumeQueue();
 
         void StartQueue();
+
+        PagedListDto<Log> GetLogs(char? type = null, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0);
     }
 }

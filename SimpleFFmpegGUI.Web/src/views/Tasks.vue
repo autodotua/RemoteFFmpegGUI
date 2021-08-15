@@ -173,6 +173,7 @@ import {
   showSuccess,
   formatDateTime,
   jump,
+  getTaskTypeDescription,
 } from "../common";
 
 import * as net from "../net";
@@ -296,11 +297,8 @@ export default Vue.extend({
           this.totalCount = response.data.totalCount;
           this.pageCount = Math.ceil(this.totalCount / this.countPerPage);
           response.data.list.forEach((element: any) => {
-            switch (element.type) {
-              case 0:
-                element.typeText = "转码";
-                break;
-            }
+         
+            element.typeText =getTaskTypeDescription(element.type);
             element.inputText =
               element.inputs.length == 1
                 ? element.inputs[0]

@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using SimpleFFmpegGUI.Dto;
-using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WebAPI.Dto;
 using System.Collections.Generic;
 using System.IO;

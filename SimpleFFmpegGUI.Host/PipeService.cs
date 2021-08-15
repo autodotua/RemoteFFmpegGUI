@@ -134,5 +134,10 @@ namespace SimpleFFmpegGUI
         {
             return PresetManager.GetPresets();
         }
+
+        public PagedListDto<Log> GetLogs(char? type = null, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0)
+        {
+            return LogManager.GetLogs(type, from, to, skip, take);
+        }
     }
 }

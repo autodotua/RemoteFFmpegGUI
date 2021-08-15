@@ -7,6 +7,8 @@ import MediaInfo from '../views/MediaInfo.vue'
 import Code from '../views/Code.vue'
 import Tasks from '../views/Tasks.vue'
 import Ftp from '../views/Ftp.vue'
+import Presets from '../views/Presets.vue'
+import Logs from '../views/Logs.vue'
 
 Vue.use(VueRouter)
 
@@ -20,6 +22,16 @@ Vue.use(VueRouter)
     path: '/info',
     name: 'MediaInfo',
     component: MediaInfo
+  },
+  {
+    path: '/preset',
+    name: 'Preset',
+    component: Presets
+  },
+  {
+    path: '/log',
+    name: 'Logs',
+    component: Logs
   },
   {
     path: '/ftp',

@@ -134,9 +134,17 @@
               <i class="el-icon-document"></i>
               <template #title>任务列表</template>
             </el-menu-item>
+            <el-menu-item index="preset">
+              <i class="el-icon-document-copy"></i>
+              <template #title>预设</template>
+            </el-menu-item>
             <el-menu-item index="ftp">
               <i class="el-icon-folder-opened"></i>
               <template #title>FTP服务</template>
+            </el-menu-item>
+            <el-menu-item index="log">
+              <i class="el-icon-takeaway-box"></i>
+              <template #title>日志</template>
             </el-menu-item>
             <el-menu-item index="about">
               <i class="el-icon-info"></i>

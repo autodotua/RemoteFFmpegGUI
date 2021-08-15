@@ -90,3 +90,26 @@ export function postFtp(input: boolean, on: boolean): Promise<AxiosResponse<any>
         return Vue.axios
                 .post(getUrl("Ftp/" + (input ? "Input" : "Output") + "/" + (on ? "On" : "Off")))
 }
+
+export function postDeletePreset(id:number): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .post(getUrl("Preset/Delete?id="+id))
+}
+
+export function getLogs(type:string|null,from:string|null,to:string|null,skip:number,take:number): Promise<AxiosResponse<any>> {
+        let url=`Log/List?skip=${skip}&take=${take}`;
+        if(type)
+        {
+                url+=`&type=${type}`;
+        }
+        if(from)
+        {
+                url+=`&from=${from}`;
+        }
+        if(to)
+        {
+                url+=`&to=${to}`;
+        }
+        return Vue.axios
+                .get(getUrl(url))
+}
