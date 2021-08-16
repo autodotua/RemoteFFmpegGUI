@@ -36,3 +36,25 @@
     text-overflow: ellipsis; 
     white-space: nowrap; 
 }
+
+html{
+    height: 100%;
+}
+
+body{
+    height: 100%;
+    overflow:hidden;
+}
+
+#app{
+    height: 100%;
+    margin-right: -12px;
+}
+
+.is-vertical{
+    height: 100%;
+}
+
+.center{
+    height: 100%;
+}
