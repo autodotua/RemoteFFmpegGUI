@@ -1,10 +1,14 @@
 import Vue from "vue";
 import { AxiosResponse } from "axios";
 
-
+const dev = false;
 function getUrl(controller: string): string {
-        // return `/api/${controller}`;//发布
-        return `https://localhost:44305/${controller}`;//调试
+        if (dev) {
+                return `https://localhost:44305/${controller}`;//调试
+        }
+        else {
+                return `/api/${controller}`;//发布
+        }
 }
 
 export function postResetTask(id: number): Promise<AxiosResponse<any>> {
@@ -71,8 +75,8 @@ export function getMediaNames(): Promise<AxiosResponse<any>> {
                 .get(getUrl("File/List/Input"))
 }
 
-export function download(id: string): void {
-      window.open(getUrl("File/Download?id=" + encodeURI( id)));
+export function download(name: string): void {
+        window.open(getUrl("File/Download?id=" + encodeURI(name)));
 }
 
 export function getMediaDetails(): Promise<AxiosResponse<any>> {

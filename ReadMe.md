@@ -25,3 +25,8 @@
     2. 为网站选择高级设置
     3. 将标识（Identity）更改为 LocalSystem
     4. 重启 IIS
+
+- 若输入或输出文件夹位于网络位置等IIS无权限的位置，则需要：
+    - 设置`appsettings.json`中的 `InputDirAccessable`和/或`OutputDirAccessable`为`false`，告知程序无权限访问，那么后端将通过Host对文件进行访问
+    - 关闭自动启动Host功能，因为自动启动的Host将继承IIS的权限，依旧无法访问
+    - 这种模式下，HTTP上传和下载功能将不可用（懒得写）

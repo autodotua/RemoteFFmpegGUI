@@ -51,5 +51,16 @@ namespace SimpleFFmpegGUI
         void StartQueue();
 
         PagedListDto<Log> GetLogs(char? type = null, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0);
+
+        void CloseFtp(int id);
+
+        List<FileInfoDto> GetFileDetails(string dir);
+
+        List<string> GetFiles(string dir);
+
+        void OpenFtp(int id, string path, int port);
+
+        int? GetFtpPort(int id);
+        bool IsFileExist(string path);
     }
 }

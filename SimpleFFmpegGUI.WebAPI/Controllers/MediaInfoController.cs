@@ -18,7 +18,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         public async Task<MediaInfoDto> GetAsync(string name)
         {
             CheckNull(name, "文件");
-            CheckInputFileExist(name);
+            await CheckInputFileExistAsync(name);
 
             var result = await pipeClient.InvokeAsync(p => p.GetInfo(Path.Combine(GetInputDir(), name)));
             return result;

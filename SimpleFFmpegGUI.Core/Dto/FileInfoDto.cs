@@ -6,27 +6,21 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SimpleFFmpegGUI.WebAPI.Dto
+namespace SimpleFFmpegGUI.Dto
 {
-    public class FileDto
+    public class FileInfoDto
     {
-        public static ConcurrentDictionary<string, string> Guid2File { get; } = new ConcurrentDictionary<string, string>();
-        private static ConcurrentDictionary<string, string> File2Guid { get; } = new ConcurrentDictionary<string, string>();
+        public FileInfoDto()
+        {
+        }
 
-        public FileDto(string path)
+        public FileInfoDto(string path)
         {
             FileInfo file = new FileInfo(path);
             Name = file.Name;
             Length = file.Length;
             LengthText = NumberConverter.ByteToFitString(Length);
             LastWriteTime = file.LastWriteTime;
-            if (!File2Guid.ContainsKey(path))
-            {
-                string id = Guid.NewGuid().ToString();
-                Guid2File.TryAdd(id, path);
-                File2Guid.TryAdd(path, id);
-            }
-            Id = File2Guid[path];
         }
 
         public string Name { get; set; }

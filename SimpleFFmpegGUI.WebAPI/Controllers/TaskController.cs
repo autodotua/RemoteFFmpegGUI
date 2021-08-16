@@ -45,7 +45,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             foreach (var file in request.Input)
             {
-                CheckInputFileExist(file);
+                await CheckInputFileExistAsync(file);
             }
             CheckFileNameNull(request.Output);
             return await pipeClient.InvokeAsync(p =>

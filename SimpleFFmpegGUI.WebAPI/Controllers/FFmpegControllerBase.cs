@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using SimpleFFmpegGUI.Model;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
@@ -61,11 +62,22 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
         }
 
-        protected void CheckInputFileExist(string name)
+        protected async Task CheckInputFileExistAsync(string name)
         {
-            if (!System.IO.File.Exists(Path.Combine(GetInputDir(), name)))
+            string path = Path.Combine(GetInputDir(), name);
+            if (CanAccessInputDir())
             {
-                throw Oops.Oh("不存在文件" + name);
+                if (!System.IO.File.Exists(path))
+                {
+                    throw Oops.Oh("不存在文件" + name);
+                }
+            }
+            else
+            {
+                if (!await pipeClient.InvokeAsync(p => p.IsFileExist(path)))
+                {
+                    throw Oops.Oh("不存在文件" + name);
+                }
             }
         }
 
@@ -77,6 +89,16 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             task.Inputs = task.Inputs.Select(p => Path.GetFileName(p)).ToList();
             task.Output = Path.GetFileName(task.Output);
+        }
+
+        protected bool CanAccessInputDir()
+        {
+            return config.GetValue("InputDirAccessable", true);
+        }
+
+        protected bool CanAccessOutputDir()
+        {
+            return config.GetValue("OutputDirAccessable", true);
         }
     }
 }

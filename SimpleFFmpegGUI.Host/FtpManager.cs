@@ -10,31 +10,28 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleFFmpegGUI.WebAPI
+namespace SimpleFFmpegGUI
 {
-    public class FtpManager : IDisposable
+    internal class FtpManager : IDisposable
     {
-        public FtpManager(string path, int port)
+        internal FtpManager(string path, int port)
         {
+            if (port <= 0)
+            {
+                port = FreeTcpPort();
+            }
             var services = new ServiceCollection();
 
-            // use %TEMP%/TestFtpServer as root folder
             services.Configure<DotNetFileSystemOptions>(opt => opt
                 .RootPath = path);
 
-            // Add FTP server services
-            // DotNetFileSystemProvider = Use the .NET file system functionality
-            // AnonymousMembershipProvider = allow only anonymous logins
             services.AddFtpServer(builder => builder
-                .UseDotNetFileSystem() // Use the .NET file system functionality
-                .EnableAnonymousAuthentication()); // allow anonymous logins
+                .UseDotNetFileSystem()
+                .EnableAnonymousAuthentication());
 
-            // Configure the FTP server
             services.Configure<FtpServerOptions>(opt => opt.Port = port);
 
-            // Build the service provider
             serviceProvider = services.BuildServiceProvider();
-            // Initialize the FTP server
             ftpServerHost = serviceProvider.GetRequiredService<IFtpServerHost>();
             Path = path;
             Port = port;

@@ -5,8 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FubarDev.FtpServer" Version="3.1.1" />
-    <PackageReference Include="FubarDev.FtpServer.FileSystem.DotNet" Version="3.1.1" />
     <PackageReference Include="Furion" Version="2.16.9" />
     <PackageReference Include="JKang.IpcServiceFramework.Client.NamedPipe" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />

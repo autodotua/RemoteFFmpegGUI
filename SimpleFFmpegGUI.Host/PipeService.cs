@@ -1,12 +1,15 @@
 ﻿using FFMpegCore;
+using FzLib.Collection;
 using Mapster;
 using Newtonsoft.Json;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace SimpleFFmpegGUI
@@ -146,6 +149,50 @@ namespace SimpleFFmpegGUI
         public PagedListDto<Log> GetLogs(char? type = null, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0)
         {
             return LogManager.GetLogs(type, from, to, skip, take);
+        }
+
+        public List<string> GetFiles(string dir)
+        {
+            return Directory.EnumerateFiles(dir).ToList();
+        }
+
+        public List<FileInfoDto> GetFileDetails(string dir)
+        {
+            return Directory.EnumerateFiles(dir).Select(p => new FileInfoDto(p)).ToList();
+        }
+
+        private ConcurrentDictionary<int, FtpManager> ftps = new ConcurrentDictionary<int, FtpManager>();
+
+        public void OpenFtp(int id, string path, int port)
+        {
+            if (ftps.ContainsKey(id))
+            {
+                return;
+            }
+            FtpManager manager = new FtpManager(path, port);
+            if (ftps.TryAdd(id, manager))
+            {
+                manager.StartAsync().Wait();
+            }
+        }
+
+        public void CloseFtp(int id)
+        {
+            if (ftps.ContainsKey(id))
+            {
+                ftps[id].StopAsync().Wait();
+                ftps.TryRemove(id, out _);
+            }
+        }
+
+        public int? GetFtpPort(int id)
+        {
+            return ftps.GetOrDefault(id)?.Port;
+        }
+
+        public bool IsFileExist(string path)
+        {
+            return File.Exists(path);
         }
     }
 }

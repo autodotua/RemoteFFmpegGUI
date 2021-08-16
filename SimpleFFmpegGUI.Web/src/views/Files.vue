@@ -113,8 +113,8 @@ export default Vue.extend({
     getUploadUrl: net.getUploadUrl,
     formatDateTime:formatDateTime,
     download(file:any){
-      const id=file.id;
-      net.download(id);
+      const name=file.name;
+      net.download(name);
 
     },
     upload() {
