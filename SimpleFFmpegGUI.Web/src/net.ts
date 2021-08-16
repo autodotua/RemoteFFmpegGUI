@@ -1,13 +1,13 @@
 import Vue from "vue";
 import { AxiosResponse } from "axios";
 
-const dev = false;
 function getUrl(controller: string): string {
-        if (dev) {
-                return `https://localhost:44305/${controller}`;//调试
-        }
-        else {
+        if (process.env.NODE_ENV === 'production') {
                 return `/api/${controller}`;//发布
+        }
+        else{
+                return `http://192.168.1.2:8080/api/${controller}`;//发布API调试
+                return `https://localhost:44305/${controller}`;//调试
         }
 }
 

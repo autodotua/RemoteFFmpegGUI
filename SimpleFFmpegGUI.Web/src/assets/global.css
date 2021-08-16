@@ -44,11 +44,12 @@ html{
 body{
     height: 100%;
     overflow:hidden;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 #app{
     height: 100%;
-    margin-right: -12px;
 }
 
 .is-vertical{

@@ -322,11 +322,11 @@ export default Vue.extend({
     showLoading();
     this.$nextTick(function () {
       this.fillData();
-      setInterval(() => {
-        if (this.selection.length == 0) {
-          this.fillData();
-        }
-      }, 20000);
+      // setInterval(() => {
+      //   if (this.selection.length == 0) {
+      //     this.fillData();
+      //   }
+      // }, 20000);
     });
   },
   components: {},

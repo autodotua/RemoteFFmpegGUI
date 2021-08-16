@@ -23,7 +23,6 @@ export function formatDoubleTimeSpan(seconds: number, includeMs = false): string
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds / 60 % 60));
     const s = seconds -m*60-h*3600;
-    console.log(s);
     
     if (includeMs) {
     return String(h).padStart(2, '0') + ":"
