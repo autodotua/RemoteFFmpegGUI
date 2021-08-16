@@ -6,7 +6,7 @@ import Welcome from '../views/Welcome.vue'
 import MediaInfo from '../views/MediaInfo.vue'
 import Code from '../views/Code.vue'
 import Tasks from '../views/Tasks.vue'
-import Ftp from '../views/Ftp.vue'
+import Files from '../views/Files.vue'
 import Presets from '../views/Presets.vue'
 import Logs from '../views/Logs.vue'
 
@@ -34,9 +34,9 @@ Vue.use(VueRouter)
     component: Logs
   },
   {
-    path: '/ftp',
-    name: 'Ftp',
-    component: Ftp
+    path: '/file',
+    name: 'File',
+    component: Files
   },
   {
     path: '/tasks',

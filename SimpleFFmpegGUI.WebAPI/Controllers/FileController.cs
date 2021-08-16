@@ -1,4 +1,6 @@
 ﻿using Furion.FriendlyException;
+using FzLib.IO;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -10,17 +12,43 @@ using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
-    public class FtpController : FFmpegControllerBase
+    public class FileController : FFmpegControllerBase
     {
         private static FtpManager inputFtp;
         private static FtpManager outputFtp;
 
-        public FtpController(ILogger<MediaInfoController> logger,
+        public FileController(ILogger<MediaInfoController> logger,
             IConfiguration config,
         PipeClient pipeClient) : base(logger, config, pipeClient) { }
 
+        [HttpGet]
+        [Route("List/Input")]
+        public IEnumerable<string> GetInputFiles()
+        {
+            return Directory.EnumerateFiles(GetInputDir()).Select(p => Path.GetFileName(p));
+        }
+
+        [HttpGet]
+        [Route("List/Output")]
+        public IEnumerable<FileDto> GetOutputFiles()
+        {
+            return Directory.EnumerateFiles(GetOutputDir()).Select(p => new FileDto(p));
+        }
+        [HttpGet]
+        [Route("Download")]
+        public IActionResult Download(string id)
+        {
+            if (FileDto.Guid2File.ContainsKey(id))
+            {
+                string path = FileDto.Guid2File[id];
+                var stream = System.IO.File.OpenRead(path);
+                return File(stream, "application/octet-stream", Path.GetFileName(path));
+            }
+            return NotFound();
+        }
+
         [HttpPost]
-        [Route("Input/On")]
+        [Route("Ftp/Input/On")]
         public async Task OpenInput()
         {
             if (inputFtp != null)
@@ -32,7 +60,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("Input/Off")]
+        [Route("Ftp/Input/Off")]
         public async Task CloseInput()
         {
             if (inputFtp == null)
@@ -44,7 +72,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("Output/On")]
+        [Route("Ftp/Output/On")]
         public async Task OpenOutput()
         {
             if (outputFtp != null)
@@ -56,7 +84,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("Output/Off")]
+        [Route("Ftp/Output/Off")]
         public async Task CloseOutput()
         {
             if (outputFtp == null)
@@ -73,8 +101,8 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("Status")]
-        public FtpStatusDto GetStatus(int id)
+        [Route("Ftp/Status")]
+        public FtpStatusDto GetStatus()
         {
             var status = new FtpStatusDto()
             {
@@ -84,6 +112,21 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                 OutputPort = outputFtp?.Port ?? 0
             };
             return status;
+        }
+
+        [HttpPost]
+        [Route("Upload")]
+        [HttpOptions]
+        [DisableRequestSizeLimit]
+        public async Task UploadFile([FromQuery] IFormFile file)
+        {
+            if (file.Length > 0)
+            {
+                string name = Path.Combine(GetInputDir(), file.FileName);
+                name = FileSystem.GetNoDuplicateFile(name);
+                using var stream = System.IO.File.Create(name);
+                await file.CopyToAsync(stream);
+            }
         }
     }
 }

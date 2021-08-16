@@ -68,7 +68,16 @@ export function getMediaInfo(name: string): Promise<AxiosResponse<any>> {
 
 export function getMediaNames(): Promise<AxiosResponse<any>> {
         return Vue.axios
-                .get(getUrl("MediaDir"))
+                .get(getUrl("File/List/Input"))
+}
+
+export function download(id: string): void {
+      window.open(getUrl("File/Download?id=" + encodeURI( id)));
+}
+
+export function getMediaDetails(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .get(getUrl("File/List/Output"))
 }
 
 export function getPresets(): Promise<AxiosResponse<any>> {
@@ -83,33 +92,34 @@ export function postAddOrUpdatePreset(item: any): Promise<AxiosResponse<any>> {
 
 export function getFtpStatus(): Promise<AxiosResponse<any>> {
         return Vue.axios
-                .get(getUrl("Ftp/Status"))
+                .get(getUrl("File/Ftp/Status"))
 }
 
 export function postFtp(input: boolean, on: boolean): Promise<AxiosResponse<any>> {
         return Vue.axios
-                .post(getUrl("Ftp/" + (input ? "Input" : "Output") + "/" + (on ? "On" : "Off")))
+                .post(getUrl("File/" + (input ? "Ftp/Input" : "Ftp/Output") + "/" + (on ? "On" : "Off")))
 }
 
-export function postDeletePreset(id:number): Promise<AxiosResponse<any>> {
+export function postDeletePreset(id: number): Promise<AxiosResponse<any>> {
         return Vue.axios
-                .post(getUrl("Preset/Delete?id="+id))
+                .post(getUrl("Preset/Delete?id=" + id))
 }
 
-export function getLogs(type:string|null,from:string|null,to:string|null,skip:number,take:number): Promise<AxiosResponse<any>> {
-        let url=`Log/List?skip=${skip}&take=${take}`;
-        if(type)
-        {
-                url+=`&type=${type}`;
+export function getLogs(type: string | null, from: string | null, to: string | null, skip: number, take: number): Promise<AxiosResponse<any>> {
+        let url = `Log/List?skip=${skip}&take=${take}`;
+        if (type) {
+                url += `&type=${type}`;
         }
-        if(from)
-        {
-                url+=`&from=${from}`;
+        if (from) {
+                url += `&from=${from}`;
         }
-        if(to)
-        {
-                url+=`&to=${to}`;
+        if (to) {
+                url += `&to=${to}`;
         }
         return Vue.axios
                 .get(getUrl(url))
+}
+
+export function getUploadUrl(): string {
+        return getUrl("File/Upload");
 }

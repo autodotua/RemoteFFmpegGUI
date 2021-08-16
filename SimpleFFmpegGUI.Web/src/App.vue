@@ -138,9 +138,9 @@
               <i class="el-icon-document-copy"></i>
               <template #title>预设</template>
             </el-menu-item>
-            <el-menu-item index="ftp">
+            <el-menu-item index="file">
               <i class="el-icon-folder-opened"></i>
-              <template #title>FTP服务</template>
+              <template #title>文件服务</template>
             </el-menu-item>
             <el-menu-item index="log">
               <i class="el-icon-takeaway-box"></i>

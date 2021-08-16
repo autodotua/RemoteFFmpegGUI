@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +34,10 @@ namespace SimpleFFmpegGUI.WebAPI
             })
                 .AddInject()
                 .AddFriendlyException();
+            services.Configure<FormOptions>(o =>
+            {
+                o.MultipartBodyLengthLimit = int.MaxValue;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

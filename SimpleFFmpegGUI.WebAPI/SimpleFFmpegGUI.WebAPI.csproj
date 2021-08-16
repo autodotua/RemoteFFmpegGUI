@@ -17,6 +17,12 @@
     <ProjectReference Include="..\SimpleFFmpegGUI.Core\SimpleFFmpegGUI.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="FzStandardLib">
+      <HintPath>..\libs\FzStandardLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>
