@@ -96,7 +96,7 @@
           <el-popconfirm
             v-if="scope.row.status == 2"
             title="真的要取消任务吗？任务会终止"
-            style="margin-left: 10px"
+            style="margin-left: 10px;margin-right: 10px"
             @onConfirm="cancelTask(scope.row)"
           >
             <el-button
@@ -156,7 +156,7 @@
         </el-pagination>
         <el-radio-group
           v-model="statusFilter"
-          size="small"
+          size="mini"
           @change="fillData"
           style="float: right"
         >

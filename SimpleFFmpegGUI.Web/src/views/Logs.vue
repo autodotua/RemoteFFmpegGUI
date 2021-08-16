@@ -53,7 +53,7 @@
         </el-pagination>
         <el-radio-group
           v-model="typeFilter"
-          size="small"
+          size="mini"
           @change="fillData"
           style="float: right"
         >

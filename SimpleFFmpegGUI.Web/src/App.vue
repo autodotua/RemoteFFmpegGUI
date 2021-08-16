@@ -3,7 +3,7 @@
     <el-container>
       <el-header
         class="header one-line"
-        style="height:auto;padding-left:28px"
+        style="height: auto; padding-left: 28px; padding-top: 8px"
       >
         <div>
           <h2 style="display: inline-block; margin-top: 12px">
@@ -26,46 +26,53 @@
               <el-col :sm="7" :xs="12">
                 <el-row><b>码率：</b>{{ status.bitrate }}</el-row>
                 <el-row
-                  ><b>已用：</b>{{
-                    formatDoubleTimeSpan(status.progress.duration)
-                  }}</el-row
+                  ><b>已用：</b
+                  >{{ formatDoubleTimeSpan(status.progress.duration) }}</el-row
                 >
               </el-col>
-              <el-col :sm="7"  :xs="12">
+              <el-col :sm="7" :xs="12">
                 <el-row
                   ><b>速度：</b>{{ status.fps }}FPS{{ "   " }}
                   {{ status.speed }}X</el-row
                 >
                 <el-row
-                  ><b>剩余：</b>{{
-                    formatDoubleTimeSpan(status.progress.lastTime)
-                  }}</el-row
+                  ><b>剩余：</b
+                  >{{ formatDoubleTimeSpan(status.progress.lastTime) }}</el-row
                 >
               </el-col>
-              <el-col :sm="7"  :xs="12">
+              <el-col :sm="7" :xs="12">
                 <el-row
                   ><b>进度：</b>{{ status.f }}帧
                   {{ formatDoubleTimeSpan(status.time, true) }}
                 </el-row>
                 <el-row
-                  ><b>预计完成：</b> {{ formatDateTime(finishTime(), false) }}</el-row
+                  ><b>预计：</b>
+                  {{ formatDateTime(finishTime(), true) }}</el-row
                 >
               </el-col>
 
-              <el-col :sm="3"  :xs="12">
-                <el-popconfirm title="真的要取消任务吗？"  @onConfirm="cancel">
+              <el-col :sm="3" :xs="12">
+                <el-popconfirm title="真的要取消任务吗？" @onConfirm="cancel">
                   <el-button
-                    type="text" style="color:red"
+                    type="text"
+                    style="color: red"
                     slot="reference"
-                  >取消</el-button
-                ></el-popconfirm>
+                    size="big"
+                    >取消</el-button
+                  ></el-popconfirm
+                >
               </el-col>
             </el-row>
-            <el-row   class="right24">
-              <el-progress
-                style="margin-right: 24px"
-                :percentage="Math.round(status.progress.percent * 10000) / 100"
-              ></el-progress>
+            <el-row class="right24">
+              <el-col :xs="8" :sm="6" :md="4" class="one-line"><b>任务：</b> {{ status.progress.name }}</el-col>
+              <el-col :xs="16" :sm="18" :md="20">
+                <el-progress  :text-inside="true" :stroke-width="20"
+                  style="margin-right: 24px;margin-top:4px"
+                  :percentage="
+                    Math.round(status.progress.percent * 10000) / 100
+                  "
+                ></el-progress
+              ></el-col>
             </el-row>
           </div>
           <div v-else style="height: 60px">
@@ -87,26 +94,31 @@
               "
               >正在执行任务</a
             >
-            <el-popconfirm 
+            <el-popconfirm
               title="真的要取消任务吗？"
-              style="float: right; margin-right: 24px; margin-top: 8px"
+              style="float: right; margin-right: 36px; margin-top: 8px"
               @onConfirm="cancel"
             >
               <el-button
-                type="danger"
-                icon="el-icon-close"
-                circle
+                type="text"
+                style="color: red"
                 slot="reference"
-              ></el-button
-            ></el-popconfirm>
+                size="big"
+                >取消</el-button
+              ></el-popconfirm
+            >
           </div>
         </div>
       </el-header>
-      <el-container class="center">
+      <el-container
+        class="center"
+        :style="{ height: 'calc(100% - ' + headerHeight + 'px)' }"
+      >
         <el-aside :width="(menuCollapse ? 68 : 200) + 'px'">
-          <el-button @click="changeMenuSize"
-            :icon="menuCollapse?'el-icon-s-unfold':'el-icon-s-fold'"
-            style="color: #909399; font-size: 24px; font-weight: 400;border:0"
+          <el-button
+            @click="changeMenuSize"
+            :icon="menuCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
+            style="color: #909399; font-size: 24px; font-weight: 400; border: 0"
           ></el-button>
           <el-menu router default-active="1" :collapse="menuCollapse">
             <el-menu-item index="/">
@@ -151,9 +163,9 @@
           </el-menu></el-aside
         >
 
-        <el-main :style="{height:'calc(100% - '+(status != null && status.isProcessing?130:60)+'px)'}"> 
-          
-          <router-view :status="status"></router-view> </el-main>
+        <el-main>
+          <router-view :status="status"></router-view>
+        </el-main>
       </el-container>
     </el-container>
   </div>
@@ -177,7 +189,8 @@ export default Vue.extend({
       status: null,
       netError: false,
       menuCollapse: true,
-      windowWidth:0
+      windowWidth: 0,
+      headerHeight: 0,
     };
   },
   computed: {
@@ -187,6 +200,7 @@ export default Vue.extend({
   },
   mounted: function () {
     this.$nextTick(function () {
+      this.resizeMenu();
       setInterval(this.getStatus, 2000);
       const url = window.location.href;
       // if (url.indexOf("login") >= 0) {
@@ -199,19 +213,21 @@ export default Vue.extend({
     });
   },
   created() {
-    this.resizeMenu();
+    this.getStatus();
     window.addEventListener("resize", this.resizeMenu);
   },
   methods: {
     jump: jump,
     formatDoubleTimeSpan: formatDoubleTimeSpan,
     formatDateTime: formatDateTime,
-    changeMenuSize(){
-      this.menuCollapse=!this.menuCollapse;
+    changeMenuSize() {
+      this.menuCollapse = !this.menuCollapse;
     },
     resizeMenu() {
-      
-      this.windowWidth=window.innerWidth;
+      this.headerHeight =
+        document.getElementsByClassName("header")[0].scrollHeight;
+
+      this.windowWidth = window.innerWidth;
       this.menuCollapse = window.innerWidth < 500;
     },
     finishTime() {
@@ -231,6 +247,7 @@ export default Vue.extend({
         .then((response) => {
           this.netError = false;
           this.status = response.data;
+          this.$nextTick(this.resizeMenu);
         })
         .catch((e) => (this.netError = true));
     },
@@ -249,29 +266,11 @@ export default Vue.extend({
   },
 });
 </script>
-<style >
-.header-title {
-  float: left;
-  margin-top: 0px;
-}
-.el-message-box {
-  width: auto !important;
-}
-body {
-  overflow-x: hidden;
-}
-</style>
+
 <style scoped>
-/* #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+#app {
+  height: 100%;
 }
-header a {
-  text-decoration: none;
-} */
 
 .header {
   margin-left: -12px;

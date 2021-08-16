@@ -12,7 +12,7 @@
 
 ## Web版本部署
 
-1. 打开Web项目，将`net.ts`文件中的`getUrl`方法中的url切换到发布版本
+1. ~~打开Web项目，将`net.ts`文件中的`getUrl`方法中的url切换到发布版本~~（当前版本自动判断，不需要修改）
 2. 在VS中发布Host和WebAPI，在Web项目中命令行运行`npm run build`发布前端包
 3. 修改WebAPI的`appsettings.json`，主要修改`InputDir`和`OutputDir`项，指定输入和输出目录
 4. 新建一个网站文件夹，放置前端文件，新建api文件夹放置WebAPI文件，新建Host文件夹放置Host文件

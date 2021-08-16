@@ -32,30 +32,27 @@
 }
 
 .single-line {
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-html{
+html {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+}
+
+.is-vertical {
     height: 100%;
 }
 
-body{
+.center {
     height: 100%;
-    overflow:hidden;
-    margin-left: 0;
-    margin-right: 0;
-}
-
-#app{
-    height: 100%;
-}
-
-.is-vertical{
-    height: 100%;
-}
-
-.center{
-    height: 100%;
+    margin: 0;
 }

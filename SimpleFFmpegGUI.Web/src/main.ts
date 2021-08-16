@@ -10,7 +10,9 @@ import './assets/global.css'
 
 Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
-Vue.use(ElementUI);
+Vue.use(ElementUI,{
+  size:'small'
+});
 new Vue({
   router,
   render: h => h(App)
