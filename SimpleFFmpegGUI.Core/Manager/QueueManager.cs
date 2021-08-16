@@ -208,7 +208,7 @@ namespace SimpleFFmpegGUI.Manager
 
         private void Output(string data, DataType type)
         {
-            Logger.Output("FFmpeg输出：" + data);
+            Logger.Output(data);
             FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(type == Instances.DataType.Error, data));
         }
 

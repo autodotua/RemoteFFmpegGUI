@@ -31,7 +31,6 @@ namespace SimpleFFmpegGUI.Model
             {
                 Database.EnsureCreated();
                 hasDb = true;
-                Console.WriteLine("数据库已建立");
             }
         }
 

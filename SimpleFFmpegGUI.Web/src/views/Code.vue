@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-form label-width="120px">
+      <h1>输入</h1>
       <el-form-item label="输入文件" v-for="value in files" :key="value.index">
         <a class="el-form-item__label">{{ value.index + 1 }}</a>
         <file-select
@@ -102,7 +103,8 @@
           </div>
         </el-form-item>
       </el-form-item>
-      <el-form-item label="预设">
+      <h1>输出</h1>
+      <el-form-item label="输出参数预设">
         <div>
           <el-select
             @change="selectPreset"
