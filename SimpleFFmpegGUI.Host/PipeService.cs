@@ -96,7 +96,7 @@ namespace SimpleFFmpegGUI
         public StatusDto GetStatus()
         {
             StatusDto status = manager.ProcessingTask == null ? new StatusDto()
-                : new StatusDto(manager.ProcessingTask, manager.Progress, lastOutput);
+                : new StatusDto(manager.ProcessingTask, manager.Progress, lastOutput, manager.IsPaused);
 
             return status;
         }

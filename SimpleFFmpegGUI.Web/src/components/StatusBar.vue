@@ -27,7 +27,8 @@
               {{ formatDoubleTimeSpan(status.time, true) }}
             </el-row>
             <el-row
-              ><b>预计：</b> {{ formatDateTime(finishTime(), true,true,false) }}</el-row
+              ><b>预计：</b>
+              {{ formatDateTime(finishTime(), true, true, false) }}</el-row
             >
           </el-col>
 
@@ -45,12 +46,13 @@
         </el-row>
         <el-row class="right24">
           <el-col :span="8" class="one-line"
-            ><b>任务：</b> {{ status.progress.name }}</el-col
+            ><b>任务：</b> {{status.isPaused?'暂停中': status.progress.name }}</el-col
           >
           <el-col :span="16">
             <el-progress
               :text-inside="true"
               :stroke-width="20"
+              :color="progressColor"
               style="margin-right: 24px; margin-top: 4px"
               :percentage="Math.round(status.progress.percent * 10000) / 100"
             ></el-progress
@@ -70,38 +72,42 @@
               {{ formatDoubleTimeSpan(status.time, true) }}
             </el-row>
           </el-col>
-                <el-col :span="12">    <el-row
+          <el-col :span="12">
+            <el-row
               ><b>已用：</b
               >{{ formatDoubleTimeSpan(status.progress.duration) }}</el-row
             >
-              <el-row
+            <el-row
               ><b>剩余：</b
               >{{ formatDoubleTimeSpan(status.progress.lastTime) }}</el-row
-            >  <el-row
-              ><b>预计：</b>{{formatDateTime(finishTime(), true,true,false) }}</el-row
             >
-            </el-col>
+            <el-row
+              ><b>预计：</b
+              >{{ formatDateTime(finishTime(), true, true, false) }}</el-row
+            >
+          </el-col>
         </el-row>
-        <el-row >
-          <b >任务：</b> {{ status.progress.name }}
-        </el-row>
+        <el-row class="single-line"> <b>任务：</b>{{status.isPaused?'暂停中': status.progress.name }} </el-row>
         <el-row>
           <el-col :span="20">
             <el-progress
               :text-inside="true"
               :stroke-width="20"
-              style=" margin-top: 10px"
+              style="margin-top: 10px"
+              :color="progressColor"
               :percentage="Math.round(status.progress.percent * 10000) / 100"
-            ></el-progress
-          ></el-col><el-col :span="4" >
+            ></el-progress></el-col
+          ><el-col :span="4">
             <el-popconfirm title="真的要取消任务吗？" @onConfirm="cancel">
-              <el-button style="width:75%;color:red" 
+              <el-button
+                style="width: 75%; color: red"
                 type="text"
                 slot="reference"
                 size="big"
                 >取消</el-button
               ></el-popconfirm
-            ></el-col>
+            ></el-col
+          >
         </el-row>
       </div>
     </div>
@@ -151,8 +157,15 @@ export default Vue.component("status-bar", {
   data() {
     return {};
   },
-  props: ["status", "windowWidth"],
-  computed: {},
+  props: ["status", "windowWidth", "isPaused"],
+  computed: {
+    progressColor() {
+      if (this.status && this.status.isPaused) {
+        return "#777777";
+      }
+      return "#50a0fc";
+    },
+  },
   watch: {},
   methods: {
     formatDateTime: formatDateTime,

@@ -20,6 +20,9 @@ namespace SimpleFFmpegGUI.Manager
     public class QueueManager
     {
         private DateTime pauseStartTime;
+        private bool paused = false;
+        public bool IsRunning => ProcessingTask != null;
+        public bool IsPaused => ProcessingTask != null && paused;
         public TaskInfo ProcessingTask { get; private set; }
         public ProgressDto Progress { get; private set; }
         private bool cancelQueue = false;
@@ -91,7 +94,7 @@ namespace SimpleFFmpegGUI.Manager
             var p = new ProgressDto();
             if (task.Inputs.Count == 1)
             {
-                p.Name = task.Inputs[0];
+                p.Name = $"正在转码：{Path.GetFileName(task.Inputs[0])}";
                 try
                 {
                     if (task.Arguments.Input != null && task.Arguments.Input.From.HasValue && task.Arguments.Input.To.HasValue)
@@ -110,7 +113,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             else
             {
-                p.Name = task.Inputs[0] + "等";
+                p.Name = $"正在合并：{Path.GetFileName(task.Inputs[0])}等";
                 try
                 {
                     if (task.Arguments.Input != null && task.Arguments.Input.From.HasValue && task.Arguments.Input.To.HasValue)
@@ -131,13 +134,13 @@ namespace SimpleFFmpegGUI.Manager
             return p;
         }
 
-        private ProgressDto GetProgress(params string[] files)
+        private ProgressDto GetConvertToTsProgress(string file)
         {
             var p = new ProgressDto();
-            p.Name = files.Length == 1 ? files[0] : files[0] + "等";
+            p.Name = $"正在生成临时TS文件：{Path.GetFileName(file)}";
             try
             {
-                p.VideoLength = TimeSpan.FromTicks(files.Select(p => FFProbe.Analyse(p).Duration.Ticks).Sum());
+                p.VideoLength = FFProbe.Analyse(file).Duration;
                 p.StartTime = DateTime.Now;
                 return p;
             }
@@ -156,7 +159,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             foreach (var file in files)
             {
-                Progress = GetProgress(file);
+                Progress = GetConvertToTsProgress(file);
                 string path = FileSystem.GetNoDuplicateFile(Path.Combine(tempFolder, "join.ts"));
                 tsFiles.Add(path);
                 await FFMpegArguments.FromFileInput(file)
@@ -176,6 +179,7 @@ namespace SimpleFFmpegGUI.Manager
 
             FFMpegArguments f = null;
             string tempPath = null;
+            paused = false;
             if (!task.Inputs.Any())
             {
                 throw new ArgumentException("没有输入文件");
@@ -222,6 +226,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 return;
             }
+            paused = true;
             Logger.Info(ProcessingTask, "暂停任务");
             pauseStartTime = DateTime.Now;
             ProcessExtension.SuspendProcess(GetFFmpegProcess().Id);
@@ -237,6 +242,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 return;
             }
+            paused = false;
             Progress.PauseTime = DateTime.Now - pauseStartTime;
             Logger.Info(ProcessingTask, "恢复任务");
             ProcessExtension.ResumeProcess(GetFFmpegProcess().Id);
@@ -386,9 +392,13 @@ namespace SimpleFFmpegGUI.Manager
                 }
             }
 
-            if (!string.IsNullOrEmpty(a.Extra))
+            if (!string.IsNullOrWhiteSpace(a.Extra))
             {
                 fa.WithArguments(a.Extra);
+            }
+            if (!string.IsNullOrWhiteSpace(a.Format))
+            {
+                fa.ForceFormat(FFMpeg.GetContainerFormat(a.Format.ToLower()));
             }
         }
     }

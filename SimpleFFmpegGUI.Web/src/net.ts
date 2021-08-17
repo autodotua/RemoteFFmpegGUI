@@ -38,6 +38,14 @@ export function postCancelQueue(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .post(getUrl("Queue/Cancel"));
 }
+export function postPauseQueue(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .post(getUrl("Queue/Pause"));
+}
+export function postResumeQueue(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .post(getUrl("Queue/Resume"));
+}
 export function postStartQueue(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .post(getUrl("Queue/Start"));

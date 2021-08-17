@@ -14,11 +14,12 @@ namespace SimpleFFmpegGUI.Dto
         {
         }
 
-        public StatusDto(TaskInfo task, ProgressDto progress, string lastOutput)
+        public StatusDto(TaskInfo task, ProgressDto progress, string lastOutput, bool paused)
         {
             Task = task;
             LastOutput = lastOutput;
             IsProcessing = true;
+            IsPaused = paused;
             if (lastOutput != null && rFFmpegOutput.IsMatch(lastOutput))
             {
                 try
@@ -32,8 +33,14 @@ namespace SimpleFFmpegGUI.Dto
                     Speed = match.Groups["speed"].Value;
                     Q = double.Parse(match.Groups["q"].Value);
                     Progress = progress;
-                    progress.Update(Time);
-                    HasDetail = true;
+                    if (progress != null)
+                    {
+                        if (!IsPaused)
+                        {
+                            progress.Update(Time);
+                        }
+                        HasDetail = true;
+                    }
                 }
                 catch
                 {
@@ -45,6 +52,7 @@ namespace SimpleFFmpegGUI.Dto
         public TaskInfo Task { get; set; }
         public ProgressDto Progress { get; set; }
         public bool IsProcessing { get; set; }
+        public bool IsPaused { get; set; }
         public string LastOutput { get; set; }
         public int Frame { get; set; }
         public double Fps { get; set; }

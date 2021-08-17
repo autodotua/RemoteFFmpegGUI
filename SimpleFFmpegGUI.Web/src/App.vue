@@ -83,7 +83,10 @@
         >
 
         <el-main>
-          <router-view :status="status"></router-view>
+          <router-view
+            :status="status"
+            @statusChanged="delayGetStatus"
+          ></router-view>
         </el-main>
       </el-container>
       <el-footer class="footer" style="height: auto; z-index: 1000">
@@ -164,6 +167,9 @@ export default Vue.extend({
           return;
         })
         .catch(showError);
+    },
+    delayGetStatus() {
+      setTimeout(this.getStatus, 500);
     },
     getStatus() {
       net

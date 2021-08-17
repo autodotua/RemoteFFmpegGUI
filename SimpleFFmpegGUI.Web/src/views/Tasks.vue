@@ -1,35 +1,62 @@
 <template>
   <div>
     <div>
-      <el-button v-if="isProcessing == false" type="primary" @click="start"
-        >开始队列</el-button
-      >
-      <el-popconfirm
-        v-if="isProcessing"
-        title="真的要取消任务吗？"
-        @onConfirm="cancel"
-      >
-        <el-button type="danger" slot="reference"
-          >停止队列</el-button
-        ></el-popconfirm
-      >
-      <el-button v-if="selection.length > 0" type="warn" @click="deleteTasks"
-        >删除</el-button
-      >
-      <el-button v-if="selection.length > 0" @click="resetTasks" type="warn"
-        >重置</el-button
-      >
-      <el-popconfirm
-        title="真的要取消所选任务吗？正在执行的任务会被终止"
-        @onConfirm="cancelTask(scope.row)"
-      >
+      <span style="float: right">
+        <el-button v-if="isProcessing == false" type="primary" @click="start"
+          >开始队列</el-button
+        >
+        <el-popconfirm
+          v-if="isProcessing"
+          title="真的要取消任务吗？"
+          @onConfirm="cancel"
+          class="right12"
+        >
+          <el-button type="danger" slot="reference"
+            >停止</el-button
+          ></el-popconfirm
+        >
+        <el-button
+          class="right12"
+          v-if="isProcessing && isPaused == false"
+          type="warning"
+          @click="pause"
+          >暂停</el-button
+        >
+        <el-button
+          class="right12"
+          v-if="isProcessing && isPaused"
+          type="warn"
+          @click="resume"
+          >继续</el-button
+        >
+      </span>
+      <span style="float: left">
+        <el-popconfirm
+          title="真的要取消所选任务吗？正在执行的任务会被终止"
+          @onConfirm="deleteTasks"
+          class="right12"
+        >
+          <el-button v-if="selection.length > 0" slot="reference" type="danger"
+            >删除</el-button
+          ></el-popconfirm
+        >
         <el-button
           v-if="selection.length > 0"
-          type="warn"
-          @click="cancelTasks"
-          slot="reference"
-          >取消</el-button
-        ></el-popconfirm
+          class="right12"
+          @click="resetTasks"
+          >重置</el-button
+        >
+        <el-popconfirm
+          title="真的要取消所选任务吗？正在执行的任务会被终止"
+          @onConfirm="cancelTasks"
+        >
+          <el-button
+            v-if="selection.length > 0"
+            type="warnning"
+            slot="reference"
+            >取消</el-button
+          ></el-popconfirm
+        ></span
       >
     </div>
     <el-table
@@ -96,7 +123,7 @@
           <el-popconfirm
             v-if="scope.row.status == 2"
             title="真的要取消任务吗？任务会终止"
-            style="margin-left: 10px;margin-right: 10px"
+            style="margin-left: 10px; margin-right: 10px"
             @onConfirm="cancelTask(scope.row)"
           >
             <el-button
@@ -194,6 +221,7 @@ export default Vue.extend({
     return {
       list: [],
       isProcessing: false,
+      isPaused: false,
       totalCount: 0,
       selection: [],
       taskID: 0,
@@ -208,12 +236,14 @@ export default Vue.extend({
     status(value) {
       if (
         this.isProcessing != value.isProcessing ||
+        this.isPaused != value.isPaused ||
         this.taskID != (value.task == null ? 0 : value.task.id)
       ) {
-        this.isProcessing = value.isProcessing;
-        this.taskID = value.task == null ? 0 : value.task.id;
         this.fillData();
       }
+      this.isProcessing = value.isProcessing;
+      this.isPaused = value.isPaused;
+      this.taskID = value.task == null ? 0 : value.task.id;
     },
   },
   methods: {
@@ -271,7 +301,6 @@ export default Vue.extend({
         .postCancelTask(item.id)
         .then((r) => {
           this.fillData();
-          console.log(r);
         })
         .catch(showError);
     },
@@ -281,6 +310,25 @@ export default Vue.extend({
         .then((r) => {
           this.isProcessing = true;
           this.fillData();
+          this.$emit("statusChanged");
+        })
+        .catch(showError);
+    },
+    pause() {
+      net
+        .postPauseQueue()
+        .then((r) => {
+          this.isPaused = true;
+          this.$emit("statusChanged");
+        })
+        .catch(showError);
+    },
+    resume() {
+      net
+        .postResumeQueue()
+        .then((r) => {
+          this.isPaused = false;
+          this.$emit("statusChanged");
         })
         .catch(showError);
     },
@@ -289,12 +337,14 @@ export default Vue.extend({
         .postCancelQueue()
         .then((r) => {
           this.isProcessing = false;
-          this.fillData();
+          this.$emit("statusChanged");
+          setTimeout(() => {
+            this.fillData();
+          }, 500);
         })
         .catch(showError);
     },
     fillData() {
-      showLoading();
       return net
         .getTaskList(
           this.statusFilter,
