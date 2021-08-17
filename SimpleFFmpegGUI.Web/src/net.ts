@@ -6,7 +6,7 @@ function getUrl(controller: string): string {
                 return `/api/${controller}`;//发布
         }
         else{
-                return `http://192.168.1.2:8080/api/${controller}`;//发布API调试
+                // return `http://192.168.1.2:8080/api/${controller}`;//发布API调试
                 return `https://localhost:44305/${controller}`;//调试
         }
 }

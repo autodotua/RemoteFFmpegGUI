@@ -1,8 +1,13 @@
 
 <template>
-  <el-form label-width="120px">
+  <el-form label-width="96px">
     <el-form-item label="视频编码">
-      <el-switch v-model="code.enableVideo"> </el-switch>
+      <el-switch v-model="code.enableVideo" class="right24"> </el-switch>
+      <a v-show="!code.enableVideo" class="right12">不导出视频</a>
+      <el-switch
+        v-show="!code.enableVideo"
+        v-model="code.disableVideo"
+      ></el-switch>
     </el-form-item>
     <el-form-item label="" v-show="code.enableVideo">
       <el-form-item label="编码" size="small">
@@ -87,31 +92,32 @@
             size="small"
             v-model="code.video.fps"
             :precision="3"
-            :min="1"  class="right24"
+            :min="1"
+            class="right24"
             :max="120"
           >
           </el-input-number>
           <el-button type="text" class="right24" @click="code.video.fps = 10"
             >10帧</el-button
           >
-          <el-button type="text"  class="right24" @click="code.video.fps = 24"
+          <el-button type="text" class="right24" @click="code.video.fps = 24"
             >24帧</el-button
           >
           <el-button type="text" class="right24" @click="code.video.fps = 25"
             >25帧</el-button
           >
-          <el-button type="text"  class="right24" @click="code.video.fps = 30"
+          <el-button type="text" class="right24" @click="code.video.fps = 30"
             >30帧</el-button
           >
-          <el-button type="text"  @click="code.video.fps = 60"
-            >60帧</el-button
-          >
+          <el-button type="text" @click="code.video.fps = 60">60帧</el-button>
         </div>
       </el-form-item>
       <el-form-item label="分辨率">
-        <el-switch v-model="code.video.enableScale"  class="right24"> </el-switch>
+        <el-switch v-model="code.video.enableScale" class="right24">
+        </el-switch>
         <el-input-number
-          size="small" class="right24 width80"
+          size="small"
+          class="right24 width80"
           :min="1"
           :max="20000"
           placeholder="宽度"
@@ -119,12 +125,10 @@
           :controls="false"
           v-show="code.video.enableScale"
         ></el-input-number>
-        <a
-          v-show="code.video.enableScale" class="right24"
-          >×</a
-        >
+        <a v-show="code.video.enableScale" class="right24">×</a>
         <el-input-number
-          size="small" class="width80"
+          size="small"
+          class="width80"
           :min="1"
           :max="20000"
           placeholder="高度"
@@ -134,8 +138,13 @@
         ></el-input-number>
       </el-form-item>
     </el-form-item>
-    <el-form-item label=" 音频编码">
-      <el-switch v-model="code.enableAudio"> </el-switch>
+    <el-form-item label="音频编码">
+      <el-switch v-model="code.enableAudio" class="right24"> </el-switch>
+      <a v-show="!code.enableAudio" class="right12">不导出音频</a>
+      <el-switch
+        v-show="!code.enableAudio"
+        v-model="code.disableAudio"
+      ></el-switch>
     </el-form-item>
     <el-form-item label="" v-show="code.enableAudio">
       <el-form-item label="编码">
@@ -162,11 +171,9 @@
         </el-slider
       ></el-form-item>
       <el-form-item label="采样率" style="margin-top: 24px">
-        <el-switch v-model="code.audio.enableSample" class="right24"> </el-switch>
-        <el-select
-          v-model="code.audio.sample"
-          v-show="code.audio.enableSample"
-        >
+        <el-switch v-model="code.audio.enableSample" class="right24">
+        </el-switch>
+        <el-select v-model="code.audio.sample" v-show="code.audio.enableSample">
           <el-option
             v-for="c in audioSamples"
             :key="c"
@@ -178,7 +185,10 @@
     </el-form-item>
 
     <el-form-item label="额外参数">
-      <el-input v-model="code.extra"  placeholder="请输入ffmpeg的运行参数"></el-input>
+      <el-input
+        v-model="code.extra"
+        placeholder="请输入ffmpeg的运行参数"
+      ></el-input>
     </el-form-item>
   </el-form>
 </template>
@@ -244,7 +254,9 @@ export default Vue.component("code-arguments", {
           enableSample: false,
           sample: 48000,
         },
-        extra:""
+        disableVideo: false,
+        disableAudio: false,
+        extra: "",
       },
     };
   },
@@ -276,7 +288,18 @@ export default Vue.component("code-arguments", {
             samplingRate: audio.enableSample ? audio.sample : null,
           }
         : null;
-      let arg = { video: videoArg, audio: audioArg, input: null,extra:this.code.extra };
+      let arg = {
+        video: videoArg,
+        audio: audioArg,
+        input: null,
+        extra: this.code.extra,
+        disableVideo: videoArg == null && this.code.disableVideo,
+        disableAudio: audioArg == null && this.code.disableAudio,
+      };
+      if (arg.disableVideo && arg.disableAudio) {
+        showError("不可同时禁用视频和音频");
+        return null;
+      }
       return arg;
     },
     updateFromArgs(args: any) {
@@ -284,9 +307,8 @@ export default Vue.component("code-arguments", {
 
       const video = args.video;
       const audio = args.audio;
-      const extra = args.extra;
 
-      if (video != null) {
+      if (video != null&&!args.disableVideo) {
         this.code.enableVideo = true;
         const uiV = this.code.video;
         uiV.code = video.code;
@@ -332,7 +354,7 @@ export default Vue.component("code-arguments", {
         this.code.enableVideo = false;
       }
 
-      if (audio != null) {
+      if (audio != null&&!args.disableAudio) {
         const uiA = this.code.audio;
         uiA.code = audio.code;
         if (audio.bitrate != null) {
@@ -347,10 +369,14 @@ export default Vue.component("code-arguments", {
         } else {
           uiA.enableSample = false;
         }
+      }else{
+        this.code.enableAudio=false;
       }
-
-      this.code.extra=extra;
-    },
+      this.code.disableVideo = args.disableVideo;
+      this.code.disableAudio = args.disableAudio;
+      this.code.extra = args.Extra;
+    }
+    
   },
   components: {},
   mounted: function () {
@@ -361,12 +387,11 @@ export default Vue.component("code-arguments", {
 });
 </script>
 <style scoped>
-div[role=slider]{
+div[role="slider"] {
   min-width: 240px;
 }
 
-.el-select{
-  min-width:160px;
+.el-select {
+  min-width: 160px;
 }
-
 </style>

@@ -288,16 +288,48 @@ namespace SimpleFFmpegGUI.Manager
 
         private void ApplyOutputArguments(FFMpegArgumentOptions fa, CodeArguments a)
         {
-            if (a.Video == null && a.Audio == null)
+            if (a.DisableVideo && a.DisableAudio)
+            {
+                throw new Exception("不能同时禁用视频和音频");
+            }
+            if (a.Video == null && a.Audio == null && !a.DisableAudio && !a.DisableVideo)
             {
                 fa.CopyChannel(Channel.Both);
                 return;
             }
+            if (a.DisableVideo)
+            {
+                a.Video = null;
+            }
+            if (a.DisableAudio)
+            {
+                a.Audio = null;
+            }
+
             if (a.Video == null)
             {
-                fa.CopyChannel(Channel.Video);
+                if (a.DisableVideo)
+                {
+                    fa.DisableChannel(Channel.Video);
+                }
+                else
+                {
+                    fa.CopyChannel(Channel.Video);
+                }
             }
-            else
+            if (a.Audio == null)
+            {
+                if (a.DisableAudio)
+                {
+                    fa.DisableChannel(Channel.Audio);
+                }
+                else
+                {
+                    fa.CopyChannel(Channel.Audio);
+                }
+            }
+
+            if (a.Video != null)
             {
                 Codec code = a.Video.Code.ToLower().Replace(".", "") switch
                 {
@@ -335,11 +367,7 @@ namespace SimpleFFmpegGUI.Manager
                     });
                 }
             }
-            if (a.Audio == null)
-            {
-                fa.CopyChannel(Channel.Audio);
-            }
-            else
+            if (a.Audio != null)
             {
                 Codec code = a.Audio.Code.ToLower().Replace(".", "") switch
                 {

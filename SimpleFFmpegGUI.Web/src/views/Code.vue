@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form label-width="120px">
+    <el-form label-width="100px">
       <h1>输入</h1>
       <el-form-item label="输入文件" v-for="value in files" :key="value.index">
         <a class="el-form-item__label">{{ value.index + 1 }}</a>
@@ -43,64 +43,102 @@
         <el-form-item label="裁剪">
           <el-switch v-model="inputArgs.enableClip"> </el-switch>
           <div v-show="inputArgs.enableClip">
-            <el-input-number
-              v-model="inputArgs.timeFromH"
-              controls-position="right"
-              :min="0"
-              :max="100"
-              size="small"
-              class="time"
-            ></el-input-number>
-            <a>:</a>
-            <el-input-number
-              v-model="inputArgs.timeFromM"
-              controls-position="right"
-              :min="0"
-              :max="59"
-              size="small"
-              class="time"
-            ></el-input-number>
-            <a>:</a>
-            <el-input-number
-              v-model="inputArgs.timeFromS"
-              controls-position="right"
-              :min="0"
-              :precision="3"
-              :max="59.999"
-              size="small"
-              class="time"
-            ></el-input-number>
+            <el-row :gutter="12">
+              <el-col :sm="24" :md="12" class="top12">
+                <el-input
+                  maxlength="13"
+                  placeholder="时间格式：12:34:56.123"
+                  v-model="inputArgs.timeFrom"
+                  class="time-text"
+                >
+                  <template slot="prepend">从</template>
+                  <el-button
+                    slot="append"
+                    icon="el-icon-check"
+                    @click="parseTime(1)"
+                  ></el-button>
+                </el-input>
+              </el-col>
+              <el-col :sm="24" :md="12" class="top12">
+                <el-input-number
+                  v-model="inputArgs.timeFromH"
+                  :min="0"
+                  :max="100"
+                  size="small"
+                  :controls="false"
+                  class="time"
+                ></el-input-number>
+                <a class="time-colon">:</a>
+                <el-input-number
+                  v-model="inputArgs.timeFromM"
+                  :min="0"
+                  :controls="false"
+                  :max="59"
+                  size="small"
+                  class="time"
+                ></el-input-number>
+                <a class="time-colon"> :</a>
+                <el-input-number
+                  v-model="inputArgs.timeFromS"
+                  :min="0"
+                  :controls="false"
+                  :precision="3"
+                  :max="59.999"
+                  size="small"
+                  class="time"
+                ></el-input-number>
+              </el-col>
+            </el-row>
+            <el-row :gutter="12">
+              <el-col :sm="24" :md="12" class="top12">
+                <el-input
+                  maxlength="13"
+                  placeholder="时间格式：12:34:56.123"
+                  v-model="inputArgs.timeTo"
+                  class="time-text"
+                >
+                  <template slot="prepend">到</template>
+                  <el-button
+                    slot="append"
+                    icon="el-icon-check"
+                    @click="parseTime"
+                  ></el-button>
+                </el-input>
+              </el-col>
+              <el-col :sm="24" :md="12" class="top12">
+                <el-input-number
+                  v-model="inputArgs.timeToH"
+                  :min="0"
+                  :max="100"
+                  size="small"
+                  :controls="false"
+                  class="time"
+                ></el-input-number>
+                <a class="time-colon">:</a>
+                <el-input-number
+                  v-model="inputArgs.timeToM"
+                  :min="0"
+                  :controls="false"
+                  :max="59"
+                  size="small"
+                  class="time"
+                ></el-input-number>
+                <a class="time-colon"> :</a>
+                <el-input-number
+                  v-model="inputArgs.timeToS"
+                  :min="0"
+                  :controls="false"
+                  :precision="3"
+                  :max="59.999"
+                  size="small"
+                  class="time"
+                ></el-input-number>
+              </el-col>
+            </el-row>
           </div>
-          <div v-show="inputArgs.enableClip">
-            <a style="margin-left: -28px">到：</a>
-            <el-input-number
-              v-model="inputArgs.timeToH"
-              controls-position="right"
-              :min="0"
-              :max="100"
-              size="small"
-              class="time"
-            ></el-input-number>
-            <a>:</a>
-            <el-input-number
-              v-model="inputArgs.timeToM"
-              controls-position="right"
-              :min="0"
-              :max="59"
-              size="small"
-              class="time"
-            ></el-input-number>
-            <a>:</a>
-            <el-input-number
-              v-model="inputArgs.timeToS"
-              controls-position="right"
-              :min="0"
-              :precision="3"
-              :max="59.999"
-              size="small"
-              class="time"
-            ></el-input-number>
-          </div>
+          <a v-if="inputArgs.timeParseError != ''" style="color: red">{{
+            inputArgs.timeParseError
+          }}</a>
         </el-form-item>
       </el-form-item>
       <h1>输出</h1>
@@ -179,6 +217,9 @@ export default Vue.extend({
         timeToH: 0,
         timeToM: 0,
         timeToS: 0,
+        timeFrom: "",
+        timeTo: "",
+        timeParseError: "",
       },
       presets: [],
       preset: null,
@@ -188,6 +229,41 @@ export default Vue.extend({
   computed: {},
   methods: {
     jump: jump,
+    parseTime(type: number) {
+      let parts: string[];
+      let h: number;
+      let m: number;
+      let s: number;
+      if (type == 1) {
+        parts = this.inputArgs.timeFrom.replace("：", ":").split(":");
+      } else {
+        parts = this.inputArgs.timeTo.replace("：", ":").split(":");
+      }
+      if (parts.length == 1 || parts.length > 3) {
+        this.inputArgs.timeParseError = "解析失败，无法识别时间部分";
+        return;
+      }
+      const strS = parts[parts.length - 1];
+      const strM = parts[parts.length - 2];
+      const strH = parts.length == 3 ? parts[parts.length - 3] : "0";
+
+      h = Number.parseInt(strH);
+      m = Number.parseInt(strM);
+      s = Number.parseFloat(strS);
+      if (Number.isNaN(h) || Number.isNaN(m) || Number.isNaN(s)) {
+        this.inputArgs.timeParseError = "解析失败，无法转为数字";
+        return;
+      }
+      if (type == 1) {
+        this.inputArgs.timeFromH = h;
+        this.inputArgs.timeFromM = m;
+        this.inputArgs.timeFromS = s;
+      } else {
+        this.inputArgs.timeToH = h;
+        this.inputArgs.timeToM = m;
+        this.inputArgs.timeToS = s;
+      }
+    },
     selectFile(file: string, index: number) {
       this.files[index].path = file;
       if (index == 0 && this.output == "") {
@@ -205,6 +281,9 @@ export default Vue.extend({
     },
     updatePreset() {
       let args = (this.$refs.args as any).getArgs();
+      if (args == null) {
+        return;
+      }
       const name = (
         this.presets.filter((p) => (p as any).id == this.preset)[0] as any
       ).name;
@@ -242,6 +321,9 @@ export default Vue.extend({
     },
     savePreset() {
       let args = (this.$refs.args as any).getArgs();
+      if (args == null) {
+        return;
+      }
       net
         .postAddOrUpdatePreset({ name: this.newPresetName, arguments: args })
         .then((r) => {
@@ -258,6 +340,9 @@ export default Vue.extend({
         return;
       }
       let args = (this.$refs.args as any).getArgs();
+      if (args == null) {
+        return;
+      }
       if (this.inputArgs.enableClip) {
         args.input = {};
         args.input.from =
@@ -310,9 +395,17 @@ export default Vue.extend({
 }
 
 .time {
+  width: 72px;
+}
+.time-second {
   width: 108px;
-  margin-left: 12px;
-  margin-right: 12px;
+}
+.time-colon {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+.time-text {
+  max-width: 320px;
 }
 .bottom-div {
   display: inline-block;
