@@ -39,7 +39,9 @@
 
 html {
     height: 100%;
+    width:100%;
     margin: 0;
+    position:fixed
 }
 
 body {
@@ -56,3 +58,10 @@ body {
     height: 100%;
     margin: 0;
 }
+
+.one-line {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  

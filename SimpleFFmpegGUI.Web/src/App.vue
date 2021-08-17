@@ -6,7 +6,9 @@
         style="height: auto; padding-left: 28px; padding-top: 8px"
       >
         <div>
-          <h2 style="display: inline-block; margin-top: 12px">
+          <h2
+            style="display: inline-block; margin-top: 8px; margin-bottom: 8px"
+          >
             远程FFmpeg工具箱
           </h2>
           <a
@@ -20,99 +22,16 @@
             >获取状态失败</a
           >
         </div>
-        <div class="status-bar" v-if="status != null && status.isProcessing">
-          <div v-if="status.hasDetail">
-            <el-row>
-              <el-col :sm="7" :xs="12">
-                <el-row><b>码率：</b>{{ status.bitrate }}</el-row>
-                <el-row
-                  ><b>已用：</b
-                  >{{ formatDoubleTimeSpan(status.progress.duration) }}</el-row
-                >
-              </el-col>
-              <el-col :sm="7" :xs="12">
-                <el-row
-                  ><b>速度：</b>{{ status.fps }}FPS{{ "   " }}
-                  {{ status.speed }}X</el-row
-                >
-                <el-row
-                  ><b>剩余：</b
-                  >{{ formatDoubleTimeSpan(status.progress.lastTime) }}</el-row
-                >
-              </el-col>
-              <el-col :sm="7" :xs="12">
-                <el-row
-                  ><b>进度：</b>{{ status.f }}帧
-                  {{ formatDoubleTimeSpan(status.time, true) }}
-                </el-row>
-                <el-row
-                  ><b>预计：</b>
-                  {{ formatDateTime(finishTime(), true) }}</el-row
-                >
-              </el-col>
-
-              <el-col :sm="3" :xs="12">
-                <el-popconfirm title="真的要取消任务吗？" @onConfirm="cancel">
-                  <el-button
-                    type="text"
-                    style="color: red"
-                    slot="reference"
-                    size="big"
-                    >取消</el-button
-                  ></el-popconfirm
-                >
-              </el-col>
-            </el-row>
-            <el-row class="right24">
-              <el-col :xs="8" :sm="6" :md="4" class="one-line"><b>任务：</b> {{ status.progress.name }}</el-col>
-              <el-col :xs="16" :sm="18" :md="20">
-                <el-progress  :text-inside="true" :stroke-width="20"
-                  style="margin-right: 24px;margin-top:4px"
-                  :percentage="
-                    Math.round(status.progress.percent * 10000) / 100
-                  "
-                ></el-progress
-              ></el-col>
-            </el-row>
-          </div>
-          <div v-else style="height: 60px">
-            <i
-              class="el-icon-loading"
-              style="
-                font-size: 24px;
-                position: absolute;
-                left: 50%;
-                margin-left: -12px;
-              "
-            ></i>
-            <a
-              style="
-                position: absolute;
-                left: 50%;
-                margin-left: -46px;
-                margin-top: 32px;
-              "
-              >正在执行任务</a
-            >
-            <el-popconfirm
-              title="真的要取消任务吗？"
-              style="float: right; margin-right: 36px; margin-top: 8px"
-              @onConfirm="cancel"
-            >
-              <el-button
-                type="text"
-                style="color: red"
-                slot="reference"
-                size="big"
-                >取消</el-button
-              ></el-popconfirm
-            >
-          </div>
-        </div>
       </el-header>
       <el-container
         class="center"
-        :style="{ height: 'calc(100% - ' + headerHeight + 'px)' }"
+        :style="{
+          height: 'calc(100% - ' + (headerHeight + footerHeight) + 'px)',
+          marginBottom:
+            status == null || status.isProcessing == false ? '0' : '12px',
+          paddingBottom:
+            status == null || status.isProcessing == false ? '0' : '8px',
+        }"
       >
         <el-aside :width="(menuCollapse ? 68 : 200) + 'px'">
           <el-button
@@ -167,6 +86,9 @@
           <router-view :status="status"></router-view>
         </el-main>
       </el-container>
+      <el-footer class="footer" style="height: auto; z-index: 1000">
+        <status-bar :status="status" :window-width="windowWidth"></status-bar>
+      </el-footer>
     </el-container>
   </div>
 </template>
@@ -180,6 +102,7 @@ import {
   formatDoubleTimeSpan,
 } from "./common";
 import * as net from "./net";
+import StatusBar from "./components/StatusBar.vue";
 
 export default Vue.extend({
   name: "App",
@@ -191,6 +114,7 @@ export default Vue.extend({
       menuCollapse: true,
       windowWidth: 0,
       headerHeight: 0,
+      footerHeight: 0,
     };
   },
   computed: {
@@ -226,13 +150,13 @@ export default Vue.extend({
     resizeMenu() {
       this.headerHeight =
         document.getElementsByClassName("header")[0].scrollHeight;
+      this.footerHeight =
+        document.getElementsByClassName("footer")[0].scrollHeight;
 
       this.windowWidth = window.innerWidth;
       this.menuCollapse = window.innerWidth < 500;
     },
-    finishTime() {
-      return new Date((this.status as any).progress.finishTime);
-    },
+
     cancel() {
       net
         .postCancelQueue()
@@ -264,6 +188,7 @@ export default Vue.extend({
       });
     },
   },
+  components: { StatusBar },
 });
 </script>
 
@@ -279,19 +204,4 @@ export default Vue.extend({
   background: #ebeef5;
   color: #606266;
 }
-.status-bar {
-  background-color: lightgreen;
-  padding-left: 24px;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  margin-left: -30px;
-  margin-right: -30px;
-  margin-top: -12px;
-}
-.one-line {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 </style>
