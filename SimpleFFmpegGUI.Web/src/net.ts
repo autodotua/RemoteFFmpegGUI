@@ -1,3 +1,4 @@
+import Cookies  from 'js-cookie';
 import Vue from "vue";
 import { AxiosResponse } from "axios";
 import { stringType2Number } from "./common";
@@ -148,4 +149,18 @@ export function getUploadUrl(): string {
 export function getFormats(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("Task/Formats"))
+}
+
+export function setHeader():void{
+        Vue.axios.defaults.headers.common['Authorization'] = Cookies.get("token");
+}
+
+export function getNeedToken(): Promise<AxiosResponse<any>>{
+        return Vue.axios
+        .get(getUrl("Token/Need"))   
+}
+
+export function getCheckToken(token:string): Promise<AxiosResponse<any>>{
+        return Vue.axios
+        .get(getUrl("Token/Check?token=")+token)   
 }

@@ -17,9 +17,17 @@
               color: red;
               display: inline-block;
               float: right;
-              margin-top: 20px;
+              margin-top: 18px;
+              font-size: 12px;
             "
             >获取状态失败</a
+          >
+          <el-button
+            style="display: inline-block; float: right; margin-top: 12px"
+            type="text"
+            v-show="logged"
+            @click="logout"
+            >已登录</el-button
           >
         </div>
       </el-header>
@@ -33,7 +41,10 @@
             status == null || status.isProcessing == false ? '0' : '8px',
         }"
       >
-        <el-aside :width="(menuCollapse ? 68 : 200) + 'px'">
+        <el-aside
+          :width="(menuCollapse ? 68 : 200) + 'px'"
+          v-if="this.$route.path != '/login'"
+        >
           <el-button
             @click="changeMenuSize"
             :icon="menuCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
@@ -122,28 +133,38 @@ export default Vue.extend({
       windowWidth: 0,
       headerHeight: 0,
       footerHeight: 0,
+      logged: false,
     };
   },
-  computed: {
-    username() {
-      return Cookies.get("username");
-    },
-  },
+  computed: {},
   mounted: function () {
     this.$nextTick(function () {
       this.resizeMenu();
       setInterval(this.getStatus, 2000);
       const url = window.location.href;
-      // if (url.indexOf("login") >= 0) {
-      //   this.showHeader = false;
-      // } else {
-      //   if (Cookies.get("userID") == undefined) {
-      //    jump("login");
-      //   }
-      // }
     });
   },
   created() {
+    console.log("app created");
+
+    net.getNeedToken().then((r) => {
+      if (r.data == true) {
+        if (Cookies.get("token")) {
+          net.getCheckToken(Cookies.get("token") as string).then((r) => {
+            if (!r.data) {
+              //token错误
+              jump("login");
+            } else {
+              net.setHeader();
+              this.logged = true;
+            }
+          });
+        } else {
+          jump("login");
+        }
+      }
+    });
+    net.setHeader();
     this.getStatus();
     window.addEventListener("resize", this.resizeMenu);
   },
@@ -174,6 +195,16 @@ export default Vue.extend({
     },
     delayGetStatus() {
       setTimeout(this.getStatus, 500);
+    },
+    logout() {
+      this.$confirm("是否注销？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        Cookies.remove("token");
+        location.reload();
+      });
     },
     getStatus() {
       net

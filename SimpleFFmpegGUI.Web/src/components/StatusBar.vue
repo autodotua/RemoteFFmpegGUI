@@ -46,7 +46,8 @@
         </el-row>
         <el-row class="right24">
           <el-col :span="8" class="one-line"
-            ><b>任务：</b> {{status.isPaused?'暂停中': status.progress.name }}</el-col
+            ><b>任务：</b>
+            {{ status.isPaused ? "暂停中" : status.progress.name }}</el-col
           >
           <el-col :span="16">
             <el-progress
@@ -87,7 +88,9 @@
             >
           </el-col>
         </el-row>
-        <el-row class="single-line"> <b>任务：</b>{{status.isPaused?'暂停中': status.progress.name }} </el-row>
+        <el-row class="single-line">
+          <b>任务：</b>{{ status.isPaused ? "暂停中" : status.progress.name }}
+        </el-row>
         <el-row>
           <el-col :span="20">
             <el-progress
@@ -185,12 +188,7 @@ export default Vue.component("status-bar", {
   components: {},
   mounted: function () {
     this.$nextTick(function () {
-      net
-        .getMediaNames()
-        .then((response) => {
-          this.files = response.data;
-        })
-        .catch(showError);
+      return;
     });
   },
 });
