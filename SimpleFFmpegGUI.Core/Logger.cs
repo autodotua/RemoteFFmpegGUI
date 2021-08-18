@@ -26,7 +26,7 @@ namespace SimpleFFmpegGUI
 
         private static string GetMessage(TaskInfo task, string message)
         {
-            return $"{message}：{task.Type}  {string.Join('+', task.Inputs)} ===> {task.Output}";
+            return $"{message} （{task.Type}  {string.Join('+', task.Inputs)} ===> {task.Output}）";
         }
 
         public static void Info(TaskInfo task, string message)

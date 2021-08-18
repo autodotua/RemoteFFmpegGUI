@@ -37,7 +37,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 
         [HttpPost]
         [Route("Add/Code")]
-        public async Task<int> AddCodeTaskAsync([FromBody] CodeTaskDto request)
+        public async Task<int> AddCodeTaskAsync([FromBody] TaskDto request)
         {
             if (request.Input == null || request.Input.Count() == 0 || request.Input.Any(p => p == null))
             {
@@ -49,7 +49,31 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             CheckFileNameNull(request.Output);
             return await pipeClient.InvokeAsync(p =>
-              p.AddCodeTask(request.Input.Select(p => Path.Combine(GetInputDir(), p)),
+              p.AddTask(TaskType.Code, request.Input.Select(p => Path.Combine(GetInputDir(), p)),
+              Path.Combine(GetOutputDir(), request.Output),
+              request.Argument,
+              request.Start));
+        }
+
+        [HttpPost]
+        [Route("Add/Combine")]
+        public async Task<int> AddCombineTaskAsync([FromBody] TaskDto request)
+        {
+            if (request.Input == null || request.Input.Any(p => p == null))
+            {
+                throw Oops.Oh("输入文件为空");
+            }
+            if (request.Input.Count() != 2)
+            {
+                throw Oops.Oh("输入文件必须为2个");
+            }
+            foreach (var file in request.Input)
+            {
+                await CheckInputFileExistAsync(file);
+            }
+            CheckFileNameNull(request.Output);
+            return await pipeClient.InvokeAsync(p =>
+              p.AddTask(TaskType.Combine, request.Input.Select(p => Path.Combine(GetInputDir(), p)),
               Path.Combine(GetOutputDir(), request.Output),
               request.Argument,
               request.Start));

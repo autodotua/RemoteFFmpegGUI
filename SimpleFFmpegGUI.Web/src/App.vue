@@ -44,7 +44,7 @@
               <i class="el-icon-s-home"></i>
               <template #title>欢迎</template>
             </el-menu-item>
-            <el-menu-item index="info">
+            <el-menu-item index="/info">
               <i class="el-icon-search"></i>
               <template #title>媒体信息查询</template>
             </el-menu-item>
@@ -54,28 +54,32 @@
                 <i class="el-icon-document-add"></i>
                 <span>新建任务</span>
               </template>
-              <el-menu-item index="code">
+              <el-menu-item index="/add/code">
                 <i class="el-icon-circle-plus-outline"></i>
                 <span>转码</span></el-menu-item
               >
+              <el-menu-item index="/add/combine">
+                <i class="el-icon-circle-plus-outline"></i>
+                <span>合并视音频</span></el-menu-item
+              >
             </el-submenu>
-            <el-menu-item index="tasks">
+            <el-menu-item index="/tasks">
               <i class="el-icon-document"></i>
               <template #title>任务列表</template>
             </el-menu-item>
-            <el-menu-item index="preset">
+            <el-menu-item index="/preset">
               <i class="el-icon-document-copy"></i>
               <template #title>预设</template>
             </el-menu-item>
-            <el-menu-item index="file">
+            <el-menu-item index="/file">
               <i class="el-icon-folder-opened"></i>
               <template #title>文件服务</template>
             </el-menu-item>
-            <el-menu-item index="log">
+            <el-menu-item index="/log">
               <i class="el-icon-takeaway-box"></i>
               <template #title>日志</template>
             </el-menu-item>
-            <el-menu-item index="about">
+            <el-menu-item index="/about">
               <i class="el-icon-info"></i>
               <template #title>关于</template>
             </el-menu-item>

@@ -53,9 +53,9 @@ namespace SimpleFFmpegGUI
             manager.Resume();
         }
 
-        public int AddCodeTask(IEnumerable<string> path, string outputPath, CodeArguments arg, bool start)
+        public int AddTask(TaskType type, IEnumerable<string> path, string outputPath, CodeArguments arg, bool start)
         {
-            int id = TaskManager.AddTask(TaskType.Code, path, outputPath, arg);
+            int id = TaskManager.AddTask(type, path, outputPath, arg);
 
             if (start)
             {

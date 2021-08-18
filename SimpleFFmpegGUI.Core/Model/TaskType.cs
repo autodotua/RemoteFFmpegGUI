@@ -2,7 +2,14 @@
 {
     public enum TaskType
     {
+        /// <summary>
+        /// 转码
+        /// </summary>
         Code,
-        Join
+
+        /// <summary>
+        /// 合并视音频
+        /// </summary>
+        Combine
     }
 }

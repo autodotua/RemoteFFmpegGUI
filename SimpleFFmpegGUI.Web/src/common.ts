@@ -78,6 +78,10 @@ export function getTaskTypeDescription(type: number): string {
     switch (type) {
         case 0:
             return "转码";
+        case 1:
+            return "合并视音频"
+        default:
+            return type.toString();
 
     }
     throw new Error("未知类型：" + type)

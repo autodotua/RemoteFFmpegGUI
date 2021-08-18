@@ -4,7 +4,8 @@ import Home from '../views/Home.vue'
 import Password from '../views/Tasks.vue'
 import Welcome from '../views/Welcome.vue'
 import MediaInfo from '../views/MediaInfo.vue'
-import Code from '../views/Code.vue'
+import Code from '../views/Add/Code.vue'
+import Combine from '../views/Add/Combine.vue'
 import Tasks from '../views/Tasks.vue'
 import Files from '../views/Files.vue'
 import Presets from '../views/Presets.vue'
@@ -44,9 +45,14 @@ Vue.use(VueRouter)
     component: Tasks
   },
   {
-    path: '/code',
+    path: '/add/code',
     name: 'Code',
     component: Code
+  },
+  {
+    path: '/add/combine',
+    name: 'Combine',
+    component: Combine
   },
   {
     path: '/password',

@@ -94,7 +94,7 @@
         </template>
       </el-table-column>
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="typeText" label="类型" width="60" />
+      <el-table-column prop="typeText" label="类型" width="90" />
       <el-table-column label="状态" width="80">
         <template slot-scope="scope">
           <span style="" v-if="scope.row.status == 1">待处理</span>
@@ -249,7 +249,7 @@ export default Vue.extend({
   methods: {
     remake(item: any) {
       localStorage.setItem("codeArgs", JSON.stringify(item.arguments));
-      jump("code");
+      jump("add/code");
     },
     getSelectionIds(): number[] {
       return this.toIdList(this.selection as []);

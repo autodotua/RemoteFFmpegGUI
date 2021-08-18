@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.WebAPI.Dto
 {
-    public class CodeTaskDto
+    public class TaskDto
     {
         public IEnumerable<string> Input { get; set; }
         public string Output { get; set; }

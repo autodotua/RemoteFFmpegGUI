@@ -54,6 +54,10 @@ export function postAddCodeTask(item: any): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .post(getUrl("Task/Add/Code"), item);
 }
+export function postAddCombineTask(item: any): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .post(getUrl("Task/Add/Combine"), item);
+}
 export function getQueueStatus(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("Queue/Status"))

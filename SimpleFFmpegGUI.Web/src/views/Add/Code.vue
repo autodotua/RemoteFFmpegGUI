@@ -189,8 +189,8 @@
 <script lang="ts">
 import Vue from "vue";
 import Cookies from "js-cookie";
-import { showError, jump, showSuccess } from "../common";
-import * as net from "../net";
+import { showError, jump, showSuccess } from "../../common";
+import * as net from "../../net";
 import CodeArguments from "@/components/CodeArguments.vue";
 export default Vue.extend({
   name: "Home",

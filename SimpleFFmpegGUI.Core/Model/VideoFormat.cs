@@ -14,7 +14,7 @@ namespace SimpleFFmpegGUI.Model
             new VideoFormat("webm","webm",main:true),
             new VideoFormat("ogv","ogv"),
             new VideoFormat("mp3","mp3",true,true),
-            new VideoFormat("aac","aac",true,true),
+            new VideoFormat("adts","aac",true,true),
             new VideoFormat("ac3","ac3"),
             new VideoFormat("av1","av1",main:true),
             new VideoFormat("wav","wav"),

@@ -74,7 +74,7 @@ export default Vue.extend({
   methods: {
     remake(item: any) {
       localStorage.setItem("codeArgs", JSON.stringify(item.arguments));
-      jump("code");
+      jump("add/code");
     },
     deletePreset(item: any) {
       net
