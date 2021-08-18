@@ -129,7 +129,16 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new ArgumentException("合并音视频操作，输入文件必须为2个");
             }
-
+            var video = FFProbe.Analyse(task.Inputs[0]);
+            var audio = FFProbe.Analyse(task.Inputs[1]);
+            if (video.VideoStreams.Count == 0)
+            {
+                throw new ArgumentException("输入1不含视频");
+            }
+            if (audio.AudioStreams.Count == 0)
+            {
+                throw new ArgumentException("输入2不含音频");
+            }
             FFMpegArguments f = FFMpegArguments
                 .FromFileInput(task.Inputs[0])
                 .AddFileInput(task.Inputs[1]);
@@ -140,6 +149,12 @@ namespace SimpleFFmpegGUI.Manager
             var p = f.OutputToFile(task.Output, true, a =>
             {
                 a.CopyChannel(Channel.Both);
+                if (video.AudioStreams.Count != 0 || audio.VideoStreams.Count != 0)
+                {
+                    a.WithMapping(0, Channel.Video, 0)
+                     .WithMapping(1, Channel.Audio, 0);
+                }
+
                 if (task.Arguments?.Combine?.Shortest ?? false)
                 {
                     a.UsingShortest(true);

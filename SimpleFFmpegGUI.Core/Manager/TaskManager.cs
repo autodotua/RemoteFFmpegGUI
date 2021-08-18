@@ -8,7 +8,7 @@ namespace SimpleFFmpegGUI.Manager
 {
     public static class TaskManager
     {
-       static TaskManager()
+        static TaskManager()
         {
             using var db = FFmpegDbContext.GetNew();
             foreach (var item in db.Tasks.Where(p => p.Status == TaskStatus.Processing))
@@ -18,9 +18,10 @@ namespace SimpleFFmpegGUI.Manager
             }
             db.SaveChanges();
         }
+
         public static int AddTask(TaskType type, IEnumerable<string> path, string outputPath, CodeArguments arg)
         {
-            FFmpegDbContext db = FFmpegDbContext.Get();
+            using FFmpegDbContext db = FFmpegDbContext.GetNew();
             var task = new TaskInfo()
             {
                 Type = type,
@@ -76,7 +77,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public static void ResetTask(int id, QueueManager queue)
         {
-            var db = FFmpegDbContext.Get();
+            using var db = FFmpegDbContext.GetNew();
             TaskInfo task = db.Tasks.Find(id);
             if (task == null)
             {
@@ -93,7 +94,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public static int TryResetTasks(IEnumerable<int> ids, QueueManager queue)
         {
-            var db = FFmpegDbContext.Get();
+            using var db = FFmpegDbContext.GetNew();
             int count = 0;
             foreach (var id in ids)
             {
@@ -117,7 +118,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public static void CancelTask(int id, QueueManager queue)
         {
-            var db = FFmpegDbContext.Get();
+            using var db = FFmpegDbContext.GetNew();
             TaskInfo task = db.Tasks.Find(id);
             if (task == null)
             {
@@ -146,7 +147,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public static int TryCancelTasks(IEnumerable<int> ids, QueueManager queue)
         {
-            var db = FFmpegDbContext.Get();
+            using var db = FFmpegDbContext.GetNew();
             int count = 0;
             foreach (var id in ids)
             {
@@ -181,7 +182,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public static void DeleteTask(int id, QueueManager queue)
         {
-            var db = FFmpegDbContext.Get();
+            using var db = FFmpegDbContext.GetNew();
             TaskInfo task = db.Tasks.Find(id);
             if (task == null)
             {
@@ -198,7 +199,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public static int TryDeleteTasks(IEnumerable<int> ids, QueueManager queue)
         {
-            var db = FFmpegDbContext.Get();
+            using var db = FFmpegDbContext.GetNew();
             int count = 0;
             foreach (var id in ids)
             {

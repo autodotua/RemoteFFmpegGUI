@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-form label-width="100px">
-      <h2>输入</h2>
+      <h2>输入和输出</h2>
       <el-form-item label="输入文件" v-for="value in files" :key="value.index">
         <a class="el-form-item__label">{{ value.index + 1 }}</a>
         <file-select
@@ -39,159 +39,122 @@
         >
       </el-form-item>
 
-      <el-form-item label="输入文件参数">
-        <el-form-item label="裁剪">
-          <el-switch v-model="inputArgs.enableClip"> </el-switch>
-          <div v-show="inputArgs.enableClip">
-            <el-row :gutter="12">
-              <el-col :sm="24" :md="12" class="top12">
-                <el-input
-                  maxlength="13"
-                  placeholder="时间格式：12:34:56.123"
-                  v-model="inputArgs.timeFrom"
-                  class="time-text"
-                >
-                  <template slot="prepend">从</template>
-                  <el-button
-                    slot="append"
-                    icon="el-icon-check"
-                    @click="parseTime(1)"
-                  ></el-button>
-                </el-input>
-              </el-col>
-              <el-col :sm="24" :md="12" class="top12">
-                <el-input-number
-                  v-model="inputArgs.timeFromH"
-                  :min="0"
-                  :max="100"
-                  size="small"
-                  :controls="false"
-                  class="time"
-                ></el-input-number>
-                <a class="time-colon">:</a>
-                <el-input-number
-                  v-model="inputArgs.timeFromM"
-                  :min="0"
-                  :controls="false"
-                  :max="59"
-                  size="small"
-                  class="time"
-                ></el-input-number>
-                <a class="time-colon"> :</a>
-                <el-input-number
-                  v-model="inputArgs.timeFromS"
-                  :min="0"
-                  :controls="false"
-                  :precision="3"
-                  :max="59.999"
-                  size="small"
-                  class="time"
-                ></el-input-number>
-              </el-col>
-            </el-row>
-            <el-row :gutter="12">
-              <el-col :sm="24" :md="12" class="top12">
-                <el-input
-                  maxlength="13"
-                  placeholder="时间格式：12:34:56.123"
-                  v-model="inputArgs.timeTo"
-                  class="time-text"
-                >
-                  <template slot="prepend">到</template>
-                  <el-button
-                    slot="append"
-                    icon="el-icon-check"
-                    @click="parseTime"
-                  ></el-button>
-                </el-input>
-              </el-col>
-              <el-col :sm="24" :md="12" class="top12">
-                <el-input-number
-                  v-model="inputArgs.timeToH"
-                  :min="0"
-                  :max="100"
-                  size="small"
-                  :controls="false"
-                  class="time"
-                ></el-input-number>
-                <a class="time-colon">:</a>
-                <el-input-number
-                  v-model="inputArgs.timeToM"
-                  :min="0"
-                  :controls="false"
-                  :max="59"
-                  size="small"
-                  class="time"
-                ></el-input-number>
-                <a class="time-colon"> :</a>
-                <el-input-number
-                  v-model="inputArgs.timeToS"
-                  :min="0"
-                  :controls="false"
-                  :precision="3"
-                  :max="59.999"
-                  size="small"
-                  class="time"
-                ></el-input-number>
-              </el-col>
-            </el-row>
-          </div>
-          <a v-if="inputArgs.timeParseError != ''" style="color: red">{{
-            inputArgs.timeParseError
-          }}</a>
-        </el-form-item>
-      </el-form-item>
-      <h2>输出</h2>
-      <el-form-item label="输出参数预设">
-        <div>
-          <el-select
-            @change="selectPreset"
-            placeholder="加载预设"
-            v-model="preset"
-            class="right24"
-          >
-            <el-option
-              v-for="p in presets"
-              :key="p.id"
-              :label="p.name"
-              :value="p.id"
-            ></el-option
-          ></el-select>
-          <el-button :disabled="preset == null" @click="updatePreset"
-            >更新</el-button
-          >
+      <el-form-item label="裁剪">
+        <el-switch v-model="inputArgs.enableClip"> </el-switch>
+        <div v-show="inputArgs.enableClip">
+          <el-row :gutter="12">
+            <el-col :sm="24" :md="12" class="top12">
+              <el-input
+                maxlength="13"
+                placeholder="时间格式：12:34:56.123"
+                v-model="inputArgs.timeFrom"
+                class="time-text"
+              >
+                <template slot="prepend">从</template>
+                <el-button
+                  slot="append"
+                  icon="el-icon-check"
+                  @click="parseTime(1)"
+                ></el-button>
+              </el-input>
+            </el-col>
+            <el-col :sm="24" :md="12" class="top12">
+              <el-input-number
+                v-model="inputArgs.timeFromH"
+                :min="0"
+                :max="100"
+                size="small"
+                :controls="false"
+                class="time"
+              ></el-input-number>
+              <a class="time-colon">:</a>
+              <el-input-number
+                v-model="inputArgs.timeFromM"
+                :min="0"
+                :controls="false"
+                :max="59"
+                size="small"
+                class="time"
+              ></el-input-number>
+              <a class="time-colon"> :</a>
+              <el-input-number
+                v-model="inputArgs.timeFromS"
+                :min="0"
+                :controls="false"
+                :precision="3"
+                :max="59.999"
+                size="small"
+                class="time"
+              ></el-input-number>
+            </el-col>
+          </el-row>
+          <el-row :gutter="12">
+            <el-col :sm="24" :md="12" class="top12">
+              <el-input
+                maxlength="13"
+                placeholder="时间格式：12:34:56.123"
+                v-model="inputArgs.timeTo"
+                class="time-text"
+              >
+                <template slot="prepend">到</template>
+                <el-button
+                  slot="append"
+                  icon="el-icon-check"
+                  @click="parseTime"
+                ></el-button>
+              </el-input>
+            </el-col>
+            <el-col :sm="24" :md="12" class="top12">
+              <el-input-number
+                v-model="inputArgs.timeToH"
+                :min="0"
+                :max="100"
+                size="small"
+                :controls="false"
+                class="time"
+              ></el-input-number>
+              <a class="time-colon">:</a>
+              <el-input-number
+                v-model="inputArgs.timeToM"
+                :min="0"
+                :controls="false"
+                :max="59"
+                size="small"
+                class="time"
+              ></el-input-number>
+              <a class="time-colon"> :</a>
+              <el-input-number
+                v-model="inputArgs.timeToS"
+                :min="0"
+                :controls="false"
+                :precision="3"
+                :max="59.999"
+                size="small"
+                class="time"
+              ></el-input-number>
+            </el-col>
+          </el-row>
         </div>
-        <div style="margin-top: 12px">
-          <el-input
-            v-model="newPresetName"
-            style="width: 128px"
-            class="right24"
-          ></el-input>
-          <el-button
-            style="display: inline"
-            :disabled="newPresetName == null || newPresetName.trim() == ''"
-            @click="savePreset"
-            >保存或更新“{{ newPresetName }}”</el-button
-          >
-        </div>
+        <a v-if="inputArgs.timeParseError != ''" style="color: red">{{
+          inputArgs.timeParseError
+        }}</a>
       </el-form-item>
+
+      <h2>参数</h2>
     </el-form>
 
-    <code-arguments ref="args" />
-    <el-button type="primary" @click="add" class="right24 bottom12"
-      >加入队列</el-button
-    >
-    <el-button @click="addAndStart" style="margin-left: 0"
-      >加入队列并立即开始</el-button
-    >
+    <code-arguments ref="args" type="code" />
+    <add-to-task-buttons :addFunc="addTask"></add-to-task-buttons>
   </div>
 </template>
 <script lang="ts">
 import Vue from "vue";
 import Cookies from "js-cookie";
-import { showError, jump, showSuccess } from "../../common";
+import { showError, jump, showSuccess, loadArgs } from "../../common";
 import * as net from "../../net";
 import CodeArguments from "@/components/CodeArguments.vue";
+import PresetSelect from "@/components/PresetSelect.vue";
+import AddToTaskButtons from "@/components/AddToTaskButtons.vue";
 export default Vue.extend({
   name: "Home",
   data() {
@@ -215,9 +178,6 @@ export default Vue.extend({
         timeTo: "",
         timeParseError: "",
       },
-      presets: [],
-      preset: null,
-      newPresetName: "新预设",
     };
   },
   computed: {},
@@ -267,68 +227,8 @@ export default Vue.extend({
     addFile() {
       this.files.push({ index: this.files.length, path: "" });
     },
-    add() {
-      this.addCode(false);
-    },
-    addAndStart() {
-      this.addCode(true);
-    },
-    updatePreset() {
-      let args = (this.$refs.args as any).getArgs();
-      if (args == null) {
-        return;
-      }
-      const name = (
-        this.presets.filter((p) => (p as any).id == this.preset)[0] as any
-      ).name;
-      net
-        .postAddOrUpdatePreset({ name: name, arguments: args })
-        .then((r) => {
-          showSuccess("更新预设成功");
-          this.fillPresetsAnd((p) => {
-            this.preset = r.data as any;
-          });
-        })
-        .catch(showError);
-    },
-    selectPreset(preset: number) {
-      (this.$refs.args as any).updateFromArgs(
-        (this.presets.filter((p) => (p as any).id == preset)[0] as any)
-          .arguments
-      );
-    },
-    fillPresets() {
-      this.fillPresetsAnd((id) => {
-        return;
-      });
-    },
-    fillPresetsAnd(action: (id: number) => void) {
-      net
-        .getPresets()
-        .then((r) => {
-          this.presets = r.data;
-          console.log(r.data);
 
-          action(r.data);
-        })
-        .catch(showError);
-    },
-    savePreset() {
-      let args = (this.$refs.args as any).getArgs();
-      if (args == null) {
-        return;
-      }
-      net
-        .postAddOrUpdatePreset({ name: this.newPresetName, arguments: args })
-        .then((r) => {
-          showSuccess("新建或更新预设成功");
-          this.fillPresetsAnd((p) => {
-            this.preset = r.data as any;
-          });
-        })
-        .catch(showError);
-    },
-    addCode(start: boolean) {
+    addTask(start: boolean) {
       if (this.files.filter((p) => p.path != "").length == 0) {
         showError("请选择输入文件");
         return;
@@ -369,16 +269,10 @@ export default Vue.extend({
         .catch(showError);
     },
   },
-  components: { CodeArguments },
+  components: { CodeArguments, AddToTaskButtons },
   mounted: function () {
     this.$nextTick(function () {
-      this.fillPresets();
-      if (localStorage.getItem("codeArgs") != null) {
-        const args = JSON.parse(localStorage.getItem("codeArgs") as string);
-        (this.$refs.args as any).updateFromArgs(args);
-        showSuccess("已加载参数");
-        localStorage.removeItem("codeArgs");
-      }
+      loadArgs(this.$refs.args);
     });
   },
 });

@@ -57,6 +57,7 @@ import {
   getTaskTypeDescription,
   showLoading,
   closeLoading,
+  jumpByArgs,
 } from "../common";
 
 import * as net from "../net";
@@ -73,8 +74,8 @@ export default Vue.extend({
   watch: {},
   methods: {
     remake(item: any) {
-      localStorage.setItem("codeArgs", JSON.stringify(item.arguments));
-      jump("add/code");
+
+      jumpByArgs(item.arguments,item.type)
     },
     deletePreset(item: any) {
       net

@@ -19,7 +19,7 @@ namespace SimpleFFmpegGUI.Manager
                 Type = type,
                 Arguments = arguments
             };
-            var db = FFmpegDbContext.Get();
+            using var db = FFmpegDbContext.GetNew();
             if (db.Presets.Any(p => p.Name == name && p.Type == type))
             {
                 db.Presets.RemoveRange(db.Presets.Where(p => p.Name == name && p.Type == type).ToArray());
@@ -31,7 +31,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public static void DeletePreset(int id)
         {
-            var db = FFmpegDbContext.Get();
+            using var db = FFmpegDbContext.GetNew();
             CodePreset preset = db.Presets.Find(id);
             if (preset == null)
             {

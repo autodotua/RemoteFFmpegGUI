@@ -74,6 +74,23 @@ export function jump(url: string): void {
     window.location.href = process.env.BASE_URL + "#/" + url;
 }
 
+
+export function loadArgs(codeArguments: any) {
+    if (localStorage.getItem("codeArgs") != null) {
+        const args = JSON.parse(localStorage.getItem("codeArgs") as string);
+        try {
+            codeArguments.updateFromArgs(args);
+            showSuccess("已加载参数");
+        } catch (error) {
+            showError("加载参数失败");
+            console.log("错误参数为",args);
+            
+            throw error;
+        } finally {
+            localStorage.removeItem("codeArgs");
+        }
+    }
+}
 export function getTaskTypeDescription(type: number): string {
     switch (type) {
         case 0:
@@ -82,7 +99,29 @@ export function getTaskTypeDescription(type: number): string {
             return "合并视音频"
         default:
             return type.toString();
-
     }
-    throw new Error("未知类型：" + type)
+}
+export function stringType2Number(type:string)
+{
+    switch (type) {
+        case "code":
+            return 0;
+        case "combine":
+            return 1
+        default:
+            throw new Error("未知类型：" + type);
+    }
+}
+export function jumpByArgs(args: any, type: number) {
+    localStorage.setItem("codeArgs", JSON.stringify(args));
+    switch (type) {
+        case 0:
+            jump("add/code");
+            break;
+        case 1:
+            jump("add/combine");
+            break;
+        default:
+            throw new Error("未知类型：" + type);
+    }
 }

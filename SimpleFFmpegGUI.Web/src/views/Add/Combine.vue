@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-form label-width="100px">
-      <h2>输入</h2>
+      <h2>输入和输出</h2>
       <el-form-item label="视频">
         <file-select
           ref="videoFile"
@@ -20,7 +20,7 @@
       <el-form-item label="输出">
         <el-input
           placeholder="输出文件名"
-          style="width: 300px;  display: block"
+          style="width: 300px; display: block"
           v-model="output"
         />
         <a style="color: gray; margin-left: 18.21px"
@@ -28,21 +28,19 @@
         >
       </el-form-item>
     </el-form>
+    <h2>参数</h2>
+    <code-arguments type="combine" ref="args" />
 
-    <el-button type="primary" @click="add" class="right24 bottom12"
-      >加入队列</el-button
-    >
-    <el-button @click="addAndStart" style="margin-left: 0"
-      >加入队列并立即开始</el-button
-    >
+    <add-to-task-buttons :addFunc="addTask"></add-to-task-buttons>
   </div>
 </template>
 <script lang="ts">
 import Vue from "vue";
 import Cookies from "js-cookie";
-import { showError, jump, showSuccess } from "../../common";
+import { showError, jump, showSuccess, loadArgs } from "../../common";
 import * as net from "../../net";
 import CodeArguments from "@/components/CodeArguments.vue";
+import AddToTaskButtons from "@/components/AddToTaskButtons.vue";
 export default Vue.extend({
   name: "Home",
   data() {
@@ -50,10 +48,6 @@ export default Vue.extend({
       video: "",
       audio: "",
       output: "",
-
-      presets: [],
-      preset: null,
-      newPresetName: "新预设",
     };
   },
   computed: {},
@@ -85,7 +79,7 @@ export default Vue.extend({
         .postAddCombineTask({
           input: [this.video, this.audio],
           output: this.output,
-          argument: null,
+          argument: (this.$refs.args as any).getArgs(),
           start: start,
         })
         .then((response) => {
@@ -99,15 +93,10 @@ export default Vue.extend({
         .catch(showError);
     },
   },
-  components: {},
+  components: { CodeArguments, AddToTaskButtons },
   mounted: function () {
     this.$nextTick(function () {
-      if (localStorage.getItem("codeArgs") != null) {
-        const args = JSON.parse(localStorage.getItem("codeArgs") as string);
-        (this.$refs.args as any).updateFromArgs(args);
-        showSuccess("已加载参数");
-        localStorage.removeItem("codeArgs");
-      }
+      loadArgs(this.$refs.args);
     });
   },
 });

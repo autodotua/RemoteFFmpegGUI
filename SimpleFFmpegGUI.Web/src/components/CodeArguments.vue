@@ -1,6 +1,40 @@
 
 <template>
   <el-form label-width="96px">
+    <h3>预设</h3>
+    <div>
+      <div>
+        <el-select
+          @change="selectPreset"
+          placeholder="加载预设"
+          v-model="preset"
+          class="right24"
+        >
+          <el-option
+            v-for="p in presets"
+            :key="p.id"
+            :label="p.name"
+            :value="p.id"
+          ></el-option
+        ></el-select>
+        <el-button :disabled="preset == null" @click="updatePreset"
+          >更新</el-button
+        >
+      </div>
+      <div style="margin-top: 12px">
+        <el-input
+          v-model="newPresetName"
+          style="width: 128px"
+          class="right24"
+        ></el-input>
+        <el-button
+          style="display: inline"
+          :disabled="newPresetName == null || newPresetName.trim() == ''"
+          @click="savePreset"
+          >保存或更新“{{ newPresetName }}”</el-button
+        >
+      </div>
+    </div>
     <h3>容器</h3>
     <el-form-item label="指定输出容器">
       <el-switch v-model="code.enableFormat" class="right24"> </el-switch>
@@ -21,209 +55,235 @@
           }}</span>
         </el-option>
       </el-select>
-      <div    v-if="code.enableFormat" class="gray">指定输出容器后，输出时会根据格式修改文件扩展名</div>
+      <div v-if="code.enableFormat" class="gray">
+        指定输出容器后，输出时会根据格式修改文件扩展名
+      </div>
     </el-form-item>
-    <h3>视频编码</h3>
-    <el-form-item label="重编码">
-      <el-switch v-model="code.enableVideo" class="right24"> </el-switch>
-      <a v-show="!code.enableVideo" class="right12 gray">不导出视频</a>
-      <el-switch
-        v-show="!code.enableVideo"
-        v-model="code.disableVideo"
-      ></el-switch
-    ></el-form-item>
-    <div v-show="code.enableVideo">
-      <el-form-item label="编码" size="small">
-        <el-select v-model="code.video.code">
-          <el-option
-            v-for="c in videoCodes"
-            :key="c"
-            :label="c"
-            :value="c"
-          ></el-option> </el-select
+    <div v-if="type == 'code'">
+      <h3>视频编码</h3>
+      <el-form-item label="重编码">
+        <el-switch v-model="code.enableVideo" class="right24"> </el-switch>
+        <a v-show="!code.enableVideo" class="right12 gray">不导出视频</a>
+        <el-switch
+          v-show="!code.enableVideo"
+          v-model="code.disableVideo"
+        ></el-switch
       ></el-form-item>
-      <el-form-item label="预设" class="bottom24">
-        <el-slider
-          style="width: 90%"
-          :max="8"
-          :show-tooltip="false"
-          v-model="code.video.preset"
-          :marks="presets"
-        >
-        </el-slider
-      ></el-form-item>
-      <el-form-item label="CRF" class="top24">
-        <el-switch v-model="code.video.enableCrf"> </el-switch>
-        <el-slider
-          v-show="code.video.enableCrf"
-          style="width: 90%"
-          :max="40"
-          :min="10"
-          show-input
-          :step="1"
-          v-model="code.video.crf"
-        >
-        </el-slider
-      ></el-form-item>
-      <el-form-item label="平均码率" class="bottom24">
-        <el-switch v-model="code.video.enableBitrate"> </el-switch>
-        <el-slider
-          v-show="code.video.enableBitrate"
-          style="width: 90%"
-          :max="500"
-          :min="0.1"
-          show-input
-          :step="0.1"
-          v-model="code.video.bitrate"
-        >
-        </el-slider
-      ></el-form-item>
-      <el-form-item label="最大码率" class="bottom24">
-        <el-switch v-model="code.video.enableMaxBitrate"> </el-switch>
-        <el-slider
+      <div v-show="code.enableVideo">
+        <el-form-item label="编码" size="small">
+          <el-select v-model="code.video.code">
+            <el-option
+              v-for="c in videoCodes"
+              :key="c"
+              :label="c"
+              :value="c"
+            ></el-option> </el-select
+        ></el-form-item>
+        <el-form-item label="预设" class="bottom24">
+          <el-slider
+            style="width: 90%"
+            :max="8"
+            :show-tooltip="false"
+            v-model="code.video.preset"
+            :marks="speedPresets"
+          >
+          </el-slider
+        ></el-form-item>
+        <el-form-item label="CRF" class="top24">
+          <el-switch v-model="code.video.enableCrf"> </el-switch>
+          <el-slider
+            v-show="code.video.enableCrf"
+            style="width: 90%"
+            :max="40"
+            :min="10"
+            show-input
+            :step="1"
+            v-model="code.video.crf"
+          >
+          </el-slider
+        ></el-form-item>
+        <el-form-item label="平均码率" class="bottom24">
+          <el-switch v-model="code.video.enableBitrate"> </el-switch>
+          <el-slider
+            v-show="code.video.enableBitrate"
+            style="width: 90%"
+            :max="500"
+            :min="0.1"
+            show-input
+            :step="0.1"
+            v-model="code.video.bitrate"
+          >
+          </el-slider
+        ></el-form-item>
+        <el-form-item label="最大码率" class="bottom24">
+          <el-switch v-model="code.video.enableMaxBitrate"> </el-switch>
+          <el-slider
+            v-show="code.video.enableMaxBitrate"
+            style="width: 90%"
+            :max="500"
+            :min="0.1"
+            show-input
+            :step="0.1"
+            v-model="code.video.maxBitrate"
+          >
+          </el-slider
+        ></el-form-item>
+        <el-form-item
+          label="缓冲倍率"
+          class="bottom24"
           v-show="code.video.enableMaxBitrate"
-          style="width: 90%"
-          :max="500"
-          :min="0.1"
-          show-input
-          :step="0.1"
-          v-model="code.video.maxBitrate"
         >
-        </el-slider
-      ></el-form-item>
-      <el-form-item
-        label="缓冲倍率"
-        class="bottom24"
-        v-show="code.video.enableMaxBitrate"
-      >
-        <el-slider
-          style="width: 90%"
-          :max="10"
-          :min="1"
-          show-input
-          show-stops
-          :step="0.5"
-          v-model="code.video.maxBitrateBuffer"
-        >
-        </el-slider
-      ></el-form-item>
-      <el-form-item label="帧率"
-        ><el-switch v-model="code.video.enableFps" class="right24"> </el-switch>
-        <div v-show="code.video.enableFps" style="display: inline">
+          <el-slider
+            style="width: 90%"
+            :max="10"
+            :min="1"
+            show-input
+            show-stops
+            :step="0.5"
+            v-model="code.video.maxBitrateBuffer"
+          >
+          </el-slider
+        ></el-form-item>
+        <el-form-item label="帧率"
+          ><el-switch v-model="code.video.enableFps" class="right24">
+          </el-switch>
+          <div v-show="code.video.enableFps" style="display: inline">
+            <el-input-number
+              size="small"
+              v-model="code.video.fps"
+              :precision="3"
+              :min="1"
+              class="right24"
+              :max="120"
+            >
+            </el-input-number>
+            <el-button type="text" class="right24" @click="code.video.fps = 10"
+              >10帧</el-button
+            >
+            <el-button type="text" class="right24" @click="code.video.fps = 24"
+              >24帧</el-button
+            >
+            <el-button type="text" class="right24" @click="code.video.fps = 25"
+              >25帧</el-button
+            >
+            <el-button type="text" class="right24" @click="code.video.fps = 30"
+              >30帧</el-button
+            >
+            <el-button type="text" @click="code.video.fps = 60">60帧</el-button>
+          </div>
+        </el-form-item>
+        <el-form-item label="分辨率">
+          <el-switch v-model="code.video.enableScale" class="right24">
+          </el-switch>
           <el-input-number
             size="small"
-            v-model="code.video.fps"
-            :precision="3"
+            class="right24 width80"
             :min="1"
-            class="right24"
-            :max="120"
-          >
-          </el-input-number>
-          <el-button type="text" class="right24" @click="code.video.fps = 10"
-            >10帧</el-button
-          >
-          <el-button type="text" class="right24" @click="code.video.fps = 24"
-            >24帧</el-button
-          >
-          <el-button type="text" class="right24" @click="code.video.fps = 25"
-            >25帧</el-button
-          >
-          <el-button type="text" class="right24" @click="code.video.fps = 30"
-            >30帧</el-button
-          >
-          <el-button type="text" @click="code.video.fps = 60">60帧</el-button>
-        </div>
+            :max="20000"
+            placeholder="宽度"
+            v-model="code.video.width"
+            :controls="false"
+            v-show="code.video.enableScale"
+          ></el-input-number>
+          <a v-show="code.video.enableScale" class="right24">×</a>
+          <el-input-number
+            size="small"
+            class="width80"
+            :min="1"
+            :max="20000"
+            placeholder="高度"
+            v-model="code.video.height"
+            :controls="false"
+            v-show="code.video.enableScale"
+          ></el-input-number>
+        </el-form-item>
+      </div>
+    </div>
+    <div v-if="type == 'code'">
+      <h3>音频编码</h3>
+      <el-form-item label="重编码">
+        <el-switch v-model="code.enableAudio" class="right24"> </el-switch>
+        <a v-show="!code.enableAudio" class="right12 gray">不导出音频</a>
+        <el-switch
+          v-show="!code.enableAudio"
+          v-model="code.disableAudio"
+        ></el-switch>
       </el-form-item>
-      <el-form-item label="分辨率">
-        <el-switch v-model="code.video.enableScale" class="right24">
-        </el-switch>
-        <el-input-number
-          size="small"
-          class="right24 width80"
-          :min="1"
-          :max="20000"
-          placeholder="宽度"
-          v-model="code.video.width"
-          :controls="false"
-          v-show="code.video.enableScale"
-        ></el-input-number>
-        <a v-show="code.video.enableScale" class="right24">×</a>
-        <el-input-number
-          size="small"
-          class="width80"
-          :min="1"
-          :max="20000"
-          placeholder="高度"
-          v-model="code.video.height"
-          :controls="false"
-          v-show="code.video.enableScale"
-        ></el-input-number>
+      <div v-show="code.enableAudio">
+        <el-form-item label="编码">
+          <el-select v-model="code.audio.code" size="small">
+            <el-option
+              v-for="c in audioCodes"
+              :key="c"
+              :label="c"
+              :value="c"
+            ></el-option> </el-select
+        ></el-form-item>
+        <el-form-item label="码率" class="bottom24">
+          <el-switch v-model="code.audio.enableBitrate"> </el-switch>
+          <el-slider
+            v-show="code.audio.enableBitrate"
+            style="width: 90%"
+            :max="320"
+            :min="32"
+            :show-tooltip="false"
+            :step="32"
+            v-model="code.audio.bitrate"
+            :marks="audioBitrates"
+          >
+          </el-slider
+        ></el-form-item>
+        <el-form-item label="采样率" style="margin-top: 24px">
+          <el-switch v-model="code.audio.enableSample" class="right24">
+          </el-switch>
+          <el-select
+            v-model="code.audio.sample"
+            v-show="code.audio.enableSample"
+          >
+            <el-option
+              v-for="c in audioSamples"
+              :key="c"
+              :label="c"
+              :value="c"
+            ></el-option
+          ></el-select>
+        </el-form-item>
+      </div>
+    </div>
+    <div v-if="type == 'combine'">
+      <h3>合并</h3>
+      <el-form-item label="音频比视频长">
+        <el-switch
+          v-model="code.combine.shortest"
+          active-text="裁剪到视频长度"
+          inactive-text="最后部分静帧或黑屏"
+        ></el-switch>
       </el-form-item>
     </div>
-    <h3>音频编码</h3>
-    <el-form-item label="重编码">
-      <el-switch v-model="code.enableAudio" class="right24"> </el-switch>
-      <a v-show="!code.enableAudio" class="right12 gray">不导出音频</a>
-      <el-switch
-        v-show="!code.enableAudio"
-        v-model="code.disableAudio"
-      ></el-switch>
-    </el-form-item>
-    <div v-show="code.enableAudio">
-      <el-form-item label="编码">
-        <el-select v-model="code.audio.code" size="small">
-          <el-option
-            v-for="c in audioCodes"
-            :key="c"
-            :label="c"
-            :value="c"
-          ></el-option> </el-select
-      ></el-form-item>
-      <el-form-item label="码率" class="bottom24">
-        <el-switch v-model="code.audio.enableBitrate"> </el-switch>
-        <el-slider
-          v-show="code.audio.enableBitrate"
-          style="width: 90%"
-          :max="320"
-          :min="32"
-          :show-tooltip="false"
-          :step="32"
-          v-model="code.audio.bitrate"
-          :marks="audioBitrates"
-        >
-        </el-slider
-      ></el-form-item>
-      <el-form-item label="采样率" style="margin-top: 24px">
-        <el-switch v-model="code.audio.enableSample" class="right24">
-        </el-switch>
-        <el-select v-model="code.audio.sample" v-show="code.audio.enableSample">
-          <el-option
-            v-for="c in audioSamples"
-            :key="c"
-            :label="c"
-            :value="c"
-          ></el-option
-        ></el-select>
+    <div>
+      <h3>额外参数</h3>
+      <el-form-item label="ffmpeg参数">
+        <el-input
+          v-model="code.extra"
+          placeholder="请输入ffmpeg的运行参数"
+        ></el-input>
       </el-form-item>
     </div>
-    <h3>额外参数</h3>
-    <el-form-item label="ffmpeg参数">
-      <el-input
-        v-model="code.extra"
-        placeholder="请输入ffmpeg的运行参数"
-      ></el-input>
-    </el-form-item>
   </el-form>
 </template>
+
+
+
+
 <script lang="ts">
 import Vue from "vue";
 import Cookies from "js-cookie";
 import * as net from "../net";
-import { withToken, showError, jump, formatDateTime } from "../common";
+import { showError, showSuccess } from "../common";
 export default Vue.component("code-arguments", {
   data() {
     return {
-      presets: {
+      speedPresets: {
         0: "",
         1: "更慢",
         2: "慢",
@@ -280,21 +340,83 @@ export default Vue.component("code-arguments", {
           enableSample: false,
           sample: 48000,
         },
+        combine: {
+          shortest: false,
+        },
         disableVideo: false,
         disableAudio: false,
         extra: "",
       },
+      presets: [],
+      preset: null,
+      newPresetName: "新预设",
     };
   },
-  props: {},
+  props: ["type"],
   computed: {},
   created() {
+    this.fillPresets();
     net
       .getFormats()
       .then((r) => (this.formats = r.data))
       .catch(showError);
   },
   methods: {
+    updatePreset() {
+      let args = this.getArgs();
+      if (args == null) {
+        return;
+      }
+      const name = (
+        this.presets.filter((p) => (p as any).id == this.preset)[0] as any
+      ).name;
+      net
+        .postAddOrUpdatePreset(name, this.type, args)
+        .then((r) => {
+          showSuccess("更新预设成功");
+          this.fillPresetsAnd((p) => {
+            this.preset = r.data;
+          });
+        })
+        .catch(showError);
+    },
+    selectPreset(preset: number) {
+      this.updateFromArgs(
+        (this.presets.filter((p) => (p as any).id == preset)[0] as any)
+          .arguments
+      );
+    },
+    fillPresets() {
+      this.fillPresetsAnd((id) => {
+        return;
+      });
+    },
+    fillPresetsAnd(action: (id: number) => void) {
+      net
+        .getPresets(this.type)
+        .then((r) => {
+          this.presets = r.data;
+          console.log(r.data);
+
+          action(r.data);
+        })
+        .catch(showError);
+    },
+    savePreset() {
+      let args = this.getArgs();
+      if (args == null) {
+        return;
+      }
+      net
+        .postAddOrUpdatePreset(this.newPresetName, this.type, args)
+        .then((r) => {
+          showSuccess("新建或更新预设成功");
+          this.fillPresetsAnd((p) => {
+            this.preset = r.data as any;
+          });
+        })
+        .catch(showError);
+    },
     getArgs() {
       const video = this.code.video;
       let videoArg = this.code.enableVideo
@@ -320,10 +442,12 @@ export default Vue.component("code-arguments", {
             samplingRate: audio.enableSample ? audio.sample : null,
           }
         : null;
+      let combine = { shortest: this.code.combine.shortest };
       let arg = {
         video: videoArg,
         audio: audioArg,
         input: null,
+        combine: combine,
         extra: this.code.extra,
         disableVideo: videoArg == null && this.code.disableVideo,
         disableAudio: audioArg == null && this.code.disableAudio,
@@ -340,6 +464,7 @@ export default Vue.component("code-arguments", {
 
       const video = args.video;
       const audio = args.audio;
+      const combine = args.combine;
 
       if (video != null && !args.disableVideo) {
         this.code.enableVideo = true;
@@ -405,6 +530,11 @@ export default Vue.component("code-arguments", {
       } else {
         this.code.enableAudio = false;
       }
+      if (combine != null) {
+        this.code.combine = {
+          shortest: combine.shortest,
+        };
+      }
       this.code.disableVideo = args.disableVideo;
       this.code.disableAudio = args.disableAudio;
       this.code.enableFormat = args.format != null;
@@ -423,7 +553,7 @@ export default Vue.component("code-arguments", {
 <style scoped>
 div[role="slider"] {
   min-width: 240px;
-  max-width:480px;
+  max-width: 480px;
 }
 
 .el-select {

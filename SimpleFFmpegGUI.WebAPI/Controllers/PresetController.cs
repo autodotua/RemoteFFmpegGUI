@@ -20,9 +20,13 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 
         [HttpGet]
         [Route("List")]
-        public Task<List<CodePreset>> GetPresets()
+        public async Task<List<CodePreset>> GetPresets(TaskType? type)
         {
-            return pipeClient.InvokeAsync(p => p.GetPresets());
+            if (type.HasValue)
+            {
+                return (await pipeClient.InvokeAsync(p => p.GetPresets())).Where(p => p.Type == type).ToList();
+            }
+            return await pipeClient.InvokeAsync(p => p.GetPresets());
         }
 
         [HttpPost]
@@ -30,7 +34,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         public Task<int> AddAsync([FromBody] CodePresetDto request)
         {
             CheckNull(request, "请求");
-            return pipeClient.InvokeAsync(p => p.AddOrUpdatePreset(request.Name, TaskType.Code, request.Arguments));
+            return pipeClient.InvokeAsync(p => p.AddOrUpdatePreset(request.Name, request.Type, request.Arguments));
         }
 
         [HttpPost]

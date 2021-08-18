@@ -8,19 +8,6 @@ namespace SimpleFFmpegGUI
 {
     public static class Logger
     {
-        private static bool needSave = false;
-        private static Timer timer = null;
-
-        static Logger()
-        {
-            timer = new Timer(o =>
-           {
-               if (needSave)
-               {
-                   FFmpegDbContext.Get().SaveChanges();
-               }
-           }, null, 10000, 10000);
-        }
 
         private static ConsoleColor DefaultColor = Console.ForegroundColor;
 
@@ -77,8 +64,9 @@ namespace SimpleFFmpegGUI
                 Message = message
             };
             Log?.Invoke(null, new LogEventArgs(log));
-            FFmpegDbContext.Get().Logs.Add(log);
-            needSave = true;
+            using var db = FFmpegDbContext.GetNew();
+            db.Logs.Add(log);
+            db.SaveChanges();
         }
 
         public static event EventHandler<LogEventArgs> Log;

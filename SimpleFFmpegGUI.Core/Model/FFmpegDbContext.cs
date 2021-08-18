@@ -11,16 +11,16 @@ namespace SimpleFFmpegGUI.Model
         private static FFmpegDbContext db;
         private bool hasDb = false;
 
-        public static FFmpegDbContext Get()
-        {
-            if (db == null)
-            {
-                db = new FFmpegDbContext();
-            }
-            return db;
-        }
+        //internal static FFmpegDbContext Get()
+        //{
+        //    if (db == null)
+        //    {
+        //        db = new FFmpegDbContext();
+        //    }
+        //    return db;
+        //}
 
-        public static FFmpegDbContext GetNew()
+        internal static FFmpegDbContext GetNew()
         {
             return new FFmpegDbContext();
         }

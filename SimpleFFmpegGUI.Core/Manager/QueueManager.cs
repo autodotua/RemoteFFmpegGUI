@@ -48,7 +48,7 @@ namespace SimpleFFmpegGUI.Manager
                 return;
             }
             Logger.Info("开始队列");
-            FFmpegDbContext db = FFmpegDbContext.Get();
+            using FFmpegDbContext db = FFmpegDbContext.GetNew();
             List<TaskInfo> tasks;
             while (!cancelQueue && GetQueueTasks(db).Any())
             {

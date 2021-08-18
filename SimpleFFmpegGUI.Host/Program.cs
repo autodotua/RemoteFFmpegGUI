@@ -53,8 +53,8 @@ namespace SimpleFFmpegGUI
                     })
                     .ConfigureIpcHost(builder =>
                     {
-                        builder.AddNamedPipeEndpoint<IPipeService>(p=> {
-
+                        builder.AddNamedPipeEndpoint<IPipeService>(p =>
+                        {
                             p.PipeName = pipeName;
                             p.IncludeFailureDetailsInResponse = true;
                         });
@@ -85,7 +85,7 @@ namespace SimpleFFmpegGUI
 
         private void Logger_Log(object sender, LogEventArgs e)
         {
-            ConsoleColor defaultColor =Console.ForegroundColor;
+            ConsoleColor defaultColor = Console.ForegroundColor;
             ConsoleColor color = e.Log.Type switch
             {
                 'E' => ConsoleColor.Red,

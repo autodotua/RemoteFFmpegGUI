@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { AxiosResponse } from "axios";
+import { stringType2Number } from "./common";
 
 function getUrl(controller: string): string {
         if (process.env.NODE_ENV === 'production') {
@@ -96,13 +97,17 @@ export function getMediaDetails(): Promise<AxiosResponse<any>> {
                 .get(getUrl("File/List/Output"))
 }
 
-export function getPresets(): Promise<AxiosResponse<any>> {
-        return Vue.axios
+export function getPresets(type:string|null=null): Promise<AxiosResponse<any>> {
+        return type?
+         Vue.axios
+                .get(getUrl("Preset/List?type="+stringType2Number(type)))
+                :
+                Vue.axios
                 .get(getUrl("Preset/List"))
 }
-export function postAddOrUpdatePreset(item: any): Promise<AxiosResponse<any>> {
+export function postAddOrUpdatePreset(name:string,type:string,args:any): Promise<AxiosResponse<any>> {
         return Vue.axios
-                .post(getUrl("Preset/Add"), item);
+                .post(getUrl("Preset/Add"), {name:name,type:stringType2Number(type),arguments:args});
 }
 
 
