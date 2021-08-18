@@ -1,15 +1,38 @@
 
 <template>
   <el-form label-width="96px">
-    <el-form-item label="视频编码">
+    <h3>容器</h3>
+    <el-form-item label="指定输出容器">
+      <el-switch v-model="code.enableFormat" class="right24"> </el-switch>
+      <el-select
+        v-if="code.enableFormat"
+        v-model="code.format"
+        placeholder="指定容器格式"
+      >
+        <el-option
+          v-for="item in formats"
+          :key="item.name"
+          :label="item.extension"
+          :value="item.name"
+        >
+          <span style="float: left">{{ item.extension }}</span>
+          <span style="float: right; color: #8492a6; font-size: 13px">{{
+            item.name
+          }}</span>
+        </el-option>
+      </el-select>
+      <div    v-if="code.enableFormat" class="gray">指定输出容器后，输出时会根据格式修改文件扩展名</div>
+    </el-form-item>
+    <h3>视频编码</h3>
+    <el-form-item label="重编码">
       <el-switch v-model="code.enableVideo" class="right24"> </el-switch>
-      <a v-show="!code.enableVideo" class="right12">不导出视频</a>
+      <a v-show="!code.enableVideo" class="right12 gray">不导出视频</a>
       <el-switch
         v-show="!code.enableVideo"
         v-model="code.disableVideo"
-      ></el-switch>
-    </el-form-item>
-    <el-form-item label="" v-show="code.enableVideo">
+      ></el-switch
+    ></el-form-item>
+    <div v-show="code.enableVideo">
       <el-form-item label="编码" size="small">
         <el-select v-model="code.video.code">
           <el-option
@@ -37,8 +60,7 @@
           :max="40"
           :min="10"
           show-input
-          :step="2"
-          show-stops
+          :step="1"
           v-model="code.video.crf"
         >
         </el-slider
@@ -137,16 +159,17 @@
           v-show="code.video.enableScale"
         ></el-input-number>
       </el-form-item>
-    </el-form-item>
-    <el-form-item label="音频编码">
+    </div>
+    <h3>音频编码</h3>
+    <el-form-item label="重编码">
       <el-switch v-model="code.enableAudio" class="right24"> </el-switch>
-      <a v-show="!code.enableAudio" class="right12">不导出音频</a>
+      <a v-show="!code.enableAudio" class="right12 gray">不导出音频</a>
       <el-switch
         v-show="!code.enableAudio"
         v-model="code.disableAudio"
       ></el-switch>
     </el-form-item>
-    <el-form-item label="" v-show="code.enableAudio">
+    <div v-show="code.enableAudio">
       <el-form-item label="编码">
         <el-select v-model="code.audio.code" size="small">
           <el-option
@@ -182,9 +205,9 @@
           ></el-option
         ></el-select>
       </el-form-item>
-    </el-form-item>
-
-    <el-form-item label="额外参数">
+    </div>
+    <h3>额外参数</h3>
+    <el-form-item label="ffmpeg参数">
       <el-input
         v-model="code.extra"
         placeholder="请输入ffmpeg的运行参数"
@@ -228,9 +251,12 @@ export default Vue.component("code-arguments", {
       videoCodes: ["H264", "H265"],
       audioCodes: ["AAC"],
       audioSamples: [8000, 16000, 32000, 44100, 48000, 96000],
+      formats: [],
       code: {
         enableVideo: true,
         enableAudio: true,
+        enableFormat: true,
+        format: "mp4",
         video: {
           code: "H265",
           preset: 3,
@@ -262,6 +288,12 @@ export default Vue.component("code-arguments", {
   },
   props: {},
   computed: {},
+  created() {
+    net
+      .getFormats()
+      .then((r) => (this.formats = r.data))
+      .catch(showError);
+  },
   methods: {
     getArgs() {
       const video = this.code.video;
@@ -295,6 +327,7 @@ export default Vue.component("code-arguments", {
         extra: this.code.extra,
         disableVideo: videoArg == null && this.code.disableVideo,
         disableAudio: audioArg == null && this.code.disableAudio,
+        format: this.code.enableFormat ? this.code.format : null,
       };
       if (arg.disableVideo && arg.disableAudio) {
         showError("不可同时禁用视频和音频");
@@ -308,7 +341,7 @@ export default Vue.component("code-arguments", {
       const video = args.video;
       const audio = args.audio;
 
-      if (video != null&&!args.disableVideo) {
+      if (video != null && !args.disableVideo) {
         this.code.enableVideo = true;
         const uiV = this.code.video;
         uiV.code = video.code;
@@ -354,7 +387,7 @@ export default Vue.component("code-arguments", {
         this.code.enableVideo = false;
       }
 
-      if (audio != null&&!args.disableAudio) {
+      if (audio != null && !args.disableAudio) {
         const uiA = this.code.audio;
         uiA.code = audio.code;
         if (audio.bitrate != null) {
@@ -369,14 +402,15 @@ export default Vue.component("code-arguments", {
         } else {
           uiA.enableSample = false;
         }
-      }else{
-        this.code.enableAudio=false;
+      } else {
+        this.code.enableAudio = false;
       }
       this.code.disableVideo = args.disableVideo;
       this.code.disableAudio = args.disableAudio;
+      this.code.enableFormat = args.format != null;
+      this.code.format = args.format;
       this.code.extra = args.Extra;
-    }
-    
+    },
   },
   components: {},
   mounted: function () {
@@ -389,6 +423,7 @@ export default Vue.component("code-arguments", {
 <style scoped>
 div[role="slider"] {
   min-width: 240px;
+  max-width:480px;
 }
 
 .el-select {

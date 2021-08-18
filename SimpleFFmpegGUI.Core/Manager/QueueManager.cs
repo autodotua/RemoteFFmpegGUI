@@ -26,6 +26,7 @@ namespace SimpleFFmpegGUI.Manager
         public TaskInfo ProcessingTask { get; private set; }
         public ProgressDto Progress { get; private set; }
         private bool cancelQueue = false;
+        private CancellationTokenSource cancel = new CancellationTokenSource();
 
         public QueueManager()
         {
@@ -56,9 +57,9 @@ namespace SimpleFFmpegGUI.Manager
 
                 ProcessingTask = task;
                 task.Status = TaskStatus.Processing;
+                task.StartTime = DateTime.Now;
                 try
                 {
-                    task.StartTime = DateTime.Now;
                     db.SaveChanges();
                     await StartNewAsync(task);
                     task.Status = TaskStatus.Done;
@@ -67,13 +68,13 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     if (task.Status != TaskStatus.Cancel)
                     {
-                        Logger.Error("运行错误：" + ex.Message);
+                        Logger.Error(task, "运行错误：" + ex.Message);
                         task.Status = TaskStatus.Error;
                         task.Message = ex.Message;
                     }
                     else
                     {
-                        Logger.Error("任务被取消");
+                        Logger.Warn(task, "任务被取消");
                     }
                 }
                 finally
@@ -173,17 +174,9 @@ namespace SimpleFFmpegGUI.Manager
             return tsFiles;
         }
 
-        public async Task StartNewAsync(TaskInfo task)
+        private async Tasks.Task<FFMpegArgumentProcessor> GetCodeProcessorAsync(TaskInfo task, string tempDir)
         {
-            Logger.Info(task, "开始任务"); ProcessingTask = task;
-
             FFMpegArguments f = null;
-            string tempPath = null;
-            paused = false;
-            if (!task.Inputs.Any())
-            {
-                throw new ArgumentException("没有输入文件");
-            }
             if (task.Inputs.Count() == 1)
             {
                 f = FFMpegArguments.FromFileInput(task.Inputs.First(), true, a => ApplyInputArguments(a, task.Arguments));
@@ -192,20 +185,38 @@ namespace SimpleFFmpegGUI.Manager
             }
             else
             {
-                tempPath = Path.Combine(Path.GetDirectoryName(task.Output), "temp");
-                var tsFiles = await ConvertToTsAsync(task.Inputs, tempPath);
+                var tsFiles = await ConvertToTsAsync(task.Inputs, tempDir);
                 f = FFMpegArguments.FromConcatInput(tsFiles, a => ApplyInputArguments(a, task.Arguments));
                 Progress = GetProgress(task);
             }
-            FFMpegArgumentProcessor p = f.OutputToFile(FileSystem.GetNoDuplicateFile(task.Output), true,
-                a => ApplyOutputArguments(a, task.Arguments));
-            p.NotifyOnOutput(Output);
+            task.Output = GetFileName(task.Arguments, task.Output);
+            return f.OutputToFile(task.Output, true, a => ApplyOutputArguments(a, task.Arguments));
+        }
 
-            Logger.Info("FFmpeg参数为：" + p.Arguments);
-            await p.ProcessAsynchronously();
-            if (Directory.Exists(tempPath))
+        public async Task StartNewAsync(TaskInfo task)
+        {
+            Logger.Info(task, "开始任务"); ProcessingTask = task;
+
+            string tempDir = Path.Combine(Path.GetDirectoryName(task.Output), "temp");
+            paused = false;
+            if (!task.Inputs.Any())
             {
-                Directory.Delete(tempPath, true);
+                throw new ArgumentException("没有输入文件");
+            }
+
+            FFMpegArgumentProcessor p = task.Type switch
+            {
+                TaskType.Code => await GetCodeProcessorAsync(task, tempDir),
+                _ => throw new NotSupportedException("不支持的任务类型：" + task.Type),
+            };
+            Logger.Info("FFmpeg参数为：" + p.Arguments);
+            await p.NotifyOnOutput(Output)
+                    .CancellableThrough(cancel.Token)
+                    .ProcessAsynchronously();
+
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
             }
             Logger.Info(task, "完成任务");
         }
@@ -227,7 +238,7 @@ namespace SimpleFFmpegGUI.Manager
                 return;
             }
             paused = true;
-            Logger.Info(ProcessingTask, "暂停任务");
+            Logger.Info(ProcessingTask, "暂停队列");
             pauseStartTime = DateTime.Now;
             ProcessExtension.SuspendProcess(GetFFmpegProcess().Id);
         }
@@ -244,22 +255,22 @@ namespace SimpleFFmpegGUI.Manager
             }
             paused = false;
             Progress.PauseTime = DateTime.Now - pauseStartTime;
-            Logger.Info(ProcessingTask, "恢复任务");
+            Logger.Info(ProcessingTask, "恢复队列");
             ProcessExtension.ResumeProcess(GetFFmpegProcess().Id);
         }
 
         public void Cancel()
         {
             Logger.Info("取消队列");
-            ProcessingTask.Status = Model.TaskStatus.Cancel;
+            ProcessingTask.Status = TaskStatus.Cancel;
             cancelQueue = true;
-            GetFFmpegProcess().Kill();
+            cancel.Cancel();
         }
 
         public void CancelCurrent()
         {
             Logger.Info(ProcessingTask, "取消当前任务");
-            ProcessingTask.Status = Model.TaskStatus.Cancel;
+            ProcessingTask.Status = TaskStatus.Cancel;
             GetFFmpegProcess().Kill();
         }
 
@@ -398,8 +409,25 @@ namespace SimpleFFmpegGUI.Manager
             }
             if (!string.IsNullOrWhiteSpace(a.Format))
             {
-                fa.ForceFormat(FFMpeg.GetContainerFormat(a.Format.ToLower()));
+                fa.ForceFormat(a.Format);
             }
+        }
+
+        private string GetFileName(CodeArguments a, string output)
+        {
+            string result = output;
+            if (!string.IsNullOrEmpty(a.Format))
+            {
+                VideoFormat format = VideoFormat.Formats.Where(p => p.Name == a.Format || p.Extension == a.Format).FirstOrDefault();
+                if (format != null)
+                {
+                    string dir = Path.GetDirectoryName(output);
+                    string name = Path.GetFileNameWithoutExtension(output);
+                    string extension = format.Extension;
+                    result = Path.Combine(dir, name + "." + extension);
+                }
+            }
+            return FileSystem.GetNoDuplicateFile(result);
         }
     }
 }

@@ -194,5 +194,10 @@ namespace SimpleFFmpegGUI
         {
             return File.Exists(path);
         }
+
+        public VideoFormat[] GetSuggestedFormats()
+        {
+            return VideoFormat.Formats;
+        }
     }
 }

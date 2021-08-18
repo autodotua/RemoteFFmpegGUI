@@ -24,9 +24,14 @@ namespace SimpleFFmpegGUI
 
         private static ConsoleColor DefaultColor = Console.ForegroundColor;
 
+        private static string GetMessage(TaskInfo task, string message)
+        {
+            return $"{message}：{task.Type}  {string.Join('+', task.Inputs)} ===> {task.Output}";
+        }
+
         public static void Info(TaskInfo task, string message)
         {
-            Info($"{message}：{task.Type}  {string.Join('+', task.Inputs)} ===> {task.Output}");
+            Info(GetMessage(task, message));
         }
 
         public static void Info(string message)
@@ -47,15 +52,24 @@ namespace SimpleFFmpegGUI
             AddLog('E', message);
         }
 
+        public static void Error(TaskInfo task, string message)
+        {
+            Error(GetMessage(task, message));
+        }
+
         public static void Warn(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             AddLog('W', message);
         }
 
+        public static void Warn(TaskInfo task, string message)
+        {
+            Warn(GetMessage(task, message));
+        }
+
         private static void AddLog(char type, string message)
         {
-            //Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss}  ——  {message}");
             Log log = new Log()
             {
                 Time = DateTime.Now,

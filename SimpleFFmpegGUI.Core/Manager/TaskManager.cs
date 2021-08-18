@@ -8,6 +8,16 @@ namespace SimpleFFmpegGUI.Manager
 {
     public static class TaskManager
     {
+       static TaskManager()
+        {
+            using var db = FFmpegDbContext.GetNew();
+            foreach (var item in db.Tasks.Where(p => p.Status == TaskStatus.Processing))
+            {
+                item.Status = TaskStatus.Error;
+                item.Message = "状态异常：启动时处于正在运行状态";
+            }
+            db.SaveChanges();
+        }
         public static int AddTask(TaskType type, IEnumerable<string> path, string outputPath, CodeArguments arg)
         {
             FFmpegDbContext db = FFmpegDbContext.Get();

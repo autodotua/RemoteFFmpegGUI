@@ -135,3 +135,8 @@ export function getLogs(type: string | null, from: string | null, to: string | n
 export function getUploadUrl(): string {
         return getUrl("File/Upload");
 }
+
+export function getFormats(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .get(getUrl("Task/Formats"))
+}

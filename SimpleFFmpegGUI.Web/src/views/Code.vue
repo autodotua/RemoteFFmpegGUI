@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-form label-width="100px">
-      <h1>输入</h1>
+      <h2>输入</h2>
       <el-form-item label="输入文件" v-for="value in files" :key="value.index">
         <a class="el-form-item__label">{{ value.index + 1 }}</a>
         <file-select
@@ -24,7 +24,7 @@
         ></el-button>
       </el-form-item>
       <el-form-item v-if="files.length > 1" label="">
-        <a style="color: gray; margin-left: 18.21px"
+        <a style="margin-left: 18.21px" class="gray"
           >输入多个文件时，将按顺序进行拼接</a
         >
       </el-form-item>
@@ -141,7 +141,7 @@
           }}</a>
         </el-form-item>
       </el-form-item>
-      <h1>输出</h1>
+      <h2>输出</h2>
       <el-form-item label="输出参数预设">
         <div>
           <el-select
@@ -178,18 +178,12 @@
     </el-form>
 
     <code-arguments ref="args" />
-    <el-form label-width="120px">
-      <el-form-item>
-        <div class="bottom-div">
-          <el-button type="primary" @click="add" class="right24 bottom12"
-            >加入队列</el-button
-          >
-          <el-button @click="addAndStart" style="margin-left: 0"
-            >加入队列并立即开始</el-button
-          >
-        </div>
-      </el-form-item>
-    </el-form>
+    <el-button type="primary" @click="add" class="right24 bottom12"
+      >加入队列</el-button
+    >
+    <el-button @click="addAndStart" style="margin-left: 0"
+      >加入队列并立即开始</el-button
+    >
   </div>
 </template>
 <script lang="ts">

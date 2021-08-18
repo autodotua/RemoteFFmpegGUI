@@ -96,5 +96,12 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             await pipeClient.InvokeAsync(p => p.DeleteTasks(ids));
         }
+
+        [HttpGet]
+        [Route("Formats")]
+        public Task<VideoFormat[]> GetVideoFormats()
+        {
+            return pipeClient.InvokeAsync(p => p.GetSuggestedFormats());
+        }
     }
 }

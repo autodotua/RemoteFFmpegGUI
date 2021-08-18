@@ -61,6 +61,9 @@ namespace SimpleFFmpegGUI
         void OpenFtp(int id, string path, int port);
 
         int? GetFtpPort(int id);
+
         bool IsFileExist(string path);
+
+        VideoFormat[] GetSuggestedFormats();
     }
 }
