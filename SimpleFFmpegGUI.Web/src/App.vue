@@ -73,6 +73,10 @@
                 <i class="el-icon-circle-plus-outline"></i>
                 <span>合并视音频</span></el-menu-item
               >
+              <el-menu-item index="/add/compare">
+                <i class="el-icon-circle-plus-outline"></i>
+                <span>视频对比</span></el-menu-item
+              >
             </el-submenu>
             <el-menu-item index="/tasks">
               <i class="el-icon-document"></i>
@@ -129,7 +133,7 @@ export default Vue.extend({
       showHeader: true,
       status: null,
       netError: false,
-      menuCollapse: true,
+      menuCollapse: false,
       windowWidth: 0,
       headerHeight: 0,
       footerHeight: 0,

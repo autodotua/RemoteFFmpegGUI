@@ -71,3 +71,7 @@ body {
   .gray{
       color:#606266
   }
+
+  .s{
+    white-space: pre-wrap
+  }

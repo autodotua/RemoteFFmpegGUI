@@ -6,6 +6,7 @@ import Welcome from '../views/Welcome.vue'
 import MediaInfo from '../views/MediaInfo.vue'
 import Code from '../views/Add/Code.vue'
 import Combine from '../views/Add/Combine.vue'
+import Compare from '../views/Add/Compare.vue'
 import Tasks from '../views/Tasks.vue'
 import Files from '../views/Files.vue'
 import Presets from '../views/Presets.vue'
@@ -53,6 +54,11 @@ Vue.use(VueRouter)
     path: '/add/combine',
     name: 'Combine',
     component: Combine
+  },
+  {
+    path: '/add/compare',
+    name: 'Compare',
+    component: Compare
   },
   {
     path: '/password',

@@ -1,6 +1,7 @@
 import Cookies from "js-cookie"
 import { Notification, Loading } from "element-ui"
 import { ElLoadingComponent } from "element-ui/types/loading";
+import { argKey, inputKey, outputKey } from "./parameters";
 let loadingInstance: ElLoadingComponent | null = null;
 export function showLoading(): void {
     loadingInstance = Loading.service({});
@@ -75,21 +76,33 @@ export function jump(url: string): void {
 }
 
 
-export function loadArgs(codeArguments: any) {
-    if (localStorage.getItem("codeArgs") != null) {
-        const args = JSON.parse(localStorage.getItem("codeArgs") as string);
+export function loadArgs(argsComponent: any): any {
+    if (argsComponent && localStorage.getItem(argKey) != null) {
+        const args = JSON.parse(localStorage.getItem(argKey) as string);
         try {
-            codeArguments.updateFromArgs(args);
+            argsComponent.updateFromArgs(args);
             showSuccess("已加载参数");
+
         } catch (error) {
-            showError("加载参数失败");
-            console.log("错误参数为",args);
-            
+            showError("加载参数失败：" + error);
+            console.log("错误参数为", args);
+
             throw error;
         } finally {
-            localStorage.removeItem("codeArgs");
+            localStorage.removeItem(argKey);
         }
     }
+    const result: any = {}
+    if (localStorage.getItem(outputKey) != null) {
+        result.output = localStorage.getItem(outputKey);
+    }
+    if (localStorage.getItem(inputKey) != null) {
+        result.inputs = JSON.parse(localStorage.getItem(inputKey) as string);
+    }
+    localStorage.removeItem(argKey);
+    localStorage.removeItem(outputKey);
+    localStorage.removeItem(inputKey);
+    return result;
 }
 export function getTaskTypeDescription(type: number): string {
     switch (type) {
@@ -97,29 +110,38 @@ export function getTaskTypeDescription(type: number): string {
             return "转码";
         case 1:
             return "合并视音频"
+        case 2:
+            return "视频对比"
         default:
             return type.toString();
     }
 }
-export function stringType2Number(type:string)
-{
+export function stringType2Number(type: string): number {
     switch (type) {
         case "code":
             return 0;
         case "combine":
             return 1
+        case "compare":
+            return 2
         default:
             throw new Error("未知类型：" + type);
     }
 }
-export function jumpByArgs(args: any, type: number) {
-    localStorage.setItem("codeArgs", JSON.stringify(args));
+export function jumpByArgs(args: any, input: Array<string>, output: string, type: number): void {
+    localStorage.setItem(argKey, JSON.stringify(args));
+    localStorage.setItem(inputKey, JSON.stringify(input));
+    localStorage.setItem(outputKey, output);
     switch (type) {
         case 0:
             jump("add/code");
             break;
         case 1:
             jump("add/combine");
+            break;
+            break;
+        case 2:
+            jump("add/compare");
             break;
         default:
             throw new Error("未知类型：" + type);

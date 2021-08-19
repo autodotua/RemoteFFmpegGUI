@@ -5,14 +5,14 @@
       <el-form-item label="视频">
         <file-select
           ref="videoFile"
-          @select="(f) => selectFile(f, true)"
+          :file.sync="video"
           class="right24"
         ></file-select>
       </el-form-item>
       <el-form-item label="音频">
         <file-select
           ref="audioFile"
-          @select="(f) => selectFile(f, false)"
+          :file.sync="audio"
           class="right24"
         ></file-select>
       </el-form-item>
@@ -51,17 +51,14 @@ export default Vue.extend({
     };
   },
   computed: {},
+  watch:{
+    video(){
+      this.output=this.video;
+    }
+  },
   methods: {
     jump: jump,
 
-    selectFile(file: string, isVideo: boolean) {
-      if (isVideo) {
-        this.video = file;
-        this.output = file;
-      } else {
-        this.audio = file;
-      }
-    },
     add() {
       this.addTask(false);
     },
@@ -70,6 +67,9 @@ export default Vue.extend({
     },
 
     addTask(start: boolean) {
+      console.log(this.video);
+      console.log(this.audio);
+
       if (this.video == "" || this.audio == "") {
         showError("请选择输入文件");
         return;
@@ -85,8 +85,6 @@ export default Vue.extend({
         .then((response) => {
           this.video = "";
           this.audio = "";
-          (this.$refs.videoFile as any).file = "";
-          (this.$refs.audioFile as any).file = "";
           this.output = "";
           showSuccess("已加入队列");
         })
@@ -96,32 +94,19 @@ export default Vue.extend({
   components: { CodeArguments, AddToTaskButtons },
   mounted: function () {
     this.$nextTick(function () {
-      loadArgs(this.$refs.args);
+      const inputOutput = loadArgs(this.$refs.args);
+      console.log(inputOutput);
+      
+      if (inputOutput.inputs) {
+        this.video = inputOutput.inputs[0];
+        this.audio = inputOutput.inputs[1];
+      }
+      if (inputOutput.output) {
+        this.output = inputOutput.output;
+      }
     });
   },
 });
 </script>
 <style scoped>
-.with-slider {
-  margin-bottom: 24px;
-}
-
-.time {
-  width: 72px;
-}
-.time-second {
-  width: 108px;
-}
-.time-colon {
-  margin-left: 6px;
-  margin-right: 6px;
-}
-.time-text {
-  max-width: 320px;
-}
-.bottom-div {
-  display: inline-block;
-  margin-top: 36px;
-  margin-right: 24px;
-}
 </style>

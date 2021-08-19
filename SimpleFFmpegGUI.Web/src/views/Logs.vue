@@ -2,7 +2,7 @@
   <div>
     <a class="right24">时间范围：</a>
     <el-date-picker
-    @change="fillData"
+      @change="fillData"
       v-model="timeRange"
       type="datetimerange"
       range-separator="至"
@@ -14,7 +14,9 @@
     <el-table ref="table" :data="list" size="small">
       <el-table-column type="expand">
         <template slot-scope="props">
-          {{ props.row.message }}
+          <div class="pre-wrap">
+            {{ props.row.message }}
+          </div>
         </template>
       </el-table-column>
 
@@ -94,16 +96,22 @@ export default Vue.extend({
       page: 1,
       countPerPage: 10,
       typeFilter: null,
-      timeRange:[]
+      timeRange: [],
     };
   },
   methods: {
     fillData() {
       showLoading();
-      const from=this.timeRange&&this.timeRange.length==2?(this.timeRange[0] as Date).toJSON():null;
-      const to=this.timeRange&&this.timeRange.length==2?(this.timeRange[1] as Date).toJSON():null;
-      
-    return  net
+      const from =
+        this.timeRange && this.timeRange.length == 2
+          ? (this.timeRange[0] as Date).toJSON()
+          : null;
+      const to =
+        this.timeRange && this.timeRange.length == 2
+          ? (this.timeRange[1] as Date).toJSON()
+          : null;
+
+      return net
         .getLogs(
           this.typeFilter,
           from,
@@ -119,7 +127,8 @@ export default Vue.extend({
           });
           this.list = response.data.list;
         })
-        .catch(showError).finally(closeLoading);
+        .catch(showError)
+        .finally(closeLoading);
     },
   },
   computed: {},

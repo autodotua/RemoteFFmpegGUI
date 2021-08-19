@@ -66,7 +66,7 @@
     >
       <el-table-column type="expand">
         <template slot-scope="props">
-          <el-form label-position="left" label-width="120px">
+          <el-form label-position="left" label-width="120px" class="pre-wrap">
             <el-form-item label="输入">
               <div v-for="file in props.row.inputs" :key="file">
                 {{ file }}
@@ -82,11 +82,11 @@
             <el-form-item label="结束时间"
               >{{ props.row.finishTime }}
             </el-form-item>
-            <el-form-item label="错误信息"
+            <el-form-item label="信息"
               >{{ props.row.message }}
             </el-form-item>
             <el-form-item label="参数"
-              ><div style="white-space: pre-wrap">
+              ><div >
                 {{ JSON.stringify(props.row.arguments, null, 4) }}
               </div></el-form-item
             >
@@ -249,7 +249,7 @@ export default Vue.extend({
   },
   methods: {
     remake(item: any) {
-      jumpByArgs(item.arguments,item.type)
+      jumpByArgs(item.arguments,item.inputs,item.output,item.type)
     },
     getSelectionIds(): number[] {
       return this.toIdList(this.selection as []);

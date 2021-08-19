@@ -12,11 +12,16 @@ using FFMpegCore.Enums;
 using FzLib.IO;
 using SimpleFFmpegGUI.FFMpegArgumentExtension;
 using System.Threading;
+using System.Text.RegularExpressions;
+using FFMpegCore.Exceptions;
 
 namespace SimpleFFmpegGUI.Manager
 {
     public class FFmpegManager
     {
+        private static readonly Regex rSsim = new Regex(@"SSIM ([YUVAll]+:[0-9\.\(\) ]+)+", RegexOptions.Compiled);
+        private static readonly Regex rPsnr = new Regex(@"PSNR (([yuvaverageminmax]+:[0-9\. ]+)+)", RegexOptions.Compiled);
+
         public ProgressDto Progress { get; private set; }
 
         private ProgressDto GetProgress(TaskInfo task)
@@ -100,7 +105,7 @@ namespace SimpleFFmpegGUI.Manager
             return tsFiles;
         }
 
-        private async Task CodeProcessAsync(TaskInfo task, string tempDir, CancellationToken cancellationToken)
+        private async Task RunCodeProcessAsync(TaskInfo task, string tempDir, CancellationToken cancellationToken)
         {
             FFMpegArguments f = null;
             string message = null;
@@ -123,7 +128,7 @@ namespace SimpleFFmpegGUI.Manager
             await RunAsync(p, message, cancellationToken);
         }
 
-        private async Task CombineProcessAsync(TaskInfo task, CancellationToken cancellationToken)
+        private async Task RunCombineProcessAsync(TaskInfo task, CancellationToken cancellationToken)
         {
             if (task.Inputs.Count() != 2)
             {
@@ -163,12 +168,73 @@ namespace SimpleFFmpegGUI.Manager
             await RunAsync(p, "正在合并音视频", cancellationToken);
         }
 
+        private async Task RunCompareProcessAsync(TaskInfo task, CancellationToken cancellationToken)
+        {
+            if (task.Inputs.Count() != 2)
+            {
+                throw new ArgumentException("视频比较，输入文件必须为2个");
+            }
+            var v1 = FFProbe.Analyse(task.Inputs[0]);
+            var v2 = FFProbe.Analyse(task.Inputs[1]);
+            if (v1.VideoStreams.Count == 0)
+            {
+                throw new ArgumentException("输入1不含视频");
+            }
+            if (v2.VideoStreams.Count == 0)
+            {
+                throw new ArgumentException("输入2不含视频");
+            }
+            var p = FFMpegArguments
+                 .FromFileInput(task.Inputs[0])
+                 .AddFileInput(task.Inputs[1])
+                 .OutputToUrl("", o =>
+                 {
+                     o.WithCustomArgument("-lavfi \"ssim;[0:v][1:v]psnr\" -f null -");
+                 });
+            FFmpegOutput += CheckOutput;
+            string ssim = null;
+            string psnr = null;
+            try
+            {
+                await RunAsync(p, null, cancellationToken);
+                if (ssim == null || psnr == null)
+                {
+                    throw new Exception("对比视频失败，为识别到对比结果");
+                }
+                task.Message = ssim + Environment.NewLine + psnr;
+            }
+            finally
+            {
+                FFmpegOutput -= CheckOutput;
+            }
+
+            void CheckOutput(object sender, FFmpegOutputEventArgs e)
+            {
+                if (!e.Data.StartsWith('['))
+                {
+                    return;
+                }
+                if (rSsim.IsMatch(e.Data))
+                {
+                    var match = rSsim.Match(e.Data);
+                    ssim = match.Value;
+                    Logger.Info(task, "对比结果（SSIM）：" + match.Value);
+                }
+                if (rPsnr.IsMatch(e.Data))
+                {
+                    var match = rPsnr.Match(e.Data);
+                    psnr = match.Value;
+                    Logger.Info(task, "对比结果（PSNR）：" + match.Value);
+                }
+            }
+        }
+
         public async Task StartNewAsync(TaskInfo task, CancellationToken cancellationToken)
         {
             try
             {
                 Logger.Info(task, "开始任务");
-                string tempDir = Path.Combine(Path.GetDirectoryName(task.Output), "temp");
+                string tempDir = ConfigHelper.TempDir;
                 if (!task.Inputs.Any())
                 {
                     throw new ArgumentException("没有输入文件");
@@ -176,14 +242,22 @@ namespace SimpleFFmpegGUI.Manager
 
                 await (task.Type switch
                 {
-                    TaskType.Code => CodeProcessAsync(task, tempDir, cancellationToken),
-                    TaskType.Combine => CombineProcessAsync(task, cancellationToken),
+                    TaskType.Code => RunCodeProcessAsync(task, tempDir, cancellationToken),
+                    TaskType.Combine => RunCombineProcessAsync(task, cancellationToken),
+                    TaskType.Compare => RunCompareProcessAsync(task, cancellationToken),
                     _ => throw new NotSupportedException("不支持的任务类型：" + task.Type),
                 });
 
                 if (Directory.Exists(tempDir))
                 {
-                    Directory.Delete(tempDir, true);
+                    try
+                    {
+                        Directory.Delete(tempDir, true);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
                 Logger.Info(task, "完成任务");
             }
@@ -196,7 +270,10 @@ namespace SimpleFFmpegGUI.Manager
         private Task RunAsync(FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken)
         {
             Logger.Info("FFmpeg参数为：" + processor.Arguments);
-            Progress.Name = desc;
+            if (Progress != null)
+            {
+                Progress.Name = desc;
+            }
             return processor
                 .CancellableThrough(cancellationToken)
                 .NotifyOnOutput(Output)
@@ -206,7 +283,7 @@ namespace SimpleFFmpegGUI.Manager
         private void Output(string data, DataType type)
         {
             Logger.Output(data);
-            FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(type == Instances.DataType.Error, data));
+            FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(type == DataType.Error, data));
         }
 
         private void ApplyInputArguments(FFMpegArgumentOptions fa, CodeArguments a)
@@ -309,7 +386,8 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     "aac" => FFMpeg.GetCodec("aac"),
                     "ac3" => FFMpeg.GetCodec("ac3"),
-                    _ => throw new NotSupportedException("不支持的格式：" + a.Video.Code)
+                    "opus" => FFMpeg.GetCodec("libopus"),
+                    _ => throw new NotSupportedException("不支持的格式：" + a.Audio.Code)
                 };
                 fa.WithAudioCodec(code);
                 if (a.Audio.Bitrate.HasValue)

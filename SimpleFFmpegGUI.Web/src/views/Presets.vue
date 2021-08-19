@@ -74,8 +74,7 @@ export default Vue.extend({
   watch: {},
   methods: {
     remake(item: any) {
-
-      jumpByArgs(item.arguments,item.type)
+      jumpByArgs(item.arguments,item.inputs,item.output,item.type)
     },
     deletePreset(item: any) {
       net

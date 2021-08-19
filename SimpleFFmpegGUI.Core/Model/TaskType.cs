@@ -10,6 +10,8 @@
         /// <summary>
         /// 合并视音频
         /// </summary>
-        Combine
+        Combine,
+
+        Compare
     }
 }

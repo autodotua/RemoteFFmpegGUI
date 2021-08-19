@@ -80,6 +80,29 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         }
 
         [HttpPost]
+        [Route("Add/Compare")]
+        public async Task<int> AddCompareTaskAsync([FromBody] TaskDto request)
+        {
+            if (request.Input == null || request.Input.Any(p => p == null))
+            {
+                throw Oops.Oh("输入文件为空");
+            }
+            if (request.Input.Count() != 2)
+            {
+                throw Oops.Oh("输入文件必须为2个");
+            }
+            foreach (var file in request.Input)
+            {
+                await CheckInputFileExistAsync(file);
+            }
+            return await pipeClient.InvokeAsync(p =>
+              p.AddTask(TaskType.Compare, request.Input.Select(p => Path.Combine(GetInputDir(), p)),
+              null,
+              null,
+              request.Start));
+        }
+
+        [HttpPost]
         [Route("Reset")]
         public async Task ResetTaskAsync(int id)
         {

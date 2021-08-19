@@ -45,7 +45,7 @@ export default Vue.component("add-to-task-buttons", {
   bottom: -20px;
   width: 100%;
   height: 48px;
-  z-index: 10;
+  z-index: 1100;
   background-color: white;
 }
 .in {

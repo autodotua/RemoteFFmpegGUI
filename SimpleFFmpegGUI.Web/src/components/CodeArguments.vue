@@ -308,8 +308,8 @@ export default Vue.component("code-arguments", {
         256: "256",
         320: "320",
       },
-      videoCodes: ["H264", "H265"],
-      audioCodes: ["AAC"],
+      videoCodes: ["H264", "H265","VP9"],
+      audioCodes: ["AAC","OPUS"],
       audioSamples: [8000, 16000, 32000, 44100, 48000, 96000],
       formats: [],
       code: {

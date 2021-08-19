@@ -1,11 +1,11 @@
 <template>
   <div>
     <div>
-      <file-select ref="files" @select="fileSelect" class="right24 bottom12"></file-select>
+      <file-select  :file.sync="file" class="right24 bottom12"></file-select>
 
       <el-button
         type="primary"
-        v-on:click="query"
+       @click="query"
         :disabled="file == ''"
         >查询</el-button
       >
@@ -126,10 +126,7 @@ export default Vue.extend({
   methods: {
     jump: jump,
     formatDoubleTimeSpan,
-    fileSelect(item: string) {
-      this.file = item;
-      console.log(item);
-    },
+   
     query() {
       showLoading();
       net

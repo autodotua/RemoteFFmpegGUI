@@ -61,8 +61,10 @@ namespace SimpleFFmpegGUI.Manager
                 cancel = new CancellationTokenSource();
                 task.Status = TaskStatus.Processing;
                 task.StartTime = DateTime.Now;
+                task.Message = "";
                 try
                 {
+                    db.Update(task);
                     db.SaveChanges();
                     await ffmpeg.StartNewAsync(task, cancel.Token);
                     task.Status = TaskStatus.Done;

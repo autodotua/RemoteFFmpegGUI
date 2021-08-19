@@ -6,7 +6,8 @@
         <a class="el-form-item__label">{{ value.index + 1 }}</a>
         <file-select
           ref="files"
-          @select="(f) => selectFile(f, value.index)"
+          @update:file="(f) => selectFile(f, value.index)"
+          :file="value.name"
           class="right24"
         ></file-select>
         <el-button
@@ -162,7 +163,7 @@ export default Vue.extend({
       files: [
         {
           index: 0,
-          path: "",
+          name: "",
         },
       ],
       output: "",
@@ -219,17 +220,17 @@ export default Vue.extend({
       }
     },
     selectFile(file: string, index: number) {
-      this.files[index].path = file;
+      this.files[index].name = file;
       if (index == 0 && this.output == "") {
         this.output = file;
       }
     },
     addFile() {
-      this.files.push({ index: this.files.length, path: "" });
+      this.files.push({ index: this.files.length, name: "" });
     },
 
     addTask(start: boolean) {
-      if (this.files.filter((p) => p.path != "").length == 0) {
+      if (this.files.filter((p) => p.name != "").length == 0) {
         showError("请选择输入文件");
         return;
       }
@@ -254,15 +255,14 @@ export default Vue.extend({
       }
       net
         .postAddCodeTask({
-          input: this.files.filter((p) => p.path != "").map((p) => p.path),
+          input: this.files.filter((p) => p.name != "").map((p) => p.name),
           output: this.output,
           argument: args,
           start: start,
         })
         .then((response) => {
           this.files = [];
-          this.files.push({ index: 0, path: "" });
-          (this.$refs.files as any)[0].file = "";
+          this.files.push({ index: 0, name: "" });
           this.output = "";
           showSuccess("已加入队列");
         })
@@ -272,7 +272,16 @@ export default Vue.extend({
   components: { CodeArguments, AddToTaskButtons },
   mounted: function () {
     this.$nextTick(function () {
-      loadArgs(this.$refs.args);
+      const inputOutput = loadArgs(this.$refs.args);
+      if (inputOutput.inputs) {
+        this.files = [];
+        for (let i = 0; i < inputOutput.inputs.length; i++) {
+          this.files.push({ index: i, name: inputOutput.inputs[i] });
+        }
+      }
+      if (inputOutput.output) {
+        this.output = inputOutput.output;
+      }
     });
   },
 });

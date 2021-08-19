@@ -58,6 +58,7 @@ namespace SimpleFFmpegGUI.Model
         public DbSet<TaskInfo> Tasks { get; set; }
         public DbSet<Log> Logs { get; set; }
         public DbSet<CodePreset> Presets { get; set; }
+        public DbSet<Config> Configs { get; set; }
 
         public void Check()
         {

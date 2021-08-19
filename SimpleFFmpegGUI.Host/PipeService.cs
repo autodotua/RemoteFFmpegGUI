@@ -73,7 +73,7 @@ namespace SimpleFFmpegGUI
             }
             catch (Exception ex)
             {
-                throw new Exception("查询信息失败");
+                throw new Exception("查询信息失败："+ex.Message);
             }
             return result.Adapt<MediaInfoDto>();
         }

@@ -3,7 +3,7 @@
   <el-select
     style="width: 280px"
     filterable
-    v-model="file"
+    v-model="selectedFile"
     @change="selectChanged"
     :placeholder="
       files == null ? '请选择文件' : '请选择文件（共' + files.length + '个）'
@@ -22,14 +22,20 @@ export default Vue.component("file-select", {
   data() {
     return {
       files: null,
-      file: null,
+      selectedFile:this.file
     };
   },
-  props: {},
-  computed: {},
+  props: ["file"],
+  computed: {
+  },
+  watch:{
+    file(){
+      this.selectedFile=this.file;
+    }
+  },
   methods: {
     selectChanged(e) {
-      this.$emit("select", e);
+      this.$emit("update:file", e);
     },
   },
   components: {},
