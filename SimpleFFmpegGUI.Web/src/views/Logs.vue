@@ -73,7 +73,6 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  withToken,
   showError,
   showSuccess,
   formatDateTime,

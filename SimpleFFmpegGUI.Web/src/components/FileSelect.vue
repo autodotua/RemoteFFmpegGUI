@@ -17,7 +17,7 @@
 import Vue from "vue";
 import Cookies from "js-cookie";
 import * as net from "../net";
-import { withToken, showError, jump, formatDateTime } from "../common";
+import {  showError, jump, formatDateTime } from "../common";
 export default Vue.component("file-select", {
   data() {
     return {

@@ -2,26 +2,26 @@
   <div>
     <el-form label-width="100px">
       <h2>输入和输出</h2>
-      <el-form-item label="输入文件" v-for="value in files" :key="value.index">
-        <a class="el-form-item__label">{{ value.index + 1 }}</a>
+      <el-form-item label="输入文件" v-for="(value,index) in files" :key="index">
+        <a class="el-form-item__label">{{ index + 1 }}</a>
         <file-select
           ref="files"
-          @update:file="(f) => selectFile(f, value.index)"
-          :file="value.name"
+          @update:file="f=>updateFile(f,index)"
+          :file="value"
           class="right24"
         ></file-select>
         <el-button
-          @click="addFile"
+          @click="files.push('')"
           icon="el-icon-plus"
           circle
-          v-if="value.index == files.length - 1"
-          class="right24"
+          v-if="index == files.length - 1"
+          class="right12"
         ></el-button>
         <el-button
           @click="files.splice(-1)"
           icon="el-icon-close"
           circle
-          v-if="value.index == files.length - 1 && value.index > 0"
+          v-if="index == files.length - 1 && index > 0"
         ></el-button>
       </el-form-item>
       <el-form-item v-if="files.length > 1" label="">
@@ -144,7 +144,7 @@
       <h2>参数</h2>
     </el-form>
 
-    <code-arguments ref="args" type="code" />
+    <code-arguments ref="args" :type="0" />
     <add-to-task-buttons :addFunc="addTask"></add-to-task-buttons>
   </div>
 </template>
@@ -160,12 +160,7 @@ export default Vue.extend({
   name: "Home",
   data() {
     return {
-      files: [
-        {
-          index: 0,
-          name: "",
-        },
-      ],
+      files: [""],
       output: "",
       inputArgs: {
         enableClip: false,
@@ -219,18 +214,15 @@ export default Vue.extend({
         this.inputArgs.timeToS = s;
       }
     },
-    selectFile(file: string, index: number) {
-      this.files[index].name = file;
+    updateFile(file: string, index: number) {
+      this.files[index] = file;
       if (index == 0 && this.output == "") {
         this.output = file;
       }
     },
-    addFile() {
-      this.files.push({ index: this.files.length, name: "" });
-    },
 
     addTask(start: boolean) {
-      if (this.files.filter((p) => p.name != "").length == 0) {
+      if (this.files.filter((p) => p != "").length == 0) {
         showError("请选择输入文件");
         return;
       }
@@ -255,14 +247,14 @@ export default Vue.extend({
       }
       net
         .postAddCodeTask({
-          input: this.files.filter((p) => p.name != "").map((p) => p.name),
+          input: this.files.filter((p) => p != ""),
           output: this.output,
           argument: args,
           start: start,
         })
         .then((response) => {
           this.files = [];
-          this.files.push({ index: 0, name: "" });
+          this.files.push( "" );
           this.output = "";
           showSuccess("已加入队列");
         })
@@ -276,7 +268,7 @@ export default Vue.extend({
       if (inputOutput.inputs) {
         this.files = [];
         for (let i = 0; i < inputOutput.inputs.length; i++) {
-          this.files.push({ index: i, name: inputOutput.inputs[i] });
+          this.files.push( inputOutput.inputs[i] );
         }
       }
       if (inputOutput.output) {
@@ -287,9 +279,7 @@ export default Vue.extend({
 });
 </script>
 <style scoped>
-.with-slider {
-  margin-bottom: 24px;
-}
+
 
 .time {
   width: 72px;
@@ -303,10 +293,5 @@ export default Vue.extend({
 }
 .time-text {
   max-width: 320px;
-}
-.bottom-div {
-  display: inline-block;
-  margin-top: 36px;
-  margin-right: 24px;
 }
 </style>

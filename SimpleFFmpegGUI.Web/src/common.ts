@@ -9,16 +9,7 @@ export function showLoading(): void {
 export function closeLoading(): void {
     (loadingInstance as ElLoadingComponent).close();
 }
-export function withToken(obj: any): any {
-    console.log(Cookies.get("token"))
-    const request = {
-        UserID: Number.parseInt(Cookies.get("userID") ?? "0"),
-        Token: Cookies.get("token")
-    }
-    Object.assign(request, obj);
-    console.log("send request", request);
-    return request;
-}
+
 
 export function formatDoubleTimeSpan(seconds: number, includeMs = false): string {
     const h = Math.floor(seconds / 3600);

@@ -256,7 +256,6 @@ namespace SimpleFFmpegGUI.Manager
                     }
                     catch (Exception ex)
                     {
-
                     }
                 }
                 Logger.Info(task, "完成任务");
@@ -349,9 +348,12 @@ namespace SimpleFFmpegGUI.Manager
                     "h265" => FFMpeg.GetCodec("libx265"),
                     "h264" => FFMpeg.GetCodec("libx264"),
                     "vp9" => FFMpeg.GetCodec("libvpx-vp9"),
-                    _ => throw new NotSupportedException("不支持的格式：" + a.Video.Code)
+                    _ => null
                 };
-                fa.WithVideoCodec(code);
+                if (code != null)
+                {
+                    fa.WithVideoCodec(code);
+                }
                 fa.WithSpeedPreset((Speed)a.Video.Preset);
                 if (a.Video.Crf.HasValue)
                 {
@@ -387,9 +389,12 @@ namespace SimpleFFmpegGUI.Manager
                     "aac" => FFMpeg.GetCodec("aac"),
                     "ac3" => FFMpeg.GetCodec("ac3"),
                     "opus" => FFMpeg.GetCodec("libopus"),
-                    _ => throw new NotSupportedException("不支持的格式：" + a.Audio.Code)
+                    _ => null
                 };
-                fa.WithAudioCodec(code);
+                if (code != null)
+                {
+                    fa.WithAudioCodec(code);
+                }
                 if (a.Audio.Bitrate.HasValue)
                 {
                     fa.WithAudioBitrate(a.Audio.Bitrate.Value);

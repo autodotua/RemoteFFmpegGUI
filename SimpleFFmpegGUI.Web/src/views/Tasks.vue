@@ -86,9 +86,9 @@
               >{{ props.row.message }}
             </el-form-item>
             <el-form-item label="参数"
-              ><div >
-                {{ JSON.stringify(props.row.arguments, null, 4) }}
-              </div></el-form-item
+              >
+              <code-arguments-description :type="props.row.type" :args="props.row.arguments"></code-arguments-description>
+          </el-form-item
             >
           </el-form>
         </template>
@@ -202,7 +202,6 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  withToken,
   showError,
   showSuccess,
   formatDateTime,
@@ -216,6 +215,7 @@ import {
 import * as net from "../net";
 import { Notification, Table } from "element-ui";
 import { ElTable } from "element-ui/types/table";
+import CodeArgumentsDescription from "@/components/CodeArgumentsDescription.vue";
 export default Vue.extend({
   name: "Home",
   data() {
@@ -379,7 +379,7 @@ export default Vue.extend({
       // }, 20000);
     });
   },
-  components: {},
+  components: {CodeArgumentsDescription},
 });
 </script>
 

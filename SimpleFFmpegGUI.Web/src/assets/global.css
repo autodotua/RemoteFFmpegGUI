@@ -67,7 +67,10 @@ body {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  
+  .el-slider__marks-text{
+    white-space: nowrap;
+    /* elementUI的BUG，Slider标签最后一个只能显示一个字符，其他会换行 */
+  }
   .gray{
       color:#606266
   }

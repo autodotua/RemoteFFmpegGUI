@@ -90,7 +90,6 @@
 import Vue from "vue";
 import Cookies from "js-cookie";
 import {
-  withToken,
   showError,
   jump,
   formatDateTime,

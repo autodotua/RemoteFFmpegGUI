@@ -1,4 +1,4 @@
-import Cookies  from 'js-cookie';
+import Cookies from 'js-cookie';
 import Vue from "vue";
 import { AxiosResponse } from "axios";
 import { stringType2Number } from "./common";
@@ -7,7 +7,7 @@ function getUrl(controller: string): string {
         if (process.env.NODE_ENV === 'production') {
                 return `/api/${controller}`;//发布
         }
-        else{
+        else {
                 // return `http://192.168.1.2:8080/api/${controller}`;//发布API调试
                 return `https://localhost:44305/${controller}`;//调试
         }
@@ -102,17 +102,17 @@ export function getMediaDetails(): Promise<AxiosResponse<any>> {
                 .get(getUrl("File/List/Output"))
 }
 
-export function getPresets(type:string|null=null): Promise<AxiosResponse<any>> {
-        return type?
-         Vue.axios
-                .get(getUrl("Preset/List?type="+stringType2Number(type)))
+export function getPresets(type: number | null = null): Promise<AxiosResponse<any>> {
+        return type ?
+                Vue.axios
+                        .get(getUrl("Preset/List?type=" + type))
                 :
                 Vue.axios
-                .get(getUrl("Preset/List"))
+                        .get(getUrl("Preset/List"))
 }
-export function postAddOrUpdatePreset(name:string,type:string,args:any): Promise<AxiosResponse<any>> {
+export function postAddOrUpdatePreset(name: string, type: number, args: any): Promise<AxiosResponse<any>> {
         return Vue.axios
-                .post(getUrl("Preset/Add"), {name:name,type:stringType2Number(type),arguments:args});
+                .post(getUrl("Preset/Add"), { name: name, type: type, arguments: args });
 }
 
 
@@ -155,16 +155,16 @@ export function getFormats(): Promise<AxiosResponse<any>> {
                 .get(getUrl("Task/Formats"))
 }
 
-export function setHeader():void{
+export function setHeader(): void {
         Vue.axios.defaults.headers.common['Authorization'] = Cookies.get("token");
 }
 
-export function getNeedToken(): Promise<AxiosResponse<any>>{
+export function getNeedToken(): Promise<AxiosResponse<any>> {
         return Vue.axios
-        .get(getUrl("Token/Need"))   
+                .get(getUrl("Token/Need"))
 }
 
-export function getCheckToken(token:string): Promise<AxiosResponse<any>>{
+export function getCheckToken(token: string): Promise<AxiosResponse<any>> {
         return Vue.axios
-        .get(getUrl("Token/Check?token=")+token)   
+                .get(getUrl("Token/Check?token=") + token)
 }

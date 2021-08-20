@@ -29,7 +29,7 @@
       </el-form-item>
     </el-form>
     <h2>参数</h2>
-    <code-arguments type="combine" ref="args" />
+    <code-arguments :type="1" ref="args" />
 
     <add-to-task-buttons :addFunc="addTask"></add-to-task-buttons>
   </div>
@@ -67,9 +67,6 @@ export default Vue.extend({
     },
 
     addTask(start: boolean) {
-      console.log(this.video);
-      console.log(this.audio);
-
       if (this.video == "" || this.audio == "") {
         showError("请选择输入文件");
         return;
@@ -95,7 +92,6 @@ export default Vue.extend({
   mounted: function () {
     this.$nextTick(function () {
       const inputOutput = loadArgs(this.$refs.args);
-      console.log(inputOutput);
       
       if (inputOutput.inputs) {
         this.video = inputOutput.inputs[0];

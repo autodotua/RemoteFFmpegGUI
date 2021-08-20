@@ -1,8 +1,8 @@
 
 <template>
   <el-form label-width="96px">
-    <h3>预设</h3>
-    <div>
+    <h3 v-if="showPresets">预设</h3>
+    <div v-if="showPresets">
       <div>
         <el-select
           @change="selectPreset"
@@ -59,7 +59,7 @@
         指定输出容器后，输出时会根据格式修改文件扩展名
       </div>
     </el-form-item>
-    <div v-if="type == 'code'">
+    <div v-if="type == 0">
       <h3>视频编码</h3>
       <el-form-item label="重编码">
         <el-switch v-model="code.enableVideo" class="right24"> </el-switch>
@@ -199,7 +199,7 @@
         </el-form-item>
       </div>
     </div>
-    <div v-if="type == 'code'">
+    <div v-if="type == 0">
       <h3>音频编码</h3>
       <el-form-item label="重编码">
         <el-switch v-model="code.enableAudio" class="right24"> </el-switch>
@@ -250,12 +250,12 @@
         </el-form-item>
       </div>
     </div>
-    <div v-if="type == 'combine'">
+    <div v-if="type == 1">
       <h3>合并</h3>
       <el-form-item label="音频比视频长">
         <el-switch
           v-model="code.combine.shortest"
-          active-text="裁剪到视频长度"
+          active-text="裁剪到最短的媒体"
           inactive-text="最后部分静帧或黑屏"
         ></el-switch>
       </el-form-item>
@@ -284,7 +284,7 @@ export default Vue.component("code-arguments", {
   data() {
     return {
       speedPresets: {
-        0: "",
+        0: "最慢",
         1: "更慢",
         2: "慢",
         3: {
@@ -297,7 +297,7 @@ export default Vue.component("code-arguments", {
         5: "更快",
         6: "很快",
         7: "超快",
-        8: "",
+        8: "极快",
       },
       audioBitrates: {
         32: "32",
@@ -308,8 +308,8 @@ export default Vue.component("code-arguments", {
         256: "256",
         320: "320",
       },
-      videoCodes: ["H264", "H265","VP9"],
-      audioCodes: ["AAC","OPUS"],
+      videoCodes: ["自动","H264", "H265","VP9"],
+      audioCodes: ["自动","AAC","OPUS"],
       audioSamples: [8000, 16000, 32000, 44100, 48000, 96000],
       formats: [],
       code: {
@@ -352,7 +352,14 @@ export default Vue.component("code-arguments", {
       newPresetName: "新预设",
     };
   },
-  props: ["type"],
+  props: {
+    type:{
+      default:0
+    },
+    showPresets:{
+      default:true
+    }
+  },
   computed: {},
   created() {
     this.fillPresets();
@@ -396,7 +403,6 @@ export default Vue.component("code-arguments", {
         .getPresets(this.type)
         .then((r) => {
           this.presets = r.data;
-          console.log(r.data);
 
           action(r.data);
         })
@@ -460,8 +466,6 @@ export default Vue.component("code-arguments", {
       return arg;
     },
     updateFromArgs(args: any) {
-      console.log(args);
-
       const video = args.video;
       const audio = args.audio;
       const combine = args.combine;

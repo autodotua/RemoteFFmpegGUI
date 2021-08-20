@@ -1,37 +1,30 @@
 <template>
   <div>
-    <el-table
-      ref="table"
-      :data="list"
-    >
+    <el-table ref="table" :data="list">
       <el-table-column type="expand">
         <template slot-scope="props">
-          <div style="white-space: pre-wrap">
-            {{ JSON.stringify(props.row.arguments, null, 4) }}
-          </div>
+          <code-arguments-description :args="props.row.arguments" :type="props.row.type"></code-arguments-description>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="预设名" min-width="80" />
       <el-table-column prop="typeText" label="类型" width="80" />
 
-      <el-table-column label="操作" width="140">
+      <el-table-column label="操作" width="165">
         <template slot-scope="scope">
+          <el-button slot="reference" type="text" @click="remake(scope.row)"
+            >新建任务</el-button
+          >
+          <el-button type="text" slot="reference" @click="edit(scope.row)"
+            >编辑</el-button
+          >
           <el-popconfirm
             title="真的要删除预设吗？"
-            style="margin-left: 10px"
+            style="margin-left: 8px"
             @onConfirm="deletePreset(scope.row)"
           >
-            <el-button slot="reference" type="text" size="small"
+            <el-button slot="reference" type="text"
               >删除</el-button
             ></el-popconfirm
-          >
-
-          <el-button
-            slot="reference"
-            type="text"
-            size="small"
-            @click="remake(scope.row)"
-            >新建任务</el-button
           >
         </template>
       </el-table-column>
@@ -42,14 +35,24 @@
         </template>
       </el-table-column>
     </el-table>
-    <div></div>
+    <el-dialog title="编辑预设" :visible.sync="dialogVisible" width="80%" >
+      <code-arguments    ref="args" :type="type" :showPresets="false" ></code-arguments>
+      <span slot="footer" class="dialog-footer">
+        <el-button
+       
+          type="primary"
+          @click="savePreset"
+          :loading="saving"
+          >保存</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import {
-  withToken,
   showError,
   showSuccess,
   formatDateTime,
@@ -58,23 +61,49 @@ import {
   showLoading,
   closeLoading,
   jumpByArgs,
+  stringType2Number,
 } from "../common";
 
 import * as net from "../net";
 import { Notification, Table } from "element-ui";
 import { ElTable } from "element-ui/types/table";
+import CodeArguments from "@/components/CodeArguments.vue";
+import CodeArgumentsDescription from "@/components/CodeArgumentsDescription.vue";
 export default Vue.extend({
   name: "Home",
   data() {
     return {
       list: [],
+      dialogVisible: false,
+      editingPreset: null,
+      type: "",
+      saving: false,
     };
   },
   props: [],
   watch: {},
   methods: {
     remake(item: any) {
-      jumpByArgs(item.arguments,item.inputs,item.output,item.type)
+      jumpByArgs(item.arguments, item.inputs, item.output, item.type);
+    },
+    savePreset() {
+      this.saving = true;
+      const item = this.editingPreset as any;
+      net
+        .postAddOrUpdatePreset(
+          item.name,
+          item.type,
+          (this.$refs.args as any).getArgs()
+        )
+        .then((r) => {
+          showSuccess("保存成功");
+          this.dialogVisible = false;
+          this.fillData();
+        })
+        .catch(showError)
+        .finally(() => {
+          this.saving = false;
+        });
     },
     deletePreset(item: any) {
       net
@@ -84,10 +113,14 @@ export default Vue.extend({
         })
         .catch(showError);
     },
-
+    edit(item: any) {
+      this.editingPreset = item;
+      this.type = item.type;
+      this.dialogVisible = true;
+    },
     fillData() {
       showLoading();
-     return net
+      return net
         .getPresets()
         .then((response) => {
           response.data.forEach((element: any) => {
@@ -106,7 +139,7 @@ export default Vue.extend({
       this.fillData();
     });
   },
-  components: {},
+  components: { CodeArguments, CodeArgumentsDescription },
 });
 </script>
 
