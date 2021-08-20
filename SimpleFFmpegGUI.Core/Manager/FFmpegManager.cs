@@ -24,44 +24,58 @@ namespace SimpleFFmpegGUI.Manager
 
         public ProgressDto Progress { get; private set; }
 
+        private TimeSpan GetVideoDuration(string path, InputCodeArguments arg)
+        {
+            TimeSpan realLength = FFProbe.Analyse(path).Duration;
+            if (arg == null || arg.From == null && arg.To == null && arg.Duration == null)
+            {
+                return realLength;
+            }
+
+            TimeSpan start = TimeSpan.Zero;
+            if (arg.From.HasValue)
+            {
+                start = arg.From.Value;
+            }
+            if (arg.To == null && arg.Duration == null)
+            {
+                if (realLength <= arg.From.Value)
+                {
+                    throw new Exception("开始时间在视频结束时间之后");
+                }
+                return realLength - arg.From.Value;
+            }
+            else if (arg.Duration.HasValue)
+            {
+                TimeSpan endTime = arg.From.Value + arg.Duration.Value;
+                if (endTime > realLength)
+                {
+                    throw new Exception("裁剪后的结束时间在视频结束时间之后");
+                }
+                return arg.Duration.Value;
+            }
+            else if (arg.To.HasValue)
+            {
+                if (arg.To.Value > realLength)
+                {
+                    throw new Exception("裁剪后的结束时间在视频结束时间之后");
+                }
+                return arg.To.Value - start;
+            }
+
+            throw new Exception("未知情况");
+        }
+
         private ProgressDto GetProgress(TaskInfo task)
         {
             var p = new ProgressDto();
             if (task.Inputs.Count == 1)
             {
-                try
-                {
-                    if (task.Arguments != null && task.Arguments.Input != null && task.Arguments.Input.From.HasValue && task.Arguments.Input.To.HasValue)
-                    {
-                        p.VideoLength = TimeSpan.FromSeconds(task.Arguments.Input.To.Value - task.Arguments.Input.From.Value);
-                    }
-                    else
-                    {
-                        p.VideoLength = FFProbe.Analyse(task.Inputs[0]).Duration;
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
+                p.VideoLength = GetVideoDuration(task.Inputs[0], task.Arguments.Input);
             }
             else
             {
-                try
-                {
-                    if (task.Arguments != null && task.Arguments.Input != null && task.Arguments.Input.From.HasValue && task.Arguments.Input.To.HasValue)
-                    {
-                        p.VideoLength = TimeSpan.FromSeconds(task.Arguments.Input.To.Value - task.Arguments.Input.From.Value);
-                    }
-                    else
-                    {
-                        p.VideoLength = TimeSpan.FromTicks(task.Inputs.Select(p => FFProbe.Analyse(p).Duration.Ticks).Sum());
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
+                p.VideoLength = TimeSpan.FromTicks(task.Inputs.Select(p => GetVideoDuration(p, task.Arguments.Input).Ticks).Sum());
             }
             p.StartTime = DateTime.Now;
             return p;
@@ -293,8 +307,15 @@ namespace SimpleFFmpegGUI.Manager
             }
             if (a.Input.From.HasValue && a.Input.To.HasValue)
             {
-                fa.Seek(TimeSpan.FromSeconds(a.Input.From.Value))
-                    .WithDuration(TimeSpan.FromSeconds(a.Input.To.Value - a.Input.From.Value));
+                fa.Seek(a.Input.From.Value);
+            }
+            if (a.Input.To.HasValue)
+            {
+                fa.To(a.Input.To.Value);
+            }
+            if (a.Input.Duration.HasValue)
+            {
+                fa.WithDuration(a.Input.Duration.Value);
             }
         }
 

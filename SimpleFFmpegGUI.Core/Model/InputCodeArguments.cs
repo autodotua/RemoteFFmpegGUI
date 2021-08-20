@@ -1,8 +1,11 @@
-﻿namespace SimpleFFmpegGUI.Model
+﻿using System;
+
+namespace SimpleFFmpegGUI.Model
 {
     public class InputCodeArguments
     {
-        public double? From { get; set; }
-        public double? To { get; set; }
+        public TimeSpan? From { get; set; }
+        public TimeSpan? To { get; set; }
+        public TimeSpan? Duration { get; set; }
     }
 }

@@ -1,6 +1,17 @@
 
 <template>
   <div>
+     <el-descriptions title="裁剪" v-if="args.input">
+      <el-descriptions-item label="开始时间" >{{
+        args.input.from? args.input.from+'秒': "未定义"
+      }}</el-descriptions-item>
+      <el-descriptions-item label="结束时间" >{{
+        args.input.to? args.input.to+'秒': "未定义"
+      }}</el-descriptions-item>
+      <el-descriptions-item label="经过时间" >{{
+        args.input.duration? args.input.duration+'秒': "未定义"
+      }}</el-descriptions-item>
+    </el-descriptions>
     <el-descriptions title="视频" v-if="type == 0">
       <el-descriptions-item label="策略">{{
         args.video == null
