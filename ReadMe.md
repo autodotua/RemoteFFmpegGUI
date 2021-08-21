@@ -1,5 +1,15 @@
 # FFmpeg GUI
 
+## 截图
+
+![](imgs/code.png)
+
+![](imgs/info.png)
+
+![](imgs/tasks.png)
+
+![](imgs/logs.png)
+
 ## 架构
 
 |项目名|项目名（中文）|介绍|

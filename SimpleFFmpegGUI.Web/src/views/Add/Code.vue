@@ -46,11 +46,27 @@
 
       <el-form-item label="裁剪">
         <div>
-          <br>
-          <time-input :enabled.sync="inputArgs.enableFrom" label="从" :time.sync="inputArgs.from"></time-input>
-          <time-input :enabled.sync="inputArgs.enableTo" label="到" :time.sync="inputArgs.to">></time-input>
-          <time-input :enabled.sync="inputArgs.enableDuration" label="经过" :time.sync="inputArgs.duration">></time-input>
-      
+          <br />
+          <time-input
+            :enabled.sync="inputArgs.enableFrom"
+            label="开始"
+            :time.sync="inputArgs.from"
+          ></time-input>
+          <time-input
+            :enabled.sync="inputArgs.enableTo"
+            label="结束"
+            :time.sync="inputArgs.to"
+            >></time-input
+          >
+          <time-input
+            :enabled.sync="inputArgs.enableDuration"
+            label="经过"
+            :time.sync="inputArgs.duration"
+            >></time-input
+          >
+          <a class="gray" v-if="inputArgs.enableTo && inputArgs.enableDuration"
+            >同时设置“结束”和“经过”时间后，优先取经过时间</a
+          >
         </div>
         <a v-if="inputArgs.timeParseError != ''" style="color: red">{{
           inputArgs.timeParseError
@@ -80,9 +96,9 @@ export default Vue.extend({
       files: [""],
       output: "",
       inputArgs: {
-       from:0,
-       to:0,
-       duration:0,
+        from: 0,
+        to: 0,
+        duration: 0,
         enableFrom: false,
         enableTo: false,
         enableDuration: false,
@@ -92,7 +108,7 @@ export default Vue.extend({
   computed: {},
   methods: {
     jump: jump,
- 
+
     updateFile(file: string, index: number) {
       this.files[index] = file;
       if (index == 0 && this.output == "") {
@@ -111,15 +127,14 @@ export default Vue.extend({
       }
       args.input = {};
 
-
       if (this.inputArgs.enableFrom) {
-        args.input.from =this.inputArgs.from;
+        args.input.from = this.inputArgs.from;
       }
       if (this.inputArgs.enableTo) {
-        args.input.to =this.inputArgs.to;
+        args.input.to = this.inputArgs.to;
       }
       if (this.inputArgs.enableDuration) {
-        args.input.duration =this.inputArgs.duration;
+        args.input.duration = this.inputArgs.duration;
       }
       if (
         args.input.to &&
@@ -164,5 +179,4 @@ export default Vue.extend({
 });
 </script>
 <style scoped>
-
 </style>

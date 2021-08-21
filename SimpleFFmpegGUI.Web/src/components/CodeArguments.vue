@@ -266,7 +266,7 @@
       <h3> {{type==3?'参数':'额外参数'}}</h3>
       <el-form-item label="ffmpeg参数">
         <el-input
-          v-model="code.extra"
+          v-model="code.extra" type="textarea" autosize spellcheck="false" autocorrect="off"
           placeholder="请输入ffmpeg的运行参数"
         ></el-input>
       </el-form-item>

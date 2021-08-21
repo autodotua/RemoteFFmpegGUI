@@ -46,8 +46,8 @@
         </el-row>
         <el-row class="right24">
           <el-col :span="8" class="one-line"
-            ><b>任务：</b>
-            {{ status.isPaused ? "暂停中" : status.progress.name }}</el-col
+            ><b>任务：</b
+            >{{ status.isPaused ? "暂停中" : status.progress.name }}</el-col
           >
           <el-col :span="16">
             <el-progress
