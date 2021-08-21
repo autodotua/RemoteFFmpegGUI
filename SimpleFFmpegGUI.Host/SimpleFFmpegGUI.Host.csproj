@@ -22,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="FzCoreLib.Windows">
+      <HintPath>..\libs\FzCoreLib.Windows.dll</HintPath>
+    </Reference>
     <Reference Include="FzStandardLib">
       <HintPath>..\libs\FzStandardLib.dll</HintPath>
     </Reference>
