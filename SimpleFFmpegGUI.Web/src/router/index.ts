@@ -1,12 +1,14 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home.vue'
+import {TaskType} from '../common'
 import Password from '../views/Tasks.vue'
 import Welcome from '../views/Welcome.vue'
 import MediaInfo from '../views/MediaInfo.vue'
 import Code from '../views/Add/Code.vue'
 import Combine from '../views/Add/Combine.vue'
 import Compare from '../views/Add/Compare.vue'
+import Custom from '../views/Add/Custom.vue'
 import Tasks from '../views/Tasks.vue'
 import Files from '../views/Files.vue'
 import Presets from '../views/Presets.vue'
@@ -46,19 +48,24 @@ Vue.use(VueRouter)
     component: Tasks
   },
   {
-    path: '/add/code',
-    name: 'Code',
+    path: '/add/'+TaskType.GetByID(0).Route,
+    name:TaskType.GetByID(0).Name,
     component: Code
   },
   {
-    path: '/add/combine',
-    name: 'Combine',
+    path: '/add/'+TaskType.GetByID(1).Route,
+    name:TaskType.GetByID(1).Name,
     component: Combine
   },
   {
-    path: '/add/compare',
-    name: 'Compare',
+    path: '/add/'+TaskType.GetByID(2).Route,
+    name: TaskType.GetByID(2).Name,
     component: Compare
+  },
+  {
+    path: '/add/'+TaskType.GetByID(3).Route,
+    name: TaskType.GetByID(3).Name,
+    component: Custom
   },
   {
     path: '/password',

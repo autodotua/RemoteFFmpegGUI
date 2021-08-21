@@ -35,30 +35,32 @@
         >
       </div>
     </div>
-    <h3>容器</h3>
-    <el-form-item label="指定输出容器">
-      <el-switch v-model="code.enableFormat" class="right24"> </el-switch>
-      <el-select
-        v-if="code.enableFormat"
-        v-model="code.format"
-        placeholder="指定容器格式"
-      >
-        <el-option
-          v-for="item in formats"
-          :key="item.name"
-          :label="item.extension"
-          :value="item.name"
+    <div v-if="type == 0 || type == 1 || type == 2">
+      <h3>容器</h3>
+      <el-form-item label="指定输出容器">
+        <el-switch v-model="code.enableFormat" class="right24"> </el-switch>
+        <el-select
+          v-if="code.enableFormat"
+          v-model="code.format"
+          placeholder="指定容器格式"
         >
-          <span style="float: left">{{ item.extension }}</span>
-          <span style="float: right; color: #8492a6; font-size: 13px">{{
-            item.name
-          }}</span>
-        </el-option>
-      </el-select>
-      <div v-if="code.enableFormat" class="gray">
-        指定输出容器后，输出时会根据格式修改文件扩展名
-      </div>
-    </el-form-item>
+          <el-option
+            v-for="item in formats"
+            :key="item.name"
+            :label="item.extension"
+            :value="item.name"
+          >
+            <span style="float: left">{{ item.extension }}</span>
+            <span style="float: right; color: #8492a6; font-size: 13px">{{
+              item.name
+            }}</span>
+          </el-option>
+        </el-select>
+        <div v-if="code.enableFormat" class="gray">
+          指定输出容器后，输出时会根据格式修改文件扩展名
+        </div>
+      </el-form-item>
+    </div>
     <div v-if="type == 0">
       <h3>视频编码</h3>
       <el-form-item label="重编码">
@@ -261,7 +263,7 @@
       </el-form-item>
     </div>
     <div>
-      <h3>额外参数</h3>
+      <h3> {{type==3?'参数':'额外参数'}}</h3>
       <el-form-item label="ffmpeg参数">
         <el-input
           v-model="code.extra"
@@ -308,8 +310,8 @@ export default Vue.component("code-arguments", {
         256: "256",
         320: "320",
       },
-      videoCodes: ["自动","H264", "H265","VP9"],
-      audioCodes: ["自动","AAC","OPUS"],
+      videoCodes: ["自动", "H264", "H265", "VP9"],
+      audioCodes: ["自动", "AAC", "OPUS"],
       audioSamples: [8000, 16000, 32000, 44100, 48000, 96000],
       formats: [],
       code: {
@@ -353,12 +355,12 @@ export default Vue.component("code-arguments", {
     };
   },
   props: {
-    type:{
-      default:0
+    type: {
+      default: 0,
     },
-    showPresets:{
-      default:true
-    }
+    showPresets: {
+      default: true,
+    },
   },
   computed: {},
   created() {

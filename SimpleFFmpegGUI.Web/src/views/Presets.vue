@@ -61,7 +61,6 @@ import {
   showLoading,
   closeLoading,
   jumpByArgs,
-  stringType2Number,
 } from "../common";
 
 import * as net from "../net";

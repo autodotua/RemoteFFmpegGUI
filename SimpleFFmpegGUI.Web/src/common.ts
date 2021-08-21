@@ -96,45 +96,43 @@ export function loadArgs(argsComponent: any): any {
     return result;
 }
 export function getTaskTypeDescription(type: number): string {
-    switch (type) {
-        case 0:
-            return "转码";
-        case 1:
-            return "合并视音频"
-        case 2:
-            return "视频对比"
-        default:
-            return type.toString();
-    }
+    const t = TaskType.GetByID(type);
+    return t.Description;
+
 }
-export function stringType2Number(type: string): number {
-    switch (type) {
-        case "code":
-            return 0;
-        case "combine":
-            return 1
-        case "compare":
-            return 2
-        default:
-            throw new Error("未知类型：" + type);
-    }
-}
+
 export function jumpByArgs(args: any, input: Array<string>, output: string, type: number): void {
     localStorage.setItem(argKey, JSON.stringify(args));
     localStorage.setItem(inputKey, JSON.stringify(input));
     localStorage.setItem(outputKey, output);
-    switch (type) {
-        case 0:
-            jump("add/code");
-            break;
-        case 1:
-            jump("add/combine");
-            break;
-            break;
-        case 2:
-            jump("add/compare");
-            break;
-        default:
-            throw new Error("未知类型：" + type);
+    const t = TaskType.GetByID(type)
+
+    jump("add/" + t.Route);
+}
+
+
+export class TaskType {
+    public static Types = [
+        new TaskType(0, "code","Code", "转码"),
+        new TaskType(1, "combine","Combine", "合并音视频"),
+        new TaskType(2, "compare","Compare", "视频对比"),
+        new TaskType(3, "custom", "Custom","自定义"),
+    ]
+    public static GetByID(id: number): TaskType {
+        const types = this.Types.filter(p => p.Id == id);
+        if (types.length == 0) {
+            throw new Error("未知类型：" + id);
+        }
+        return types[0];
     }
+    public constructor(id: number, route: string,name:string, desc: string) {
+        this.Id = id;
+        this.Route = route;
+        this.Name=name;
+        this.Description = desc;
+    }
+    public Id: number;
+    public Name: string;
+    public Route: string;
+    public Description: string
 }

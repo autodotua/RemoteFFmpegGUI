@@ -357,9 +357,10 @@ export default Vue.extend({
           response.data.list.forEach((element: any) => {
             element.typeText = getTaskTypeDescription(element.type);
             element.inputText =
+            element.inputs==null?"未知":(
               element.inputs.length == 1
                 ? element.inputs[0]
-                : element.inputs[0] + " 等";
+                : element.inputs[0] + " 等");
           });
           this.list = response.data.list;
         })

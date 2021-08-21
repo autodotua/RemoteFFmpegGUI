@@ -243,22 +243,32 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
+        private async Task RunCustomProcessAsync(TaskInfo task, CancellationToken cancellationToken)
+        {
+            Type type = typeof(FFMpegArguments);
+            FFMpegArguments fa = Activator.CreateInstance(typeof(FFMpegArguments), true) as FFMpegArguments;
+
+            var p = fa
+                 .OutputToUrl("", o =>
+                 {
+                     o.WithCustomArgument(task.Arguments.Extra);
+                 });
+
+            await RunAsync(p, null, cancellationToken);
+        }
+
         public async Task StartNewAsync(TaskInfo task, CancellationToken cancellationToken)
         {
             try
             {
                 Logger.Info(task, "开始任务");
                 string tempDir = ConfigHelper.TempDir;
-                if (!task.Inputs.Any())
-                {
-                    throw new ArgumentException("没有输入文件");
-                }
-
                 await (task.Type switch
                 {
                     TaskType.Code => RunCodeProcessAsync(task, tempDir, cancellationToken),
                     TaskType.Combine => RunCombineProcessAsync(task, cancellationToken),
                     TaskType.Compare => RunCompareProcessAsync(task, cancellationToken),
+                    TaskType.Custom => RunCustomProcessAsync(task, cancellationToken),
                     _ => throw new NotSupportedException("不支持的任务类型：" + task.Type),
                 });
 

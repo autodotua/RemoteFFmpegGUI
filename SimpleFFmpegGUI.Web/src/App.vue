@@ -77,6 +77,10 @@
                 <i class="el-icon-circle-plus-outline"></i>
                 <span>视频对比</span></el-menu-item
               >
+              <el-menu-item index="/add/custom">
+                <i class="el-icon-circle-plus-outline"></i>
+                <span>自定义</span></el-menu-item
+              >
             </el-submenu>
             <el-menu-item index="/tasks">
               <i class="el-icon-document"></i>

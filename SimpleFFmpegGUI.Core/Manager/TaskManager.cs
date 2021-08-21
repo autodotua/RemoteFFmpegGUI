@@ -19,13 +19,13 @@ namespace SimpleFFmpegGUI.Manager
             db.SaveChanges();
         }
 
-        public static int AddTask(TaskType type, IEnumerable<string> path, string outputPath, CodeArguments arg)
+        public static int AddTask(TaskType type, List<string> path, string outputPath, CodeArguments arg)
         {
             using FFmpegDbContext db = FFmpegDbContext.GetNew();
             var task = new TaskInfo()
             {
                 Type = type,
-                Inputs = path.ToList(),
+                Inputs = path,
                 Output = outputPath,
                 Arguments = arg
             };

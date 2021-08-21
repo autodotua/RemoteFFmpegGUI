@@ -5,13 +5,21 @@
         /// <summary>
         /// 转码
         /// </summary>
-        Code,
+        Code = 0,
 
         /// <summary>
         /// 合并视音频
         /// </summary>
-        Combine,
+        Combine = 1,
 
-        Compare
+        /// <summary>
+        /// 视频比较
+        /// </summary>
+        Compare = 2,
+
+        /// <summary>
+        /// 自定义参数
+        /// </summary>
+        Custom = 3
     }
 }

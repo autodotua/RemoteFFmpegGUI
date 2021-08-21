@@ -1,7 +1,6 @@
 import Cookies from 'js-cookie';
 import Vue from "vue";
 import { AxiosResponse } from "axios";
-import { stringType2Number } from "./common";
 
 function getUrl(controller: string): string {
         if (process.env.NODE_ENV === 'production') {
@@ -63,6 +62,10 @@ export function postAddCombineTask(item: any): Promise<AxiosResponse<any>> {
 export function postAddCompareTask(item: any): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .post(getUrl("Task/Add/Compare"), item);
+}
+export function postAddCustomTask(item: any): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .post(getUrl("Task/Add/Custom"), item);
 }
 export function getQueueStatus(): Promise<AxiosResponse<any>> {
         return Vue.axios

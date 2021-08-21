@@ -1,15 +1,15 @@
 
 <template>
   <div>
-     <el-descriptions title="裁剪" v-if="args.input">
-      <el-descriptions-item label="开始时间" >{{
-        args.input.from? args.input.from+'秒': "未定义"
+    <el-descriptions title="裁剪" v-if="args.input">
+      <el-descriptions-item label="开始时间">{{
+        args.input.from ? args.input.from + "秒" : "未定义"
       }}</el-descriptions-item>
-      <el-descriptions-item label="结束时间" >{{
-        args.input.to? args.input.to+'秒': "未定义"
+      <el-descriptions-item label="结束时间">{{
+        args.input.to ? args.input.to + "秒" : "未定义"
       }}</el-descriptions-item>
-      <el-descriptions-item label="经过时间" >{{
-        args.input.duration? args.input.duration+'秒': "未定义"
+      <el-descriptions-item label="经过时间">{{
+        args.input.duration ? args.input.duration + "秒" : "未定义"
       }}</el-descriptions-item>
     </el-descriptions>
     <el-descriptions title="视频" v-if="type == 0">
@@ -65,7 +65,7 @@
         args.audio.samplingRate ? args.audio.samplingRate : "未定义"
       }}</el-descriptions-item>
     </el-descriptions>
-    <el-descriptions title="容器">
+    <el-descriptions title="容器" v-if="type == 0 || type == 1">
       <el-descriptions-item label="格式" v-if="showAudio">{{
         args.format ? args.format : "未定义"
       }}</el-descriptions-item>
@@ -77,6 +77,11 @@
             ? "裁剪到最短的媒体"
             : "最后部分静帧或黑屏"
           : "未定义"
+      }}</el-descriptions-item>
+    </el-descriptions>
+    <el-descriptions title="其他参数" v-if="type == 0||type == 1||type == 3">
+      <el-descriptions-item label="参数">{{
+        args.extra ? args.extra : "未定义"
       }}</el-descriptions-item>
     </el-descriptions>
   </div>
@@ -123,7 +128,7 @@ export default Vue.component("code-arguments-description", {
 });
 </script>
 <style scoped>
-.el-descriptions{
-  margin-top:18px
+.el-descriptions {
+  margin-top: 18px;
 }
 </style>

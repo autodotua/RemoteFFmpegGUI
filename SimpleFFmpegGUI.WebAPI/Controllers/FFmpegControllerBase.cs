@@ -87,8 +87,14 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 return;
             }
-            task.Inputs = task.Inputs.Select(p => Path.GetFileName(p)).ToList();
-            task.Output = Path.GetFileName(task.Output);
+            if (task.Inputs != null)
+            {
+                task.Inputs = task.Inputs.Select(p => Path.GetFileName(p)).ToList();
+            }
+            if (task.Output != null)
+            {
+                task.Output = Path.GetFileName(task.Output);
+            }
         }
 
         protected bool CanAccessInputDir()

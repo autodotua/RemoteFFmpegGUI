@@ -49,7 +49,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             CheckFileNameNull(request.Output);
             return await pipeClient.InvokeAsync(p =>
-              p.AddTask(TaskType.Code, request.Input.Select(p => Path.Combine(GetInputDir(), p)),
+              p.AddTask(TaskType.Code, request.Input.Select(p => Path.Combine(GetInputDir(), p)).ToList(),
               Path.Combine(GetOutputDir(), request.Output),
               request.Argument,
               request.Start));
@@ -73,7 +73,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             CheckFileNameNull(request.Output);
             return await pipeClient.InvokeAsync(p =>
-              p.AddTask(TaskType.Combine, request.Input.Select(p => Path.Combine(GetInputDir(), p)),
+              p.AddTask(TaskType.Combine, request.Input.Select(p => Path.Combine(GetInputDir(), p)).ToList(),
               Path.Combine(GetOutputDir(), request.Output),
               request.Argument,
               request.Start));
@@ -96,9 +96,22 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                 await CheckInputFileExistAsync(file);
             }
             return await pipeClient.InvokeAsync(p =>
-              p.AddTask(TaskType.Compare, request.Input.Select(p => Path.Combine(GetInputDir(), p)),
+              p.AddTask(TaskType.Compare, request.Input.Select(p => Path.Combine(GetInputDir(), p)).ToList(),
               null,
               null,
+              request.Start));
+        }
+
+        [HttpPost]
+        [Route("Add/Custom")]
+        public async Task<int> AddCustomTaskAsync([FromBody] TaskDto request)
+        {
+            CheckNull(request.Argument, "参数");
+            CheckNull(request.Argument.Extra, "参数");
+            return await pipeClient.InvokeAsync(p =>
+              p.AddTask(TaskType.Custom, null,
+              null,
+              request.Argument,
               request.Start));
         }
 
