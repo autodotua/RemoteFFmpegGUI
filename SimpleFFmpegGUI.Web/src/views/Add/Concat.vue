@@ -4,13 +4,14 @@
       <h2>输入和输出</h2>
       <FileIOGroup
         :inputs="files"
-        :output="output"
-        ref="io"
+        :output="output" :min="2"
+        ref="io" :showClip="false"
+        :singleOutput="true"
       ></FileIOGroup>
       <h2>参数</h2>
     </el-form>
 
-    <code-arguments ref="args" :type="0" />
+    <code-arguments ref="args" :type="4" />
     <add-to-task-buttons :addFunc="addTask"></add-to-task-buttons>
   </div>
 </template>
@@ -47,8 +48,8 @@ export default Vue.extend({
     getNewFile() {
       return { filePath: "", from: null, to: null, duration: null };
     },
-    addTask(start: boolean) {
-      this.files = (this.$refs.io as any).getArgs();
+    addTask(start: boolean) {    
+        this.files = (this.$refs.io as any).getArgs();
       this.output = (this.$refs.io as any).outputFile;
       if (this.files.filter((p) => p.filePath != "").length == 0) {
         showError("请选择输入文件");
@@ -58,8 +59,9 @@ export default Vue.extend({
       if (args == null) {
         return;
       }
+
       net
-        .postAddCodeTask({
+        .postAddConcatTask({
           inputs: this.files,
           output: this.output,
           argument: args,
@@ -67,6 +69,7 @@ export default Vue.extend({
         })
         .then((response) => {
           this.files = [];
+          this.files.push(this.getNewFile());
           this.files.push(this.getNewFile());
           this.output = "";
           showSuccess("已加入队列");

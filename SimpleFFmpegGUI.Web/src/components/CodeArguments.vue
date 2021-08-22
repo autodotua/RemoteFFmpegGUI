@@ -1,9 +1,10 @@
 
 <template>
-  <el-form label-width="96px">
+  <el-form label-width="100px">
     <h3 v-if="showPresets">预设</h3>
+
     <div v-if="showPresets">
-      <div>
+      <el-form-item label="选择和更新">
         <el-select
           @change="selectPreset"
           placeholder="加载预设"
@@ -20,8 +21,8 @@
         <el-button :disabled="preset == null" @click="updatePreset"
           >更新</el-button
         >
-      </div>
-      <div style="margin-top: 12px">
+      </el-form-item>
+      <el-form-item label="新增">
         <el-input
           v-model="newPresetName"
           style="width: 128px"
@@ -33,9 +34,36 @@
           @click="savePreset"
           >保存或更新“{{ newPresetName }}”</el-button
         >
-      </div>
+      </el-form-item>
     </div>
-    <div v-if="type == 0 || type == 1 || type == 2">
+    <div v-if="type == 1">
+      <h3>合并参数</h3>
+      <el-form-item label="音频比视频长">
+        <el-switch
+          v-model="code.combine.shortest"
+          active-text="裁剪到最短的媒体"
+          inactive-text="最后部分静帧或黑屏"
+        ></el-switch>
+      </el-form-item>
+    </div>
+    <div v-if="type == 4">
+      <h3>拼接参数</h3>
+      <el-form-item label="拼接方法">
+        <el-select
+          v-model="code.concat.type"
+          value-key="id"
+          style="width: 320px"
+        >
+          <el-option
+            v-for="value in concatTypes"
+            :key="value.id"
+            :label="value.name"
+            :value="value.id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+    </div>
+    <div v-if="showFormats">
       <h3>容器</h3>
       <el-form-item label="指定输出容器">
         <el-switch v-model="code.enableFormat" class="right24"> </el-switch>
@@ -61,7 +89,7 @@
         </div>
       </el-form-item>
     </div>
-    <div v-if="type == 0">
+    <div v-if="showVideosAndAudios">
       <h3>视频编码</h3>
       <el-form-item label="重编码">
         <el-switch v-model="code.enableVideo" class="right24"> </el-switch>
@@ -201,7 +229,7 @@
         </el-form-item>
       </div>
     </div>
-    <div v-if="type == 0">
+    <div v-if="showVideosAndAudios">
       <h3>音频编码</h3>
       <el-form-item label="重编码">
         <el-switch v-model="code.enableAudio" class="right24"> </el-switch>
@@ -252,21 +280,16 @@
         </el-form-item>
       </div>
     </div>
-    <div v-if="type == 1">
-      <h3>合并</h3>
-      <el-form-item label="音频比视频长">
-        <el-switch
-          v-model="code.combine.shortest"
-          active-text="裁剪到最短的媒体"
-          inactive-text="最后部分静帧或黑屏"
-        ></el-switch>
-      </el-form-item>
-    </div>
+
     <div>
-      <h3> {{type==3?'参数':'额外参数'}}</h3>
+      <h3>{{ type == 3 ? "参数" : "额外参数" }}</h3>
       <el-form-item label="ffmpeg参数">
         <el-input
-          v-model="code.extra" type="textarea" autosize spellcheck="false" autocorrect="off"
+          v-model="code.extra"
+          type="textarea"
+          autosize
+          spellcheck="false"
+          autocorrect="off"
           placeholder="请输入ffmpeg的运行参数"
         ></el-input>
       </el-form-item>
@@ -310,6 +333,13 @@ export default Vue.component("code-arguments", {
         256: "256",
         320: "320",
       },
+      concatTypes: [
+        { id: 0, name: "通过ts中转，支持不同格式" },
+        {
+          id: 1,
+          name: "使用concat格式，不需要重新解码和编码，需要相同格式文件",
+        },
+      ],
       videoCodes: ["自动", "H264", "H265", "VP9"],
       audioCodes: ["自动", "AAC", "OPUS"],
       audioSamples: [8000, 16000, 32000, 44100, 48000, 96000],
@@ -345,6 +375,9 @@ export default Vue.component("code-arguments", {
         combine: {
           shortest: false,
         },
+        concat: {
+          type: 0,
+        },
         disableVideo: false,
         disableAudio: false,
         extra: "",
@@ -362,7 +395,20 @@ export default Vue.component("code-arguments", {
       default: true,
     },
   },
-  computed: {},
+  computed: {
+    showFormats(): boolean {
+      return (
+        [0, 1, 2, 4].includes(this.type) &&
+        (this.type != 4 || this.code.concat.type != 1)
+      );
+    },
+    showVideosAndAudios(): boolean {
+      return (
+        [0, 4].includes(this.type) &&
+        (this.type != 4 || this.code.concat.type != 1)
+      );
+    },
+  },
   created() {
     this.fillPresets();
     net
@@ -451,11 +497,13 @@ export default Vue.component("code-arguments", {
           }
         : null;
       let combine = { shortest: this.code.combine.shortest };
+      let concat = { type: this.code.concat.type };
       let arg = {
         video: videoArg,
         audio: audioArg,
         input: null,
-        combine: combine,
+        combine: this.type == 1 ? combine : null,
+        concat: this.type == 4 ? concat : null,
         extra: this.code.extra,
         disableVideo: videoArg == null && this.code.disableVideo,
         disableAudio: audioArg == null && this.code.disableAudio,
@@ -471,6 +519,7 @@ export default Vue.component("code-arguments", {
       const video = args.video;
       const audio = args.audio;
       const combine = args.combine;
+      const concat = args.concat;
 
       if (video != null && !args.disableVideo) {
         this.code.enableVideo = true;
@@ -536,9 +585,14 @@ export default Vue.component("code-arguments", {
       } else {
         this.code.enableAudio = false;
       }
-      if (combine != null) {
+      if (this.type == 1 && combine != null) {
         this.code.combine = {
           shortest: combine.shortest,
+        };
+      }
+      if (this.type == 4 && concat != null) {
+        this.code.concat = {
+          type: concat.type,
         };
       }
       this.code.disableVideo = args.disableVideo;

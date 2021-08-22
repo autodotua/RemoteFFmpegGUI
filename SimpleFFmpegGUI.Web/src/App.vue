@@ -73,6 +73,10 @@
                 <i class="el-icon-circle-plus-outline"></i>
                 <span>合并视音频</span></el-menu-item
               >
+              <el-menu-item index="/add/concat">
+                <i class="el-icon-circle-plus-outline"></i>
+                <span>视频拼接</span></el-menu-item
+              >
               <el-menu-item index="/add/compare">
                 <i class="el-icon-circle-plus-outline"></i>
                 <span>视频对比</span></el-menu-item

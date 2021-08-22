@@ -27,7 +27,7 @@
             ></file-select>
           </div>
 
-          <div>
+          <div v-if="showClip">
             <time-input
               :enabled.sync="value.enableFrom"
               label="开始"
@@ -69,11 +69,11 @@
         placeholder="输出文件名"
         style="width: 300px; display: block"
         v-model="outputFile"
-        :disabled="inputFiles.length > 1"
+        :disabled="inputFiles.length > 1&&!singleOutput"
         @change="(value) => $emit('update:output', value)"
       >
       </el-input>
-      <a v-if="inputFiles.length > 1" class="gray"
+      <a v-if="inputFiles.length > 1&&!singleOutput" class="gray"
         >输入多个文件时，输出文件名为首个不重复的原文件名</a
       >
     </el-form-item>
@@ -108,14 +108,26 @@ export default Vue.component("file-io-group", {
     inputs: {
       default: [],
     },
-    output: { 
-      default: "" 
+    output: {
+      default: "",
     },
-    min:{
-      default:1
+    min: {
+      default: 1,
+    },
+    showClip:{
+      default:true
+    },
+    singleOutput:{
+      default:false
     }
   },
   computed: {},
+  created() {
+    for (let i = 1; i < this.min; i++) {
+      this.inputFiles.push(this.getNewFile());
+      this.activeInput.push(i)
+    }
+  },
   watch: {
     inputs() {
       this.updateFromArgs(this.inputs);

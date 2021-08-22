@@ -149,12 +149,13 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new ArgumentException("拼接视频，输入文件必须为2个或更多");
             }
+            message = $"正在合并：{Path.GetFileName(task.Inputs[0].FilePath)}等";
+
             if (task.Arguments.Concat == null || task.Arguments.Concat.Type == ConcatType.ViaTs)
             {
                 var tsFiles = await ConvertToTsAsync(task, tempDir, cancellationToken);
                 f = FFMpegArguments.FromConcatInput(tsFiles, a => ApplyInputArguments(a, task.Inputs[0]));
                 Progress = GetProgress(task);
-                message = $"正在合并：{Path.GetFileName(task.Inputs[0].FilePath)}等";
 
                 task.Output = GetFileName(task.Arguments, task.Output);
                 var p = f.OutputToFile(task.Output, true, a => ApplyOutputArguments(a, task.Arguments));
@@ -162,7 +163,21 @@ namespace SimpleFFmpegGUI.Manager
             }
             else
             {
-                throw new NotSupportedException();
+                string tempName = Guid.NewGuid().ToString() + ".txt";
+                string tempPath = Path.Combine(tempDir, tempName);
+                using (var stream = File.CreateText(tempPath))
+                {
+                    foreach (var file in task.Inputs)
+                    {
+                        stream.WriteLine($"file '{file.FilePath}'");
+                    }
+                }
+                task.Arguments.Format = null;
+                task.Output = GetFileName(task.Arguments, task.Output);
+                var p = FFMpegArguments.FromFileInput(tempPath, false,
+                    o => o.WithCustomArgument("-f concat -safe 0"))
+                     .OutputToFile(task.Output, true, o => o.CopyChannel(Channel.Both));
+                await RunAsync(task, p, message, cancellationToken);
             }
         }
 

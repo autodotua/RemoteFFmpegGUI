@@ -8,6 +8,7 @@ import MediaInfo from '../views/MediaInfo.vue'
 import Code from '../views/Add/Code.vue'
 import Combine from '../views/Add/Combine.vue'
 import Compare from '../views/Add/Compare.vue'
+import Concat from '../views/Add/Concat.vue'
 import Custom from '../views/Add/Custom.vue'
 import Tasks from '../views/Tasks.vue'
 import Files from '../views/Files.vue'
@@ -57,6 +58,7 @@ Vue.use(VueRouter)
     name:TaskType.GetByID(1).Name,
     component: Combine
   },
+
   {
     path: '/add/'+TaskType.GetByID(2).Route,
     name: TaskType.GetByID(2).Name,
@@ -66,6 +68,10 @@ Vue.use(VueRouter)
     path: '/add/'+TaskType.GetByID(3).Route,
     name: TaskType.GetByID(3).Name,
     component: Custom
+  },  {
+    path: '/add/'+TaskType.GetByID(4).Route,
+    name:TaskType.GetByID(4).Name,
+    component: Concat
   },
   {
     path: '/password',
