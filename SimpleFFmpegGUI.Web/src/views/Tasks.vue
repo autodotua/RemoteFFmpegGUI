@@ -116,7 +116,6 @@
         </template></el-table-column
       >
       <el-table-column prop="inputText" label="输入" min-width="360" />
-      <!-- <el-table-column prop="output" label="输出" width="180" /> -->
 
       <el-table-column label="操作" width="140">
         <template slot-scope="scope">

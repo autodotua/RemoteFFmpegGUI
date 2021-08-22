@@ -5,30 +5,14 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <!-- <link rel="icon" href="<%= BASE_URL %>favicon.ico"> -->
-  <!-- <title><%= htmlWebpackPlugin.options.title %></title> -->
-  <title>远程FFmpeg工具箱</title>
+  <title>远程 FFmpeg 工具箱</title>
 </head>
 
 <body>
   <noscript>
-    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
-        Please enable it to continue.</strong>
+    <strong>无法使用脚本，应用无法运行</strong>
   </noscript>
   <div id="app"></div>
-  <!-- built files will be auto injected -->
-  <script>
-    //不知道为什么，修改上面的图标会被自动注释掉
-    var link = document.querySelector("link[rel~='icon']");
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = 'icon';
-      document.getElementsByTagName('head')[0].appendChild(link);
-    }
-    link.href = 'icon.png';
-
-  </script>
 </body>
 
 </html>

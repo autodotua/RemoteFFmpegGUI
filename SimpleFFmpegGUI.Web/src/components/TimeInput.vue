@@ -14,11 +14,6 @@
           class="time-text"
         >
           <template slot="prepend"> {{ label }}</template>
-          <!-- <el-button
-            slot="append"
-            icon="el-icon-check"
-            @click="parseTime"
-          ></el-button> -->
         </el-input>
       </el-col>
       <el-col :sm="24" :md="11" class="top12">

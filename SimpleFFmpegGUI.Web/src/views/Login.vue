@@ -22,7 +22,6 @@
       <br />
       <br />
 
-      <!-- <el-link href="register" >注册</el-link> -->
     </div>
   </div>
 </template>

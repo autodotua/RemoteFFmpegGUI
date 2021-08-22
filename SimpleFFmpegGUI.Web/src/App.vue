@@ -157,8 +157,6 @@ export default Vue.extend({
     });
   },
   created() {
-    console.log("app created");
-
     net.getNeedToken().then((r) => {
       if (r.data == true) {
         if (Cookies.get("token")) {
