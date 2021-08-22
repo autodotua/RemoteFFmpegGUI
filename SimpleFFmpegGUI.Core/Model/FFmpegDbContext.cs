@@ -41,12 +41,12 @@ namespace SimpleFFmpegGUI.Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var strListConverter = new EfJsonConverter<List<string>>();
-            var argConverter = new EfJsonConverter<CodeArguments>();
+            var listConverter = new EfJsonConverter<List<InputArguments>>();
+            var argConverter = new EfJsonConverter<OutputArguments>();
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<TaskInfo>()
                 .Property(p => p.Inputs)
-                .HasConversion(strListConverter);
+                .HasConversion(listConverter);
             modelBuilder.Entity<TaskInfo>()
                 .Property(p => p.Arguments)
                 .HasConversion(argConverter);

@@ -193,14 +193,7 @@ export default Vue.extend({
       this.menuCollapse = window.innerWidth < 500;
     },
 
-    cancel() {
-      net
-        .postCancelQueue()
-        .then((r) => {
-          return;
-        })
-        .catch(showError);
-    },
+ 
     delayGetStatus() {
       setTimeout(this.getStatus, 500);
     },

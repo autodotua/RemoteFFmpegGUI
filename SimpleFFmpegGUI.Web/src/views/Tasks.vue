@@ -8,7 +8,7 @@
         <el-popconfirm
           v-if="isProcessing"
           title="真的要取消任务吗？"
-          @onConfirm="cancel"
+          @confirm="cancel"
           class="right12"
         >
           <el-button type="danger" slot="reference"
@@ -33,7 +33,7 @@
       <span style="float: left">
         <el-popconfirm
           title="真的要取消所选任务吗？正在执行的任务会被终止"
-          @onConfirm="deleteTasks"
+          @confirm="deleteTasks"
           class="right12"
         >
           <el-button v-if="selection.length > 0" slot="reference" type="danger"
@@ -48,7 +48,7 @@
         >
         <el-popconfirm
           title="真的要取消所选任务吗？正在执行的任务会被终止"
-          @onConfirm="cancelTasks"
+          @confirm="cancelTasks"
         >
           <el-button
             v-if="selection.length > 0"
@@ -68,8 +68,13 @@
         <template slot-scope="props">
           <el-form label-position="left" label-width="120px" class="pre-wrap">
             <el-form-item label="输入">
-              <div v-for="file in props.row.inputs" :key="file">
-                {{ file }}
+              <div v-for="file in props.row.inputs" :key="file.filePath">
+                <a class="right24">
+                  {{ file.filePath }}
+                </a>
+                <a v-if="file.from" class="right12"> 开始：{{ file.from }}s</a>
+                <a v-if="file.to" class="right12"> 结束：{{ file.to }}s</a>
+                <a v-if="file.duration" class="right12"> 经过：{{ file.duration }}s</a>
               </div>
             </el-form-item>
             <el-form-item label="输出">{{ props.row.output }} </el-form-item>
@@ -82,14 +87,16 @@
             <el-form-item label="结束时间"
               >{{ props.row.finishTime }}
             </el-form-item>
-            <el-form-item label="信息"
-              >{{ props.row.message }}
+            <el-form-item label="FFmpeg参数"
+              >{{ props.row.fFmpegArguments }}
             </el-form-item>
-            <el-form-item label="参数"
-              >
-              <code-arguments-description :type="props.row.type" :args="props.row.arguments"></code-arguments-description>
-          </el-form-item
-            >
+            <el-form-item label="信息" class="s">{{ props.row.message }} </el-form-item>
+            <el-form-item label="参数">
+              <code-arguments-description
+                :type="props.row.type"
+                :args="props.row.arguments"
+              ></code-arguments-description>
+            </el-form-item>
           </el-form>
         </template>
       </el-table-column>
@@ -124,7 +131,7 @@
             v-if="scope.row.status == 2"
             title="真的要取消任务吗？任务会终止"
             style="margin-left: 10px; margin-right: 10px"
-            @onConfirm="cancelTask(scope.row)"
+            @confirm="cancelTask(scope.row)"
           >
             <el-button
               slot="reference"
@@ -249,7 +256,7 @@ export default Vue.extend({
   },
   methods: {
     remake(item: any) {
-      jumpByArgs(item.arguments,item.inputs,item.output,item.type)
+      jumpByArgs(item.arguments, item.inputs, item.output, item.type);
     },
     getSelectionIds(): number[] {
       return this.toIdList(this.selection as []);
@@ -357,10 +364,11 @@ export default Vue.extend({
           response.data.list.forEach((element: any) => {
             element.typeText = getTaskTypeDescription(element.type);
             element.inputText =
-            element.inputs==null?"未知":(
-              element.inputs.length == 1
-                ? element.inputs[0]
-                : element.inputs[0] + " 等");
+              element.inputs == null
+                ? "未知"
+                : element.inputs.length == 1
+                ? element.inputs[0].filePath
+                : element.inputs[0].filePath + " 等";
           });
           this.list = response.data.list;
         })
@@ -380,7 +388,7 @@ export default Vue.extend({
       // }, 20000);
     });
   },
-  components: {CodeArgumentsDescription},
+  components: { CodeArgumentsDescription },
 });
 </script>
 

@@ -20,6 +20,11 @@
         /// <summary>
         /// 自定义参数
         /// </summary>
-        Custom = 3
+        Custom = 3,
+
+        /// <summary>
+        /// 视频拼接
+        /// </summary>
+        Concat = 4
     }
 }

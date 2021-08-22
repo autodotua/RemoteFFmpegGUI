@@ -8,9 +8,9 @@ namespace SimpleFFmpegGUI.WebAPI.Dto
 {
     public class TaskDto
     {
-        public IEnumerable<string> Input { get; set; }
+        public List<InputArguments> Inputs { get; set; }
         public string Output { get; set; }
-        public CodeArguments Argument { get; set; }
+        public OutputArguments Argument { get; set; }
         public bool Start { get; set; }
     }
 }

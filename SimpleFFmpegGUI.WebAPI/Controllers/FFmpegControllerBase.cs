@@ -89,7 +89,10 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             if (task.Inputs != null)
             {
-                task.Inputs = task.Inputs.Select(p => Path.GetFileName(p)).ToList();
+                foreach (var input in task.Inputs)
+                {
+                    input.FilePath = Path.GetFileName(input.FilePath);
+                }
             }
             if (task.Output != null)
             {

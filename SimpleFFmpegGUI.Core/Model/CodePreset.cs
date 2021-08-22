@@ -4,6 +4,6 @@
     {
         public string Name { get; set; }
         public TaskType Type { get; set; }
-        public CodeArguments Arguments { get; set; }
+        public OutputArguments Arguments { get; set; }
     }
 }

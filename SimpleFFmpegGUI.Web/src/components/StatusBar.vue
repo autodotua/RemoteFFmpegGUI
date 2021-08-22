@@ -33,7 +33,7 @@
           </el-col>
 
           <el-col :span="3">
-            <el-popconfirm title="真的要取消任务吗？" @onConfirm="cancel">
+            <el-popconfirm title="真的要取消任务吗？" @confirm="cancel">
               <el-button
                 type="text"
                 style="color: red"
@@ -101,7 +101,7 @@
               :percentage="Math.round(status.progress.percent * 10000) / 100"
             ></el-progress></el-col
           ><el-col :span="4">
-            <el-popconfirm title="真的要取消任务吗？" @onConfirm="cancel">
+            <el-popconfirm title="真的要取消任务吗？" @confirm="cancel">
               <el-button
                 style="width: 75%; color: red"
                 type="text"
@@ -136,7 +136,7 @@
       <el-popconfirm
         title="真的要取消任务吗？"
         style="float: right; margin-right: 36px; margin-top: 8px"
-        @onConfirm="cancel"
+        @confirm="cancel"
       >
         <el-button type="text" style="color: red" slot="reference" size="big"
           >取消</el-button

@@ -23,7 +23,7 @@
           style="width: 300px; display: block"
           v-model="output"
         />
-        <a style="color: gray; margin-left: 18.21px"
+        <a class="gray"
           >输出文件名在处理时会自动重命名为首个不存在重复文件的文件名</a
         >
       </el-form-item>
@@ -74,7 +74,7 @@ export default Vue.extend({
 
       net
         .postAddCombineTask({
-          input: [this.video, this.audio],
+          inputs: [{filePath:this.video},{filePath: this.audio}],
           output: this.output,
           argument: (this.$refs.args as any).getArgs(),
           start: start,
@@ -94,8 +94,8 @@ export default Vue.extend({
       const inputOutput = loadArgs(this.$refs.args);
       
       if (inputOutput.inputs) {
-        this.video = inputOutput.inputs[0];
-        this.audio = inputOutput.inputs[1];
+        this.video = inputOutput.inputs[0].filePath;
+        this.audio = inputOutput.inputs[1].filePath;
       }
       if (inputOutput.output) {
         this.output = inputOutput.output;

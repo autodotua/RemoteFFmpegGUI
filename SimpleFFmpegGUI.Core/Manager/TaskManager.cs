@@ -19,7 +19,7 @@ namespace SimpleFFmpegGUI.Manager
             db.SaveChanges();
         }
 
-        public static int AddTask(TaskType type, List<string> path, string outputPath, CodeArguments arg)
+        public static int AddTask(TaskType type, List<InputArguments> path, string outputPath, OutputArguments arg)
         {
             using FFmpegDbContext db = FFmpegDbContext.GetNew();
             var task = new TaskInfo()
@@ -29,10 +29,10 @@ namespace SimpleFFmpegGUI.Manager
                 Output = outputPath,
                 Arguments = arg
             };
-            Logger.Info(task, "新建任务");
             db.Tasks.Add(task);
             db.SaveChanges();
-            return task.ID;
+            Logger.Info(task, "新建任务");
+            return task.Id;
         }
 
         public static PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)
@@ -83,7 +83,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new ArgumentException($"找不到ID为{id}的任务");
             }
-            if (queue.ProcessingTask?.ID == id)
+            if (queue.ProcessingTask?.Id == id)
             {
                 throw new Exception("ID为{id}的任务正在进行中");
             }
@@ -103,7 +103,7 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     continue;
                 }
-                if (queue.ProcessingTask?.ID == id)
+                if (queue.ProcessingTask?.Id == id)
                 {
                     continue;
                 }
@@ -136,7 +136,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new Exception("ID为{id}的任务已完成并出现错误");
             }
-            if (queue.ProcessingTask?.ID == id)
+            if (queue.ProcessingTask?.Id == id)
             {
                 queue.CancelCurrent();
             }
@@ -168,7 +168,7 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     continue;
                 }
-                if (queue.ProcessingTask?.ID == id)
+                if (queue.ProcessingTask?.Id == id)
                 {
                     queue.CancelCurrent();
                 }
@@ -188,7 +188,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new ArgumentException($"找不到ID为{id}的任务");
             }
-            if (queue.ProcessingTask?.ID == id)
+            if (queue.ProcessingTask?.Id == id)
             {
                 queue.CancelCurrent();
             }
@@ -208,7 +208,7 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     continue;
                 }
-                if (queue.ProcessingTask?.ID == id)
+                if (queue.ProcessingTask?.Id == id)
                 {
                     queue.CancelCurrent();
                 }

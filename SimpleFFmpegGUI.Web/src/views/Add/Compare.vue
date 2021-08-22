@@ -45,7 +45,7 @@ export default Vue.extend({
 
       net
         .postAddCompareTask({
-          input: [this.video1, this.video2],
+          inputs: [{filePath:this.video1}, {filePath:this.video2}],
           start: start,
         })
         .then((response) => {
@@ -61,8 +61,8 @@ export default Vue.extend({
     this.$nextTick(function () {
       const inputOutput = loadArgs(null);
       if (inputOutput.inputs) {
-        this.video1 = inputOutput.inputs[0];
-        this.video2 = inputOutput.inputs[1];
+        this.video1 = inputOutput.inputs[0].filePath;
+        this.video2 = inputOutput.inputs[1].filePath;
       }
     });
   },

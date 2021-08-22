@@ -7,7 +7,7 @@ namespace SimpleFFmpegGUI.Manager
 {
     public static class PresetManager
     {
-        public static int AddOrUpdatePreset(string name, TaskType type, CodeArguments arguments)
+        public static int AddOrUpdatePreset(string name, TaskType type, OutputArguments arguments)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -26,7 +26,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             db.Presets.Add(preset);
             db.SaveChanges();
-            return preset.ID;
+            return preset.Id;
         }
 
         public static void DeletePreset(int id)

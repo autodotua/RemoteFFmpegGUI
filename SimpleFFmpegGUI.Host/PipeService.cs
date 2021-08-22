@@ -53,9 +53,9 @@ namespace SimpleFFmpegGUI
             manager.Resume();
         }
 
-        public int AddTask(TaskType type, List<string> path, string outputPath, CodeArguments arg, bool start)
+        public int AddTask(TaskType type, List<InputArguments> inputs, string outputPath, OutputArguments arg, bool start)
         {
-            int id = TaskManager.AddTask(type, path, outputPath, arg);
+            int id = TaskManager.AddTask(type, inputs, outputPath, arg);
 
             if (start)
             {
@@ -73,7 +73,7 @@ namespace SimpleFFmpegGUI
             }
             catch (Exception ex)
             {
-                throw new Exception("查询信息失败："+ex.Message);
+                throw new Exception("查询信息失败：" + ex.Message);
             }
             return result.Adapt<MediaInfoDto>();
         }
@@ -131,7 +131,7 @@ namespace SimpleFFmpegGUI
             TaskManager.TryDeleteTasks(ids, manager);
         }
 
-        public int AddOrUpdatePreset(string name, TaskType type, CodeArguments arguments)
+        public int AddOrUpdatePreset(string name, TaskType type, OutputArguments arguments)
         {
             return PresetManager.AddOrUpdatePreset(name, type, arguments);
         }

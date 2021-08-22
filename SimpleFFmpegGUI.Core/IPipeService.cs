@@ -12,7 +12,7 @@ namespace SimpleFFmpegGUI
 {
     public interface IPipeService
     {
-        int AddOrUpdatePreset(string name, TaskType type, CodeArguments arguments);
+        int AddOrUpdatePreset(string name, TaskType type, OutputArguments arguments);
 
         void CancelQueue();
 
@@ -20,7 +20,7 @@ namespace SimpleFFmpegGUI
 
         void CancelTasks(IEnumerable<int> ids);
 
-        int AddTask(TaskType type, List<string> path, string outputPath, CodeArguments arg, bool start);
+        int AddTask(TaskType type, List<InputArguments> inputs, string outputPath, OutputArguments arg, bool start);
 
         void DeletePreset(int id);
 

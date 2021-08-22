@@ -20,7 +20,7 @@
           <el-popconfirm
             title="真的要删除预设吗？"
             style="margin-left: 8px"
-            @onConfirm="deletePreset(scope.row)"
+            @confirm="deletePreset(scope.row)"
           >
             <el-button slot="reference" type="text"
               >删除</el-button
