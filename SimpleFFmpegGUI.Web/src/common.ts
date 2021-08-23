@@ -114,10 +114,10 @@ export function jumpByArgs(args: any, input: any[], output: string, type: number
 export class TaskType {
     public static Types = [
         new TaskType(0, "code","Code", "转码"),
+        new TaskType(4, "concat", "Concat","拼接"),
         new TaskType(1, "combine","Combine", "合并音视频"),
         new TaskType(2, "compare","Compare", "视频对比"),
         new TaskType(3, "custom", "Custom","自定义"),
-        new TaskType(4, "concat", "Concat","拼接"),
     ]
     public static GetByID(id: number): TaskType {
         const types = this.Types.filter(p => p.Id == id);

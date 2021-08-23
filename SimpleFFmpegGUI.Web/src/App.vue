@@ -50,61 +50,32 @@
             :icon="menuCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
             style="color: #909399; font-size: 24px; font-weight: 400; border: 0"
           ></el-button>
-          <el-menu router default-active="1" :collapse="menuCollapse">
+          <el-menu router :default-active="activeMenu" :collapse="menuCollapse">
             <el-menu-item index="/">
               <i class="el-icon-s-home"></i>
               <template #title>欢迎</template>
             </el-menu-item>
-            <el-menu-item index="/info">
-              <i class="el-icon-search"></i>
-              <template #title>媒体信息查询</template>
-            </el-menu-item>
-
             <el-submenu index="new">
               <template #title>
                 <i class="el-icon-document-add"></i>
                 <span>新建任务</span>
               </template>
-              <el-menu-item index="/add/code">
-                <i class="el-icon-circle-plus-outline"></i>
-                <span>转码</span></el-menu-item
+              <el-menu-item
+                v-for="type in types"
+                :key="type.Name"
+                :index="'/add/' + type.Route"
               >
-              <el-menu-item index="/add/combine">
                 <i class="el-icon-circle-plus-outline"></i>
-                <span>合并视音频</span></el-menu-item
-              >
-              <el-menu-item index="/add/concat">
-                <i class="el-icon-circle-plus-outline"></i>
-                <span>视频拼接</span></el-menu-item
-              >
-              <el-menu-item index="/add/compare">
-                <i class="el-icon-circle-plus-outline"></i>
-                <span>视频对比</span></el-menu-item
-              >
-              <el-menu-item index="/add/custom">
-                <i class="el-icon-circle-plus-outline"></i>
-                <span>自定义</span></el-menu-item
+                <span>{{ type.Description }}</span></el-menu-item
               >
             </el-submenu>
-            <el-menu-item index="/tasks">
-              <i class="el-icon-document"></i>
-              <template #title>任务列表</template>
-            </el-menu-item>
-            <el-menu-item index="/preset">
-              <i class="el-icon-document-copy"></i>
-              <template #title>预设</template>
-            </el-menu-item>
-            <el-menu-item index="/file">
-              <i class="el-icon-folder-opened"></i>
-              <template #title>文件服务</template>
-            </el-menu-item>
-            <el-menu-item index="/log">
-              <i class="el-icon-takeaway-box"></i>
-              <template #title>日志</template>
-            </el-menu-item>
-            <el-menu-item index="/about">
-              <i class="el-icon-info"></i>
-              <template #title>关于</template>
+            <el-menu-item
+              v-for="value in menus"
+              :key="value[0]"
+              :index="value[0]"
+            >
+              <i :class="value[1]"></i>
+              <template #title>{{ value[2] }}</template>
             </el-menu-item>
           </el-menu></el-aside
         >
@@ -130,6 +101,7 @@ import {
   showError,
   formatDateTime,
   formatDoubleTimeSpan,
+  TaskType,
 } from "./common";
 import * as net from "./net";
 import StatusBar from "./components/StatusBar.vue";
@@ -138,6 +110,16 @@ export default Vue.extend({
   name: "App",
   data: function () {
     return {
+      activeMenu:"/",
+      menus: [
+        ["/info", "el-icon-search", "媒体信息查询"],
+        ["/tasks", "el-icon-document", "任务列表"],
+        ["/preset", "el-icon-document-copy", "预设"],
+        ["/file", "el-icon-folder-opened", "文件服务"],
+        ["/log", "el-icon-takeaway-box", "日志"],
+        // ["/about", "el-icon-info", "关于"],
+      ],
+      types: TaskType.Types,
       showHeader: true,
       status: null,
       netError: false,
@@ -178,6 +160,11 @@ export default Vue.extend({
     this.getStatus();
     window.addEventListener("resize", this.resizeMenu);
   },
+  watch: {
+    $route(to, from) {
+      this.activeMenu=to.path;
+    },
+  },
   methods: {
     jump: jump,
     formatDoubleTimeSpan: formatDoubleTimeSpan,
@@ -195,7 +182,6 @@ export default Vue.extend({
       this.menuCollapse = window.innerWidth < 500;
     },
 
- 
     delayGetStatus() {
       setTimeout(this.getStatus, 500);
     },

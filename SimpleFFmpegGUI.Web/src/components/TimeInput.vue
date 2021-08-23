@@ -3,7 +3,7 @@
   <div>
     <el-row :gutter="12">
       <el-col :span="1">
-        <el-checkbox style="margin-top: 12px" v-model="isEnabled"></el-checkbox>
+        <el-checkbox style="margin-top: 15px" v-model="isEnabled"></el-checkbox>
       </el-col>
       <el-col :sm="22" :md="10" class="top12">
         <el-input
