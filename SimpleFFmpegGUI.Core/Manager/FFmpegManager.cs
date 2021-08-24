@@ -49,7 +49,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             else if (arg.Duration.HasValue)
             {
-                TimeSpan endTime = arg.From.Value + arg.Duration.Value;
+                TimeSpan endTime = (arg.From.HasValue? arg.From.Value:TimeSpan.Zero) + arg.Duration.Value;
                 if (endTime > realLength)
                 {
                     throw new Exception("裁剪后的结束时间在视频结束时间之后");

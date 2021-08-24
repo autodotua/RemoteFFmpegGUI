@@ -73,7 +73,7 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     if (task.Status != TaskStatus.Cancel)
                     {
-                        Logger.Error(task, "运行错误：" + ex.Message);
+                        Logger.Error(task, "运行错误：" + ex.ToString());
                         task.Status = TaskStatus.Error;
                         task.Message = ex.Message;
                     }

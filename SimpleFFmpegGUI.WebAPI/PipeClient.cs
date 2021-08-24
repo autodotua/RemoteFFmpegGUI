@@ -22,7 +22,7 @@ namespace SimpleFFmpegGUI.WebAPI
 
         public PipeClient(IConfiguration config)
         {
-            pipeName = config.GetValue<string>("PipeName") ?? throw new Exception("不存在PipeName配置项");
+            pipeName = Program.PipeName ?? config.GetValue<string>("PipeName") ?? throw new Exception("不存在PipeName配置项");
             hostName = config.GetValue<string>("HostName", null);
             hostPath = config.GetValue<string>("HostPath", null);
             try

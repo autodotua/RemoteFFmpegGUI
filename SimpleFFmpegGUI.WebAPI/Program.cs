@@ -12,20 +12,36 @@ namespace SimpleFFmpegGUI.WebAPI
 {
     public class Program
     {
+        internal static bool WebApp { get; private set; }
+        internal static string PipeName { get; private set; }
+
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder().Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static void Main(int port, string pipeName)
+        {
+            PipeName = pipeName;
+            WebApp = true;
+            CreateHostBuilder($"http://localhost:{port}/").Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string url = null) =>
+            Host.CreateDefaultBuilder()
             .ConfigureServices(c =>
             {
                 c.AddSingleton<PipeClient>();
             })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.Inject().UseStartup<Startup>();
+                    var builder = webBuilder
+                        .Inject()
+                        .UseStartup<Startup>();
+                    if (url != null)
+                    {
+                        builder.UseUrls(url);
+                    }
                 });
     }
 }

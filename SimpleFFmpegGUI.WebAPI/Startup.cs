@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
@@ -55,7 +56,13 @@ namespace SimpleFFmpegGUI.WebAPI
             }
 
             app.UseHttpsRedirection();
-
+            if (Program.WebApp)
+            {
+                app.UseStaticFiles(new StaticFileOptions()
+                {
+                    FileProvider = new PhysicalFileProvider(env.ContentRootPath + "/html")
+                });
+            }
             app.UseRouting();
             app.UseCorsAccessor();
             app.UseAuthorization();
@@ -93,7 +100,7 @@ namespace SimpleFFmpegGUI.WebAPI
             {
                 if (!http.Request.Headers.ContainsKey("Authorization")
                     || StringValues.IsNullOrEmpty(http.Request.Headers["Authorization"])
-                    || http.Request.Headers["Authorization"].FirstOrDefault()== "undefined")
+                    || http.Request.Headers["Authorization"].FirstOrDefault() == "undefined")
                 {
                     context.Result = new UnauthorizedObjectResult("ÐèÒªToken");
                     return;

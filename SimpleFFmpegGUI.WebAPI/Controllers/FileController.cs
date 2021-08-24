@@ -1,5 +1,6 @@
 ﻿using Furion.FriendlyException;
 using FzLib.IO;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -19,10 +20,22 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
     {
         public static ConcurrentDictionary<string, string> Guid2File { get; } = new ConcurrentDictionary<string, string>();
         private static ConcurrentDictionary<string, string> File2Guid { get; } = new ConcurrentDictionary<string, string>();
+        private readonly IHostingEnvironment hostingEnvironment;
 
         public FileController(ILogger<MediaInfoController> logger,
             IConfiguration config,
-        PipeClient pipeClient) : base(logger, config, pipeClient) { }
+        PipeClient pipeClient,
+        IHostingEnvironment hostingEnvironment) : base(logger, config, pipeClient)
+        {
+            this.hostingEnvironment = hostingEnvironment;
+        }
+
+        [HttpGet]
+        [Route("Dir")]
+        public string GetCurrentDir()
+        {
+            return hostingEnvironment.ContentRootPath;
+        }
 
         [HttpGet]
         [Route("List/Input")]

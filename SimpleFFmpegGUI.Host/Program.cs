@@ -20,7 +20,7 @@ namespace SimpleFFmpegGUI
     {
         private const string DefaultPipeName = "ffpipe";
 
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
             string pipeName = DefaultPipeName;
             Parser.Default.ParseArguments<Options>(args)

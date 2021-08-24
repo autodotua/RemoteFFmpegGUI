@@ -22,8 +22,8 @@
 
 ## Web版本部署
 
-1. ~~打开Web项目，将`net.ts`文件中的`getUrl`方法中的url切换到发布版本~~（当前版本自动判断，不需要修改）
-2. 在VS中发布Host和WebAPI，在Web项目中命令行运行`npm run build`发布前端包
+1. 在VS中发布Host和WebAPI，在Web项目中命令行运行`npm run build`发布前端包
+2. 将ffmpeg.exe和ffprobe.exe两个二进制文件放到Host生成的文件夹中
 3. 修改WebAPI的`appsettings.json`，主要修改`InputDir`和`OutputDir`项，指定输入和输出目录
 4. 新建一个网站文件夹，放置前端文件，新建api文件夹放置WebAPI文件，新建Host文件夹放置Host文件
 4. 确保安装了.Net 5 Hosting Bundle，并在Windows中启用了IIS
@@ -40,3 +40,12 @@
     - 设置`appsettings.json`中的 `InputDirAccessable`和/或`OutputDirAccessable`为`false`，告知程序无权限访问，那么后端将通过Host对文件进行访问
     - 关闭自动启动Host功能，因为自动启动的Host将继承IIS的权限，依旧无法访问
     - 这种模式下，HTTP上传和下载功能将不可用（懒得写）
+
+
+## 桌面包装版本部署
+
+1. 在VS中发布或生成WebApp，在Web项目中命令行运行`npm run build`发布前端包
+2. 将前端包放入WebApp生成或发布的文件夹中：
+   - 方式1：运行一次WebApp的程序，即可自动复制
+   - 方式2：将Web项目中的dist文件夹复制到WebApp程序目录并改名为html
+3. 将ffmpeg.exe和ffprobe.exe两个二进制文件放到WebApp程序目录中
