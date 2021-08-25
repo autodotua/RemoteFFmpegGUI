@@ -74,6 +74,10 @@ export function postAddCustomTask(item: any): Promise<AxiosResponse<any>> {
 export function getQueueStatus(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("Queue/Status"))
+} 
+export function getTask(id: number) {
+        return Vue.axios
+                .get(getUrl("Task?id=" + id))
 }
 export function getTaskList(status: number | null, skip: number | null, take: number | null): Promise<AxiosResponse<any>> {
         let url = "Task/List?";
@@ -138,7 +142,7 @@ export function postDeletePreset(id: number): Promise<AxiosResponse<any>> {
                 .post(getUrl("Preset/Delete?id=" + id))
 }
 
-export function getLogs(type: string | null, from: string | null, to: string | null, skip: number, take: number): Promise<AxiosResponse<any>> {
+export function getLogs(type: string | null, taskId: number, from: string | null, to: string | null, skip: number, take: number): Promise<AxiosResponse<any>> {
         let url = `Log/List?skip=${skip}&take=${take}`;
         if (type) {
                 url += `&type=${type}`;
@@ -148,6 +152,9 @@ export function getLogs(type: string | null, from: string | null, to: string | n
         }
         if (to) {
                 url += `&to=${to}`;
+        }
+        if (taskId != 0) {
+                url += `&taskId=${taskId}`;
         }
         return Vue.axios
                 .get(getUrl(url))

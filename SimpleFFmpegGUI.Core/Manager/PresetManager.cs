@@ -44,7 +44,7 @@ namespace SimpleFFmpegGUI.Manager
         public static List<CodePreset> GetPresets()
         {
             using var db = FFmpegDbContext.GetNew();
-            return db.Presets.Where(p => !p.IsDeleted).ToList();
+            return db.Presets.Where(p => !p.IsDeleted).OrderBy(p => p.Type).ToList();
         }
     }
 }

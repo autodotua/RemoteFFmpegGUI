@@ -81,11 +81,11 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
         }
 
-        protected void HideAbsolutePath(TaskInfo task)
+        protected TaskInfo HideAbsolutePath(TaskInfo task)
         {
             if (task == null)
             {
-                return;
+                return null;
             }
             if (task.Inputs != null)
             {
@@ -98,6 +98,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 task.Output = Path.GetFileName(task.Output);
             }
+            return task;
         }
 
         protected bool CanAccessInputDir()

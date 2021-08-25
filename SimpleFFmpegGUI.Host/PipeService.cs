@@ -93,6 +93,11 @@ namespace SimpleFFmpegGUI
             return TaskManager.GetTasks(status, skip, take);
         }
 
+        public TaskInfo GetTask(int id)
+        {
+            return TaskManager.GetTask(id);
+        }
+
         public StatusDto GetStatus()
         {
             StatusDto status = manager.ProcessingTask == null ? new StatusDto()
@@ -146,9 +151,9 @@ namespace SimpleFFmpegGUI
             return PresetManager.GetPresets();
         }
 
-        public PagedListDto<Log> GetLogs(char? type = null, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0)
+        public PagedListDto<Log> GetLogs(char? type = null, int taskId = 0, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0)
         {
-            return LogManager.GetLogs(type, from, to, skip, take);
+            return LogManager.GetLogs(type, taskId, from, to, skip, take);
         }
 
         public List<string> GetFiles(string dir)

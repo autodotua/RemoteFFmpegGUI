@@ -35,6 +35,18 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             return tasks;
         }
 
+        [HttpGet]
+        [Route("")]
+        public async Task<IActionResult> GetTask(int id)
+        {
+            var task = await pipeClient.InvokeAsync(p => p.GetTask(id));
+            if (task == null)
+            {
+                return NotFound();
+            }
+            return Ok(HideAbsolutePath(task));
+        }
+
         [HttpPost]
         [Route("Add/Code")]
         public async Task<List<int>> AddCodeTaskAsync([FromBody] TaskDto request)
@@ -71,7 +83,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("Add/Concat")]
         public async Task<List<int>> AddConcatTaskAsync([FromBody] TaskDto request)
         {
-            if (request.Inputs == null || request.Inputs.Count() <2
+            if (request.Inputs == null || request.Inputs.Count() < 2
                 || request.Inputs.Any(p => string.IsNullOrEmpty(p.FilePath)))
             {
                 throw Oops.Oh("输入文件为空或少于2个");

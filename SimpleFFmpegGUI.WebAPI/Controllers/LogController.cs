@@ -16,17 +16,17 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 
         [HttpGet]
         [Route("List")]
-        public async Task<PagedListDto<Log>> GetLogs(char? type = null, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0)
+        public async Task<PagedListDto<Log>> GetLogs(char? type = null, int taskId = 0, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0)
         {
-            if(from.HasValue)
+            if (from.HasValue)
             {
                 from = from.Value.ToLocalTime();
             }
-            if(to.HasValue)
+            if (to.HasValue)
             {
                 to = to.Value.ToLocalTime();
             }
-            var result = await pipeClient.InvokeAsync(p => p.GetLogs(type, from, to, skip, take));
+            var result = await pipeClient.InvokeAsync(p => p.GetLogs(type, taskId, from, to, skip, take));
             return result;
         }
     }

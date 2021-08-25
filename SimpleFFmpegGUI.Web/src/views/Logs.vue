@@ -1,16 +1,19 @@
 <template>
   <div>
-    <a class="right24">时间范围：</a>
-    <el-date-picker
-      @change="fillData"
-      v-model="timeRange"
-      type="datetimerange"
-      range-separator="至"
-      start-placeholder="开始日期"
-      end-placeholder="结束日期"
-      align="right"
-    >
-    </el-date-picker>
+    <div>
+      <a class="right24">时间范围：</a>
+      <el-date-picker
+        @change="fillData"
+        v-model="timeRange"
+        type="datetimerange"
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        align="right"
+      >
+      </el-date-picker>
+    </div>
+    <div class="gray top12" v-if="taskName">任务：{{ taskName }}</div>
     <el-table ref="table" :data="list" size="small">
       <el-table-column type="expand">
         <template slot-scope="props">
@@ -80,6 +83,7 @@ import {
   getTaskTypeDescription,
   showLoading,
   closeLoading,
+  TaskType,
 } from "../common";
 
 import * as net from "../net";
@@ -96,7 +100,31 @@ export default Vue.extend({
       countPerPage: 10,
       typeFilter: null,
       timeRange: [],
+      taskName: "",
     };
+  },
+  created() {
+    if (this.$route.query.id) {
+      net.getTask(Number.parseInt(this.$route.query.id as string)).then((r) => {
+        this.taskName = TaskType.GetByID(r.data.type).Description="（";
+
+        if (r.data.inputs && r.data.inputs.length > 0) {
+          this.taskName += r.data.inputs[0].filePath;
+          if (r.data.inputs.length > 1) {
+            this.taskName += " 等";
+          }
+        } else {
+          this.taskName = "？";
+        }
+        // this.taskName += " => ";
+        // if (r.data.output) {
+        //   this.taskName += r.data.output;
+        // } else {
+        //   this.taskName += "？";
+        // }
+        this.taskName+="）";
+      });
+    }
   },
   methods: {
     fillData() {
@@ -109,10 +137,14 @@ export default Vue.extend({
         this.timeRange && this.timeRange.length == 2
           ? (this.timeRange[1] as Date).toJSON()
           : null;
+      const taskId = this.$route.query.id
+        ? Number.parseInt(this.$route.query.id as string)
+        : 0;
 
       return net
         .getLogs(
           this.typeFilter,
+          taskId,
           from,
           to,
           (this.page - 1) * this.countPerPage,

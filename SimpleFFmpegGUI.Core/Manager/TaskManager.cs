@@ -75,6 +75,13 @@ namespace SimpleFFmpegGUI.Manager
             return new PagedListDto<TaskInfo>(tasks, count);
         }
 
+        public static TaskInfo GetTask(int id)
+        {
+            using var db = FFmpegDbContext.GetNew();
+            var task = db.Tasks.Find(id);
+            return task;
+        }
+
         public static void ResetTask(int id, QueueManager queue)
         {
             using var db = FFmpegDbContext.GetNew();

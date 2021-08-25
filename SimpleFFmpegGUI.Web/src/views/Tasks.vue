@@ -117,7 +117,7 @@
       >
       <el-table-column prop="inputText" label="输入" min-width="360" />
 
-      <el-table-column label="操作" width="140">
+      <el-table-column label="操作" width="180">
         <template slot-scope="scope">
           <el-button
             @click="resetTask(scope.row)"
@@ -164,6 +164,14 @@
             size="small"
             @click="remake(scope.row)"
             >重制</el-button
+          >
+
+          <el-button
+            slot="reference"
+            type="text"
+            size="small"
+            @click="jump('log?id='+scope.row.id)"
+            >日志</el-button
           >
         </template>
       </el-table-column>
@@ -254,6 +262,7 @@ export default Vue.extend({
     },
   },
   methods: {
+    jump,
     remake(item: any) {
       jumpByArgs(item.arguments, item.inputs, item.output, item.type);
     },

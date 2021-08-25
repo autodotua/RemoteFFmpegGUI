@@ -50,7 +50,7 @@ namespace SimpleFFmpegGUI
 
         void StartQueue();
 
-        PagedListDto<Log> GetLogs(char? type = null, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0);
+        PagedListDto<Log> GetLogs(char? type = null, int taskId = 0, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0);
 
         void CloseFtp(int id);
 
@@ -65,5 +65,6 @@ namespace SimpleFFmpegGUI
         bool IsFileExist(string path);
 
         VideoFormat[] GetSuggestedFormats();
+        TaskInfo GetTask(int id);
     }
 }
