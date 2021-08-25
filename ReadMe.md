@@ -19,6 +19,7 @@
 |WPF|桌面GUI|桌面端的GUI实现，暂时不实现|
 |WebAPI|服务端|使用ASP.NetCore实现的服务器|
 |Web|Web客户端|使用Vue.js实现的网页端|
+|WebApp|桌面客户端|对WebAPI、Web和Host进行包装的、使用内置浏览器显示的、基于WinForms的桌面客户端|
 
 ## Web版本部署
 

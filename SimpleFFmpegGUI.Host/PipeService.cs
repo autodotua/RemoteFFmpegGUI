@@ -24,7 +24,7 @@ namespace SimpleFFmpegGUI
             };
         }
 
-        private static QueueManager manager = new QueueManager();
+        private static QueueManager manager = QueueManager.Instance;
 
         public PipeService()
         {

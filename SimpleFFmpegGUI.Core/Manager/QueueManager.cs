@@ -29,9 +29,11 @@ namespace SimpleFFmpegGUI.Manager
         private CancellationTokenSource cancel;
         private FFmpegManager ffmpeg = new FFmpegManager();
 
-        public QueueManager()
+        private QueueManager()
         {
         }
+
+        public static QueueManager Instance { get; } = new QueueManager();
 
         private IQueryable<TaskInfo> GetQueueTasks(FFmpegDbContext db)
         {
@@ -93,7 +95,6 @@ namespace SimpleFFmpegGUI.Manager
             cancelQueue = false;
             Logger.Info("队列完成");
         }
-
 
         public void Suspend()
         {
@@ -161,6 +162,5 @@ namespace SimpleFFmpegGUI.Manager
             }
             return ps.First();
         }
-
     }
 }
