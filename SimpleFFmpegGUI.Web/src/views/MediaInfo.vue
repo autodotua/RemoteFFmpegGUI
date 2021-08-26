@@ -1,12 +1,9 @@
 <template>
   <div>
     <div>
-      <file-select  :file.sync="file" class="right24 bottom12"></file-select>
+      <file-select :file.sync="file" class="right24 bottom12"></file-select>
 
-      <el-button
-        type="primary"
-       @click="query"
-        :disabled="file == ''"
+      <el-button type="primary" @click="query" :disabled="file == ''"
         >查询</el-button
       >
     </div>
@@ -96,6 +93,10 @@
             >{{ value }}
           </el-form-item>
         </el-form-item>
+        <el-form-item label="详细信息">
+          <br />
+          <a style="font-family: Consolas" class="s">{{ info.detail }}</a>
+        </el-form-item>
       </el-form>
     </div>
   </div>
@@ -125,7 +126,7 @@ export default Vue.extend({
   methods: {
     jump: jump,
     formatDoubleTimeSpan,
-   
+
     query() {
       showLoading();
       net

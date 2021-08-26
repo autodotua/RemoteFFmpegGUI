@@ -11,5 +11,6 @@ namespace SimpleFFmpegGUI.Dto
         public MediaFormat Format { get; set; }
         public List<VideoStreamDto> VideoStreams { get; set; }
         public List<AudioStreamDto> AudioStreams { get; set; }
+        public string Detail { get; set; }
     }
 }

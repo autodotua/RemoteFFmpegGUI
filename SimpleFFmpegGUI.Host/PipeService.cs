@@ -1,6 +1,7 @@
 ﻿using FFMpegCore;
 using FzLib.Collection;
 using Mapster;
+using MediaInfo;
 using Newtonsoft.Json;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
@@ -75,7 +76,16 @@ namespace SimpleFFmpegGUI
             {
                 throw new Exception("查询信息失败：" + ex.Message);
             }
-            return result.Adapt<MediaInfoDto>();
+            var info = result.Adapt<MediaInfoDto>();
+            try
+            {
+                info.Detail = MediaInfoModule.GetInfo(path);
+            }
+            catch (Exception ex)
+            {
+                info.Detail = ex.Message;
+            }
+            return info;
         }
 
         public void Join(IEnumerable<string> path)

@@ -21,10 +21,10 @@
 |Web|Web客户端|使用Vue.js实现的网页端|
 |WebApp|桌面客户端|对WebAPI、Web和Host进行包装的、使用内置浏览器显示的、基于WinForms的桌面客户端|
 
-## Web版本部署
+## 基于Windows +IIS的Web版本部署
 
 1. 在VS中发布Host和WebAPI，在Web项目中命令行运行`npm run build`发布前端包
-2. 将ffmpeg.exe和ffprobe.exe两个二进制文件放到Host生成的文件夹中
+2. 将ffmpeg.exe、ffprobe.exe和MediaInfo.dll共三个二进制文件放到Host生成的文件夹中
 3. 修改WebAPI的`appsettings.json`，主要修改`InputDir`和`OutputDir`项，指定输入和输出目录
 4. 新建一个网站文件夹，放置前端文件，新建api文件夹放置WebAPI文件，新建Host文件夹放置Host文件
 4. 确保安装了.Net 5 Hosting Bundle，并在Windows中启用了IIS
