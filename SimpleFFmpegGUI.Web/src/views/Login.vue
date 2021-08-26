@@ -47,7 +47,7 @@ export default Vue.extend({
             showError("Token错误");
           }
           else{
-            Cookies.set("token",this.token)
+            Cookies.set("token",this.token,{expires:365})
             net.setHeader();
             this.$router.push({path:"/"})
           }

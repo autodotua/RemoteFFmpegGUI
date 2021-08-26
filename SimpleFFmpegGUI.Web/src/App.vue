@@ -135,7 +135,6 @@ export default Vue.extend({
     this.$nextTick(function () {
       this.resizeMenu();
       setInterval(this.getStatus, 2000);
-      const url = window.location.href;
     });
   },
   created() {
