@@ -42,8 +42,9 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         public async Task<List<string>> GetInputFiles()
         {
             return (CanAccessInputDir() ?
-                Directory.EnumerateFiles(GetInputDir()) : await pipeClient.InvokeAsync(p => p.GetFiles(GetInputDir())))
-            .Select(p => Path.GetFileName(p)).ToList();
+                Directory.EnumerateFiles(InputDir, "*", SearchOption.AllDirectories)
+                : await pipeClient.InvokeAsync(p => p.GetFiles(InputDir)))
+            .Select(p => GetInputRelativePath(p)).ToList();
         }
 
         [HttpGet]
@@ -52,11 +53,11 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             if (CanAccessOutputDir())
             {
-                return Directory.EnumerateFiles(GetOutputDir()).Select(p => new FileInfoDto(p)).ToList();
+                return Directory.EnumerateFiles(OutputDir).Select(p => new FileInfoDto(p)).ToList();
             }
             else
             {
-                return await pipeClient.InvokeAsync(p => p.GetFileDetails(GetOutputDir()));
+                return await pipeClient.InvokeAsync(p => p.GetFileDetails(OutputDir));
             }
         }
 
@@ -68,7 +69,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 throw Oops.Oh("无法访问输出文件夹，请使用其他方式下载");
             }
-            string path = Path.Combine(GetOutputDir(), name);
+            string path = Path.Combine(OutputDir, name);
             if (!System.IO.File.Exists(path))
             {
                 return NotFound();
@@ -81,7 +82,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("Ftp/Input/On")]
         public async Task OpenInput()
         {
-            await pipeClient.InvokeAsync(p => p.OpenFtp(1, GetInputDir(), config.GetValue("InputFtpPort", 0)));
+            await pipeClient.InvokeAsync(p => p.OpenFtp(1, InputDir, config.GetValue("InputFtpPort", 0)));
         }
 
         [HttpPost]
@@ -95,7 +96,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("Ftp/Output/On")]
         public async Task OpenOutput()
         {
-            await pipeClient.InvokeAsync(p => p.OpenFtp(2, GetInputDir(), config.GetValue("InputFtpPort", 0)));
+            await pipeClient.InvokeAsync(p => p.OpenFtp(2, InputDir, config.GetValue("InputFtpPort", 0)));
         }
 
         [HttpPost]
@@ -138,7 +139,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             //}
             if (file.Length > 0)
             {
-                string name = Path.Combine(GetInputDir(), file.FileName);
+                string name = Path.Combine(InputDir, file.FileName);
                 name = FileSystem.GetNoDuplicateFile(name);
                 using var stream = System.IO.File.Create(name);
                 await file.CopyToAsync(stream);

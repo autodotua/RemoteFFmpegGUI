@@ -24,27 +24,12 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             this.logger = logger;
             this.config = config;
             this.pipeClient = pipeClient;
+            InputDir = config.GetValue<string>("InputDir") ?? throw Oops.Oh("没有配置输入文件夹");
+            OutputDir = config.GetValue<string>("OutputDir") ?? throw Oops.Oh("没有配置输出文件夹");
         }
 
-        protected string GetInputDir()
-        {
-            string path = config.GetValue<string>("InputDir");
-            if (path == null)
-            {
-                throw Oops.Oh("没有配置输入文件夹");
-            }
-            return path;
-        }
-
-        protected string GetOutputDir()
-        {
-            string path = config.GetValue<string>("OutputDir");
-            if (path == null)
-            {
-                throw Oops.Oh("没有配置输出文件夹");
-            }
-            return path;
-        }
+        public readonly string InputDir = null;
+        public readonly string OutputDir = null;
 
         protected void CheckFileNameNull(string path)
         {
@@ -64,7 +49,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 
         protected async Task CheckInputFileExistAsync(string name)
         {
-            string path = Path.Combine(GetInputDir(), name);
+            string path = Path.Combine(InputDir, name);
             if (CanAccessInputDir())
             {
                 if (!System.IO.File.Exists(path))
@@ -91,14 +76,28 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 foreach (var input in task.Inputs)
                 {
-                    input.FilePath = Path.GetFileName(input.FilePath);
+                    input.FilePath = GetInputRelativePath(input.FilePath);
                 }
             }
             if (task.Output != null)
             {
-                task.Output = Path.GetFileName(task.Output);
+                task.Output = GetOutputRelativePath(task.Output);
             }
             return task;
+        }
+
+        protected string GetInputRelativePath(string path)
+        {
+            return path.StartsWith(InputDir) ?
+                path.Substring(InputDir.Length).Replace('\\', '/').TrimStart('/')
+                : throw new System.Exception("输入目录与实际文件位置不匹配，无法获取相对路径");
+        }
+
+        protected string GetOutputRelativePath(string path)
+        {
+            return path.StartsWith(OutputDir) ?
+                path.Substring(OutputDir.Length).Replace('\\', '/').TrimStart('/')
+                : throw new System.Exception("输出目录与实际文件位置不匹配，无法获取相对路径");
         }
 
         protected bool CanAccessInputDir()

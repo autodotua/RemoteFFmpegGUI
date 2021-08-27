@@ -156,7 +156,7 @@ export default Vue.component("file-io-group", {
     updateFile(file: string, index: number) {
       this.inputFiles[index].name = file;
       if (index == 0 && this.output == "") {
-        this.outputFile = file;
+        this.outputFile = file.split('/').slice(-1)[0];
       }
       this.$emit("update:inputs", this.getArgs());
       this.$emit("update:output", this.output);

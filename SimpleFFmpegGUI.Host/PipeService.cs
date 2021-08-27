@@ -168,7 +168,7 @@ namespace SimpleFFmpegGUI
 
         public List<string> GetFiles(string dir)
         {
-            return Directory.EnumerateFiles(dir).ToList();
+            return Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories).ToList();
         }
 
         public List<FileInfoDto> GetFileDetails(string dir)

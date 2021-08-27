@@ -65,14 +65,14 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                 string output = request.Output;
                 if (request.Inputs.Count > 1 || string.IsNullOrWhiteSpace(output))
                 {
-                    request.Output = Path.Combine(GetOutputDir(), file.FilePath);
+                    request.Output = Path.Combine(OutputDir, file.FilePath);
                 }
                 //拼接输入路径
-                file.FilePath = Path.Combine(GetInputDir(), file.FilePath);
+                file.FilePath = Path.Combine(InputDir, file.FilePath);
 
                 ids.Add(await pipeClient.InvokeAsync(p =>
                  p.AddTask(TaskType.Code, new List<InputArguments>() { file },
-                 Path.Combine(GetOutputDir(), request.Output),
+                 Path.Combine(OutputDir, request.Output),
                  request.Argument,
                  request.Start)));
             }
@@ -94,11 +94,11 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             foreach (var file in request.Inputs)
             {
                 await CheckInputFileExistAsync(file.FilePath);
-                file.FilePath = Path.Combine(GetInputDir(), file.FilePath);
+                file.FilePath = Path.Combine(InputDir, file.FilePath);
             }
             ids.Add(await pipeClient.InvokeAsync(p =>
                  p.AddTask(TaskType.Concat, request.Inputs,
-                 Path.Combine(GetOutputDir(), request.Output),
+                 Path.Combine(OutputDir, request.Output),
                  request.Argument,
                  request.Start)));
             return ids;
@@ -121,10 +121,10 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                 await CheckInputFileExistAsync(file.FilePath);
             }
             CheckFileNameNull(request.Output);
-            request.Inputs.ForEach(p => p.FilePath = Path.Combine(GetInputDir(), p.FilePath));
+            request.Inputs.ForEach(p => p.FilePath = Path.Combine(InputDir, p.FilePath));
             return await pipeClient.InvokeAsync(p =>
               p.AddTask(TaskType.Combine, request.Inputs,
-              Path.Combine(GetOutputDir(), request.Output),
+              Path.Combine(OutputDir, request.Output),
               request.Argument,
               request.Start));
         }
@@ -145,7 +145,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 await CheckInputFileExistAsync(file.FilePath);
             }
-            request.Inputs.ForEach(p => p.FilePath = Path.Combine(GetInputDir(), p.FilePath));
+            request.Inputs.ForEach(p => p.FilePath = Path.Combine(InputDir, p.FilePath));
             return await pipeClient.InvokeAsync(p =>
               p.AddTask(TaskType.Compare, request.Inputs, null,
               null,

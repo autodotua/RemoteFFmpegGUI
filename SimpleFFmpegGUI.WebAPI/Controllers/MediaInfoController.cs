@@ -20,7 +20,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             CheckNull(name, "文件");
             await CheckInputFileExistAsync(name);
 
-            var result = await pipeClient.InvokeAsync(p => p.GetInfo(Path.Combine(GetInputDir(), name)));
+            var result = await pipeClient.InvokeAsync(p => p.GetInfo(Path.Combine(InputDir, name)));
             return result;
         }
     }
