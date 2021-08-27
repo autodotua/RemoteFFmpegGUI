@@ -6,13 +6,11 @@
         {
         }
 
-        public FFmpegOutputEventArgs(bool isError, string data)
+        public FFmpegOutputEventArgs(string data)
         {
-            IsError = isError;
             Data = data;
         }
 
-        public bool IsError { get; set; }
         public string Data { get; set; }
     }
 }

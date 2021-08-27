@@ -24,6 +24,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public ProgressDto Progress { get; private set; }
         private TaskInfo currentTask;
+        public FFmpegProcess Process { get; private set; }
 
         private TimeSpan GetVideoDuration(InputArguments arg)
         {
@@ -49,7 +50,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             else if (arg.Duration.HasValue)
             {
-                TimeSpan endTime = (arg.From.HasValue? arg.From.Value:TimeSpan.Zero) + arg.Duration.Value;
+                TimeSpan endTime = (arg.From.HasValue ? arg.From.Value : TimeSpan.Zero) + arg.Duration.Value;
                 if (endTime > realLength)
                 {
                     throw new Exception("裁剪后的结束时间在视频结束时间之后");
@@ -298,6 +299,10 @@ namespace SimpleFFmpegGUI.Manager
 
         public async Task StartNewAsync(TaskInfo task, CancellationToken cancellationToken)
         {
+            if (Process != null)
+            {
+                throw new Exception("正在执行一个进程，单个实例不可同时执行多个进程");
+            }
             currentTask = task ?? throw new ArgumentNullException(nameof(task));
             try
             {
@@ -331,24 +336,35 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
-        private Task RunAsync(TaskInfo task, FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken)
+        private async Task RunAsync(TaskInfo task, FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken)
         {
-            Logger.Info("FFmpeg参数为：" + processor.Arguments);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                Logger.Info(task, "进程启动前就被要求取消");
+                return;
+            }
+            Logger.Info(task, "FFmpeg参数为：" + processor.Arguments);
             task.FFmpegArguments = task.FFmpegArguments == null ? processor.Arguments : task.FFmpegArguments + ";" + processor.Arguments;
             if (Progress != null)
             {
                 Progress.Name = desc;
             }
-            return processor
-                .CancellableThrough(cancellationToken)
-                .NotifyOnOutput(Output)
-                .ProcessAsynchronously();
+            Process = new FFmpegProcess(processor.Arguments);
+            Process.Output += Output;
+            try
+            {
+                await Process.StartAsync(cancellationToken);
+            }
+            finally
+            {
+                Process = null;
+            }
         }
 
-        private void Output(string data, DataType type)
+        private void Output(object sender, FFmpegOutputEventArgs e)
         {
-            Logger.Output(currentTask, data);
-            FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(type == DataType.Error, data));
+            Logger.Output(currentTask, e.Data);
+            FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(e.Data));
         }
 
         private void ApplyInputArguments(FFMpegArgumentOptions fa, InputArguments a)

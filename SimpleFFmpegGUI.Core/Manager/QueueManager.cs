@@ -102,6 +102,10 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new PlatformNotSupportedException("暂停和恢复功能仅支持Windows");
             }
+            if (ffmpeg.Process == null)
+            {
+                throw new Exception("进程还未启动，不可暂停");
+            }
             if (ProcessingTask == null)
             {
                 return;
@@ -109,7 +113,7 @@ namespace SimpleFFmpegGUI.Manager
             paused = true;
             Logger.Info(ProcessingTask, "暂停队列");
             pauseStartTime = DateTime.Now;
-            ProcessExtension.SuspendProcess(GetFFmpegProcess().Id);
+            ProcessExtension.SuspendProcess(ffmpeg.Process.Id);
         }
 
         public void Resume()
@@ -118,6 +122,10 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new PlatformNotSupportedException("暂停和恢复功能仅支持Windows");
             }
+            if (ffmpeg.Process == null)
+            {
+                throw new Exception("进程还未启动，不可暂停或恢复");
+            }
             if (ProcessingTask == null)
             {
                 return;
@@ -125,7 +133,7 @@ namespace SimpleFFmpegGUI.Manager
             paused = false;
             Progress.PauseTime = DateTime.Now - pauseStartTime;
             Logger.Info(ProcessingTask, "恢复队列");
-            ProcessExtension.ResumeProcess(GetFFmpegProcess().Id);
+            ProcessExtension.ResumeProcess(ffmpeg.Process.Id);
         }
 
         public void Cancel()
@@ -140,7 +148,7 @@ namespace SimpleFFmpegGUI.Manager
         {
             Logger.Info(ProcessingTask, "取消当前任务");
             ProcessingTask.Status = TaskStatus.Cancel;
-            GetFFmpegProcess().Kill();
+            cancel.Cancel();
         }
 
         public event EventHandler<FFmpegOutputEventArgs> FFmpegOutput
@@ -149,18 +157,5 @@ namespace SimpleFFmpegGUI.Manager
             remove => ffmpeg.FFmpegOutput -= value;
         }
 
-        private Process GetFFmpegProcess()
-        {
-            Process current = Process.GetCurrentProcess();
-            var ps = Process.GetProcessesByName("ffmpeg")
-                .Where(p => Path.GetDirectoryName(p.MainModule.FileName)
-                == Path.GetDirectoryName(current.MainModule.FileName))
-                .Where(p => p.StartTime > current.StartTime);
-            if (ps.Count() != 1)
-            {
-                throw new Exception("存在多个或不存在FFmpeg进程");
-            }
-            return ps.First();
-        }
     }
 }
