@@ -111,7 +111,7 @@ namespace SimpleFFmpegGUI.WebApp
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (QueueManager.Instance.IsRunning)
+            if (PipeService.Manager.IsRunning)
             {
                 MessageBox.Show("请先停止任务，然后才能关闭程序", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 e.Cancel = true;

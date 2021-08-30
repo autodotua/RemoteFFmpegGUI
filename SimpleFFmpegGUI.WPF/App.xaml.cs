@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SimpleFFmpegGUI.Manager;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +15,28 @@ namespace SimpleFFmpegGUI.WPF
     /// </summary>
     public partial class App : Application
     {
+        public static ServiceProvider ServiceProvider { get; private set; }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+
+            ServiceProvider = serviceCollection.BuildServiceProvider();
+            MainWindow = ServiceProvider.GetService<MainWindow>();
+            MainWindow.Show();
+        }
+
+        private void ConfigureServices(IServiceCollection services)
+        {
+            services.AddSingleton<QueueManager>();
+            services.AddSingleton<MainWindow>();
+            services.AddSingleton<MainWindowViewModel>();
+            services.AddSingleton<TaskListViewModel>();
+            services.AddSingleton<CodeArgumentsPanelViewModel>();
+            services.AddTransient<AddTaskWindow>();
+            services.AddSingleton<AddTaskWindowViewModel>();
+        }
     }
 }

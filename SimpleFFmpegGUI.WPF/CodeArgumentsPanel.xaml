@@ -1,0 +1,273 @@
+﻿<UserControl
+    x:Class="SimpleFFmpegGUI.WPF.CodeArgumentsPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <local:Int2StringConverter x:Key="Int2StringConverter" />
+        <Style
+            BasedOn="{StaticResource DefaultComboBoxStyle}"
+            TargetType="{x:Type ComboBox}">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <ScrollViewer
+            Padding="0,0,16,0"
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            <ui:SimpleStackPanel
+                Margin="8"
+                Spacing="8">
+                <ui:SimpleStackPanel
+                    Orientation="Horizontal"
+                    Spacing="16">
+                    <ComboBox
+                        ui:ControlHelper.Header="视频导出选项"
+                        ItemsSource="{Binding ChannelOutputStrategies}"
+                        SelectedItem="{Binding VideoOutputStrategy}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ., Converter={StaticResource Enum2DescriptionConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ComboBox
+                        ui:ControlHelper.Header="音频导出选项"
+                        ItemsSource="{Binding ChannelOutputStrategies}"
+                        SelectedItem="{Binding AudioOutputStrategy}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ., Converter={StaticResource Enum2DescriptionConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </ui:SimpleStackPanel>
+                <GroupBox Header="容器">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox
+                            Content="指定格式"
+                            IsChecked="{Binding Format.EnableFormat}" />
+                        <ComboBox
+                            Grid.Column="2"
+                            IsEnabled="{Binding Format.EnableFormat}"
+                            ItemsSource="{Binding Formats}"
+                            SelectedValue="{Binding Format.Format}"
+                            SelectedValuePath="Extension">
+
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Extension, Mode=OneWay}" />
+                                            <TextBlock
+                                                Opacity="0.6"
+                                                Text="（" />
+                                            <TextBlock
+                                                Opacity="0.6"
+                                                Text="{Binding Name, Mode=OneWay}" />
+                                            <TextBlock
+                                                Opacity="0.6"
+                                                Text="）" />
+                                        </StackPanel>
+
+
+                                        <TextBlock
+                                            HorizontalAlignment="Right"
+                                            Opacity="0.6"
+                                            Text="{Binding AudioOnly, Converter={StaticResource Bool2StringConverter}, ConverterParameter=仅音频:}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                </GroupBox>
+                <GroupBox
+                    Header="视频"
+                    Visibility="{Binding VideoOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource Equal2VisiableConverter}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                        </Grid.RowDefinitions>
+                        <!--  编码  -->
+                        <Label Content="编码" />
+                        <ComboBox
+                            Grid.Column="2"
+                            ItemsSource="{Binding VideoCodes}"
+                            SelectedIndex="1"
+                            SelectedItem="{Binding Video.Code}" />
+                        <!--  预设  -->
+                        <Label
+                            Grid.Row="2"
+                            Content="速度预设" />
+                        <Slider
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Margin="0,0,36,0"
+                            AutoToolTipPlacement="TopLeft"
+                            IsSnapToTickEnabled="True"
+                            Maximum="8"
+                            Minimum="0"
+                            TickFrequency="1"
+                            TickPlacement="BottomRight"
+                            Value="{Binding Video.Preset}" />
+                        <Label
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Content="{Binding Video.Preset, Converter={StaticResource Int2StringConverter}, ConverterParameter=0:很慢;1:慢;2:较慢;3:平衡;4:较快;5:快;6:很快;7:超快;8:极快}" />
+                        <!--  CRF  -->
+                        <CheckBox
+                            Grid.Row="4"
+                            Content="CRF"
+                            IsChecked="{Binding Video.EnableCrf}" />
+                        <Slider
+                            Grid.Row="4"
+                            Grid.Column="2"
+                            Margin="0,0,36,0"
+                            AutoToolTipPlacement="TopLeft"
+                            IsEnabled="{Binding Video.EnableCrf}"
+                            IsSnapToTickEnabled="True"
+                            Maximum="40"
+                            Minimum="10"
+                            TickFrequency="1"
+                            TickPlacement="BottomRight"
+                            Value="{Binding Video.Crf}" />
+                        <Label
+                            Grid.Row="4"
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Content="{Binding Video.Crf}"
+                            IsEnabled="{Binding Video.EnableCrf}" />
+                        <!--  平均码率  -->
+                        <CheckBox
+                            Grid.Row="6"
+                            Content="平均码率"
+                            IsChecked="{Binding Video.EnableAverageBitrate}" />
+                        <ui:NumberBox
+                            Grid.Row="6"
+                            Grid.Column="2"
+                            IsEnabled="{Binding Video.EnableAverageBitrate}"
+                            Maximum="800"
+                            Minimum="0.1"
+                            Value="{Binding Video.AverageBitrate}" />
+                        <!--  最大码率  -->
+                        <CheckBox
+                            Grid.Row="8"
+                            Content="最大码率"
+                            IsChecked="{Binding Video.EnableMaxBitrate}" />
+                        <ui:NumberBox
+                            Grid.Row="8"
+                            Grid.Column="2"
+                            IsEnabled="{Binding Video.EnableMaxBitrate}"
+                            Maximum="800"
+                            Minimum="0.1"
+                            Value="{Binding Video.MaxBitrate}" />
+                        <Label
+                            Grid.Row="10"
+                            VerticalAlignment="Center"
+                            Content="倍率"
+                            IsEnabled="{Binding Video.EnableMaxBitrate}" />
+                        <ui:NumberBox
+                            Grid.Row="10"
+                            Grid.Column="2"
+                            IsEnabled="{Binding Video.EnableMaxBitrate}"
+                            Maximum="10"
+                            Minimum="0.5"
+                            Value="{Binding Video.MaxBitrateBuffer}" />
+                    </Grid>
+                </GroupBox>
+                <GroupBox
+                    Header="音频"
+                    Visibility="{Binding AudioOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource Equal2VisiableConverter}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <!--  编码  -->
+                        <Label
+                            VerticalAlignment="Center"
+                            Content="编码" />
+                        <ComboBox
+                            Grid.Column="2"
+                            ItemsSource="{Binding AudioCodes}"
+                            SelectedIndex="1"
+                            SelectedItem="{Binding Audio.Code}" />
+
+                        <!--  平均码率  -->
+                        <CheckBox
+                            Grid.Row="2"
+                            Content="平均码率"
+                            IsChecked="{Binding Audio.EnableBitrate}" />
+                        <ComboBox
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            IsEnabled="{Binding Audio.EnableBitrate}"
+                            ItemsSource="{Binding AudioBitrates}"
+                            SelectedItem="{Binding Audio.Bitrate}" />
+                        <!--  采样率  -->
+                        <CheckBox
+                            Grid.Row="4"
+                            Content="采样率"
+                            IsChecked="{Binding Audio.EnableSamplingRate}" />
+                        <ComboBox
+                            Grid.Row="4"
+                            Grid.Column="2"
+                            IsEnabled="{Binding Audio.EnableSamplingRate}"
+                            ItemsSource="{Binding AudioSamplingRates}"
+                            SelectedItem="{Binding Audio.SamplingRate}" />
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="额外参数">
+                    <TextBox
+                        ui:ControlHelper.PlaceholderText="请输入ffmpeg参数"
+                        MaxLines="3"
+                        MinLines="3"
+                        Text="{Binding Extra}"
+                        TextWrapping="Wrap" />
+                </GroupBox>
+            </ui:SimpleStackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

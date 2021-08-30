@@ -29,11 +29,10 @@ namespace SimpleFFmpegGUI.Manager
         private CancellationTokenSource cancel;
         private FFmpegManager ffmpeg = new FFmpegManager();
 
-        private QueueManager()
+        public QueueManager()
         {
         }
 
-        public static QueueManager Instance { get; } = new QueueManager();
 
         private IQueryable<TaskInfo> GetQueueTasks(FFmpegDbContext db)
         {

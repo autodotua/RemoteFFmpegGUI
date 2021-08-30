@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
+using SimpleFFmpegGUI.Model;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,31 +19,28 @@ using System.Windows.Shapes;
 
 namespace SimpleFFmpegGUI.WPF
 {
-    public class MainWindowViewModel
+    public class AddTaskWindowViewModel
     {
-        public QueueManager queue;
-
-        public MainWindowViewModel(QueueManager queue)
+        public AddTaskWindowViewModel()
         {
-            this.queue = queue;
         }
+
+        public IEnumerable TaskTypes => Enum.GetValues(typeof(TaskType));
+        public TaskType Type { get; set; } = TaskType.Code;
     }
 
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for AddTaskWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class AddTaskWindow : Window
     {
-        public MainWindowViewModel ViewModel { get; set; }
+        public AddTaskWindowViewModel ViewModel { get; set; }
 
-        public MainWindow(MainWindowViewModel viewModel)
+        public AddTaskWindow(AddTaskWindowViewModel viewModel)
         {
+            ViewModel = viewModel;
+            DataContext = ViewModel;
             InitializeComponent();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            App.ServiceProvider.GetService<AddTaskWindow>().ShowDialog();
         }
     }
 }

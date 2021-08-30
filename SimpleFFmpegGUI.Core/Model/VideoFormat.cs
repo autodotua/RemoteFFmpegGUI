@@ -6,8 +6,8 @@ namespace SimpleFFmpegGUI.Model
     {
         public static readonly VideoFormat[] Formats = new[]
         {
-            new VideoFormat("matroska","mkv",main:true),
             new VideoFormat("mp4","mp4",main:true),
+            new VideoFormat("matroska","mkv",main:true),
             new VideoFormat("mov","mov",main:true),
             new VideoFormat("mpegts","ts"),
             new VideoFormat("avi","avi",main:true),
