@@ -1,7 +1,18 @@
-﻿namespace SimpleFFmpegGUI.Model
+﻿using FzLib;
+using System.ComponentModel;
+
+namespace SimpleFFmpegGUI.Model
 {
-    public class CombineArguments
+    public class CombineArguments : INotifyPropertyChanged
     {
-        public bool Shortest { get; set; }
+        private bool shortest;
+
+        public bool Shortest
+        {
+            get => shortest;
+            set => this.SetValueAndNotify(ref shortest, value, nameof(Shortest));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

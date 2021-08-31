@@ -27,7 +27,8 @@
                 Spacing="8">
                 <ui:SimpleStackPanel
                     Orientation="Horizontal"
-                    Spacing="16">
+                    Spacing="16"
+                    Visibility="{Binding CanSetVideoAndAudio, Converter={StaticResource Bool2VisibilityConverter}}">
                     <ComboBox
                         ui:ControlHelper.Header="视频导出选项"
                         ItemsSource="{Binding ChannelOutputStrategies}"
@@ -49,7 +50,9 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </ui:SimpleStackPanel>
-                <GroupBox Header="容器">
+                <GroupBox
+                    Header="容器"
+                    Visibility="{Binding CanSpecifyFormat, Converter={StaticResource Bool2VisibilityConverter}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />
@@ -82,7 +85,6 @@
                                                 Opacity="0.6"
                                                 Text="）" />
                                         </StackPanel>
-
 
                                         <TextBlock
                                             HorizontalAlignment="Right"
@@ -117,7 +119,6 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="8" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="8" />
                         </Grid.RowDefinitions>
                         <!--  编码  -->
                         <Label Content="编码" />
@@ -207,6 +208,35 @@
                             Maximum="10"
                             Minimum="0.5"
                             Value="{Binding Video.MaxBitrateBuffer}" />
+                        <CheckBox
+                            Grid.Row="12"
+                            Content="分辨率"
+                            IsChecked="{Binding Video.EnableSize}" />
+                        <Grid
+                            Grid.Row="12"
+                            Grid.Column="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox
+                                Grid.Column="0"
+                                ui:ControlHelper.PlaceholderText="宽度"
+                                IsEnabled="{Binding Video.EnableSize}"
+                                Text="{Binding Video.Width}" />
+                            <Label
+                                Grid.Column="1"
+                                Margin="4,0"
+                                IsEnabled="{Binding Video.EnableSize}">
+                                ×
+                            </Label>
+                            <TextBox
+                                Grid.Column="2"
+                                ui:ControlHelper.PlaceholderText="高度"
+                                IsEnabled="{Binding Video.EnableSize}"
+                                Text="{Binding Video.Height}" />
+                        </Grid>
                     </Grid>
                 </GroupBox>
                 <GroupBox
@@ -258,6 +288,28 @@
                             ItemsSource="{Binding AudioSamplingRates}"
                             SelectedItem="{Binding Audio.SamplingRate}" />
                     </Grid>
+                </GroupBox>
+                <GroupBox
+                    Header="合并参数"
+                    Visibility="{Binding CanSetCombine, Converter={StaticResource Bool2VisibilityConverter}}">
+                    <CheckBox
+                        Content="裁剪到视频长度"
+                        IsChecked="{Binding Combine.Shortest}" />
+                </GroupBox>
+                <GroupBox
+                    Header="拼接参数"
+                    Visibility="{Binding CanSetConcat, Converter={StaticResource Bool2VisibilityConverter}}">
+                    <ComboBox
+                        ui:ControlHelper.Header="拼接方式"
+                        ItemsSource="{Binding ConcatTypes}"
+                        SelectedIndex="0"
+                        SelectedItem="{Binding Concat.Type}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ., Converter={StaticResource Enum2DescriptionConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </GroupBox>
                 <GroupBox Header="额外参数">
                     <TextBox

@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FzLib;
+using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,14 +21,22 @@ using System.Windows.Shapes;
 
 namespace SimpleFFmpegGUI.WPF
 {
-    public class AddTaskWindowViewModel
+    public class AddTaskWindowViewModel : INotifyPropertyChanged
     {
         public AddTaskWindowViewModel()
         {
         }
 
         public IEnumerable TaskTypes => Enum.GetValues(typeof(TaskType));
-        public TaskType Type { get; set; } = TaskType.Code;
+        private TaskType type = TaskType.Code;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public TaskType Type
+        {
+            get => type;
+            set => this.SetValueAndNotify(ref type, value, nameof(Type));
+        }
     }
 
     /// <summary>
@@ -39,8 +49,21 @@ namespace SimpleFFmpegGUI.WPF
         public AddTaskWindow(AddTaskWindowViewModel viewModel)
         {
             ViewModel = viewModel;
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             DataContext = ViewModel;
             InitializeComponent();
+        }
+
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ViewModel.Type):
+                    argumentsPanel.Update(ViewModel.Type);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

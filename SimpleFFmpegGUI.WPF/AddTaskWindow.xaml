@@ -34,7 +34,7 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <local:CodeArgumentsPanel
+        <local:CodeArgumentsPanel x:Name="argumentsPanel"
             Grid.RowSpan="99"
             Grid.Column="2" />
     </Grid>
