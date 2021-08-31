@@ -59,6 +59,7 @@ namespace SimpleFFmpegGUI.WPF
             switch (e.PropertyName)
             {
                 case nameof(ViewModel.Type):
+                    fileIOPanel.Update(ViewModel.Type);
                     argumentsPanel.Update(ViewModel.Type);
                     break;
                 default:

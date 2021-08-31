@@ -1,0 +1,130 @@
+﻿<UserControl
+    x:Class="SimpleFFmpegGUI.WPF.FileIOPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    x:Name="root"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <local:Int2StringConverter x:Key="Int2StringConverter" />
+        <Style
+            BasedOn="{StaticResource DefaultComboBoxStyle}"
+            TargetType="{x:Type ComboBox}">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ScrollViewer
+            Padding="0,0,18,0"
+            VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Inputs}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            Margin="4,8"
+                            Padding="12"
+                            Background="{DynamicResource SystemControlBackgroundListLowBrush}"
+                            CornerRadius="8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="4" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="8" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="{Binding Index, StringFormat=输入文件 {0}}" />
+                                <Grid Grid.Row="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="0" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox Text="{Binding FilePath}" />
+                                    <Button
+                                        Grid.Column="2"
+                                        VerticalAlignment="Bottom"
+                                        Click="BrowseFileButton_Click"
+                                        Tag="{Binding .}">
+                                        <ui:SymbolIcon Symbol="BrowsePhotos" />
+                                    </Button>
+                                    <Button
+                                        Grid.Column="4"
+                                        Margin="8,0,0,0"
+                                        VerticalAlignment="Bottom"
+                                        Click="DeleteFileButton_Click"
+                                        IsEnabled="{Binding CanDelete}"
+                                        Tag="{Binding .}"
+                                        Visibility="{Binding ElementName=root, Path=DataContext.CanChangeInputsCount, Converter={StaticResource Bool2VisibilityConverter}}">
+                                        <ui:SymbolIcon Symbol="Delete" />
+                                    </Button>
+                                </Grid>
+                                <Grid Grid.Row="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="8" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="8" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <CheckBox
+                                        Content="开始"
+                                        IsChecked="{Binding EnableFrom}" />
+                                    <TextBox
+                                        Grid.Column="2"
+                                        ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
+                                        IsEnabled="{Binding EnableFrom}"
+                                        Text="{Binding From, StringFormat=hh\:mm\:ss}" />
+                                    <CheckBox
+                                        Grid.Row="2"
+                                        Content="结束"
+                                        IsChecked="{Binding EnableTo}" />
+                                    <TextBox
+                                        Grid.Row="2"
+                                        Grid.Column="2"
+                                        ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
+                                        IsEnabled="{Binding EnableTo}"
+                                        Text="{Binding To, StringFormat=hh\:mm\:ss}" />
+                                    <CheckBox
+                                        Grid.Row="4"
+                                        Content="经过"
+                                        IsChecked="{Binding EnableDuration}" />
+                                    <TextBox
+                                        Grid.Row="4"
+                                        Grid.Column="2"
+                                        ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
+                                        IsEnabled="{Binding EnableDuration}"
+                                        Text="{Binding Duration, StringFormat=hh\:mm\:ss}" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Button
+            Grid.Row="2"
+            Click="Button_Click"
+            Content="新增" />
+    </Grid>
+</UserControl>

@@ -41,7 +41,9 @@ namespace SimpleFFmpegGUI.WPF
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<AddTaskWindow>().ShowDialog();
+            var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
+            dialog.Owner = this;
+            dialog.ShowDialog();
         }
     }
 }

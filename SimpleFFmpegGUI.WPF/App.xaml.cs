@@ -34,7 +34,8 @@ namespace SimpleFFmpegGUI.WPF
             services.AddSingleton<MainWindow>();
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<TaskListViewModel>();
-            services.AddSingleton<CodeArgumentsPanelViewModel>();
+            services.AddTransient<CodeArgumentsPanelViewModel>();
+            services.AddTransient<FileIOPanelViewModel>();
             services.AddTransient<AddTaskWindow>();
             services.AddSingleton<AddTaskWindowViewModel>();
         }

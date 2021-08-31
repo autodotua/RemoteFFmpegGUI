@@ -26,14 +26,14 @@ using System.Windows.Shapes;
 
 namespace SimpleFFmpegGUI.WPF
 {
-    public interface IArgumentsWithSwitch : INotifyPropertyChanged
+    public interface ITempArguments : INotifyPropertyChanged
     {
         public void Update();
 
         public void Apply();
     }
 
-    public class VideoArgumentsWithSwitch : VideoCodeArguments, IArgumentsWithSwitch
+    public class VideoArgumentsWithSwitch : VideoCodeArguments, ITempArguments
     {
         public VideoArgumentsWithSwitch()
         {
@@ -107,7 +107,7 @@ namespace SimpleFFmpegGUI.WPF
         }
     }
 
-    public class AudioArgumentsWithSwitch : AudioCodeArguments, IArgumentsWithSwitch
+    public class AudioArgumentsWithSwitch : AudioCodeArguments, ITempArguments
     {
         public AudioArgumentsWithSwitch()
         {
@@ -146,7 +146,7 @@ namespace SimpleFFmpegGUI.WPF
         }
     }
 
-    public class FormatArgumentWithSwitch : IArgumentsWithSwitch
+    public class FormatArgumentWithSwitch : ITempArguments
     {
         private bool enableFormat;
 
@@ -376,7 +376,7 @@ namespace SimpleFFmpegGUI.WPF
             ViewModel.Update(task.Type, task.Arguments);
         }
 
-        public CodeArgumentsPanelViewModel ViewModel => App.ServiceProvider.GetService<CodeArgumentsPanelViewModel>();
+        public CodeArgumentsPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<CodeArgumentsPanelViewModel>();
     }
 
     public enum ChannelOutputStrategy

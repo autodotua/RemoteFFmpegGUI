@@ -7,20 +7,21 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="新建任务"
-    Width="800"
-    Height="450"
+    Width="1280"
+    Height="640"
     ui:WindowHelper.UseModernWindowStyle="True"
+    WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="8" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="8" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="*" />
             <RowDefinition Height="8" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -34,8 +35,10 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <local:CodeArgumentsPanel x:Name="argumentsPanel"
+        <local:FileIOPanel Grid.Row="2" x:Name="fileIOPanel" />
+        <local:CodeArgumentsPanel
+            x:Name="argumentsPanel"
             Grid.RowSpan="99"
-            Grid.Column="2" />
+            Grid.Column="4" />
     </Grid>
 </Window>
