@@ -20,13 +20,52 @@ namespace SimpleFFmpegGUI.Manager
                 Arguments = arguments
             };
             using var db = FFmpegDbContext.GetNew();
-            if (db.Presets.Any(p => p.Name == name && p.Type == type))
+            if (db.Presets.Where(p => p.IsDeleted == false).Any(p => p.Name == name && p.Type == type))
             {
-                db.Presets.RemoveRange(db.Presets.Where(p => p.Name == name && p.Type == type).ToArray());
+                db.Presets.RemoveRange(db.Presets.Where(p => p.IsDeleted == false).Where(p => p.Name == name && p.Type == type).ToArray());
             }
             db.Presets.Add(preset);
             db.SaveChanges();
             return preset.Id;
+        }
+
+        public static void UpdatePreset(CodePreset preset)
+        {
+            using var db = FFmpegDbContext.GetNew();
+            db.Presets.Update(preset);
+            db.SaveChanges();
+        }
+        public static CodePreset AddPreset(string name, TaskType type, OutputArguments arguments)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("名称为空");
+            }
+            if (ContainsPreset(name, type))
+            {
+                throw new Exception($"名为{name}的预设已存在");
+            }
+            CodePreset preset = new CodePreset()
+            {
+                Name = name,
+                Type = type,
+                Arguments = arguments
+            };
+            using var db = FFmpegDbContext.GetNew();
+
+            db.Presets.Add(preset);
+            db.SaveChanges();
+            return preset;
+        }
+
+        public static bool ContainsPreset(string name, TaskType type)
+        {
+            using var db = FFmpegDbContext.GetNew();
+            if (db.Presets.Where(p => p.IsDeleted == false).Any(p => p.Name == name && p.Type == type))
+            {
+                return true;
+            }
+            return false;
         }
 
         public static void DeletePreset(int id)

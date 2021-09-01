@@ -1,12 +1,38 @@
-﻿using System;
+﻿using FzLib;
+using System;
+using System.ComponentModel;
 
 namespace SimpleFFmpegGUI.Model
 {
-    public class InputArguments
+    public class InputArguments:INotifyPropertyChanged
     {
-        public string FilePath { get; set; }
-        public TimeSpan? From { get; set; }
-        public TimeSpan? To { get; set; }
-        public TimeSpan? Duration { get; set; }
+        private string filePath;
+        public string FilePath
+        {
+            get => filePath;
+            set => this.SetValueAndNotify(ref filePath, value, nameof(FilePath));
+        }
+        private TimeSpan? from;
+        public TimeSpan? From
+        {
+            get => from;
+            set => this.SetValueAndNotify(ref from, value, nameof(From));
+        }
+        private TimeSpan? to;
+        public TimeSpan? To
+        {
+            get => to;
+            set => this.SetValueAndNotify(ref to, value, nameof(To));
+        }
+        private TimeSpan? duration;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public TimeSpan? Duration
+        {
+            get => duration;
+            set => this.SetValueAndNotify(ref duration, value, nameof(Duration));
+        }
+
     }
 }

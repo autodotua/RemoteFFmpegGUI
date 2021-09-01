@@ -14,6 +14,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
+    <PackageReference Include="Notifications.Wpf.Core" Version="1.3.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Enterwell.Clients.Wpf.Notifications">
+      <HintPath>..\libs\Enterwell.Clients.Wpf.Notifications.dll</HintPath>
+    </Reference>
     <Reference Include="FzCoreLib.Windows">
       <HintPath>..\libs\FzCoreLib.Windows.dll</HintPath>
     </Reference>
@@ -36,6 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="PresetsPanel.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="FileIOPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -45,6 +52,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="PresetsPanel.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="FileIOPanel.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

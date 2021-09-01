@@ -38,12 +38,16 @@ namespace SimpleFFmpegGUI.WPF
 
         public void Update()
         {
-            throw new NotImplementedException();
+            EnableFrom = From.HasValue;
+            EnableTo = To.HasValue;
+            EnableDuration = Duration.HasValue;
         }
 
         public void Apply()
         {
-            throw new NotImplementedException();
+            From = EnableFrom ? From : null;
+            To = EnableTo ? To : null;
+            Duration = EnableDuration ? Duration : null;
         }
 
         private int index;
@@ -80,7 +84,24 @@ namespace SimpleFFmpegGUI.WPF
             Inputs.CollectionChanged += Inputs_CollectionChanged;
         }
 
-        public int MinInputsCount { get; set; } = 1;
+        private int minInputsCount = 1;
+
+        public int MinInputsCount
+        {
+            get => minInputsCount;
+            set
+            {
+                this.SetValueAndNotify(ref minInputsCount, value, nameof(MinInputsCount));
+                while (value > Inputs.Count)
+                {
+                    Inputs.Add(new InputArgumentsDetail());
+                } 
+                while (value < Inputs.Count)
+                {
+                    Inputs.RemoveAt(Inputs.Count - 1);
+                }
+            }
+        }
 
         private void Inputs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -92,6 +113,13 @@ namespace SimpleFFmpegGUI.WPF
         }
 
         public ObservableCollection<InputArgumentsDetail> Inputs { get; } = new ObservableCollection<InputArgumentsDetail>();
+        private string output;
+
+        public string Output
+        {
+            get => output;
+            set => this.SetValueAndNotify(ref output, value, nameof(Output));
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -114,7 +142,21 @@ namespace SimpleFFmpegGUI.WPF
 
         public FileIOPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<FileIOPanelViewModel>();
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        public List<InputArguments> GetInputs()
+        {
+            foreach (var input in ViewModel.Inputs)
+            {
+                input.Apply();
+            }
+            return ViewModel.Inputs.Cast<InputArguments>().ToList();
+        }
+
+        public string GetOutput()
+        {
+            return ViewModel.Output;
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.Inputs.Add(new InputArgumentsDetail());
         }
@@ -137,6 +179,32 @@ namespace SimpleFFmpegGUI.WPF
         public void Update(TaskType type)
         {
             ViewModel.CanChangeInputsCount = type is TaskType.Code or TaskType.Combine or TaskType.Concat;
+            ViewModel.MinInputsCount = type switch
+            {
+                TaskType.Code => 1,
+                TaskType.Combine or TaskType.Concat or TaskType.Compare => 2,
+                _ => 0
+            };
+        }
+
+        private void BrowseAndAddButton_Click(object sender, RoutedEventArgs e)
+        {
+            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().GetFilePath();
+            if (path != null)
+            {
+                var input = new InputArgumentsDetail();
+                input.SetFile(path);
+                ViewModel.Inputs.Add(input);
+            }
+        }
+
+        private void BrowseOutputFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            string path = new FileFilterCollection().AddAll().CreateSaveFileDialog().GetFilePath();
+            if (path != null)
+            {
+                ViewModel.Output = path;
+            }
         }
     }
 }

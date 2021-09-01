@@ -376,6 +376,11 @@ namespace SimpleFFmpegGUI.WPF
             ViewModel.Update(task.Type, task.Arguments);
         }
 
+        public OutputArguments GetOutputArguments()
+        {
+            return ViewModel.GetArguments();
+        }
+
         public CodeArgumentsPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<CodeArgumentsPanelViewModel>();
     }
 

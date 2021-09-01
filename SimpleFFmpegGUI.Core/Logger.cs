@@ -1,6 +1,7 @@
 ﻿using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 
@@ -28,6 +29,7 @@ namespace SimpleFFmpegGUI
         public static void Output(TaskInfo task, string message)
         {
             AddLog('O', message, task);
+            Debug.WriteLine(message);
         }
 
         public static void Error(string message)

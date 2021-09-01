@@ -132,6 +132,7 @@
                             Grid.Row="2"
                             Content="速度预设" />
                         <Slider
+                            x:Name="sldPreset"
                             Grid.Row="2"
                             Grid.Column="2"
                             Margin="0,0,36,0"

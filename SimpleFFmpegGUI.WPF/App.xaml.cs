@@ -31,13 +31,17 @@ namespace SimpleFFmpegGUI.WPF
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<QueueManager>();
+
             services.AddSingleton<MainWindow>();
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<TaskListViewModel>();
+
+            services.AddTransient<AddTaskWindow>();
+
             services.AddTransient<CodeArgumentsPanelViewModel>();
             services.AddTransient<FileIOPanelViewModel>();
-            services.AddTransient<AddTaskWindow>();
             services.AddSingleton<AddTaskWindowViewModel>();
+            services.AddTransient<PresetsPanelViewModel>();
         }
     }
 }

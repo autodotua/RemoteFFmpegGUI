@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="新建任务"
     Width="1280"
@@ -24,6 +25,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="8" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ComboBox
             HorizontalAlignment="Stretch"
@@ -35,10 +38,41 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <local:FileIOPanel Grid.Row="2" x:Name="fileIOPanel" />
-        <local:CodeArgumentsPanel
-            x:Name="argumentsPanel"
-            Grid.RowSpan="99"
-            Grid.Column="4" />
+        <local:FileIOPanel
+            x:Name="fileIOPanel"
+            Grid.Row="2"
+            Grid.RowSpan="5" />
+        <GroupBox
+            Grid.RowSpan="5"
+            Grid.Column="2"
+            Padding="0"
+            Header="预设">
+            <local:PresetsPanel x:Name="presetsPanel" />
+        </GroupBox>
+        <GroupBox
+            Grid.RowSpan="3"
+            Grid.Column="4"
+            Padding="0"
+            Header="参数">
+            <local:CodeArgumentsPanel x:Name="argumentsPanel" />
+        </GroupBox>
+        <Grid
+            Grid.Row="4"
+            Grid.Column="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button
+                HorizontalAlignment="Stretch"
+                Click="AddToQueueButton_Click"
+                Content="加入队列" />
+            <Button
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                Click="AddToQueueAndStartButton_Click"
+                Content="加入并开始队列" />
+        </Grid>
     </Grid>
 </Window>
