@@ -40,27 +40,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="PresetsPanel.xaml.cs">
+    <Compile Update="Panels\PresetsPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="FileIOPanel.xaml.cs">
+    <Compile Update="Panels\FileIOPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="CodeArgumentsPanel.xaml.cs">
+    <Compile Update="Panels\CodeArgumentsPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="PresetsPanel.xaml">
+    <Page Update="Panels\PresetsPanel.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="FileIOPanel.xaml">
+    <Page Update="Panels\FileIOPanel.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="CodeArgumentsPanel.xaml">
+    <Page Update="Panels\CodeArgumentsPanel.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

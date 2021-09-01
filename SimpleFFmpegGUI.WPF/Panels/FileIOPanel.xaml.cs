@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAPICodePack.FzExtension;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF;
+using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,53 +26,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Panels
 {
-    public class InputArgumentsDetail : InputArguments, INotifyPropertyChanged, ITempArguments
-    {
-        public void SetFile(string path)
-        {
-            FilePath = path;
-            this.Notify(nameof(path));
-        }
-
-        public void Update()
-        {
-            EnableFrom = From.HasValue;
-            EnableTo = To.HasValue;
-            EnableDuration = Duration.HasValue;
-        }
-
-        public void Apply()
-        {
-            From = EnableFrom ? From : null;
-            To = EnableTo ? To : null;
-            Duration = EnableDuration ? Duration : null;
-        }
-
-        private int index;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public int Index
-        {
-            get => index;
-            set => this.SetValueAndNotify(ref index, value, nameof(Index));
-        }
-
-        private bool canDelete;
-
-        public bool CanDelete
-        {
-            get => canDelete;
-            set => this.SetValueAndNotify(ref canDelete, value, nameof(CanDelete));
-        }
-
-        public bool EnableFrom { get; set; }
-        public bool EnableTo { get; set; }
-        public bool EnableDuration { get; set; }
-    }
-
     public class FileIOPanelViewModel : INotifyPropertyChanged
     {
         public FileIOPanelViewModel()
@@ -95,7 +50,7 @@ namespace SimpleFFmpegGUI.WPF
                 while (value > Inputs.Count)
                 {
                     Inputs.Add(new InputArgumentsDetail());
-                } 
+                }
                 while (value < Inputs.Count)
                 {
                     Inputs.RemoveAt(Inputs.Count - 1);

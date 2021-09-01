@@ -20,7 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Panels
 {
     public class TaskListViewModel : INotifyPropertyChanged
     {

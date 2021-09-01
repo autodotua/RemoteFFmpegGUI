@@ -4,7 +4,7 @@ using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF;
+using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,159 +24,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Panels
 {
-    public interface ITempArguments : INotifyPropertyChanged
-    {
-        public void Update();
-
-        public void Apply();
-    }
-
-    public class VideoArgumentsWithSwitch : VideoCodeArguments, ITempArguments
-    {
-        public VideoArgumentsWithSwitch()
-        {
-            Code = "H265";
-            Preset = 2;
-            Crf = 25;
-            AverageBitrate = 10;
-            MaxBitrate = 20;
-            MaxBitrateBuffer = 2;
-        }
-
-        private bool enableCrf;
-
-        public bool EnableCrf
-        {
-            get => enableCrf;
-            set => this.SetValueAndNotify(ref enableCrf, value, nameof(EnableCrf));
-        }
-
-        private bool enableSize;
-
-        public bool EnableSize
-        {
-            get => enableSize;
-            set => this.SetValueAndNotify(ref enableSize, value, nameof(EnableSize));
-        }
-
-        private bool enableFps;
-
-        public bool EnableFps
-        {
-            get => enableFps;
-            set => this.SetValueAndNotify(ref enableFps, value, nameof(EnableFps));
-        }
-
-        private bool enableAverageBitrate;
-
-        public bool EnableAverageBitrate
-        {
-            get => enableAverageBitrate;
-            set => this.SetValueAndNotify(ref enableAverageBitrate, value, nameof(EnableAverageBitrate));
-        }
-
-        private bool enableMaxBitrate;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public bool EnableMaxBitrate
-        {
-            get => enableMaxBitrate;
-            set => this.SetValueAndNotify(ref enableMaxBitrate, value, nameof(EnableMaxBitrate));
-        }
-
-        public void Apply()
-        {
-            Crf = EnableCrf ? Crf : null;
-            Width = EnableSize ? Width : null;
-            Height = EnableSize ? Height : null;
-            Fps = EnableFps ? Fps : null;
-            AverageBitrate = EnableAverageBitrate ? AverageBitrate : null;
-            MaxBitrate = EnableMaxBitrate ? MaxBitrate : null;
-        }
-
-        public void Update()
-        {
-            EnableCrf = Crf.HasValue;
-            EnableSize = Width.HasValue && Height.HasValue;
-            EnableFps = Fps.HasValue;
-            EnableAverageBitrate = AverageBitrate.HasValue;
-            EnableMaxBitrate = MaxBitrate.HasValue;
-        }
-    }
-
-    public class AudioArgumentsWithSwitch : AudioCodeArguments, ITempArguments
-    {
-        public AudioArgumentsWithSwitch()
-        {
-            Bitrate = 128;
-            SamplingRate = 48000;
-        }
-
-        private bool enableBitrate;
-
-        public bool EnableBitrate
-        {
-            get => enableBitrate;
-            set => this.SetValueAndNotify(ref enableBitrate, value, nameof(EnableBitrate));
-        }
-
-        private bool enableSamplingRate;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public bool EnableSamplingRate
-        {
-            get => enableSamplingRate;
-            set => this.SetValueAndNotify(ref enableSamplingRate, value, nameof(EnableSamplingRate));
-        }
-
-        public void Apply()
-        {
-            Bitrate = EnableBitrate ? Bitrate : null;
-            SamplingRate = EnableSamplingRate ? SamplingRate : null;
-        }
-
-        public void Update()
-        {
-            EnableBitrate = Bitrate.HasValue;
-            EnableSamplingRate = SamplingRate.HasValue;
-        }
-    }
-
-    public class FormatArgumentWithSwitch : ITempArguments
-    {
-        private bool enableFormat;
-
-        public bool EnableFormat
-        {
-            get => enableFormat;
-            set => this.SetValueAndNotify(ref enableFormat, value, nameof(EnableFormat));
-        }
-
-        private string format = "mp4";
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public string Format
-        {
-            get => format;
-            set => this.SetValueAndNotify(ref format, value, nameof(Format));
-        }
-
-        public void Apply()
-        {
-            Format = EnableFormat ? Format : null;
-        }
-
-        public void Update()
-        {
-            EnableFormat = Format != null;
-        }
-    }
-
     public class CodeArgumentsPanelViewModel : INotifyPropertyChanged
     {
         public CodeArgumentsPanelViewModel()

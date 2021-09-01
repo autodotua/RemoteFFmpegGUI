@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:ui="http://schemas.modernwpf.com/2019"
@@ -38,7 +39,7 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <local:FileIOPanel
+        <panels:FileIOPanel
             x:Name="fileIOPanel"
             Grid.Row="2"
             Grid.RowSpan="5" />
@@ -47,14 +48,14 @@
             Grid.Column="2"
             Padding="0"
             Header="预设">
-            <local:PresetsPanel x:Name="presetsPanel" />
+            <panels:PresetsPanel x:Name="presetsPanel" />
         </GroupBox>
         <GroupBox
             Grid.RowSpan="3"
             Grid.Column="4"
             Padding="0"
             Header="参数">
-            <local:CodeArgumentsPanel x:Name="argumentsPanel" />
+            <panels:CodeArgumentsPanel x:Name="argumentsPanel" />
         </GroupBox>
         <Grid
             Grid.Row="4"

@@ -1,5 +1,4 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
-using Enterwell.Clients.Wpf.Notifications.Controls;
 using FzLib;
 using Mapster;
 using Microsoft.DotNet.PlatformAbstractions;
@@ -9,7 +8,6 @@ using ModernWpf.FzExtension.CommonDialog;
 using Notifications.Wpf.Core;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,12 +24,11 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Panels
 {
     public class PresetsPanelViewModel : INotifyPropertyChanged
     {
@@ -111,61 +108,6 @@ namespace SimpleFFmpegGUI.WPF
             {
                 this.CreateMessage().QueueError("更新预设失败", ex);
             }
-        }
-    }
-
-    public static class NotificationMessageExtension
-    {
-        public static void QueueSuccess(this NotificationMessageBuilder builder, string message)
-        {
-            builder.Background(Brushes.Green)
-                       .HasMessage(message)
-                       .Animates(true)
-                       .Dismiss().WithDelay(2000)
-                       .Queue();
-        }
-
-        public static void QueueError(this NotificationMessageBuilder builder, string message, Exception ex)
-        {
-            builder.Background("#B71C1C")
-                       .HasMessage(message)
-                       .Animates(true)
-                       .Dismiss().WithDelay(5000)
-                       .Dismiss().WithButton("详情", b => CommonDialog.ShowErrorDialogAsync(ex))
-                       .Queue();
-        }
-
-        public static NotificationMessageBuilder CreateMessage(this DependencyObject element)
-        {
-            var window = Window.GetWindow(element);
-            if (window == null)
-            {
-                throw new Exception("找不到元素的窗口");
-            }
-            if (!(window.Content is Grid))
-            {
-                throw new Exception("窗口的内容不是Grid");
-            }
-            Grid grid = window.Content as Grid;
-
-            NotificationMessageContainer container;
-            if (grid.Children.OfType<NotificationMessageContainer>().Any())
-            {
-                container = grid.Children.OfType<NotificationMessageContainer>().First();
-            }
-            else
-            {
-                container = new NotificationMessageContainer
-                {
-                    Margin = new Thickness(-grid.Margin.Left, -grid.Margin.Top, -grid.Margin.Right, -grid.Margin.Bottom),
-                    Width = 360,
-                    Manager = new NotificationMessageManager()
-                };
-                Grid.SetRowSpan(container, int.MaxValue);
-                Grid.SetColumnSpan(container, int.MaxValue);
-                grid.Children.Add(container);
-            }
-            return container.Manager.CreateMessage();
         }
     }
 }

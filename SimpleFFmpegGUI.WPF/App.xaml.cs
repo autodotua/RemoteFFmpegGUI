@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
+using SimpleFFmpegGUI.WPF.Panels;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
