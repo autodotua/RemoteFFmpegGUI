@@ -4,12 +4,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
-    xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="MainWindow"
-    Width="800"
-    Height="450"
+    Width="1200"
+    Height="600"
     ui:WindowHelper.UseModernWindowStyle="True"
     mc:Ignorable="d">
     <Grid>
@@ -17,11 +17,11 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="8" />
             <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <panels:TaskList />
-        <Button
-            Grid.Column="2"
-            Click="Button_Click">
+        <panels:TaskList Grid.Column="2" />
+        <Button Click="Button_Click">
             新建
         </Button>
     </Grid>
