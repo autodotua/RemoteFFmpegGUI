@@ -19,20 +19,19 @@ namespace SimpleFFmpegGUI.Manager
 {
     public class QueueManager
     {
-        private DateTime pauseStartTime;
-        private bool paused = false;
-        public bool IsRunning => ProcessingTask != null;
-        public bool IsPaused => ProcessingTask != null && paused;
-        public TaskInfo ProcessingTask { get; private set; }
-        public ProgressDto Progress => ffmpeg.Progress;
+        private List<FFmpegManager> taskProcessManagers = new List<FFmpegManager>();
+
+        public TaskInfo MainQueueTask { get; private set; }
+        public FFmpegManager MainQueueManager => Managers.FirstOrDefault(p => p.Task == MainQueueTask);
+        public IReadOnlyList<FFmpegManager> Managers => taskProcessManagers.AsReadOnly();
+        public IEnumerable<TaskInfo> StandaloneTasks => Managers.Where(p => p.Task != MainQueueTask).Select(p => p.Task);
+        public IEnumerable<TaskInfo> Tasks => Managers.Select(p => p.Task);
+
         private bool cancelQueue = false;
-        private CancellationTokenSource cancel;
-        private FFmpegManager ffmpeg = new FFmpegManager();
 
         public QueueManager()
         {
         }
-
 
         private IQueryable<TaskInfo> GetQueueTasks(FFmpegDbContext db)
         {
@@ -43,7 +42,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public async void StartQueue()
         {
-            if (ProcessingTask != null)
+            if (MainQueueTask != null)
             {
                 Logger.Warn("队列正在运行，开始队列失败");
                 return;
@@ -57,104 +56,84 @@ namespace SimpleFFmpegGUI.Manager
 
                 var task = tasks[0];
 
-                ProcessingTask = task;
-                paused = false;
-                cancel = new CancellationTokenSource();
-                task.Status = TaskStatus.Processing;
-                task.StartTime = DateTime.Now;
-                task.Message = "";
-                try
-                {
-                    db.Update(task);
-                    db.SaveChanges();
-                    await ffmpeg.StartNewAsync(task, cancel.Token);
-                    task.Status = TaskStatus.Done;
-                }
-                catch (Exception ex)
-                {
-                    if (task.Status != TaskStatus.Cancel)
-                    {
-                        Logger.Error(task, "运行错误：" + ex.ToString());
-                        task.Status = TaskStatus.Error;
-                        task.Message = ex.Message;
-                    }
-                    else
-                    {
-                        Logger.Warn(task, "任务被取消");
-                    }
-                }
-                finally
-                {
-                    task.FinishTime = DateTime.Now;
-                    ProcessingTask = null;
-                }
-                db.Update(task);
-                db.SaveChanges();
+                await ProcessTaskAsync(db, task, true);
             }
             cancelQueue = false;
             Logger.Info("队列完成");
         }
 
-        public void Suspend()
+        private async Task ProcessTaskAsync(FFmpegDbContext db, TaskInfo task, bool queue)
         {
-            if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            FFmpegManager ffmpegManager = new FFmpegManager(task);
+            MainQueueTask = task;
+            taskProcessManagers.Add(ffmpegManager);
+
+            task.Status = TaskStatus.Processing;
+            task.StartTime = DateTime.Now;
+            task.Message = "";
+            db.Update(task);
+            db.SaveChanges();
+
+            try
             {
-                throw new PlatformNotSupportedException("暂停和恢复功能仅支持Windows");
+                await ffmpegManager.RunAsync();
+                task.Status = TaskStatus.Done;
             }
-            if (ffmpeg.Process == null)
+            catch (Exception ex)
             {
-                throw new Exception("进程还未启动，不可暂停");
+                if (task.Status != TaskStatus.Cancel)
+                {
+                    Logger.Error(task, "运行错误：" + ex.ToString());
+                    task.Status = TaskStatus.Error;
+                    task.Message = ex.Message;
+                }
+                else
+                {
+                    Logger.Warn(task, "任务被取消");
+                }
             }
-            if (ProcessingTask == null)
+            finally
             {
-                return;
+                task.FinishTime = DateTime.Now;
+                MainQueueTask = null;
+                taskProcessManagers.Remove(ffmpegManager);
             }
-            paused = true;
-            Logger.Info(ProcessingTask, "暂停队列");
-            pauseStartTime = DateTime.Now;
-            ProcessExtension.SuspendProcess(ffmpeg.Process.Id);
+            db.Update(task);
+            db.SaveChanges();
         }
 
-        public void Resume()
+        public void SuspendMainQueue()
         {
-            if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
-            {
-                throw new PlatformNotSupportedException("暂停和恢复功能仅支持Windows");
-            }
-            if (ffmpeg.Process == null)
-            {
-                throw new Exception("进程还未启动，不可暂停或恢复");
-            }
-            if (ProcessingTask == null)
-            {
-                return;
-            }
-            paused = false;
-            Progress.PauseTime = DateTime.Now - pauseStartTime;
-            Logger.Info(ProcessingTask, "恢复队列");
-            ProcessExtension.ResumeProcess(ffmpeg.Process.Id);
+            CheckMainQueueProcessingTaskManager();
+            MainQueueManager.Suspend();
+        }
+
+        public void ResumeMainQueue()
+        {
+            CheckMainQueueProcessingTaskManager();
+            MainQueueManager.Resume();
         }
 
         public void Cancel()
         {
-            Logger.Info("取消队列");
-            ProcessingTask.Status = TaskStatus.Cancel;
+            CheckMainQueueProcessingTaskManager();
             cancelQueue = true;
-            cancel.Cancel();
+
+            MainQueueManager.Cancel();
         }
 
         public void CancelCurrent()
         {
-            Logger.Info(ProcessingTask, "取消当前任务");
-            ProcessingTask.Status = TaskStatus.Cancel;
-            cancel.Cancel();
+            CheckMainQueueProcessingTaskManager();
+            MainQueueManager.Cancel();
         }
 
-        public event EventHandler<FFmpegOutputEventArgs> FFmpegOutput
+        private void CheckMainQueueProcessingTaskManager()
         {
-            add => ffmpeg.FFmpegOutput += value;
-            remove => ffmpeg.FFmpegOutput -= value;
+            if (!Managers.Any(p => p.Task == MainQueueTask))
+            {
+                throw new Exception("主队列未运行或当前任务正在准备中");
+            }
         }
-
     }
 }

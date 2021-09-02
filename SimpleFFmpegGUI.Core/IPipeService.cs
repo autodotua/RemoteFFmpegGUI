@@ -30,8 +30,6 @@ namespace SimpleFFmpegGUI
 
         MediaInfoDto GetInfo(string path);
 
-        string GetLastOutput();
-
         List<CodePreset> GetPresets();
 
         StatusDto GetStatus();
@@ -65,6 +63,7 @@ namespace SimpleFFmpegGUI
         bool IsFileExist(string path);
 
         VideoFormat[] GetSuggestedFormats();
+
         TaskInfo GetTask(int id);
     }
 }

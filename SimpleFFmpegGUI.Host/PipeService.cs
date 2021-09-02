@@ -17,27 +17,12 @@ namespace SimpleFFmpegGUI
 {
     public class PipeService : IPipeService
     {
-        static PipeService()
-        {
-            manager.FFmpegOutput += (p1, p2) =>
-            {
-                lastOutput = p2.Data;
-            };
-        }
-
         private static QueueManager manager = new QueueManager();
         public static QueueManager Manager => manager;
 
         public PipeService()
         {
             Logger.Info("实例化新的PipeService类");
-        }
-
-        private static string lastOutput;
-
-        public string GetLastOutput()
-        {
-            return lastOutput;
         }
 
         public void StartQueue()
@@ -47,12 +32,12 @@ namespace SimpleFFmpegGUI
 
         public void PauseQueue()
         {
-            manager.Suspend();
+            manager.SuspendMainQueue();
         }
 
         public void ResumeQueue()
         {
-            manager.Resume();
+            manager.ResumeMainQueue();
         }
 
         public int AddTask(TaskType type, List<InputArguments> inputs, string outputPath, OutputArguments arg, bool start)
@@ -111,8 +96,9 @@ namespace SimpleFFmpegGUI
 
         public StatusDto GetStatus()
         {
-            StatusDto status = manager.ProcessingTask == null ? new StatusDto()
-                : new StatusDto(manager.ProcessingTask, manager.Progress, lastOutput, manager.IsPaused);
+            StatusDto status = manager.MainQueueManager == null
+                ? new StatusDto()
+                : manager.MainQueueManager.GetStatus();
 
             return status;
         }

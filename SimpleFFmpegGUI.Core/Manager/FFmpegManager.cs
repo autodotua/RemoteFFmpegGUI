@@ -19,12 +19,31 @@ namespace SimpleFFmpegGUI.Manager
 {
     public class FFmpegManager
     {
+        public FFmpegManager(TaskInfo task)
+        {
+            this.task = task;
+        }
+
+        public TaskInfo Task => task;
+        private bool hasRun = false;
+        private DateTime pauseStartTime;
+        private bool paused = false;
         private static readonly Regex rSsim = new Regex(@"SSIM ([YUVAll]+:[0-9\.\(\) ]+)+", RegexOptions.Compiled);
         private static readonly Regex rPsnr = new Regex(@"PSNR (([yuvaverageminmax]+:[0-9\. ]+)+)", RegexOptions.Compiled);
-
+        private CancellationTokenSource cancel;
         public ProgressDto Progress { get; private set; }
-        private TaskInfo currentTask;
-        public FFmpegProcess Process { get; private set; }
+        private readonly TaskInfo task;
+        private FFmpegProcess Process { get; set; }
+        private string lastOutput;
+
+        public StatusDto GetStatus()
+        {
+            if (Process == null)
+            {
+                return new StatusDto();
+            }
+            return new StatusDto(task, Progress, lastOutput, paused);
+        }
 
         private TimeSpan GetVideoDuration(InputArguments arg)
         {
@@ -117,12 +136,12 @@ namespace SimpleFFmpegGUI.Manager
                               p.CopyChannel()
                               .WithBitStreamFilter(Channel.Video, Filter.H264_Mp4ToAnnexB)
                               .ForceFormat(VideoType.Ts));
-                await RunAsync(task, p, $"打包第{++i}个临时文件", cancellationToken);
+                await RunAsync(p, $"打包第{++i}个临时文件", cancellationToken);
             }
             return tsFiles;
         }
 
-        private async Task RunCodeProcessAsync(TaskInfo task, string tempDir, CancellationToken cancellationToken)
+        private async Task RunCodeProcessAsync(string tempDir, CancellationToken cancellationToken)
         {
             FFMpegArguments f = null;
             string message = null;
@@ -139,10 +158,10 @@ namespace SimpleFFmpegGUI.Manager
             }
             task.Output = GetFileName(task.Arguments, task.Output);
             var p = f.OutputToFile(task.Output, true, a => ApplyOutputArguments(a, task.Arguments));
-            await RunAsync(task, p, message, cancellationToken);
+            await RunAsync(p, message, cancellationToken);
         }
 
-        private async Task RunConcatProcessAsync(TaskInfo task, string tempDir, CancellationToken cancellationToken)
+        private async Task RunConcatProcessAsync(string tempDir, CancellationToken cancellationToken)
         {
             FFMpegArguments f = null;
             string message = null;
@@ -160,7 +179,7 @@ namespace SimpleFFmpegGUI.Manager
 
                 task.Output = GetFileName(task.Arguments, task.Output);
                 var p = f.OutputToFile(task.Output, true, a => ApplyOutputArguments(a, task.Arguments));
-                await RunAsync(task, p, message, cancellationToken);
+                await RunAsync(p, message, cancellationToken);
             }
             else
             {
@@ -178,11 +197,11 @@ namespace SimpleFFmpegGUI.Manager
                 var p = FFMpegArguments.FromFileInput(tempPath, false,
                     o => o.WithCustomArgument("-f concat -safe 0"))
                      .OutputToFile(task.Output, true, o => o.CopyChannel(Channel.Both));
-                await RunAsync(task, p, message, cancellationToken);
+                await RunAsync(p, message, cancellationToken);
             }
         }
 
-        private async Task RunCombineProcessAsync(TaskInfo task, CancellationToken cancellationToken)
+        private async Task RunCombineProcessAsync(CancellationToken cancellationToken)
         {
             if (task.Inputs.Count() != 2)
             {
@@ -219,10 +238,10 @@ namespace SimpleFFmpegGUI.Manager
                     a.UsingShortest(true);
                 }
             });
-            await RunAsync(task, p, "正在合并音视频", cancellationToken);
+            await RunAsync(p, "正在合并音视频", cancellationToken);
         }
 
-        private async Task RunCompareProcessAsync(TaskInfo task, CancellationToken cancellationToken)
+        private async Task RunCompareProcessAsync(CancellationToken cancellationToken)
         {
             if (task.Inputs.Count() != 2)
             {
@@ -250,7 +269,7 @@ namespace SimpleFFmpegGUI.Manager
             string psnr = null;
             try
             {
-                await RunAsync(task, p, null, cancellationToken);
+                await RunAsync(p, null, cancellationToken);
                 if (ssim == null || psnr == null)
                 {
                     throw new Exception("对比视频失败，为识别到对比结果");
@@ -283,7 +302,7 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
-        private async Task RunCustomProcessAsync(TaskInfo task, CancellationToken cancellationToken)
+        private async Task RunCustomProcessAsync(CancellationToken cancellationToken)
         {
             Type type = typeof(FFMpegArguments);
             FFMpegArguments fa = Activator.CreateInstance(typeof(FFMpegArguments), true) as FFMpegArguments;
@@ -294,27 +313,28 @@ namespace SimpleFFmpegGUI.Manager
                      o.WithCustomArgument(task.Arguments.Extra);
                  });
 
-            await RunAsync(task, p, null, cancellationToken);
+            await RunAsync(p, null, cancellationToken);
         }
 
-        public async Task StartNewAsync(TaskInfo task, CancellationToken cancellationToken)
+        public async Task RunAsync()
         {
-            if (Process != null)
+            if (hasRun)
             {
-                throw new Exception("正在执行一个进程，单个实例不可同时执行多个进程");
+                throw new Exception("一个实例只可运行一次");
             }
-            currentTask = task ?? throw new ArgumentNullException(nameof(task));
+            hasRun = true;
+            cancel = new CancellationTokenSource();
             try
             {
                 Logger.Info(task, "开始任务");
                 string tempDir = ConfigHelper.TempDir;
                 await (task.Type switch
                 {
-                    TaskType.Code => RunCodeProcessAsync(task, tempDir, cancellationToken),
-                    TaskType.Combine => RunCombineProcessAsync(task, cancellationToken),
-                    TaskType.Compare => RunCompareProcessAsync(task, cancellationToken),
-                    TaskType.Custom => RunCustomProcessAsync(task, cancellationToken),
-                    TaskType.Concat => RunConcatProcessAsync(task, tempDir, cancellationToken),
+                    TaskType.Code => RunCodeProcessAsync(tempDir, cancel.Token),
+                    TaskType.Combine => RunCombineProcessAsync(cancel.Token),
+                    TaskType.Compare => RunCompareProcessAsync(cancel.Token),
+                    TaskType.Custom => RunCustomProcessAsync(cancel.Token),
+                    TaskType.Concat => RunConcatProcessAsync(tempDir, cancel.Token),
                     _ => throw new NotSupportedException("不支持的任务类型：" + task.Type),
                 });
 
@@ -336,7 +356,7 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
-        private async Task RunAsync(TaskInfo task, FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken)
+        private async Task RunAsync(FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -363,7 +383,8 @@ namespace SimpleFFmpegGUI.Manager
 
         private void Output(object sender, FFmpegOutputEventArgs e)
         {
-            Logger.Output(currentTask, e.Data);
+            lastOutput = e.Data;
+            Logger.Output(task, e.Data);
             FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(e.Data));
         }
 
@@ -522,5 +543,44 @@ namespace SimpleFFmpegGUI.Manager
         }
 
         public event EventHandler<FFmpegOutputEventArgs> FFmpegOutput;
+
+        public void Suspend()
+        {
+            if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("暂停和恢复功能仅支持Windows");
+            }
+            if (Process == null)
+            {
+                throw new Exception("进程还未启动，不可暂停");
+            }
+            paused = true;
+            Logger.Info(task, "暂停队列");
+            pauseStartTime = DateTime.Now;
+            ProcessExtension.SuspendProcess(Process.Id);
+        }
+
+        public void Resume()
+        {
+            if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("暂停和恢复功能仅支持Windows");
+            }
+            if (Process == null)
+            {
+                throw new Exception("进程还未启动，不可暂停或恢复");
+            }
+            paused = false;
+            Progress.PauseTime = DateTime.Now - pauseStartTime;
+            Logger.Info(task, "恢复队列");
+            ProcessExtension.ResumeProcess(Process.Id);
+        }
+
+        public void Cancel()
+        {
+            Logger.Info(task, "取消当前任务");
+            task.Status = TaskStatus.Cancel;
+            cancel.Cancel();
+        }
     }
 }

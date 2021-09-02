@@ -90,7 +90,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new ArgumentException($"找不到ID为{id}的任务");
             }
-            if (queue.ProcessingTask?.Id == id)
+            if (queue.Tasks.Any(p => p.Id == id))
             {
                 throw new Exception("ID为{id}的任务正在进行中");
             }
@@ -110,7 +110,7 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     continue;
                 }
-                if (queue.ProcessingTask?.Id == id)
+                if (queue.Tasks.Any(p => p.Id == id))
                 {
                     continue;
                 }
@@ -143,9 +143,9 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new Exception("ID为{id}的任务已完成并出现错误");
             }
-            if (queue.ProcessingTask?.Id == id)
+            if (queue.Tasks.Any(p => p.Id == task.Id))
             {
-                queue.CancelCurrent();
+                queue.Managers.First(p => p.Task.Id == task.Id).Cancel();
             }
             task.Status = TaskStatus.Cancel;
             db.Update(task);
@@ -175,9 +175,9 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     continue;
                 }
-                if (queue.ProcessingTask?.Id == id)
+                if (queue.Tasks.Any(p => p.Id == task.Id))
                 {
-                    queue.CancelCurrent();
+                    queue.Managers.First(p => p.Task.Id == task.Id).Cancel();
                 }
                 task.Status = TaskStatus.Cancel;
                 db.Update(task);
@@ -195,9 +195,9 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new ArgumentException($"找不到ID为{id}的任务");
             }
-            if (queue.ProcessingTask?.Id == id)
+            if (queue.Tasks.Any(p => p.Id == task.Id))
             {
-                queue.CancelCurrent();
+                queue.Managers.First(p => p.Task.Id == task.Id).Cancel();
             }
             task.IsDeleted = true;
             db.Update(task);
@@ -215,9 +215,9 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     continue;
                 }
-                if (queue.ProcessingTask?.Id == id)
+                if (queue.Tasks.Any(p => p.Id == task.Id))
                 {
-                    queue.CancelCurrent();
+                    queue.Managers.First(p => p.Task.Id == task.Id).Cancel();
                 }
                 task.IsDeleted = true;
                 db.Update(task);
