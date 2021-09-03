@@ -20,8 +20,8 @@
         </Grid.RowDefinitions>
 
         <ListView
-            ItemsSource="{Binding Tasks}"
-            SelectedItem="{Binding SelectedTask}">
+            ItemsSource="{Binding Tasks.Tasks}"
+            SelectedItem="{Binding Tasks.SelectedTask}">
             <ListView.ItemContainerStyle>
                 <Style
                     BasedOn="{StaticResource DefaultListViewItemStyle}"
@@ -55,13 +55,19 @@
                             Grid.Row="2"
                             Foreground="{Binding Color}"
                             Text="{Binding StatusText}" />
+                        <ProgressBar
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Maximum="1"
+                            Minimum="0"
+                            Value="{Binding Percent, Mode=OneWay}" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
         <Grid
             Grid.Row="2"
-            Visibility="{Binding SelectedTask, Converter={StaticResource NotNull2VisibleConverter}}">
+            Visibility="{Binding Tasks.SelectedTask, Converter={StaticResource NotNull2VisibleConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="8" />
@@ -69,13 +75,15 @@
             </Grid.ColumnDefinitions>
             <Grid
                 Margin="8"
-                DataContext="{Binding SelectedTask}">
+                DataContext="{Binding Tasks.SelectedTask}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="8" />
                     <RowDefinition Height="Auto" />
@@ -147,19 +155,30 @@
                     Grid.Row="12"
                     Grid.Column="2"
                     Text="{Binding FinishTime, StringFormat={StaticResource DateTimeFormat}}" />
+                <TextBlock
+                    Grid.Row="14"
+                    FontWeight="Bold"
+                    Text="信息" />
+                <TextBlock
+                    Grid.Row="14"
+                    Grid.Column="2"
+                    Text="{Binding Message}" />
             </Grid>
             <ui:SimpleStackPanel
                 Grid.Column="2"
                 VerticalAlignment="Center"
+                DataContext="{Binding Tasks.SelectedTask}"
                 Spacing="8">
                 <Button
                     HorizontalAlignment="Stretch"
                     Click="CancelButton_Click"
-                    Content="取消" />
+                    Content="取消"
+                    IsEnabled="{Binding CancelButtonEnabled}" />
                 <Button
                     HorizontalAlignment="Stretch"
                     Click="ResetButton_Click"
-                    Content="重置" />
+                    Content="重置"
+                    IsEnabled="{Binding ResetButtonEnabled}" />
                 <Button
                     HorizontalAlignment="Stretch"
                     Click="CloneButton_Click"

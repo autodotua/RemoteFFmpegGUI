@@ -30,60 +30,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public TaskListViewModel(QueueManager queue)
         {
             Queue = queue;
-            Refresh();
+            Tasks.Refresh();
         }
 
-        public void Refresh()
-        {
-            var tasks = TaskManager.GetTasks();
-            Tasks = new ObservableCollection<TaskInfoWithUI>(tasks.List.Adapt<List<TaskInfoWithUI>>());
-        }
-
-        private ObservableCollection<TaskInfoWithUI> tasks;
-
-        public ObservableCollection<TaskInfoWithUI> Tasks
-        {
-            get => tasks;
-            set => this.SetValueAndNotify(ref tasks, value, nameof(Tasks));
-        }
-
-        private TaskInfoWithUI selectedTask;
-
-        public TaskInfoWithUI SelectedTask
-        {
-            get => selectedTask;
-            set => this.SetValueAndNotify(ref selectedTask, value, nameof(SelectedTask));
-        }
+        public TasksAndStatuses Tasks => App.ServiceProvider.GetService<TasksAndStatuses>();
 
         public QueueManager Queue { get; }
 
-        private void UpdateTask(TaskInfoWithUI task)
-        {
-            TaskManager.GetTask(task.Id).Adapt(task);
-        }
-
-        public void DeleteTask()
-        {
-            Debug.Assert(SelectedTask != null);
-            TaskManager.DeleteTask(SelectedTask.Id, Queue);
-            Tasks.Remove(SelectedTask);
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public void ResetTask()
-        {
-            Debug.Assert(SelectedTask != null);
-            TaskManager.ResetTask(SelectedTask.Id, Queue);
-            UpdateTask(SelectedTask);
-        }
-
-        public void CancelTask()
-        {
-            Debug.Assert(SelectedTask != null);
-            TaskManager.CancelTask(SelectedTask.Id, Queue);
-            UpdateTask(SelectedTask);
-        }
     }
 
     public partial class TaskList : UserControl
@@ -98,19 +52,19 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.CancelTask();
+            App.ServiceProvider.GetService<TasksAndStatuses>().CancelTask();
         }
 
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             bool delete = true;
-            if (ViewModel.SelectedTask.Status == SimpleFFmpegGUI.Model.TaskStatus.Processing)
+            if (App.ServiceProvider.GetService<TasksAndStatuses>().SelectedTask.Status == SimpleFFmpegGUI.Model.TaskStatus.Processing)
             {
                 delete = await CommonDialog.ShowYesNoDialogAsync("删除", "任务正在处理，是否删除？");
             }
             if (delete)
             {
-                ViewModel.DeleteTask();
+                App.ServiceProvider.GetService<TasksAndStatuses>().DeleteTask();
             }
         }
 
@@ -120,12 +74,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.ResetTask();
+            App.ServiceProvider.GetService<TasksAndStatuses>().ResetTask();
         }
 
         public void Refresh()
         {
-            ViewModel.Refresh();
+            App.ServiceProvider.GetService<TasksAndStatuses>().Refresh();
         }
     }
 }

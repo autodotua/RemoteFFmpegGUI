@@ -26,5 +26,6 @@
         <Button Click="Button_Click">
             新建
         </Button>
+        <Button Click="StartButton_Click" Margin="0,60,0,0" Content="开始"/>
     </Grid>
 </Window>

@@ -35,13 +35,14 @@ namespace SimpleFFmpegGUI.Manager
         private readonly TaskInfo task;
         private FFmpegProcess Process { get; set; }
         private string lastOutput;
-        public EventHandler StatusChanged;
+
+        public event EventHandler StatusChanged;
 
         public StatusDto GetStatus()
         {
             if (Process == null)
             {
-                return new StatusDto();
+                return new StatusDto(task);
             }
             return new StatusDto(task, Progress, lastOutput, paused);
         }

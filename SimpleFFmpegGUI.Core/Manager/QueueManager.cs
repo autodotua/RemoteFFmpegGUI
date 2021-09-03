@@ -68,17 +68,16 @@ namespace SimpleFFmpegGUI.Manager
             Logger.Info("队列完成");
         }
 
-        private async Task ProcessTaskAsync(FFmpegDbContext db, TaskInfo task, bool queue)
+        private async Task ProcessTaskAsync(FFmpegDbContext db, TaskInfo task, bool main)
         {
             FFmpegManager ffmpegManager = new FFmpegManager(task);
-            AddManager(task, ffmpegManager, true);
 
             task.Status = TaskStatus.Processing;
             task.StartTime = DateTime.Now;
             task.Message = "";
             db.Update(task);
             db.SaveChanges();
-
+            AddManager(task, ffmpegManager, main);
             try
             {
                 await ffmpegManager.RunAsync();
@@ -100,8 +99,7 @@ namespace SimpleFFmpegGUI.Manager
             finally
             {
                 task.FinishTime = DateTime.Now;
-                MainQueueTask = null;
-                taskProcessManagers.Remove(ffmpegManager);
+                RemoveManager(task, ffmpegManager, main);
             }
             db.Update(task);
             db.SaveChanges();

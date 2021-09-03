@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
+using SimpleFFmpegGUI.WPF.Model;
 using SimpleFFmpegGUI.WPF.Panels;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,7 @@ namespace SimpleFFmpegGUI.WPF
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<QueueManager>();
+            services.AddSingleton<TasksAndStatuses>();
 
             services.AddSingleton<MainWindow>();
             services.AddSingleton<MainWindowViewModel>();

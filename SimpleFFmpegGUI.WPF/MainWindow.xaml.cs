@@ -32,11 +32,14 @@ namespace SimpleFFmpegGUI.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly QueueManager queue;
+
         public MainWindowViewModel ViewModel { get; set; }
 
-        public MainWindow(MainWindowViewModel viewModel)
+        public MainWindow(MainWindowViewModel viewModel, QueueManager queue)
         {
             InitializeComponent();
+            this.queue = queue;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -45,6 +48,11 @@ namespace SimpleFFmpegGUI.WPF
             dialog.Owner = this;
             dialog.TaskCreated += (s, e) => taskPanel.Refresh();
             dialog.Show();
+        }
+
+        private void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+            queue.StartQueue();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FzLib;
 using FzLib.WPF.Converters;
+using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
@@ -55,7 +56,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public string StatusText => Status switch
         {
-            TaskStatus.Processing => throw new NotImplementedException(),
+            TaskStatus.Processing => Percent .ToString("0.00%"),
             _ => Enum2DescriptionConverter.GetDescription(Status)
         };
 
@@ -68,7 +69,15 @@ namespace SimpleFFmpegGUI.WPF.Model
             TaskStatus.Cancel => Brushes.Gray,
         };
 
-        public double Percent => throw new NotImplementedException();
+        private StatusDto processStatus;
+
+        public StatusDto ProcessStatus
+        {
+            get => processStatus;
+            set => this.SetValueAndNotify(ref processStatus, value, nameof(ProcessStatus),nameof(Percent),nameof(Status),nameof(StatusText));
+        }
+
+        public double Percent => ProcessStatus == null || ProcessStatus.HasDetail == false ? 0 : ProcessStatus.Progress.Percent;
         public bool CancelButtonEnabled => Status is TaskStatus.Queue or TaskStatus.Processing;
         public bool ResetButtonEnabled => Status is TaskStatus.Done or TaskStatus.Cancel or TaskStatus.Error;
         private TaskType type;
