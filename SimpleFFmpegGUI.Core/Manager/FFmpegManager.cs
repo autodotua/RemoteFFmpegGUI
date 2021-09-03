@@ -35,6 +35,7 @@ namespace SimpleFFmpegGUI.Manager
         private readonly TaskInfo task;
         private FFmpegProcess Process { get; set; }
         private string lastOutput;
+        public EventHandler StatusChanged;
 
         public StatusDto GetStatus()
         {
@@ -386,6 +387,7 @@ namespace SimpleFFmpegGUI.Manager
             lastOutput = e.Data;
             Logger.Output(task, e.Data);
             FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(e.Data));
+            StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void ApplyInputArguments(FFMpegArgumentOptions fa, InputArguments a)

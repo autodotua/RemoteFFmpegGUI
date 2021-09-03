@@ -8,6 +8,7 @@ using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -28,6 +29,9 @@ namespace SimpleFFmpegGUI.Manager
         public IEnumerable<TaskInfo> Tasks => Managers.Select(p => p.Task);
 
         private bool cancelQueue = false;
+        private bool running = false;
+
+        public event NotifyCollectionChangedEventHandler TaskManagersChanged;
 
         public QueueManager()
         {
@@ -42,11 +46,12 @@ namespace SimpleFFmpegGUI.Manager
 
         public async void StartQueue()
         {
-            if (MainQueueTask != null)
+            if (running)
             {
                 Logger.Warn("队列正在运行，开始队列失败");
                 return;
             }
+            running = true;
             Logger.Info("开始队列");
             using FFmpegDbContext db = FFmpegDbContext.GetNew();
             List<TaskInfo> tasks;
@@ -58,6 +63,7 @@ namespace SimpleFFmpegGUI.Manager
 
                 await ProcessTaskAsync(db, task, true);
             }
+            running = false;
             cancelQueue = false;
             Logger.Info("队列完成");
         }
@@ -65,8 +71,7 @@ namespace SimpleFFmpegGUI.Manager
         private async Task ProcessTaskAsync(FFmpegDbContext db, TaskInfo task, bool queue)
         {
             FFmpegManager ffmpegManager = new FFmpegManager(task);
-            MainQueueTask = task;
-            taskProcessManagers.Add(ffmpegManager);
+            AddManager(task, ffmpegManager, true);
 
             task.Status = TaskStatus.Processing;
             task.StartTime = DateTime.Now;
@@ -100,6 +105,29 @@ namespace SimpleFFmpegGUI.Manager
             }
             db.Update(task);
             db.SaveChanges();
+        }
+
+        private void AddManager(TaskInfo task, FFmpegManager ffmpegManager, bool main)
+        {
+            taskProcessManagers.Add(ffmpegManager);
+            if (main)
+            {
+                MainQueueTask = task;
+            }
+            TaskManagersChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, ffmpegManager));
+        }
+
+        private void RemoveManager(TaskInfo task, FFmpegManager ffmpegManager, bool main)
+        {
+            if (!taskProcessManagers.Remove(ffmpegManager))
+            {
+                throw new Exception("管理器未在管理器集合中");
+            }
+            if (main)
+            {
+                MainQueueTask = null;
+            }
+            TaskManagersChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, ffmpegManager));
         }
 
         public void SuspendMainQueue()

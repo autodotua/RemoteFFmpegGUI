@@ -43,7 +43,8 @@ namespace SimpleFFmpegGUI.WPF
         {
             var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
             dialog.Owner = this;
-            dialog.ShowDialog();
+            dialog.TaskCreated += (s, e) => taskPanel.Refresh();
+            dialog.Show();
         }
     }
 }

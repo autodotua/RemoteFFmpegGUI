@@ -1,9 +1,11 @@
 ﻿using FzLib;
-using FzLib.WPF.Converters;
+using Mapster;
 using Microsoft.Extensions.DependencyInjection;
+using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF;
+using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,11 +20,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
-using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
 namespace SimpleFFmpegGUI.WPF.Panels
 {
@@ -30,19 +29,61 @@ namespace SimpleFFmpegGUI.WPF.Panels
     {
         public TaskListViewModel(QueueManager queue)
         {
-            var tasks = TaskManager.GetTasks();
-            Tasks = new ObservableCollection<TaskInfo>(tasks.List);
+            Queue = queue;
+            Refresh();
         }
 
-        private ObservableCollection<TaskInfo> tasks;
+        public void Refresh()
+        {
+            var tasks = TaskManager.GetTasks();
+            Tasks = new ObservableCollection<TaskInfoWithUI>(tasks.List.Adapt<List<TaskInfoWithUI>>());
+        }
 
-        public ObservableCollection<TaskInfo> Tasks
+        private ObservableCollection<TaskInfoWithUI> tasks;
+
+        public ObservableCollection<TaskInfoWithUI> Tasks
         {
             get => tasks;
             set => this.SetValueAndNotify(ref tasks, value, nameof(Tasks));
         }
 
+        private TaskInfoWithUI selectedTask;
+
+        public TaskInfoWithUI SelectedTask
+        {
+            get => selectedTask;
+            set => this.SetValueAndNotify(ref selectedTask, value, nameof(SelectedTask));
+        }
+
+        public QueueManager Queue { get; }
+
+        private void UpdateTask(TaskInfoWithUI task)
+        {
+            TaskManager.GetTask(task.Id).Adapt(task);
+        }
+
+        public void DeleteTask()
+        {
+            Debug.Assert(SelectedTask != null);
+            TaskManager.DeleteTask(SelectedTask.Id, Queue);
+            Tasks.Remove(SelectedTask);
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public void ResetTask()
+        {
+            Debug.Assert(SelectedTask != null);
+            TaskManager.ResetTask(SelectedTask.Id, Queue);
+            UpdateTask(SelectedTask);
+        }
+
+        public void CancelTask()
+        {
+            Debug.Assert(SelectedTask != null);
+            TaskManager.CancelTask(SelectedTask.Id, Queue);
+            UpdateTask(SelectedTask);
+        }
     }
 
     public partial class TaskList : UserControl
@@ -54,64 +95,37 @@ namespace SimpleFFmpegGUI.WPF.Panels
         }
 
         public TaskListViewModel ViewModel => App.ServiceProvider.GetService<TaskListViewModel>();
-    }
 
-    public class TaskDescriptionConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            TaskInfo task = value as TaskInfo;
-            Debug.Assert(task != null);
-            switch (parameter as string)
+            ViewModel.CancelTask();
+        }
+
+        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            bool delete = true;
+            if (ViewModel.SelectedTask.Status == SimpleFFmpegGUI.Model.TaskStatus.Processing)
             {
-                case "IO":
-                    return $"{Convert(task, targetType, nameof(task.Inputs), culture)} → {Convert(task, targetType, nameof(task.Output), culture)}";
-
-                case nameof(TaskInfo.Inputs):
-                    var inputs = task.Inputs;
-                    if (inputs.Count == 0)
-                    {
-                        return "未指定输入";
-                    }
-                    string path = System.IO.Path.GetFileName(inputs[0].FilePath);
-                    return inputs.Count == 1 ? path : (path + "等");
-
-                case nameof(TaskInfo.Output):
-                    var output = task.Output;
-                    if (output == null)
-                    {
-                        return "未指定输出";
-                    }
-                    return System.IO.Path.GetFileName(output);
-
-                case nameof(TaskInfo.Status):
-                    return task.Status switch
-                    {
-                        TaskStatus.Processing => throw new NotImplementedException(),
-                        _ => Enum2DescriptionConverter.GetDescription(task.Status)
-                    };
-
-                case "Color":
-                    return task.Status switch
-                    {
-                        TaskStatus.Queue => App.Current.FindResource("SystemControlForegroundBaseHighBrush") as Brush,
-                        TaskStatus.Processing => Brushes.Orange,
-                        TaskStatus.Done => Brushes.Green,
-                        TaskStatus.Error => Brushes.Red,
-                        TaskStatus.Cancel => Brushes.Gray,
-                    };
-
-                case "Percent":
-                    throw new NotImplementedException();
-
-                default:
-                    throw new NotSupportedException();
+                delete = await CommonDialog.ShowYesNoDialogAsync("删除", "任务正在处理，是否删除？");
+            }
+            if (delete)
+            {
+                ViewModel.DeleteTask();
             }
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        private void CloneButton_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+        }
+
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.ResetTask();
+        }
+
+        public void Refresh()
+        {
+            ViewModel.Refresh();
         }
     }
 }

@@ -20,7 +20,9 @@
             <ColumnDefinition Width="8" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <panels:TaskList Grid.Column="2" />
+        <panels:TaskList
+            x:Name="taskPanel"
+            Grid.Column="2" />
         <Button Click="Button_Click">
             新建
         </Button>

@@ -5,7 +5,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class FormatArgumentWithSwitch : ITempArguments
     {
-        private bool enableFormat;
+        private bool enableFormat = true;
 
         public bool EnableFormat
         {

@@ -85,6 +85,15 @@ namespace SimpleFFmpegGUI.WPF.Panels
             get => canChangeInputsCount;
             set => this.SetValueAndNotify(ref canChangeInputsCount, value, nameof(CanChangeInputsCount));
         }
+
+        public void Reset()
+        {
+            Inputs.Clear();
+            while(Inputs.Count< MinInputsCount)
+            {
+                Inputs.Add(new InputArgumentsDetail());
+            }
+        }
     }
 
     public partial class FileIOPanel : UserControl
@@ -109,6 +118,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public string GetOutput()
         {
             return ViewModel.Output;
+        }
+        public void Reset()
+        {
+            ViewModel.Reset();
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -158,6 +171,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             string path = new FileFilterCollection().AddAll().CreateSaveFileDialog().GetFilePath();
             if (path != null)
             {
+                path = path.RemoveEnd(".*");
                 ViewModel.Output = path;
             }
         }

@@ -6,20 +6,22 @@
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:SimpleFFmpegGUI.Model;assembly=SimpleFFmpegGUI.Core"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:uimodel="clr-namespace:SimpleFFmpegGUI.WPF.Model"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Grid>
-        <Grid.Resources>
-            <local:TaskDescriptionConverter x:Key="TaskDescriptionConverter" />
-        </Grid.Resources>
+        <Grid.Resources />
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ListView ItemsSource="{Binding Tasks}">
+        <ListView
+            ItemsSource="{Binding Tasks}"
+            SelectedItem="{Binding SelectedTask}">
             <ListView.ItemContainerStyle>
                 <Style
                     BasedOn="{StaticResource DefaultListViewItemStyle}"
@@ -30,7 +32,7 @@
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
-                <DataTemplate DataType="{x:Type model:TaskInfo}">
+                <DataTemplate DataType="{x:Type uimodel:TaskInfoWithUI}">
 
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -48,20 +50,125 @@
                         <TextBlock Text="{Binding Type, Converter={StaticResource Enum2DescriptionConverter}}" />
                         <TextBlock
                             Grid.Column="2"
-                            Text="{Binding ., Converter={StaticResource TaskDescriptionConverter}, ConverterParameter=IO}" />
-                        <!--<TextBlock
-                            Grid.Column="2"
-                            Text="{Binding Inputs, Converter={StaticResource TaskDescriptionConverter}, ConverterParameter=Inputs}" />
-                        <TextBlock
-                            Grid.Column="4"
-                            Text="{Binding Output, Converter={StaticResource TaskDescriptionConverter}, ConverterParameter=Output}" />-->
+                            Text="{Binding IOText}" />
                         <TextBlock
                             Grid.Row="2"
-                            Foreground="{Binding ., Converter={StaticResource TaskDescriptionConverter}, ConverterParameter=Color}"
-                            Text="{Binding ., Converter={StaticResource TaskDescriptionConverter}, ConverterParameter=Status}" />
+                            Foreground="{Binding Color}"
+                            Text="{Binding StatusText}" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        <Grid
+            Grid.Row="2"
+            Visibility="{Binding SelectedTask, Converter={StaticResource NotNull2VisibleConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid
+                Margin="8"
+                DataContext="{Binding SelectedTask}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Grid.Row="0"
+                    FontWeight="Bold"
+                    Text="类型" />
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Text="{Binding Type, Converter={StaticResource Enum2DescriptionConverter}}" />
+                <TextBlock
+                    Grid.Row="2"
+                    FontWeight="Bold"
+                    Text="状态" />
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Text="{Binding Status, Converter={StaticResource Enum2DescriptionConverter}}" />
+                <TextBlock
+                    Grid.Row="4"
+                    FontWeight="Bold"
+                    Text="输入" />
+                <TextBlock
+                    Grid.Row="4"
+                    Grid.Column="4"
+                    Text="{Binding InputsText}" />
+                <TextBlock
+                    Grid.Row="6"
+                    FontWeight="Bold"
+                    Text="输出" />
+                <TextBlock
+                    Grid.Row="6"
+                    Grid.Column="2"
+                    Text="{Binding OutputText}" />
+
+                <TextBlock
+                    Grid.Row="8"
+                    FontWeight="Bold"
+                    Text="创建时间" />
+                <TextBlock
+                    Grid.Row="8"
+                    Grid.Column="2"
+                    Text="{Binding CreateTime, StringFormat={StaticResource DateTimeFormat}}" />
+                <TextBlock
+                    Grid.Row="10"
+                    FontWeight="Bold"
+                    Text="开始时间" />
+                <TextBlock
+                    Grid.Row="10"
+                    Grid.Column="2"
+                    Text="{Binding StartTime, StringFormat={StaticResource DateTimeFormat}}" />
+                <TextBlock
+                    Grid.Row="12"
+                    FontWeight="Bold"
+                    Text="结束时间" />
+                <TextBlock
+                    Grid.Row="12"
+                    Grid.Column="2"
+                    Text="{Binding FinishTime, StringFormat={StaticResource DateTimeFormat}}" />
+            </Grid>
+            <ui:SimpleStackPanel
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Spacing="8">
+                <Button
+                    HorizontalAlignment="Stretch"
+                    Click="CancelButton_Click"
+                    Content="取消" />
+                <Button
+                    HorizontalAlignment="Stretch"
+                    Click="ResetButton_Click"
+                    Content="重置" />
+                <Button
+                    HorizontalAlignment="Stretch"
+                    Click="CloneButton_Click"
+                    Content="建立副本" />
+                <Button
+                    HorizontalAlignment="Stretch"
+                    Click="DeleteButton_Click"
+                    Content="删除" />
+            </ui:SimpleStackPanel>
+        </Grid>
     </Grid>
 </UserControl>
