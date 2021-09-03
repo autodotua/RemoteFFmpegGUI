@@ -38,8 +38,8 @@ namespace SimpleFFmpegGUI.WPF
             services.AddSingleton<TasksAndStatuses>();
 
             services.AddSingleton<MainWindow>();
-            services.AddSingleton<MainWindowViewModel>();
-            services.AddSingleton<TaskListViewModel>();
+            services.AddTransient<MainWindowViewModel>();
+            services.AddTransient<TaskListViewModel>();
 
             services.AddTransient<AddTaskWindow>();
 
@@ -47,6 +47,7 @@ namespace SimpleFFmpegGUI.WPF
             services.AddTransient<FileIOPanelViewModel>();
             services.AddSingleton<AddTaskWindowViewModel>();
             services.AddTransient<PresetsPanelViewModel>();
+            services.AddTransient<StatusPanelViewModel>();
         }
     }
 }

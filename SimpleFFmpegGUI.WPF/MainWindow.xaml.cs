@@ -54,5 +54,16 @@ namespace SimpleFFmpegGUI.WPF
         {
             queue.StartQueue();
         }
+
+        private void Button_Click1(object sender, RoutedEventArgs e)
+        {
+            queue.MainQueueManager.Suspend();
+        }
+
+        private void Button_Click2(object sender, RoutedEventArgs e)
+        {
+
+            queue.MainQueueManager.Resume();
+        }
     }
 }

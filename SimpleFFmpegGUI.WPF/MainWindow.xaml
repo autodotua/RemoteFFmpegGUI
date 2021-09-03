@@ -18,14 +18,28 @@
             <ColumnDefinition Width="8" />
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="1.5*" />
         </Grid.ColumnDefinitions>
         <panels:TaskList
             x:Name="taskPanel"
             Grid.Column="2" />
-        <Button Click="Button_Click">
-            新建
-        </Button>
-        <Button Click="StartButton_Click" Margin="0,60,0,0" Content="开始"/>
+        <panels:StatusPanel
+            x:Name="statusPanel"
+            Grid.Column="4" />
+        <Button
+            Click="Button_Click"
+            Content="新建" />
+        <Button
+            Margin="0,60,0,0"
+            Click="StartButton_Click"
+            Content="开始" />
+        <Button
+            Margin="0,120,0,0"
+            Click="Button_Click1"
+            Content="开始222" />
+        <Button
+            Margin="0,180,0,0"
+            Click="Button_Click2"
+            Content="开始22222" />
     </Grid>
 </Window>

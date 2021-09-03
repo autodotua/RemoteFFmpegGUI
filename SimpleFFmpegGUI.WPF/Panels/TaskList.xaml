@@ -21,6 +21,7 @@
 
         <ListView
             ItemsSource="{Binding Tasks.Tasks}"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             SelectedItem="{Binding Tasks.SelectedTask}">
             <ListView.ItemContainerStyle>
                 <Style
@@ -29,18 +30,52 @@
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="Padding" Value="8" />
                     <Setter Property="Margin" Value="0,0,16,0" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListViewItem">
+                                <Border
+                                    x:Name="Bd"
+                                    Padding="{TemplateBinding Padding}"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="2"
+                                    CornerRadius="4"
+                                    SnapsToDevicePixels="true">
+                                    <ContentPresenter
+                                        x:Name="ContentPresenter"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
+                                        <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ListViewItemForegroundPointerOver}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource ListViewItemForegroundSelected}" />
+                                        <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ListViewItemForegroundSelected}" />
+                                    </Trigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsSelected" Value="True" />
+                                            <Condition Property="IsMouseOver" Value="True" />
+                                        </MultiTrigger.Conditions>
+                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ListViewItemBackgroundSelectedPointerOver}" />
+                                    </MultiTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
-                <DataTemplate DataType="{x:Type uimodel:TaskInfoWithUI}">
-
-                    <Grid>
+                <DataTemplate DataType="{x:Type uimodel:UITaskInfo}">
+                    <Grid HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="64" />
                             <ColumnDefinition Width="8" />
                             <ColumnDefinition Width="2*" />
-                            <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -50,7 +85,8 @@
                         <TextBlock Text="{Binding Type, Converter={StaticResource Enum2DescriptionConverter}}" />
                         <TextBlock
                             Grid.Column="2"
-                            Text="{Binding IOText}" />
+                            Text="{Binding IOText}"
+                            TextTrimming="CharacterEllipsis" />
                         <TextBlock
                             Grid.Row="2"
                             Foreground="{Binding Color}"
@@ -70,7 +106,7 @@
             Visibility="{Binding Tasks.SelectedTask, Converter={StaticResource NotNull2VisibleConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="16" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid
@@ -79,7 +115,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -121,7 +157,8 @@
                 <TextBlock
                     Grid.Row="4"
                     Grid.Column="4"
-                    Text="{Binding InputsText}" />
+                    Text="{Binding InputsText}"
+                    TextTrimming="CharacterEllipsis" />
                 <TextBlock
                     Grid.Row="6"
                     FontWeight="Bold"
@@ -129,7 +166,8 @@
                 <TextBlock
                     Grid.Row="6"
                     Grid.Column="2"
-                    Text="{Binding OutputText}" />
+                    Text="{Binding OutputText}"
+                    TextTrimming="CharacterEllipsis" />
 
                 <TextBlock
                     Grid.Row="8"

@@ -1,7 +1,9 @@
 ﻿using FzLib;
+using FzLib.Collection;
 using Mapster;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
+using SimpleFFmpegGUI.Model;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,9 +12,33 @@ using System.Linq;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
+    //public class UITaskStatus : StatusDto
+    //{
+    //    public UITaskStatus()
+    //    {
+    //    }
+
+    //    public UITaskStatus(TaskInfo task) : base(task)
+    //    {
+    //    }
+
+    //    public string Title
+    //    {
+    //        get
+    //        {
+    //        }
+    //    }
+
+    //    public void Update(StatusDto status)
+    //    {
+    //        status.Adapt(this);
+    //        this.Notify(nameof(Title));
+    //    }
+    //}
+
     public class TasksAndStatuses : INotifyPropertyChanged
     {
-        private ObservableCollection<TaskInfoWithUI> tasks;
+        private ObservableCollection<UITaskInfo> tasks;
 
         public TasksAndStatuses(QueueManager queue)
         {
@@ -27,18 +53,19 @@ namespace SimpleFFmpegGUI.WPF.Model
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
                 var manager = e.NewItems[0] as FFmpegManager;
-                var status = new StatusDto(manager.Task);
-                taskID2Status.Add(manager.Task.Id, status);
+                var unstartStatus = new StatusDto(manager.Task);
+                taskID2Status.AddOrSetValue(manager.Task.Id, unstartStatus);
                 var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);
                 Debug.Assert(task != null);
                 UpdateTask(task);
+                task.ProcessStatus = unstartStatus;
                 if (manager == Queue.MainQueueManager)
                 {
-                    Statuses.Insert(0, status);
+                    Statuses.Insert(0, unstartStatus);
                 }
                 else
                 {
-                    Statuses.Add(status);
+                    Statuses.Add(unstartStatus);
                 }
                 manager.StatusChanged += Manager_StatusChanged;
             }
@@ -56,6 +83,15 @@ namespace SimpleFFmpegGUI.WPF.Model
                 Statuses.Remove(status);
                 manager.StatusChanged -= Manager_StatusChanged;
             }
+            ProcessingTasks = Tasks.Where(p => p.ProcessStatus != null).ToList();
+        }
+
+        private List<UITaskInfo> processingTasks;
+
+        public List<UITaskInfo> ProcessingTasks
+        {
+            get => processingTasks;
+            private set => this.SetValueAndNotify(ref processingTasks, value, nameof(ProcessingTasks));
         }
 
         private void Manager_StatusChanged(object sender, System.EventArgs e)
@@ -67,7 +103,6 @@ namespace SimpleFFmpegGUI.WPF.Model
 
             var task = Tasks.FirstOrDefault(p => p.Id == newStatus.Task.Id);
             Debug.Assert(task != null);
-            task.ProcessStatus = newStatus;
 
             newStatus.Adapt(status);
         }
@@ -75,10 +110,10 @@ namespace SimpleFFmpegGUI.WPF.Model
         public void Refresh()
         {
             var tasks = TaskManager.GetTasks();
-            Tasks = new ObservableCollection<TaskInfoWithUI>(tasks.List.Adapt<List<TaskInfoWithUI>>());
+            Tasks = new ObservableCollection<UITaskInfo>(tasks.List.Adapt<List<UITaskInfo>>());
         }
 
-        public ObservableCollection<TaskInfoWithUI> Tasks
+        public ObservableCollection<UITaskInfo> Tasks
         {
             get => tasks;
             set => this.SetValueAndNotify(ref tasks, value, nameof(Tasks));
@@ -90,7 +125,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void UpdateTask(TaskInfoWithUI task)
+        private void UpdateTask(UITaskInfo task)
         {
             TaskManager.GetTask(task.Id).Adapt(task);
         }
@@ -116,9 +151,9 @@ namespace SimpleFFmpegGUI.WPF.Model
             UpdateTask(SelectedTask);
         }
 
-        private TaskInfoWithUI selectedTask;
+        private UITaskInfo selectedTask;
 
-        public TaskInfoWithUI SelectedTask
+        public UITaskInfo SelectedTask
         {
             get => selectedTask;
             set => this.SetValueAndNotify(ref selectedTask, value, nameof(SelectedTask));

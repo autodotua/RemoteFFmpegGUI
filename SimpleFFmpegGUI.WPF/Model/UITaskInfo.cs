@@ -12,7 +12,7 @@ using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
-    public class TaskInfoWithUI : ModelBase, INotifyPropertyChanged
+    public class UITaskInfo : ModelBase, INotifyPropertyChanged
     {
         public string IOText => $"{InputText} → {OutputText}";
 
@@ -56,7 +56,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public string StatusText => Status switch
         {
-            TaskStatus.Processing => Percent .ToString("0.00%"),
+            TaskStatus.Processing => Percent.ToString("0.00%"),
             _ => Enum2DescriptionConverter.GetDescription(Status)
         };
 
@@ -74,7 +74,11 @@ namespace SimpleFFmpegGUI.WPF.Model
         public StatusDto ProcessStatus
         {
             get => processStatus;
-            set => this.SetValueAndNotify(ref processStatus, value, nameof(ProcessStatus),nameof(Percent),nameof(Status),nameof(StatusText));
+            set => this.SetValueAndNotify(ref processStatus, value,
+                nameof(ProcessStatus),
+                nameof(Percent),
+                nameof(Status),
+                nameof(StatusText));
         }
 
         public double Percent => ProcessStatus == null || ProcessStatus.HasDetail == false ? 0 : ProcessStatus.Progress.Percent;
