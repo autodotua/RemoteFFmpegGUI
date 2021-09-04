@@ -17,7 +17,7 @@ namespace SimpleFFmpegGUI.WPF
             builder.Background(Brushes.Green)
                        .HasMessage(message)
                        .Animates(true)
-                       .Dismiss().WithDelay(2000)
+                       .Dismiss().WithDelay(3000)
                        .Queue();
         }
 
@@ -28,6 +28,14 @@ namespace SimpleFFmpegGUI.WPF
                        .Animates(true)
                        .Dismiss().WithDelay(5000)
                        .Dismiss().WithButton("详情", b => CommonDialog.ShowErrorDialogAsync(ex))
+                       .Queue();
+        }
+           public static void QueueError(this NotificationMessageBuilder builder, string message)
+        {
+            builder.Background("#B71C1C")
+                       .HasMessage(message)
+                       .Animates(true)
+                       .Dismiss().WithDelay(5000)
                        .Queue();
         }
 

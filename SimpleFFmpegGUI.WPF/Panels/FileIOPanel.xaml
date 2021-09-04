@@ -25,7 +25,6 @@
             <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ScrollViewer
             Padding="0,0,18,0"
@@ -139,22 +138,6 @@
                 Click="BrowseOutputFileButton_Click">
                 <ui:SymbolIcon Symbol="BrowsePhotos" />
             </Button>
-        </Grid>
-        <Grid Grid.Row="4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="8" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Button
-                HorizontalAlignment="Stretch"
-                Click="AddButton_Click"
-                Content="新增" />
-            <Button
-                Grid.Column="2"
-                HorizontalAlignment="Stretch"
-                Click="BrowseAndAddButton_Click"
-                Content="浏览并新增" />
         </Grid>
     </Grid>
 </UserControl>

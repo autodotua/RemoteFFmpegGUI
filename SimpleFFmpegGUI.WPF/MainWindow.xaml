@@ -7,39 +7,43 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Title="MainWindow"
+    Title="FFmpeg 工具箱"
     Width="1200"
     Height="600"
     ui:WindowHelper.UseModernWindowStyle="True"
     mc:Ignorable="d">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
             <ColumnDefinition Width="8" />
             <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="1.5*" />
         </Grid.ColumnDefinitions>
         <panels:TaskList
             x:Name="taskPanel"
-            Grid.Column="2" />
+            Grid.Column="0" />
         <panels:StatusPanel
             x:Name="statusPanel"
-            Grid.Column="4" />
-        <Button
-            Click="Button_Click"
-            Content="新建" />
-        <Button
-            Margin="0,60,0,0"
-            Click="StartButton_Click"
-            Content="开始" />
-        <Button
-            Margin="0,120,0,0"
-            Click="Button_Click1"
-            Content="开始222" />
-        <Button
-            Margin="0,180,0,0"
-            Click="Button_Click2"
-            Content="开始22222" />
+            Grid.Column="2" />
+
+        <ui:CommandBar
+            Grid.Row="2"
+            Grid.ColumnSpan="99">
+
+            <ui:AppBarButton
+                Click="StartButton_Click"
+                Icon="Play"
+                IsEnabled="{Binding CanStartMainQueue}"
+                Label="开始队列" />
+            <ui:AppBarButton
+                Click="Button_Click"
+                Icon="Add"
+                Label="创建任务" />
+
+        </ui:CommandBar>
     </Grid>
 </Window>

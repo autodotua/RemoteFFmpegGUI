@@ -82,6 +82,12 @@ namespace SimpleFFmpegGUI.Manager
             return task;
         }
 
+        public static bool HasQueueTasks()
+        {
+            using var db = FFmpegDbContext.GetNew();
+            return db.Tasks.Any(p => p.IsDeleted == false && p.Status == TaskStatus.Queue);
+        }
+
         public static void ResetTask(int id, QueueManager queue)
         {
             using var db = FFmpegDbContext.GetNew();

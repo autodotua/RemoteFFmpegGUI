@@ -11,31 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 
 namespace SimpleFFmpegGUI.WPF.Model
-{
-    //public class UITaskStatus : StatusDto
-    //{
-    //    public UITaskStatus()
-    //    {
-    //    }
-
-    //    public UITaskStatus(TaskInfo task) : base(task)
-    //    {
-    //    }
-
-    //    public string Title
-    //    {
-    //        get
-    //        {
-    //        }
-    //    }
-
-    //    public void Update(StatusDto status)
-    //    {
-    //        status.Adapt(this);
-    //        this.Notify(nameof(Title));
-    //    }
-    //}
-
+{ 
     public class TasksAndStatuses : INotifyPropertyChanged
     {
         private ObservableCollection<UITaskInfo> tasks;
@@ -46,19 +22,17 @@ namespace SimpleFFmpegGUI.WPF.Model
             queue.TaskManagersChanged += Queue_TaskManagersChanged;
         }
 
-        private Dictionary<int, StatusDto> taskID2Status = new Dictionary<int, StatusDto>();
-
         private void Queue_TaskManagersChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
                 var manager = e.NewItems[0] as FFmpegManager;
                 var unstartStatus = new StatusDto(manager.Task);
-                taskID2Status.AddOrSetValue(manager.Task.Id, unstartStatus);
                 var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);
                 Debug.Assert(task != null);
                 UpdateTask(task);
                 task.ProcessStatus = unstartStatus;
+                task.ProcessManager = manager;
                 if (manager == Queue.MainQueueManager)
                 {
                     Statuses.Insert(0, unstartStatus);
@@ -77,6 +51,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
                 var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);
                 Debug.Assert(task != null);
+                task.ProcessManager = null;
                 task.ProcessStatus = null;
                 UpdateTask(task);
 
@@ -97,14 +72,13 @@ namespace SimpleFFmpegGUI.WPF.Model
         private void Manager_StatusChanged(object sender, System.EventArgs e)
         {
             var manager = sender as FFmpegManager;
-            var status = taskID2Status.GetValueOrDefault(manager.Task.Id);
-            Debug.Assert(status != null);
             var newStatus = manager.GetStatus();
 
             var task = Tasks.FirstOrDefault(p => p.Id == newStatus.Task.Id);
             Debug.Assert(task != null);
+            Debug.Assert(task.ProcessStatus != null);
 
-            newStatus.Adapt(status);
+            newStatus.Adapt(task.ProcessStatus);
         }
 
         public void Refresh()

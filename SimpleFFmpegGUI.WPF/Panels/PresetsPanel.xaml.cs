@@ -68,7 +68,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public CodeArgumentsPanelViewModel CodeArgumentsViewModel { get; set; }
 
-        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+        public async Task SaveToPresetAsync()
         {
             Debug.Assert(CodeArgumentsViewModel != null);
             var name = await CommonDialog.ShowInputDialogAsync("请输入新预设的名称");

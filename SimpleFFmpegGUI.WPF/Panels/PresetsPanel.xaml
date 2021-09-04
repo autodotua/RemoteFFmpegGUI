@@ -22,8 +22,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
+            <!--<RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />-->
         </Grid.RowDefinitions>
         <ScrollViewer
             Padding="0,0,18,0"
@@ -66,10 +66,10 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-        <Button
+        <!--<Button
             Grid.Row="2"
             HorizontalAlignment="Stretch"
             Click="SaveButton_Click"
-            Content="保存为预设" />
+            Content="保存为预设" />-->
     </Grid>
 </UserControl>

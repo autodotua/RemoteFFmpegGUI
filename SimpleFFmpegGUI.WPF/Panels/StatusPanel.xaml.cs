@@ -52,7 +52,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<TasksAndStatuses>().CancelTask();
+            UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
+            Debug.Assert(task != null);
+            Debug.Assert(task.ProcessManager != null);
+            task.ProcessManager.Cancel();
         }
 
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -68,18 +71,23 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
         }
 
-        private void CloneButton_Click(object sender, RoutedEventArgs e)
+
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
+            UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
+            Debug.Assert(task != null);
+            Debug.Assert(task.ProcessManager != null);
+            task.ProcessManager.Suspend();
         }
 
-        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        private void ResumeButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<TasksAndStatuses>().ResetTask();
-        }
+            UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
+            Debug.Assert(task != null);
+            Debug.Assert(task.ProcessManager != null);
+            task.ProcessManager.Resume();
 
-        public void Refresh()
-        {
-            App.ServiceProvider.GetService<TasksAndStatuses>().Refresh();
         }
     }
 }

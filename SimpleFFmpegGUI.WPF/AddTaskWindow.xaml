@@ -4,17 +4,17 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
-    xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
+    xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Title="新建任务"
+    Title="新建任务 - FFmpeg 工具箱"
     Width="1280"
     Height="640"
     ui:WindowHelper.UseModernWindowStyle="True"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
-    <Grid Margin="4">
+    <Grid Margin="8,8,0,8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="8" />
@@ -42,9 +42,9 @@
         <panels:FileIOPanel
             x:Name="fileIOPanel"
             Grid.Row="2"
-            Grid.RowSpan="5" />
+            Grid.RowSpan="1" />
         <GroupBox
-            Grid.RowSpan="5"
+            Grid.RowSpan="3"
             Grid.Column="2"
             Padding="0"
             Header="预设">
@@ -57,23 +57,39 @@
             Header="参数">
             <panels:CodeArgumentsPanel x:Name="argumentsPanel" />
         </GroupBox>
-        <Grid
+
+        <ui:CommandBar
             Grid.Row="4"
-            Grid.Column="4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="8" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Button
-                HorizontalAlignment="Stretch"
+            Grid.ColumnSpan="99"
+            Margin="-8,-8,0,-8">
+            <ui:AppBarButton
+                Click="AddInputButton_Click"
+                Label="新增输入文件">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Glyph="&#xE82E;" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
+            <ui:AppBarButton
+                Click="BrowseAndAddInputButton_Click"
+                Label="浏览并新增输入文件">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Glyph="&#xE7C5;" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
+            <ui:AppBarSeparator />
+            <ui:AppBarButton
+                Click="SaveToPresetButton_Click"
+                Icon="Save"
+                Label="保存为预设" />
+            <ui:AppBarSeparator />
+            <ui:AppBarButton
                 Click="AddToQueueButton_Click"
-                Content="加入队列" />
-            <Button
-                Grid.Column="2"
-                HorizontalAlignment="Stretch"
+                Icon="Add"
+                Label="加入队列" />
+            <ui:AppBarButton
                 Click="AddToQueueAndStartButton_Click"
-                Content="加入并开始队列" />
-        </Grid>
+                Icon="Add"
+                Label="加入并启动队列" />
+        </ui:CommandBar>
     </Grid>
 </Window>

@@ -14,10 +14,12 @@ using SimpleFFmpegGUI.FFMpegArgumentExtension;
 using System.Threading;
 using System.Text.RegularExpressions;
 using FFMpegCore.Exceptions;
+using System.ComponentModel;
+using FzLib;
 
 namespace SimpleFFmpegGUI.Manager
 {
-    public class FFmpegManager
+    public class FFmpegManager : INotifyPropertyChanged
     {
         public FFmpegManager(TaskInfo task)
         {
@@ -27,7 +29,14 @@ namespace SimpleFFmpegGUI.Manager
         public TaskInfo Task => task;
         private bool hasRun = false;
         private DateTime pauseStartTime;
-        private bool paused = false;
+        private bool paused;
+
+        public bool Paused
+        {
+            get => paused;
+            set => this.SetValueAndNotify(ref paused, value, nameof(Paused));
+        }
+
         private static readonly Regex rSsim = new Regex(@"SSIM ([YUVAll]+:[0-9\.\(\) ]+)+", RegexOptions.Compiled);
         private static readonly Regex rPsnr = new Regex(@"PSNR (([yuvaverageminmax]+:[0-9\. ]+)+)", RegexOptions.Compiled);
         private CancellationTokenSource cancel;
@@ -366,7 +375,7 @@ namespace SimpleFFmpegGUI.Manager
                 return;
             }
             Logger.Info(task, "FFmpeg参数为：" + processor.Arguments);
-            task.FFmpegArguments = task.FFmpegArguments == null ? processor.Arguments : task.FFmpegArguments + ";" + processor.Arguments;
+            task.FFmpegArguments = string.IsNullOrEmpty(task.FFmpegArguments) ? processor.Arguments : task.FFmpegArguments + ";" + processor.Arguments;
             if (Progress != null)
             {
                 Progress.Name = desc;
@@ -547,6 +556,8 @@ namespace SimpleFFmpegGUI.Manager
 
         public event EventHandler<FFmpegOutputEventArgs> FFmpegOutput;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public void Suspend()
         {
             if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
@@ -557,7 +568,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new Exception("进程还未启动，不可暂停");
             }
-            paused = true;
+            Paused = true;
             Logger.Info(task, "暂停队列");
             pauseStartTime = DateTime.Now;
             ProcessExtension.SuspendProcess(Process.Id);
@@ -573,7 +584,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new Exception("进程还未启动，不可暂停或恢复");
             }
-            paused = false;
+            Paused = false;
             Progress.PauseTime = DateTime.Now - pauseStartTime;
             Logger.Info(task, "恢复队列");
             ProcessExtension.ResumeProcess(Process.Id);

@@ -98,5 +98,20 @@ namespace SimpleFFmpegGUI.WPF
         }
 
         public event EventHandler TaskCreated;
+
+        private async void SaveToPresetButton_Click(object sender, RoutedEventArgs e)
+        {
+            await presetsPanel.SaveToPresetAsync();
+        }
+
+        private void BrowseAndAddInputButton_Click(object sender, RoutedEventArgs e)
+        {
+            fileIOPanel.BrowseAndAddInput();
+        }
+
+        private void AddInputButton_Click(object sender, RoutedEventArgs e)
+        {
+            fileIOPanel.AddInput();
+        }
     }
 }

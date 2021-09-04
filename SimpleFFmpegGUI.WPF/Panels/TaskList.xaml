@@ -133,6 +133,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="8" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <TextBlock
                     Grid.Row="0"
@@ -201,6 +203,14 @@
                     Grid.Row="14"
                     Grid.Column="2"
                     Text="{Binding Message}" />
+                <TextBlock
+                    Grid.Row="16"
+                    FontWeight="Bold"
+                    Text="FFmpeg参数" />
+                <TextBox IsReadOnly="True" Focusable="False" BorderThickness="0" MaxLines="3"
+                    Grid.Row="16" TextWrapping="Wrap"
+                    Grid.Column="2"
+                    Text="{Binding FFmpegArguments}" />
             </Grid>
             <ui:SimpleStackPanel
                 Grid.Column="2"

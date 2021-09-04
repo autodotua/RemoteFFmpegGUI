@@ -75,6 +75,7 @@ namespace SimpleFFmpegGUI.Manager
             task.Status = TaskStatus.Processing;
             task.StartTime = DateTime.Now;
             task.Message = "";
+            task.FFmpegArguments = "";
             db.Update(task);
             db.SaveChanges();
             AddManager(task, ffmpegManager, main);
@@ -99,10 +100,10 @@ namespace SimpleFFmpegGUI.Manager
             finally
             {
                 task.FinishTime = DateTime.Now;
-                RemoveManager(task, ffmpegManager, main);
             }
             db.Update(task);
             db.SaveChanges();
+            RemoveManager(task, ffmpegManager, main);
         }
 
         private void AddManager(TaskInfo task, FFmpegManager ffmpegManager, bool main)

@@ -25,7 +25,7 @@
                             Margin="4,8"
                             Padding="12"
                             Background="{DynamicResource SystemControlBackgroundListLowBrush}"
-                            CornerRadius="8">
+                            ClipToBounds="True">
                             <ui:SimpleStackPanel Spacing="8">
                                 <TextBlock
                                     Text="{Binding InputText}"
@@ -139,16 +139,31 @@
                                         Grid.Row="14"
                                         Grid.Column="2"
                                         Text="{Binding ProcessStatus.Progress.LastTime, StringFormat={}hh\\:mm\\:ss}" />
-
                                 </Grid>
                                 <TextBox
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Focusable="False"
                                     IsReadOnly="True"
-                                    MaxLines="3"
+                                    MaxLines="3" Opacity="0.8"
                                     Text="{Binding ProcessStatus.LastOutput}"
                                     TextWrapping="Wrap" />
+                                <ui:CommandBar Margin="-12">
+                                    <ui:AppBarButton
+                                        Click="CancelButton_Click"
+                                        Icon="Cancel"
+                                        Label="取消" />
+                                    <ui:AppBarButton
+                                        Click="ResumeButton_Click"
+                                        Icon="Play"
+                                        IsEnabled="{Binding ProcessManager.Paused}"
+                                        Label="恢复" />
+                                    <ui:AppBarButton
+                                        Click="PauseButton_Click"
+                                        Icon="Pause"
+                                        IsEnabled="{Binding ProcessManager.Paused, Converter={StaticResource InverseBoolConverter}}"
+                                        Label="暂停" />
+                                </ui:CommandBar>
                             </ui:SimpleStackPanel>
                         </Border>
                     </DataTemplate>

@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FzLib;
+using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,14 +19,19 @@ using System.Windows.Shapes;
 
 namespace SimpleFFmpegGUI.WPF
 {
-    public class MainWindowViewModel
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
         public QueueManager queue;
 
         public MainWindowViewModel(QueueManager queue)
         {
             this.queue = queue;
+            queue.TaskManagersChanged += (s, e) => this.Notify(nameof(CanStartMainQueue));
         }
+
+        public bool CanStartMainQueue => queue.MainQueueTask == null;
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     /// <summary>
@@ -38,6 +45,8 @@ namespace SimpleFFmpegGUI.WPF
 
         public MainWindow(MainWindowViewModel viewModel, QueueManager queue)
         {
+            ViewModel = viewModel;
+            DataContext = ViewModel;
             InitializeComponent();
             this.queue = queue;
         }
@@ -52,6 +61,11 @@ namespace SimpleFFmpegGUI.WPF
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!TaskManager.HasQueueTasks())
+            {
+                this.CreateMessage().QueueError("没有排队中的任务");
+                return;
+            }
             queue.StartQueue();
         }
 
@@ -62,7 +76,6 @@ namespace SimpleFFmpegGUI.WPF
 
         private void Button_Click2(object sender, RoutedEventArgs e)
         {
-
             queue.MainQueueManager.Resume();
         }
     }

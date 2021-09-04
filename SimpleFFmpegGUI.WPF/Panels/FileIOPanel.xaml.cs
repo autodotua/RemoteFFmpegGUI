@@ -63,7 +63,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             for (int i = 0; i < Inputs.Count; i++)
             {
                 Inputs[i].Index = i + 1;
-                Inputs[i].CanDelete = i >= MinInputsCount;
+                Inputs[i].CanDelete = Inputs.Count > MinInputsCount;
             }
         }
 
@@ -124,10 +124,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             ViewModel.Reset();
         }
 
-        private void AddButton_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.Inputs.Add(new InputArgumentsDetail());
-        }
+  
 
         private void BrowseFileButton_Click(object sender, RoutedEventArgs e)
         {
@@ -154,8 +151,11 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 _ => 0
             };
         }
-
-        private void BrowseAndAddButton_Click(object sender, RoutedEventArgs e)
+        public void AddInput()
+        {
+            ViewModel.Inputs.Add(new InputArgumentsDetail());
+        }
+        public void BrowseAndAddInput()
         {
             string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().GetFilePath();
             if (path != null)

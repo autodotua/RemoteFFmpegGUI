@@ -1,6 +1,7 @@
 ﻿using FzLib;
 using FzLib.WPF.Converters;
 using SimpleFFmpegGUI.Dto;
+using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
@@ -81,6 +82,7 @@ namespace SimpleFFmpegGUI.WPF.Model
                 nameof(StatusText));
         }
 
+        public FFmpegManager ProcessManager { get; set; }
         public double Percent => ProcessStatus == null || ProcessStatus.HasDetail == false ? 0 : ProcessStatus.Progress.Percent;
         public bool CancelButtonEnabled => Status is TaskStatus.Queue or TaskStatus.Processing;
         public bool ResetButtonEnabled => Status is TaskStatus.Done or TaskStatus.Cancel or TaskStatus.Error;
