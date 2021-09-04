@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
-    public class InputArgumentsDetail : InputArguments, INotifyPropertyChanged, ITempArguments
+    public class InputArgumentsDetail : InputArguments, ITempArguments
     {
         public void SetFile(string path)
         {
@@ -28,7 +28,6 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         private int index;
 
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public int Index
         {

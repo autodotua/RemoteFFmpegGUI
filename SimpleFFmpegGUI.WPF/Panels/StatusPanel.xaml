@@ -145,10 +145,14 @@
                                     BorderThickness="0"
                                     Focusable="False"
                                     IsReadOnly="True"
-                                    MaxLines="2" MinLines="2" Opacity="0.8"
+                                    MaxLines="2"
+                                    MinLines="2"
+                                    Opacity="0.8"
                                     Text="{Binding ProcessStatus.LastOutput}"
                                     TextWrapping="Wrap" />
-                                <ui:CommandBar Margin="-12" Background="Transparent">
+                                <ui:CommandBar
+                                    Margin="-12"
+                                    Background="Transparent">
                                     <ui:AppBarButton
                                         Click="CancelButton_Click"
                                         Icon="Cancel"
@@ -170,5 +174,11 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+        <TextBlock
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Opacity="0.6"
+            Text="当前没有正在执行的任务"
+            Visibility="{Binding IsRunning, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=1}" />
     </Grid>
 </UserControl>

@@ -48,7 +48,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             InitializeComponent();
         }
 
-        public TaskListViewModel ViewModel { get; }= App.ServiceProvider.GetService<TaskListViewModel>();
+        public TaskListViewModel ViewModel { get; } = App.ServiceProvider.GetService<TaskListViewModel>();
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
@@ -68,6 +68,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             if (delete)
             {
                 var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+                App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Remove(task);
                 Debug.Assert(task != null);
                 TaskManager.DeleteTask(task.Id, ViewModel.Queue);
                 task.UpdateSelf();
@@ -86,7 +87,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
             task.UpdateSelf();
         }
 
-
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -100,6 +100,33 @@ namespace SimpleFFmpegGUI.WPF.Panels
             {
                 this.CreateMessage().QueueError("启动失败", ex);
             }
+        }
+
+        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void ArgumentsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            Debug.Assert(task != null);
+            var panel = new CodeArgumentsPanel
+            {
+                IsHitTestVisible = false
+            };
+            panel.ViewModel.Update(task.Type, task.Arguments);
+            ScrollViewer scr = new ScrollViewer();
+            scr.Content = panel;
+            Window win = new Window()
+            {
+                Owner = Window.GetWindow(this),
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Content = scr,
+                Width=600,
+                Height=800,
+                Title="详细参数 - FFmpeg工具箱"
+            };
+            win.Show();
         }
     }
 }

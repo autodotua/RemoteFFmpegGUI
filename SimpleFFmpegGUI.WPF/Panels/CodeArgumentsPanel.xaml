@@ -317,7 +317,7 @@
                         ui:ControlHelper.PlaceholderText="请输入ffmpeg参数"
                         MaxLines="3"
                         MinLines="3"
-                        Text="{Binding Extra}"
+                        Text="{Binding Extra, UpdateSourceTrigger=PropertyChanged}"
                         TextWrapping="Wrap" />
                 </GroupBox>
             </ui:SimpleStackPanel>

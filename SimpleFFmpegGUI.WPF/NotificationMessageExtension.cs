@@ -24,7 +24,7 @@ namespace SimpleFFmpegGUI.WPF
         public static void QueueError(this NotificationMessageBuilder builder, string message, Exception ex)
         {
             builder.Background("#B71C1C")
-                       .HasMessage(message)
+                       .HasMessage(message+"："+ex.Message)
                        .Animates(true)
                        .Dismiss().WithDelay(5000)
                        .Dismiss().WithButton("详情", b => CommonDialog.ShowErrorDialogAsync(ex))

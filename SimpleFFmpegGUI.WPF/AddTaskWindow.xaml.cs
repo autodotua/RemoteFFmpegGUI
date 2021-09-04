@@ -87,10 +87,21 @@ namespace SimpleFFmpegGUI.WPF
 
         private void AddToQueue(bool start)
         {
-            TaskManager.AddTask(ViewModel.Type, fileIOPanel.GetInputs(), fileIOPanel.GetOutput(), argumentsPanel.GetOutputArguments());
-            this.CreateMessage().QueueSuccess("已加入队列");
-            TaskCreated?.Invoke(this, EventArgs.Empty);
-            fileIOPanel.Reset();
+            try
+            {
+                List<InputArguments> inputs = fileIOPanel.GetInputs();
+                string output = fileIOPanel.GetOutput();
+                OutputArguments args = argumentsPanel.GetOutputArguments();
+
+                TaskManager.AddTask(ViewModel.Type, inputs, output, args);
+                this.CreateMessage().QueueSuccess("已加入队列");
+                TaskCreated?.Invoke(this, EventArgs.Empty);
+                fileIOPanel.Reset();
+            }
+            catch(Exception ex)
+            {
+                this.CreateMessage().QueueError("加入队列失败", ex);
+            }
             if (start)
             {
                 ViewModel.Queue.StartQueue();

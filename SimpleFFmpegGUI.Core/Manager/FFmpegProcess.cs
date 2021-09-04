@@ -76,6 +76,10 @@ namespace SimpleFFmpegGUI.Manager
 
         private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
+            if(e.Data==null)
+            {
+                return;
+            }
             Output?.Invoke(this, new FFmpegOutputEventArgs(e.Data));
         }
 

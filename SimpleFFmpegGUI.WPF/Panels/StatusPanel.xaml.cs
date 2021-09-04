@@ -31,11 +31,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             Queue = queue;
             Tasks.Refresh();
+            queue.TaskManagersChanged += (s, e) => this.Notify(nameof(IsRunning));
         }
 
         public TasksAndStatuses Tasks => App.ServiceProvider.GetService<TasksAndStatuses>();
 
         public QueueManager Queue { get; }
+
+        public bool IsRunning => Queue.Tasks.Any();
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

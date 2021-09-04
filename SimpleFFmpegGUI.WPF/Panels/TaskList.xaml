@@ -73,7 +73,7 @@
                 <DataTemplate DataType="{x:Type uimodel:UITaskInfo}">
                     <Grid HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="72" />
                             <ColumnDefinition Width="8" />
                             <ColumnDefinition Width="2*" />
                         </Grid.ColumnDefinitions>
@@ -101,161 +101,176 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Grid
+        <Border
             Grid.Row="2"
+            BorderBrush="{DynamicResource TextControlBorderBrush}"
+            BorderThickness="0,1,0,0"
             Visibility="{Binding Tasks.SelectedTask, Converter={StaticResource NotNull2VisibleConverter}}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="16" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid
-                Margin="8"
-                DataContext="{Binding Tasks.SelectedTask}">
+            <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <TextBlock
-                    Grid.Row="0"
-                    FontWeight="Bold"
-                    Text="类型" />
-                <TextBlock
-                    Grid.Row="0"
-                    Grid.Column="2"
-                    Text="{Binding Type, Converter={StaticResource Enum2DescriptionConverter}}" />
-                <TextBlock
-                    Grid.Row="2"
-                    FontWeight="Bold"
-                    Text="状态" />
-                <TextBlock
-                    Grid.Row="2"
-                    Grid.Column="2"
-                    Text="{Binding Status, Converter={StaticResource Enum2DescriptionConverter}}" />
-                <TextBlock
-                    Grid.Row="4"
-                    FontWeight="Bold"
-                    Text="输入" />
-                <TextBlock
-                    Grid.Row="4"
-                    Grid.Column="4"
-                    Text="{Binding InputsText}"
-                    TextTrimming="CharacterEllipsis" />
-                <TextBlock
-                    Grid.Row="6"
-                    FontWeight="Bold"
-                    Text="输出" />
-                <TextBlock
-                    Grid.Row="6"
-                    Grid.Column="2"
-                    Text="{Binding OutputText}"
-                    TextTrimming="CharacterEllipsis" />
 
-                <TextBlock
-                    Grid.Row="8"
-                    FontWeight="Bold"
-                    Text="创建时间" />
-                <TextBlock
-                    Grid.Row="8"
+                <Grid
+                    Margin="8"
+                    DataContext="{Binding Tasks.SelectedTask}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        FontWeight="Bold"
+                        Text="类型" />
+                    <ui:SimpleStackPanel
+                        Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="16">
+                        <TextBlock Text="{Binding Type, Converter={StaticResource Enum2DescriptionConverter}}" />
+                        <Button
+                            Margin="-8,-4"
+                            Padding="8,4"
+                            Background="Transparent"
+                            Click="ArgumentsButton_Click"
+                            Cursor="Hand">
+                            <TextBlock TextDecorations="Underline">详细参数</TextBlock>
+                        </Button>
+                    </ui:SimpleStackPanel>
+                    <TextBlock
+                        Grid.Row="2"
+                        FontWeight="Bold"
+                        Text="状态" />
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Text="{Binding Status, Converter={StaticResource Enum2DescriptionConverter}}" />
+                    <TextBlock
+                        Grid.Row="4"
+                        FontWeight="Bold"
+                        Text="输入" />
+                    <TextBlock
+                        Grid.Row="4"
+                        Grid.Column="4"
+                        Text="{Binding InputsText}"
+                        TextTrimming="CharacterEllipsis" />
+                    <TextBlock
+                        Grid.Row="6"
+                        FontWeight="Bold"
+                        Text="输出" />
+                    <TextBlock
+                        Grid.Row="6"
+                        Grid.Column="2"
+                        Text="{Binding OutputText}"
+                        TextTrimming="CharacterEllipsis" />
+
+                    <TextBlock
+                        Grid.Row="8"
+                        FontWeight="Bold"
+                        Text="创建时间" />
+                    <TextBlock
+                        Grid.Row="8"
+                        Grid.Column="2"
+                        Text="{Binding CreateTime, StringFormat={StaticResource DateTimeFormat}}" />
+                    <TextBlock
+                        Grid.Row="10"
+                        FontWeight="Bold"
+                        Text="开始时间" />
+                    <TextBlock
+                        Grid.Row="10"
+                        Grid.Column="2"
+                        Text="{Binding StartTime, StringFormat={StaticResource DateTimeFormat}}" />
+                    <TextBlock
+                        Grid.Row="12"
+                        FontWeight="Bold"
+                        Text="结束时间" />
+                    <TextBlock
+                        Grid.Row="12"
+                        Grid.Column="2"
+                        Text="{Binding FinishTime, StringFormat={StaticResource DateTimeFormat}}" />
+                    <TextBlock
+                        Grid.Row="14"
+                        FontWeight="Bold"
+                        Text="信息" />
+                    <TextBlock
+                        Grid.Row="14"
+                        Grid.Column="2"
+                        Text="{Binding Message}" />
+                    <TextBlock
+                        Grid.Row="16"
+                        FontWeight="Bold"
+                        Text="FFmpeg参数" />
+                    <TextBox
+                        Grid.Row="16"
+                        Grid.Column="2"
+                        BorderThickness="0"
+                        Focusable="False"
+                        IsReadOnly="True"
+                        MaxLines="3"
+                        Text="{Binding FFmpegArguments}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <ui:SimpleStackPanel
                     Grid.Column="2"
-                    Text="{Binding CreateTime, StringFormat={StaticResource DateTimeFormat}}" />
-                <TextBlock
-                    Grid.Row="10"
-                    FontWeight="Bold"
-                    Text="开始时间" />
-                <TextBlock
-                    Grid.Row="10"
-                    Grid.Column="2"
-                    Text="{Binding StartTime, StringFormat={StaticResource DateTimeFormat}}" />
-                <TextBlock
-                    Grid.Row="12"
-                    FontWeight="Bold"
-                    Text="结束时间" />
-                <TextBlock
-                    Grid.Row="12"
-                    Grid.Column="2"
-                    Text="{Binding FinishTime, StringFormat={StaticResource DateTimeFormat}}" />
-                <TextBlock
-                    Grid.Row="14"
-                    FontWeight="Bold"
-                    Text="信息" />
-                <TextBlock
-                    Grid.Row="14"
-                    Grid.Column="2"
-                    Text="{Binding Message}" />
-                <TextBlock
-                    Grid.Row="16"
-                    FontWeight="Bold"
-                    Text="FFmpeg参数" />
-                <TextBox
-                    Grid.Row="16"
-                    Grid.Column="2"
-                    BorderThickness="0"
-                    Focusable="False"
-                    IsReadOnly="True"
-                    MaxLines="3"
-                    Text="{Binding FFmpegArguments}"
-                    TextWrapping="Wrap" />
+                    VerticalAlignment="Center"
+                    DataContext="{Binding Tasks.SelectedTask}"
+                    Spacing="8">
+                    <Button
+                        HorizontalAlignment="Stretch"
+                        Click="StartButton_Click"
+                        Content="独立执行"
+                        IsEnabled="{Binding StartButtonEnabled}" />
+                    <Button
+                        HorizontalAlignment="Stretch"
+                        Click="CancelButton_Click"
+                        Content="取消"
+                        IsEnabled="{Binding CancelButtonEnabled}"
+                        ToolTip="取消执行任务，正在执行的任务会被停止" />
+                    <Button
+                        HorizontalAlignment="Stretch"
+                        Click="ResetButton_Click"
+                        Content="重置"
+                        IsEnabled="{Binding ResetButtonEnabled}"
+                        ToolTip="将任务设置为排队状态" />
+                    <Button
+                        HorizontalAlignment="Stretch"
+                        Click="DeleteButton_Click"
+                        Content="删除" />
+                    <Button
+                        Margin="0,16,0,0"
+                        HorizontalAlignment="Stretch"
+                        Content="更多">
+                        <ui:FlyoutService.Flyout>
+                            <ui:MenuFlyout>
+                                <MenuItem
+                                    Click="CloneButton_Click"
+                                    Header="建立副本" />
+                            </ui:MenuFlyout>
+                        </ui:FlyoutService.Flyout>
+                    </Button>
+                </ui:SimpleStackPanel>
             </Grid>
-            <ui:SimpleStackPanel
-                Grid.Column="2"
-                VerticalAlignment="Center"
-                DataContext="{Binding Tasks.SelectedTask}"
-                Spacing="8">
-                <Button
-                    HorizontalAlignment="Stretch"
-                    Click="StartButton_Click"
-                    Content="独立执行"
-                    IsEnabled="{Binding StartButtonEnabled}" />
-                <Button
-                    HorizontalAlignment="Stretch"
-                    Click="CancelButton_Click"
-                    Content="取消"
-                    IsEnabled="{Binding CancelButtonEnabled}"
-                    ToolTip="取消执行任务，正在执行的任务会被停止" />
-                <Button
-                    HorizontalAlignment="Stretch"
-                    Click="ResetButton_Click"
-                    Content="重置"
-                    IsEnabled="{Binding ResetButtonEnabled}"
-                    ToolTip="将任务设置为排队状态" />
-                <Button
-                    HorizontalAlignment="Stretch"
-                    Click="DeleteButton_Click"
-                    Content="删除" />
-                <Button
-                    Margin="0,16,0,0"
-                    HorizontalAlignment="Stretch"
-                    Content="更多">
-                    <ui:FlyoutService.Flyout>
-                        <ui:MenuFlyout>
-                            <MenuItem
-                                Click="CloneButton_Click"
-                                Header="建立副本" />
-                        </ui:MenuFlyout>
-                    </ui:FlyoutService.Flyout>
-                </Button>
-            </ui:SimpleStackPanel>
-        </Grid>
+        </Border>
     </Grid>
 </UserControl>

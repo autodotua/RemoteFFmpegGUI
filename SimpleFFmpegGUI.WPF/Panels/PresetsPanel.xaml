@@ -19,57 +19,47 @@
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <!--<RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />-->
-        </Grid.RowDefinitions>
-        <ScrollViewer
-            Padding="0,0,18,0"
-            VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Presets}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border
-                            Margin="4,8"
-                            Padding="12"
-                            Background="{DynamicResource SystemControlBackgroundListLowBrush}"
-                            CornerRadius="8">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
 
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    Text="{Binding Name}" />
-                                <Button
-                                    Grid.Column="4"
-                                    Click="ApplyButton_Click"
-                                    Content="应用"
-                                    Tag="{Binding .}"
-                                    ToolTip="设置当前参数为该预设" />
-                                <Button
-                                    Grid.Column="2"
-                                    Click="UpdateButton_Click"
-                                    Content="更新"
-                                    Tag="{Binding .}"
-                                    ToolTip="使用当前输出参数更新该预设" />
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-        <!--<Button
-            Grid.Row="2"
-            HorizontalAlignment="Stretch"
-            Click="SaveButton_Click"
-            Content="保存为预设" />-->
-    </Grid>
+    <ScrollViewer
+        Padding="0,0,18,0"
+        VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding Presets}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border
+                        Margin="4,8"
+                        Padding="12"
+                        Background="{DynamicResource SystemControlBackgroundListLowBrush}"
+                        CornerRadius="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding Name}" />
+                            <Button
+                                Grid.Column="4"
+                                Click="ApplyButton_Click"
+                                Content="应用"
+                                Tag="{Binding .}"
+                                ToolTip="设置当前参数为该预设" />
+                            <Button
+                                Grid.Column="2"
+                                Click="UpdateButton_Click"
+                                Content="更新"
+                                Tag="{Binding .}"
+                                ToolTip="使用当前输出参数更新该预设" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+
 </UserControl>

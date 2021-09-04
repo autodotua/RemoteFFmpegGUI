@@ -57,6 +57,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 }
             }
         }
+        private bool showTimeClip;
+        public bool ShowTimeClip
+        {
+            get => showTimeClip;
+            set => this.SetValueAndNotify(ref showTimeClip, value, nameof(ShowTimeClip));
+        }
 
         private void Inputs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -89,7 +95,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public void Reset()
         {
             Inputs.Clear();
-            while(Inputs.Count< MinInputsCount)
+            while (Inputs.Count < MinInputsCount)
             {
                 Inputs.Add(new InputArgumentsDetail());
             }
@@ -112,7 +118,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
             {
                 input.Apply();
             }
-            return ViewModel.Inputs.Cast<InputArguments>().ToList();
+            var inputs = ViewModel.Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath));
+            if (inputs.Count() < ViewModel.MinInputsCount)
+            {
+                throw new Exception("输入文件少于需要的文件数量");
+            }
+            return inputs.Cast<InputArguments>().ToList();
         }
 
         public string GetOutput()
@@ -123,8 +134,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             ViewModel.Reset();
         }
-
-  
 
         private void BrowseFileButton_Click(object sender, RoutedEventArgs e)
         {
@@ -149,6 +158,11 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 TaskType.Code => 1,
                 TaskType.Combine or TaskType.Concat or TaskType.Compare => 2,
                 _ => 0
+            };
+            ViewModel.ShowTimeClip = type switch
+            {
+                TaskType.Code => true,
+                _ => false
             };
         }
         public void AddInput()

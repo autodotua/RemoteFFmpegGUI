@@ -50,7 +50,6 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         private bool enableMaxBitrate;
 
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public bool EnableMaxBitrate
         {

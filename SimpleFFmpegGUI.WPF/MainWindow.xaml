@@ -20,13 +20,20 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="32" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <panels:TaskList
             x:Name="taskPanel"
             Grid.Column="0"
             Margin="8,0,0,0" />
+        <GridSplitter
+            Grid.Column="1"
+            Width="2"
+            Margin="0,36"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch"
+            Background="{DynamicResource TextControlBorderBrush}" />
         <panels:StatusPanel
             x:Name="statusPanel"
             Grid.Column="2" />

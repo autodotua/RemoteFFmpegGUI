@@ -39,21 +39,30 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public void Update(TaskType type, OutputArguments argument = null)
         {
             this.type = type;
-            CanSpecifyFormat = type is TaskType.Code or TaskType.Combine;
-            CanSetVideoAndAudio = type is TaskType.Code or TaskType.Concat;
-            CanSetCombine = type is TaskType.Combine;
-            canSetConcat = type is TaskType.Concat;
+
             if (argument != null)
             {
                 Video = argument.Video.Adapt<VideoArgumentsWithSwitch>();
-                Video.Update();
+                Video?.Update();
+                VideoOutputStrategy = argument.Video == null ?
+                    (argument.DisableVideo ? ChannelOutputStrategy.Disable : ChannelOutputStrategy.Copy)
+                    : ChannelOutputStrategy.Code;
                 Audio = argument.Audio.Adapt<AudioArgumentsWithSwitch>();
-                Audio.Update();
+                Audio?.Update();
+                AudioOutputStrategy = argument.Audio == null ?
+                 (argument.DisableVideo ? ChannelOutputStrategy.Disable : ChannelOutputStrategy.Copy)
+                 : ChannelOutputStrategy.Code;
                 Format = new FormatArgumentWithSwitch() { Format = argument.Format };
                 Format.Update();
                 Combine = argument.Combine;
                 Concat = argument.Concat;
+                Extra = argument.Extra;
             }
+
+            CanSpecifyFormat = type is TaskType.Code or TaskType.Combine;
+            CanSetVideoAndAudio = type is TaskType.Code or TaskType.Concat;
+            CanSetCombine = type is TaskType.Combine;
+            CanSetConcat = type is TaskType.Concat;
             if (type is TaskType.Concat)
             {
                 UpdateWhenConcatArgumentsChanged();
