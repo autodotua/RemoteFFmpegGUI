@@ -58,19 +58,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
             task.ProcessManager.Cancel();
         }
 
-        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
-        {
-            bool delete = true;
-            if (App.ServiceProvider.GetService<TasksAndStatuses>().SelectedTask.Status == SimpleFFmpegGUI.Model.TaskStatus.Processing)
-            {
-                delete = await CommonDialog.ShowYesNoDialogAsync("删除", "任务正在处理，是否删除？");
-            }
-            if (delete)
-            {
-                App.ServiceProvider.GetService<TasksAndStatuses>().DeleteTask();
-            }
-        }
-
 
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)

@@ -1,5 +1,6 @@
 ﻿using FzLib;
 using FzLib.WPF.Converters;
+using Mapster;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
@@ -46,12 +47,21 @@ namespace SimpleFFmpegGUI.WPF.Model
         {
             get
             {
-                var output = Output;
+                string output = Output;
+
                 if (output == null)
                 {
-                    return "未指定输出";
+                    output = "未指定输出";
                 }
-                return Path.GetFileName(output);
+                else
+                {
+                    output = Path.GetFileName(Output);
+                }
+                if (!string.IsNullOrEmpty(RealOutput))
+                {
+                    output += $"（实际输出：{Path.GetFileName(RealOutput)}）";
+                }
+                return output;
             }
         }
 
@@ -86,6 +96,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         public double Percent => ProcessStatus == null || ProcessStatus.HasDetail == false ? 0 : ProcessStatus.Progress.Percent;
         public bool CancelButtonEnabled => Status is TaskStatus.Queue or TaskStatus.Processing;
         public bool ResetButtonEnabled => Status is TaskStatus.Done or TaskStatus.Cancel or TaskStatus.Error;
+        public bool StartButtonEnabled => Status is TaskStatus.Queue;
         private TaskType type;
 
         public TaskType Type
@@ -101,6 +112,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             get => status;
             set => this.SetValueAndNotify(ref status, value, nameof(Status),
                 nameof(ResetButtonEnabled),
+                nameof(StartButtonEnabled),
                 nameof(CancelButtonEnabled),
                 nameof(StatusText),
                 nameof(Color),
@@ -121,6 +133,14 @@ namespace SimpleFFmpegGUI.WPF.Model
         {
             get => output;
             set => this.SetValueAndNotify(ref output, value, nameof(Output), nameof(OutputText), nameof(IOText));
+        }
+
+        private string realOutput;
+
+        public string RealOutput
+        {
+            get => realOutput;
+            set => this.SetValueAndNotify(ref realOutput, value, nameof(RealOutput));
         }
 
         private OutputArguments arguments;
@@ -171,6 +191,16 @@ namespace SimpleFFmpegGUI.WPF.Model
         {
             get => fFmpegArguments;
             set => this.SetValueAndNotify(ref fFmpegArguments, value, nameof(FFmpegArguments));
+        }
+
+        public TaskInfo GetTask()
+        {
+            return TaskManager.GetTask(Id);
+        }
+
+        public void UpdateSelf()
+        {
+            TaskManager.GetTask(Id).Adapt(this);
         }
     }
 }

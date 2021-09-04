@@ -207,10 +207,15 @@
                     Grid.Row="16"
                     FontWeight="Bold"
                     Text="FFmpeg参数" />
-                <TextBox IsReadOnly="True" Focusable="False" BorderThickness="0" MaxLines="3"
-                    Grid.Row="16" TextWrapping="Wrap"
+                <TextBox
+                    Grid.Row="16"
                     Grid.Column="2"
-                    Text="{Binding FFmpegArguments}" />
+                    BorderThickness="0"
+                    Focusable="False"
+                    IsReadOnly="True"
+                    MaxLines="3"
+                    Text="{Binding FFmpegArguments}"
+                    TextWrapping="Wrap" />
             </Grid>
             <ui:SimpleStackPanel
                 Grid.Column="2"
@@ -219,22 +224,37 @@
                 Spacing="8">
                 <Button
                     HorizontalAlignment="Stretch"
+                    Click="StartButton_Click"
+                    Content="独立执行"
+                    IsEnabled="{Binding StartButtonEnabled}" />
+                <Button
+                    HorizontalAlignment="Stretch"
                     Click="CancelButton_Click"
                     Content="取消"
-                    IsEnabled="{Binding CancelButtonEnabled}" />
+                    IsEnabled="{Binding CancelButtonEnabled}"
+                    ToolTip="取消执行任务，正在执行的任务会被停止" />
                 <Button
                     HorizontalAlignment="Stretch"
                     Click="ResetButton_Click"
                     Content="重置"
-                    IsEnabled="{Binding ResetButtonEnabled}" />
-                <Button
-                    HorizontalAlignment="Stretch"
-                    Click="CloneButton_Click"
-                    Content="建立副本" />
+                    IsEnabled="{Binding ResetButtonEnabled}"
+                    ToolTip="将任务设置为排队状态" />
                 <Button
                     HorizontalAlignment="Stretch"
                     Click="DeleteButton_Click"
                     Content="删除" />
+                <Button
+                    Margin="0,16,0,0"
+                    HorizontalAlignment="Stretch"
+                    Content="更多">
+                    <ui:FlyoutService.Flyout>
+                        <ui:MenuFlyout>
+                            <MenuItem
+                                Click="CloneButton_Click"
+                                Header="建立副本" />
+                        </ui:MenuFlyout>
+                    </ui:FlyoutService.Flyout>
+                </Button>
             </ui:SimpleStackPanel>
         </Grid>
     </Grid>

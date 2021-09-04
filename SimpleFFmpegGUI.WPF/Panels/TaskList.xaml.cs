@@ -48,11 +48,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
             InitializeComponent();
         }
 
-        public TaskListViewModel ViewModel => App.ServiceProvider.GetService<TaskListViewModel>();
+        public TaskListViewModel ViewModel { get; }= App.ServiceProvider.GetService<TaskListViewModel>();
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<TasksAndStatuses>().CancelTask();
+            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            Debug.Assert(task != null);
+            TaskManager.CancelTask(task.Id, ViewModel.Queue);
+            task.UpdateSelf();
         }
 
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -64,7 +67,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             if (delete)
             {
-                App.ServiceProvider.GetService<TasksAndStatuses>().DeleteTask();
+                var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+                Debug.Assert(task != null);
+                TaskManager.DeleteTask(task.Id, ViewModel.Queue);
+                task.UpdateSelf();
             }
         }
 
@@ -74,12 +80,26 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<TasksAndStatuses>().ResetTask();
+            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            Debug.Assert(task != null);
+            TaskManager.ResetTask(task.Id, ViewModel.Queue);
+            task.UpdateSelf();
         }
 
-        public void Refresh()
+
+        private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<TasksAndStatuses>().Refresh();
+            try
+            {
+                var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+                Debug.Assert(task != null);
+                ViewModel.Queue.StartStandalone(task.Id);
+                task.UpdateSelf();
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError("启动失败", ex);
+            }
         }
     }
 }

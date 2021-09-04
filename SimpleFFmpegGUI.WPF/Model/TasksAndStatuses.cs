@@ -11,7 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 
 namespace SimpleFFmpegGUI.WPF.Model
-{ 
+{
     public class TasksAndStatuses : INotifyPropertyChanged
     {
         private ObservableCollection<UITaskInfo> tasks;
@@ -30,7 +30,7 @@ namespace SimpleFFmpegGUI.WPF.Model
                 var unstartStatus = new StatusDto(manager.Task);
                 var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);
                 Debug.Assert(task != null);
-                UpdateTask(task);
+                task.UpdateSelf();
                 task.ProcessStatus = unstartStatus;
                 task.ProcessManager = manager;
                 if (manager == Queue.MainQueueManager)
@@ -53,7 +53,7 @@ namespace SimpleFFmpegGUI.WPF.Model
                 Debug.Assert(task != null);
                 task.ProcessManager = null;
                 task.ProcessStatus = null;
-                UpdateTask(task);
+                task.UpdateSelf();
 
                 Statuses.Remove(status);
                 manager.StatusChanged -= Manager_StatusChanged;
@@ -78,7 +78,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             Debug.Assert(task != null);
             Debug.Assert(task.ProcessStatus != null);
 
-            newStatus.Adapt(task.ProcessStatus);
+            task.ProcessStatus = newStatus;
         }
 
         public void Refresh()
@@ -98,32 +98,6 @@ namespace SimpleFFmpegGUI.WPF.Model
         public QueueManager Queue { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        private void UpdateTask(UITaskInfo task)
-        {
-            TaskManager.GetTask(task.Id).Adapt(task);
-        }
-
-        public void DeleteTask()
-        {
-            Debug.Assert(SelectedTask != null);
-            TaskManager.DeleteTask(SelectedTask.Id, Queue);
-            Tasks.Remove(SelectedTask);
-        }
-
-        public void ResetTask()
-        {
-            Debug.Assert(SelectedTask != null);
-            TaskManager.ResetTask(SelectedTask.Id, Queue);
-            UpdateTask(SelectedTask);
-        }
-
-        public void CancelTask()
-        {
-            Debug.Assert(SelectedTask != null);
-            TaskManager.CancelTask(SelectedTask.Id, Queue);
-            UpdateTask(SelectedTask);
-        }
 
         private UITaskInfo selectedTask;
 

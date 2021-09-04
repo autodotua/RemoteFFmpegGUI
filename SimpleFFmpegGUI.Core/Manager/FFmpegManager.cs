@@ -167,8 +167,8 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new ArgumentException("普通编码，输入文件必须为1个");
             }
-            task.Output = GetFileName(task.Arguments, task.Output);
-            var p = f.OutputToFile(task.Output, true, a => ApplyOutputArguments(a, task.Arguments));
+            GenerateOutputPath();
+            var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments));
             await RunAsync(p, message, cancellationToken);
         }
 
@@ -188,8 +188,8 @@ namespace SimpleFFmpegGUI.Manager
                 f = FFMpegArguments.FromConcatInput(tsFiles, a => ApplyInputArguments(a, task.Inputs[0]));
                 Progress = GetProgress(task);
 
-                task.Output = GetFileName(task.Arguments, task.Output);
-                var p = f.OutputToFile(task.Output, true, a => ApplyOutputArguments(a, task.Arguments));
+                GenerateOutputPath();
+                var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments));
                 await RunAsync(p, message, cancellationToken);
             }
             else
@@ -204,10 +204,10 @@ namespace SimpleFFmpegGUI.Manager
                     }
                 }
                 task.Arguments.Format = null;
-                task.Output = GetFileName(task.Arguments, task.Output);
+                GenerateOutputPath();
                 var p = FFMpegArguments.FromFileInput(tempPath, false,
                     o => o.WithCustomArgument("-f concat -safe 0"))
-                     .OutputToFile(task.Output, true, o => o.CopyChannel(Channel.Both));
+                     .OutputToFile(task.RealOutput, true, o => o.CopyChannel(Channel.Both));
                 await RunAsync(p, message, cancellationToken);
             }
         }
@@ -234,8 +234,8 @@ namespace SimpleFFmpegGUI.Manager
 
             Progress = GetProgress(task);
 
-            task.Output = GetFileName(task.Arguments, task.Output);
-            var p = f.OutputToFile(task.Output, true, a =>
+            GenerateOutputPath();
+            var p = f.OutputToFile(task.RealOutput, true, a =>
             {
                 a.CopyChannel(Channel.Both);
                 if (video.AudioStreams.Count != 0 || audio.VideoStreams.Count != 0)
@@ -537,9 +537,18 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
-        private string GetFileName(OutputArguments a, string output)
+        private void GenerateOutputPath()
         {
-            string result = output;
+            string output = task.Output;
+            var a = task.Arguments;
+            if (string.IsNullOrEmpty(output))
+            {
+                if (task.Inputs.Count == 0)
+                {
+                    throw new Exception("没有指定输出路径，且输入文件为空");
+                }
+                output = task.Inputs[0].FilePath;
+            }
             if (!string.IsNullOrEmpty(a?.Format))
             {
                 VideoFormat format = VideoFormat.Formats.Where(p => p.Name == a.Format || p.Extension == a.Format).FirstOrDefault();
@@ -548,10 +557,10 @@ namespace SimpleFFmpegGUI.Manager
                     string dir = Path.GetDirectoryName(output);
                     string name = Path.GetFileNameWithoutExtension(output);
                     string extension = format.Extension;
-                    result = Path.Combine(dir, name + "." + extension);
+                    output = Path.Combine(dir, name + "." + extension);
                 }
             }
-            return FileSystem.GetNoDuplicateFile(result);
+            task.RealOutput = FileSystem.GetNoDuplicateFile(output);
         }
 
         public event EventHandler<FFmpegOutputEventArgs> FFmpegOutput;

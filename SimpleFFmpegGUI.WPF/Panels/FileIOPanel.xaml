@@ -131,6 +131,7 @@
             </Grid.ColumnDefinitions>
             <TextBox
                 ui:ControlHelper.Header="输出路径"
+                ui:ControlHelper.PlaceholderText="（输出至源文件目录）"
                 Text="{Binding Output}" />
             <Button
                 Grid.Column="2"

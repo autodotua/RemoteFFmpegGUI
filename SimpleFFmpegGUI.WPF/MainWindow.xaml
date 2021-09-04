@@ -25,7 +25,8 @@
         </Grid.ColumnDefinitions>
         <panels:TaskList
             x:Name="taskPanel"
-            Grid.Column="0" />
+            Grid.Column="0"
+            Margin="8,0,0,0" />
         <panels:StatusPanel
             x:Name="statusPanel"
             Grid.Column="2" />
@@ -37,13 +38,17 @@
             <ui:AppBarButton
                 Click="StartButton_Click"
                 Icon="Play"
-                IsEnabled="{Binding CanStartMainQueue}"
-                Label="开始队列" />
+                Label="开始队列"
+                Visibility="{Binding StartMainQueueButtonVisibility}" />
+            <ui:AppBarButton
+                Click="CancelButton_Click"
+                Icon="Stop"
+                Label="终止队列"
+                Visibility="{Binding StopMainQueueButtonVisibility}" />
             <ui:AppBarButton
                 Click="Button_Click"
                 Icon="Add"
                 Label="创建任务" />
-
         </ui:CommandBar>
     </Grid>
 </Window>

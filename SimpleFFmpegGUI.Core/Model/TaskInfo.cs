@@ -16,6 +16,7 @@ namespace SimpleFFmpegGUI.Model
         public TaskStatus Status { get; set; }
         public List<InputArguments> Inputs { get; set; }
         public string Output { get; set; }
+        public string RealOutput { get; set; }
         public OutputArguments Arguments { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime? StartTime { get; set; }

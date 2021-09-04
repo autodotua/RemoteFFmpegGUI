@@ -1,6 +1,7 @@
 ﻿using FzLib;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
+using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,10 +27,11 @@ namespace SimpleFFmpegGUI.WPF
         public MainWindowViewModel(QueueManager queue)
         {
             this.queue = queue;
-            queue.TaskManagersChanged += (s, e) => this.Notify(nameof(CanStartMainQueue));
+            queue.TaskManagersChanged += (s, e) => this.Notify(nameof(StartMainQueueButtonVisibility), nameof(StopMainQueueButtonVisibility));
         }
 
-        public bool CanStartMainQueue => queue.MainQueueTask == null;
+        public Visibility StartMainQueueButtonVisibility => queue.MainQueueTask == null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility StopMainQueueButtonVisibility => queue.MainQueueTask == null ? Visibility.Collapsed : Visibility.Visible;
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
@@ -55,7 +57,8 @@ namespace SimpleFFmpegGUI.WPF
         {
             var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
             dialog.Owner = this;
-            dialog.TaskCreated += (s, e) => taskPanel.Refresh();
+            dialog.TaskCreated += (s, e) =>
+            App.ServiceProvider.GetService<TasksAndStatuses>().Refresh();
             dialog.Show();
         }
 
@@ -69,14 +72,9 @@ namespace SimpleFFmpegGUI.WPF
             queue.StartQueue();
         }
 
-        private void Button_Click1(object sender, RoutedEventArgs e)
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            queue.MainQueueManager.Suspend();
-        }
-
-        private void Button_Click2(object sender, RoutedEventArgs e)
-        {
-            queue.MainQueueManager.Resume();
+            queue.Cancel();
         }
     }
 }

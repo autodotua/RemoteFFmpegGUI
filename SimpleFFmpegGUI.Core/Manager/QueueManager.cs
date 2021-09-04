@@ -44,6 +44,27 @@ namespace SimpleFFmpegGUI.Manager
                 .Where(p => !p.IsDeleted);
         }
 
+        public async void StartStandalone(int id)
+        {
+            using FFmpegDbContext db = FFmpegDbContext.GetNew();
+            var task = db.Tasks.Find(id);
+            if (task == null)
+            {
+                throw new Exception("找不到ID为" + id + "的任务");
+            }
+            if (task.Status != TaskStatus.Queue)
+            {
+                throw new Exception("任务的状态不正确，不可开始任务");
+            }
+            if (Tasks.Any(p => p.Id == task.Id))
+            {
+                throw new Exception("任务正在进行中，但状态不是正在处理中");
+            }
+            Logger.Info(task, "开始独立任务");
+            await ProcessTaskAsync(db, task, false);
+            Logger.Info(task, "独立任务完成");
+        }
+
         public async void StartQueue()
         {
             if (running)
@@ -146,12 +167,6 @@ namespace SimpleFFmpegGUI.Manager
             CheckMainQueueProcessingTaskManager();
             cancelQueue = true;
 
-            MainQueueManager.Cancel();
-        }
-
-        public void CancelCurrent()
-        {
-            CheckMainQueueProcessingTaskManager();
             MainQueueManager.Cancel();
         }
 
