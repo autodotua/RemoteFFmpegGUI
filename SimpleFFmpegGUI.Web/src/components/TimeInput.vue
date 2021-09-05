@@ -2,12 +2,8 @@
 <template>
   <div>
     <el-row :gutter="12">
-      <el-col :span="1">
-        <el-checkbox style="margin-top: 15px" v-model="isEnabled"></el-checkbox>
-      </el-col>
-      <el-col :sm="22" :md="10" class="top12">
+      <el-col :sm="24" :md="11" class="top12">
         <el-input
-          :disabled="!isEnabled"
           maxlength="13"
           placeholder="时间格式：12:34:56.123"
           v-model="str"
@@ -16,7 +12,10 @@
           <template slot="prepend"> {{ label }}</template>
         </el-input>
       </el-col>
-      <el-col :sm="24" :md="11" class="top12">
+      <el-col :span="1">
+        <el-checkbox style="margin-top: 15px" v-model="isEnabled"></el-checkbox>
+      </el-col>
+      <el-col :sm="22" :md="10" class="top12">
         <el-input-number
           :disabled="!isEnabled"
           v-model="h"
@@ -73,6 +72,9 @@ export default Vue.component("time-input", {
   props: ["enabled", "label", "time"],
   computed: {},
   watch: {
+    enabled() {
+      this.isEnabled = this.enabled;
+    },
     isEnabled() {
       this.$emit("update:enabled", this.isEnabled);
     },
@@ -126,6 +128,7 @@ export default Vue.component("time-input", {
       this.h = h;
       this.m = m;
       this.s = s;
+      this.isEnabled=true;
     },
   },
   components: {},

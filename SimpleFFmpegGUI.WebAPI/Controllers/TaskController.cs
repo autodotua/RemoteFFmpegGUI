@@ -61,22 +61,34 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 //检查输入文件存在
                 await CheckInputFileExistAsync(file.FilePath);
-                //处理输出路径
-                string output = request.Output;
-                if (request.Inputs.Count > 1 || string.IsNullOrWhiteSpace(output))
-                {
-                    request.Output = Path.Combine(OutputDir, file.FilePath);
-                }
                 //拼接输入路径
                 file.FilePath = Path.Combine(InputDir, file.FilePath);
 
                 ids.Add(await pipeClient.InvokeAsync(p =>
                  p.AddTask(TaskType.Code, new List<InputArguments>() { file },
-                 Path.Combine(OutputDir, request.Output),
+              GetOutput(request),
                  request.Argument,
                  request.Start)));
             }
             return ids;
+        }
+
+        private string GetOutput(TaskDto request)
+        {
+            string output = request.Output;
+            if (string.IsNullOrWhiteSpace(output))
+            {
+                if (request.Inputs.Count > 0)
+                {
+                    output = Path.Combine(OutputDir, Path.GetFileName(request.Inputs[0].FilePath));
+                }
+            }
+            else
+            {
+                output = Path.Combine(OutputDir, request.Output);
+            }
+
+            return output;
         }
 
         [HttpPost]
@@ -98,7 +110,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             ids.Add(await pipeClient.InvokeAsync(p =>
                  p.AddTask(TaskType.Concat, request.Inputs,
-                 Path.Combine(OutputDir, request.Output),
+                 GetOutput(request),
                  request.Argument,
                  request.Start)));
             return ids;
@@ -124,7 +136,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             request.Inputs.ForEach(p => p.FilePath = Path.Combine(InputDir, p.FilePath));
             return await pipeClient.InvokeAsync(p =>
               p.AddTask(TaskType.Combine, request.Inputs,
-              Path.Combine(OutputDir, request.Output),
+             GetOutput(request),
               request.Argument,
               request.Start));
         }

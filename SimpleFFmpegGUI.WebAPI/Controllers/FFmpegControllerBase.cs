@@ -90,14 +90,14 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             return path.StartsWith(InputDir) ?
                 path.Substring(InputDir.Length).Replace('\\', '/').TrimStart('/')
-                : throw new System.Exception("输入目录与实际文件位置不匹配，无法获取相对路径");
+                : path;
         }
 
         protected string GetOutputRelativePath(string path)
         {
             return path.StartsWith(OutputDir) ?
                 path.Substring(OutputDir.Length).Replace('\\', '/').TrimStart('/')
-                : throw new System.Exception("输出目录与实际文件位置不匹配，无法获取相对路径");
+                : path;
         }
 
         protected bool CanAccessInputDir()

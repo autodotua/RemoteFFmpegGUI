@@ -69,11 +69,11 @@
         placeholder="输出文件名"
         style="width: 300px; display: block"
         v-model="outputFile"
-        :disabled="inputFiles.length > 1&&!singleOutput"
+        :disabled="inputFiles.length > 1 && !singleOutput"
         @change="(value) => $emit('update:output', value)"
       >
       </el-input>
-      <a v-if="inputFiles.length > 1&&!singleOutput" class="gray"
+      <a v-if="inputFiles.length > 1 && !singleOutput" class="gray"
         >输入多个文件时，输出文件名为首个不重复的原文件名</a
       >
     </el-form-item>
@@ -114,18 +114,18 @@ export default Vue.component("file-io-group", {
     min: {
       default: 1,
     },
-    showClip:{
-      default:true
+    showClip: {
+      default: true,
     },
-    singleOutput:{
-      default:false
-    }
+    singleOutput: {
+      default: false,
+    },
   },
   computed: {},
   created() {
     for (let i = 1; i < this.min; i++) {
       this.inputFiles.push(this.getNewFile());
-      this.activeInput.push(i)
+      this.activeInput.push(i);
     }
   },
   watch: {
@@ -155,11 +155,7 @@ export default Vue.component("file-io-group", {
     },
     updateFile(file: string, index: number) {
       this.inputFiles[index].name = file;
-      if (index == 0 && this.output == "") {
-        this.outputFile = file.split('/').slice(-1)[0];
-      }
       this.$emit("update:inputs", this.getArgs());
-      this.$emit("update:output", this.output);
     },
     removeFile() {
       this.inputFiles.splice(-1);
@@ -170,7 +166,6 @@ export default Vue.component("file-io-group", {
       this.inputFiles
         .filter((p) => p.name != "")
         .forEach((file) => {
-          console.log(file);
           if (file.to && file.from && file.to <= file.from) {
             showError("结束时间需要小于开始时间");
             return;
@@ -199,7 +194,6 @@ export default Vue.component("file-io-group", {
           enableDuration: file.duration != null,
           duration: file.duration != null ? file.duration : null,
         });
-        console.log(this.inputFiles);
       });
     },
   },
