@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>SimpleFFmpegGUI.WPF</RootNamespace>
     <SatelliteResourceLanguages>zh-cn</SatelliteResourceLanguages>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -53,6 +54,12 @@
     <Compile Update="Panels\StatusPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

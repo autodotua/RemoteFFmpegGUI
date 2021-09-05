@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FzLib.Program.Runtime;
+using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.WPF.Model;
 using SimpleFFmpegGUI.WPF.Panels;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,12 +26,26 @@ namespace SimpleFFmpegGUI.WPF
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            UnhandledException.RegistAll();
+            UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
             ServiceProvider = serviceCollection.BuildServiceProvider();
             MainWindow = ServiceProvider.GetService<MainWindow>();
             MainWindow.Show();
+        }
+
+        private void UnhandledException_UnhandledExceptionCatched(object sender, FzLib.Program.Runtime.UnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                File.AppendAllText("error.log", DateTime.Now.ToString() + Environment.NewLine + e.Exception.ToString() + Environment.NewLine + Environment.NewLine);
+            }
+            catch (Exception ex)
+            {
+            }
+            MessageBox.Show(e.Exception.ToString(), "MapBoard - 未捕获的异常", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void ConfigureServices(IServiceCollection services)

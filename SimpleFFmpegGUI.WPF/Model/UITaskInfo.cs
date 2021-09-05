@@ -198,6 +198,11 @@ namespace SimpleFFmpegGUI.WPF.Model
             return TaskManager.GetTask(Id);
         }
 
+        public TaskInfo ToTask()
+        {
+            return this.Adapt<TaskInfo>();
+        }
+
         public void UpdateSelf()
         {
             TaskManager.GetTask(Id).Adapt(this);

@@ -6,12 +6,6 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class InputArgumentsDetail : InputArguments, ITempArguments
     {
-        public void SetFile(string path)
-        {
-            FilePath = path;
-            this.Notify(nameof(path));
-        }
-
         public void Update()
         {
             EnableFrom = From.HasValue;
@@ -28,7 +22,6 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         private int index;
 
-
         public int Index
         {
             get => index;
@@ -43,8 +36,28 @@ namespace SimpleFFmpegGUI.WPF.Model
             set => this.SetValueAndNotify(ref canDelete, value, nameof(CanDelete));
         }
 
-        public bool EnableFrom { get; set; }
-        public bool EnableTo { get; set; }
-        public bool EnableDuration { get; set; }
+        private bool enableFrom;
+
+        public bool EnableFrom
+        {
+            get => enableFrom;
+            set => this.SetValueAndNotify(ref enableFrom, value, nameof(EnableFrom));
+        }
+
+        private bool enableTo;
+
+        public bool EnableTo
+        {
+            get => enableTo;
+            set => this.SetValueAndNotify(ref enableTo, value, nameof(EnableTo));
+        }
+
+        private bool enableDuration;
+
+        public bool EnableDuration
+        {
+            get => enableDuration;
+            set => this.SetValueAndNotify(ref enableDuration, value, nameof(EnableDuration));
+        }
     }
 }

@@ -11,6 +11,7 @@
     Title="新建任务 - FFmpeg 工具箱"
     Width="1280"
     Height="640"
+    ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
@@ -29,8 +30,9 @@
             <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ComboBox
+        <ComboBox Margin="0,0,24,0"
             HorizontalAlignment="Stretch"
+            IsEnabled="{Binding AllowChangeType}"
             ItemsSource="{Binding TaskTypes}"
             SelectedItem="{Binding Type}">
             <ComboBox.ItemTemplate>

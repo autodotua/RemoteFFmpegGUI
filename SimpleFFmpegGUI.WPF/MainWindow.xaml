@@ -10,6 +10,7 @@
     Title="FFmpeg 工具箱"
     Width="1200"
     Height="600"
+    ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     mc:Ignorable="d">
     <Grid>
@@ -41,7 +42,12 @@
         <ui:CommandBar
             Grid.Row="2"
             Grid.ColumnSpan="99">
-
+            <ui:AppBarButton Label="最小化到托盘" Click="TrayButton_Click">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Glyph="&#xE972;" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
+            <ui:AppBarSeparator />
             <ui:AppBarButton
                 Click="StartButton_Click"
                 Icon="Play"

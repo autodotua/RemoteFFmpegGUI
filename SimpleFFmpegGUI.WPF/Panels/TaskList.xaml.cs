@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -77,6 +78,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void CloneButton_Click(object sender, RoutedEventArgs e)
         {
+            AddTaskWindow win = App.ServiceProvider.GetService<AddTaskWindow>();
+            win.SetAsClone(((sender as FrameworkElement).DataContext as UITaskInfo).ToTask());
+            win.Owner = Window.GetWindow(this); ;
+            win.TaskCreated += (s, e) =>
+       App.ServiceProvider.GetService<TasksAndStatuses>().Refresh();
+            win.Show();
         }
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
@@ -122,11 +129,50 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 Owner = Window.GetWindow(this),
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Content = scr,
-                Width=600,
-                Height=800,
-                Title="详细参数 - FFmpeg工具箱"
+                Width = 600,
+                Height = 800,
+                Title = "详细参数 - FFmpeg工具箱"
             };
             win.Show();
+        }
+
+        private void OpenOutputFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            Debug.Assert(task != null);
+            if (!File.Exists(task.RealOutput))
+            {
+                this.CreateMessage().QueueError("找不到目标文件：" + task.RealOutput);
+                return;
+            }
+            new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = task.RealOutput,
+                    UseShellExecute = true
+                }
+            }.Start();
+        }
+
+        private void OpenOutputDirButton_Click(object sender, RoutedEventArgs e)
+        {
+            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            Debug.Assert(task != null);
+            var dir = Path.GetDirectoryName(task.RealOutput);
+            if (!Directory.Exists(dir))
+            {
+                this.CreateMessage().QueueError("找不到目标文件目录：" +dir);
+                return;
+            }
+            new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = dir,
+                    UseShellExecute = true
+                }
+            }.Start();
         }
     }
 }

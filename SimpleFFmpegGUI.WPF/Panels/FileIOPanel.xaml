@@ -12,6 +12,7 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <local:TimeSpanConverter x:Key="TimeSpanConverter" />
         <local:Int2StringConverter x:Key="Int2StringConverter" />
         <Style
             BasedOn="{StaticResource DefaultComboBoxStyle}"
@@ -97,7 +98,7 @@
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
                                         IsEnabled="{Binding EnableFrom}"
-                                        Text="{Binding From, StringFormat=hh\:mm\:ss}" />
+                                        Text="{Binding From, Converter={StaticResource TimeSpanConverter}}" />
                                     <CheckBox
                                         Grid.Row="2"
                                         Content="结束"
@@ -107,7 +108,7 @@
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
                                         IsEnabled="{Binding EnableTo}"
-                                        Text="{Binding To, StringFormat=hh\:mm\:ss}" />
+                                        Text="{Binding To, Converter={StaticResource TimeSpanConverter}}" />
                                     <CheckBox
                                         Grid.Row="4"
                                         Content="经过"
@@ -117,7 +118,7 @@
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
                                         IsEnabled="{Binding EnableDuration}"
-                                        Text="{Binding Duration, StringFormat=hh\:mm\:ss}" />
+                                        Text="{Binding Duration, Converter={StaticResource TimeSpanConverter}}" />
                                 </Grid>
                             </Grid>
                         </Border>

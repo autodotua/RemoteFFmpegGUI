@@ -266,6 +266,14 @@
                                 <MenuItem
                                     Click="CloneButton_Click"
                                     Header="建立副本" />
+                                <MenuItem
+                                    Click="OpenOutputFileButton_Click"
+                                    Header="打开目标文件"
+                                    Visibility="{Binding Status, Converter={StaticResource Equal2VisiableConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
+                                <MenuItem
+                                    Click="OpenOutputDirButton_Click"
+                                    Header="打开目标文件目录"
+                                    Visibility="{Binding Status, Converter={StaticResource Equal2VisiableConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
                             </ui:MenuFlyout>
                         </ui:FlyoutService.Flyout>
                     </Button>

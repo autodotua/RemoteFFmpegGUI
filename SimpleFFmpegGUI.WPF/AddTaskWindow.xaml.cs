@@ -41,6 +41,14 @@ namespace SimpleFFmpegGUI.WPF
         }
 
         public QueueManager Queue { get; }
+
+        private bool allowChangeType = true;
+
+        public bool AllowChangeType
+        {
+            get => allowChangeType;
+            set => this.SetValueAndNotify(ref allowChangeType, value, nameof(AllowChangeType));
+        }
     }
 
     /// <summary>
@@ -85,6 +93,14 @@ namespace SimpleFFmpegGUI.WPF
             AddToQueue(false);
         }
 
+        public void SetAsClone(TaskInfo task)
+        {
+            ViewModel.AllowChangeType = false;
+            ViewModel.Type = task.Type;
+            fileIOPanel.Update(task.Type, task.Inputs, task.Output);
+            argumentsPanel.Update(task);
+        }
+
         private void AddToQueue(bool start)
         {
             try
@@ -98,7 +114,7 @@ namespace SimpleFFmpegGUI.WPF
                 TaskCreated?.Invoke(this, EventArgs.Empty);
                 fileIOPanel.Reset();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.CreateMessage().QueueError("加入队列失败", ex);
             }
