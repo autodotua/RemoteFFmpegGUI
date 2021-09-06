@@ -35,7 +35,7 @@
                         SelectedItem="{Binding VideoOutputStrategy}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ., Converter={StaticResource Enum2DescriptionConverter}}" />
+                                <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
@@ -45,7 +45,7 @@
                         SelectedItem="{Binding AudioOutputStrategy}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ., Converter={StaticResource Enum2DescriptionConverter}}" />
+                                <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
@@ -98,7 +98,7 @@
                 </GroupBox>
                 <GroupBox
                     Header="视频"
-                    Visibility="{Binding VideoOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource Equal2VisiableConverter}}">
+                    Visibility="{Binding VideoOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource Equal2VisibleConverter}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />
@@ -242,7 +242,7 @@
                 </GroupBox>
                 <GroupBox
                     Header="音频"
-                    Visibility="{Binding AudioOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource Equal2VisiableConverter}}">
+                    Visibility="{Binding AudioOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource Equal2VisibleConverter}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />
@@ -307,7 +307,7 @@
                         SelectedItem="{Binding Concat.Type}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ., Converter={StaticResource Enum2DescriptionConverter}}" />
+                                <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>

@@ -37,7 +37,7 @@
             SelectedItem="{Binding Type}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding ., Converter={StaticResource Enum2DescriptionConverter}}" />
+                    <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>

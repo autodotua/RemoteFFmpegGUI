@@ -13,6 +13,9 @@
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     mc:Ignorable="d">
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo x:Name="taskbar" />
+    </Window.TaskbarItemInfo>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -47,7 +50,9 @@
                 Icon="List"
                 Label="查看日志" />
             <ui:AppBarSeparator />
-            <ui:AppBarButton Label="最小化到托盘" Click="TrayButton_Click">
+            <ui:AppBarButton
+                Click="TrayButton_Click"
+                Label="最小化到托盘">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE972;" />
                 </ui:AppBarButton.Icon>

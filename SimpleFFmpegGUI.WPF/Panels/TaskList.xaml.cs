@@ -162,7 +162,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             var dir = Path.GetDirectoryName(task.RealOutput);
             if (!Directory.Exists(dir))
             {
-                this.CreateMessage().QueueError("找不到目标文件目录：" +dir);
+                this.CreateMessage().QueueError("找不到目标文件目录：" + dir);
                 return;
             }
             new Process()

@@ -6,13 +6,15 @@
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:converters="clr-namespace:FzLib.WPF.Converters;assembly=FzCoreLib.Windows"
     x:Name="root"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <local:TimeSpanConverter x:Key="TimeSpanConverter" />
+        <converters:TimeSpanConverter
+            x:Key="TimeSpanMMConverter"
+            Format="hh\:mm\:ss\.fff" />
         <local:Int2StringConverter x:Key="Int2StringConverter" />
         <Style
             BasedOn="{StaticResource DefaultComboBoxStyle}"
@@ -98,7 +100,7 @@
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
                                         IsEnabled="{Binding EnableFrom}"
-                                        Text="{Binding From, Converter={StaticResource TimeSpanConverter}}" />
+                                        Text="{Binding From, Converter={StaticResource TimeSpanMMConverter}}" />
                                     <CheckBox
                                         Grid.Row="2"
                                         Content="结束"
@@ -108,7 +110,7 @@
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
                                         IsEnabled="{Binding EnableTo}"
-                                        Text="{Binding To, Converter={StaticResource TimeSpanConverter}}" />
+                                        Text="{Binding To, Converter={StaticResource TimeSpanMMConverter}}" />
                                     <CheckBox
                                         Grid.Row="4"
                                         Content="经过"
@@ -118,7 +120,7 @@
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
                                         IsEnabled="{Binding EnableDuration}"
-                                        Text="{Binding Duration, Converter={StaticResource TimeSpanConverter}}" />
+                                        Text="{Binding Duration, Converter={StaticResource TimeSpanMMConverter}}" />
                                 </Grid>
                             </Grid>
                         </Border>

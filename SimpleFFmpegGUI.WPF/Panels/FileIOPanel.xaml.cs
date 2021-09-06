@@ -170,7 +170,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         private void BrowseFileButton_Click(object sender, RoutedEventArgs e)
         {
             var input = (sender as FrameworkElement).Tag as InputArgumentsDetail;
-            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().GetFilePath();
+            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(Window.GetWindow(this)).GetFilePath();
             if (path != null)
             {
                 input.FilePath = path;
@@ -199,7 +199,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public void BrowseAndAddInput()
         {
-            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().GetFilePath();
+            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(Window.GetWindow(this)).GetFilePath();
             if (path != null)
             {
                 var input = new InputArgumentsDetail();
@@ -210,69 +210,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void BrowseOutputFileButton_Click(object sender, RoutedEventArgs e)
         {
-            string path = new FileFilterCollection().AddAll().CreateSaveFileDialog().GetFilePath();
+            string path = new FileFilterCollection().AddAll().CreateSaveFileDialog().SetParent(Window.GetWindow(this)).GetFilePath();
             if (path != null)
             {
                 path = path.RemoveEnd(".*");
                 ViewModel.Output = path;
             }
-        }
-    }
-
-    public class TimeSpanConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-            if (value is TimeSpan ts)
-            {
-                return ts.ToString("hh\\:mm\\:ss");
-            }
-            throw new Exception("绑定源必须为TimeSpan");
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-            if (value is string str)
-            {
-                str = str.Trim().ToLower();
-                if (str.Any(p => p is ';' or '：' or '：'))
-                {
-                    str = str
-                        .Replace(";", ":")
-                        .Replace("；", ":")
-                        .Replace('：', ':');
-                }
-                if (str.Count(p => p == ':') == 1)
-                {
-                    str = "0:" + str;
-                }
-                if (TimeSpan.TryParse(str, out TimeSpan t))
-                {
-                    return t;
-                }
-                if (double.TryParse(str.TrimEnd('s'), out double s))
-                {
-                    return TimeSpan.FromSeconds(s);
-                }
-                if (str.EndsWith('m') && double.TryParse(str.TrimEnd('m'), out double m))
-                {
-                    return TimeSpan.FromMinutes(m);
-                }
-                if (str.EndsWith('h') && double.TryParse(str.TrimEnd('h'), out double h))
-                {
-                    return TimeSpan.FromHours(h);
-                }
-                throw new Exception("转换失败");
-            }
-            throw new Exception("绑定目标必须为String");
         }
     }
 }

@@ -82,7 +82,7 @@
                             <RowDefinition Height="4" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBlock Text="{Binding Type, Converter={StaticResource Enum2DescriptionConverter}}" />
+                        <TextBlock Text="{Binding Type, Converter={StaticResource DescriptionConverter}}" />
                         <TextBlock
                             Grid.Column="2"
                             Text="{Binding IOText}"
@@ -148,7 +148,7 @@
                         Grid.Column="2"
                         Orientation="Horizontal"
                         Spacing="16">
-                        <TextBlock Text="{Binding Type, Converter={StaticResource Enum2DescriptionConverter}}" />
+                        <TextBlock Text="{Binding Type, Converter={StaticResource DescriptionConverter}}" />
                         <Button
                             Margin="-8,-4"
                             Padding="8,4"
@@ -165,7 +165,7 @@
                     <TextBlock
                         Grid.Row="2"
                         Grid.Column="2"
-                        Text="{Binding Status, Converter={StaticResource Enum2DescriptionConverter}}" />
+                        Text="{Binding Status, Converter={StaticResource DescriptionConverter}}" />
                     <TextBlock
                         Grid.Row="4"
                         FontWeight="Bold"
@@ -269,11 +269,11 @@
                                 <MenuItem
                                     Click="OpenOutputFileButton_Click"
                                     Header="打开目标文件"
-                                    Visibility="{Binding Status, Converter={StaticResource Equal2VisiableConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
+                                    Visibility="{Binding Status, Converter={StaticResource Equal2VisibleConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
                                 <MenuItem
                                     Click="OpenOutputDirButton_Click"
                                     Header="打开目标文件目录"
-                                    Visibility="{Binding Status, Converter={StaticResource Equal2VisiableConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
+                                    Visibility="{Binding Status, Converter={StaticResource Equal2VisibleConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
                             </ui:MenuFlyout>
                         </ui:FlyoutService.Flyout>
                     </Button>

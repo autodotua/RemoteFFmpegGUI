@@ -5,7 +5,6 @@ using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAPICodePack.FzExtension;
 using ModernWpf.FzExtension.CommonDialog;
-using Notifications.Wpf.Core;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using System;

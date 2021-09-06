@@ -58,7 +58,7 @@
                     Binding="{Binding Time, StringFormat={StaticResource DateTimeFormat}}"
                     Header="时间" />
                 <DataGridTextColumn
-                    Binding="{Binding Type, Converter={StaticResource Enum2StringConverter}, ConverterParameter=I:信息;O:输出;E:错误;W:警告}"
+                    Binding="{Binding Type, Converter={StaticResource StringReplaceConverter}, ConverterParameter=I:信息;O:输出;E:错误;W:警告}"
                     Header="类型" />
                 <DataGridTextColumn
                     Binding="{Binding Message}"

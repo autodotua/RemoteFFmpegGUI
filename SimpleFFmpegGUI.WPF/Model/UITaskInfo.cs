@@ -68,7 +68,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         public string StatusText => Status switch
         {
             TaskStatus.Processing => Percent.ToString("0.00%"),
-            _ => Enum2DescriptionConverter.GetDescription(Status)
+            _ => DescriptionConverter.GetDescription(Status)
         };
 
         public Brush Color => Status switch
