@@ -42,6 +42,11 @@
         <ui:CommandBar
             Grid.Row="2"
             Grid.ColumnSpan="99">
+            <ui:AppBarButton
+                Click="LogsButton_Click"
+                Icon="List"
+                Label="查看日志" />
+            <ui:AppBarSeparator />
             <ui:AppBarButton Label="最小化到托盘" Click="TrayButton_Click">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE972;" />

@@ -123,5 +123,12 @@ namespace SimpleFFmpegGUI.WPF
                 }
             }
         }
+
+        private void LogsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var win = App.ServiceProvider.GetService<LogsWindow>();
+            win.Owner = this;
+            win.Show();
+        }
     }
 }

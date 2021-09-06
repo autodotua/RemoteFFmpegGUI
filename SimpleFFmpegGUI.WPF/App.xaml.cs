@@ -26,8 +26,14 @@ namespace SimpleFFmpegGUI.WPF
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+#if !DEBUG
+
             UnhandledException.RegistAll();
             UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
+
+#endif
+
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
@@ -53,15 +59,18 @@ namespace SimpleFFmpegGUI.WPF
             services.AddSingleton<QueueManager>();
             services.AddSingleton<TasksAndStatuses>();
 
-            services.AddSingleton<MainWindow>();
+            services.AddTransient<MainWindow>();
             services.AddTransient<MainWindowViewModel>();
-            services.AddTransient<TaskListViewModel>();
 
             services.AddTransient<AddTaskWindow>();
+            services.AddTransient<AddTaskWindowViewModel>();
 
+            services.AddTransient<LogsWindow>();
+            services.AddTransient<LogsWindowViewModel>();
+
+            services.AddTransient<TaskListViewModel>();
             services.AddTransient<CodeArgumentsPanelViewModel>();
             services.AddTransient<FileIOPanelViewModel>();
-            services.AddSingleton<AddTaskWindowViewModel>();
             services.AddTransient<PresetsPanelViewModel>();
             services.AddTransient<StatusPanelViewModel>();
         }
