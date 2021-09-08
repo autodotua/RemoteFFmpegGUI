@@ -174,5 +174,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 }
             }.Start();
         }
+
+        private void LogsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            Debug.Assert(task != null);
+            var logWin = App.ServiceProvider.GetService<LogsWindow>();
+            logWin.FillLogs(task.Id);
+            logWin.Show();
+        }
     }
 }

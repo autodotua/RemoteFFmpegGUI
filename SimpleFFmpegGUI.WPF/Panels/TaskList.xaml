@@ -266,6 +266,7 @@
                                 <MenuItem
                                     Click="CloneButton_Click"
                                     Header="建立副本" />
+                                <MenuItem Header="查看日志"  Click="LogsButton_Click" />
                                 <MenuItem
                                     Click="OpenOutputFileButton_Click"
                                     Header="打开目标文件"

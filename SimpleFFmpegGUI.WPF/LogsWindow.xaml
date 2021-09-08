@@ -42,17 +42,28 @@
                 DisplayMemberPath="IOText"
                 ItemsSource="{Binding Tasks}"
                 SelectedItem="{Binding SelectedTask}" />
+            <ComboBox
+                Margin="0,8,16,0"
+                ui:ControlHelper.Header="类型"
+                SelectedIndex="{Binding TypeIndex}">
+                <ComboBoxItem>全部</ComboBoxItem>
+                <ComboBoxItem>错误</ComboBoxItem>
+                <ComboBoxItem>警告</ComboBoxItem>
+                <ComboBoxItem>信息</ComboBoxItem>
+                <ComboBoxItem>输出</ComboBoxItem>
+            </ComboBox>
             <Button
                 VerticalAlignment="Bottom"
                 Click="FilterButton_Click">
                 筛选
             </Button>
         </WrapPanel>
-        <DataGrid ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+        <DataGrid
             Grid.Row="2"
             AutoGenerateColumns="False"
             IsReadOnly="True"
-            ItemsSource="{Binding Logs}">
+            ItemsSource="{Binding Logs}"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Binding="{Binding Time, StringFormat={StaticResource DateTimeFormat}}"

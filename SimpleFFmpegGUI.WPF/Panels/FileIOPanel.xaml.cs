@@ -217,5 +217,36 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 ViewModel.Output = path;
             }
         }
+
+        protected override void OnDragOver(DragEventArgs e)
+        {
+            base.OnDragOver(e);
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Link;
+            }
+        }
+
+        protected override void OnDrop(DragEventArgs e)
+        {
+            base.OnDrop(e);
+            var files = e.Data.GetData(DataFormats.FileDrop) as string[];
+
+            foreach (var file in ViewModel.Inputs.Where(p => string.IsNullOrEmpty(p.FilePath)).ToList())
+            {
+                ViewModel.Inputs.Remove(file);
+            }
+            foreach (string file in files)
+            {
+                if (File.Exists(file))
+                {
+                    ViewModel.Inputs.Add(new InputArgumentsDetail() { FilePath = file });
+                }
+            }
+            while (ViewModel.Inputs.Count < ViewModel.MinInputsCount)
+            {
+                ViewModel.Inputs.Add(new InputArgumentsDetail());
+            }
+        }
     }
 }

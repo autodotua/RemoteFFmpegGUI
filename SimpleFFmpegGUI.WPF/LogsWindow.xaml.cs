@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -74,18 +75,27 @@ namespace SimpleFFmpegGUI.WPF
             set => this.SetValueAndNotify(ref selectedTask, value, nameof(SelectedTask));
         }
 
-        private string type;
-
-        public string Type
-        {
-            get => type;
-            set => this.SetValueAndNotify(ref type, value, nameof(Type));
-        }
-
         public void FillLogs()
         {
-            Logs = LogManager.GetLogs(taskId: SelectedTask.Id, from: From, to: To).List;
+            Logs = LogManager.GetLogs(type: Type, taskId: SelectedTask?.Id??0, from: From, to: To).List;
         }
+
+        private int typeIndex;
+
+        public int TypeIndex
+        {
+            get => typeIndex;
+            set => this.SetValueAndNotify(ref typeIndex, value, nameof(TypeIndex));
+        }
+
+        public char? Type => typeIndex switch
+        {
+            0 => null,
+            1 => 'E',
+            2 => 'W',
+            3 => 'I',
+            4 => 'O'
+        };
     }
 
     /// <summary>
@@ -104,6 +114,15 @@ namespace SimpleFFmpegGUI.WPF
 
         private void FilterButton_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.FillLogs();
+        }
+
+        public void FillLogs(int taskID)
+        {
+            var task = ViewModel.Tasks.FirstOrDefault(p => p.Id == taskID);
+            Debug.Assert(task != null);
+            ViewModel.SelectedTask = task;
+            ViewModel.From = DateTime.MinValue;
             ViewModel.FillLogs();
         }
     }
