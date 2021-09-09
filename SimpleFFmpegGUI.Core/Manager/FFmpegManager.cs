@@ -280,10 +280,10 @@ namespace SimpleFFmpegGUI.Manager
             string psnr = null;
             try
             {
-                await RunAsync(p, null, cancellationToken);
+                await RunAsync(p, null, cancellationToken, true);
                 if (ssim == null || psnr == null)
                 {
-                    throw new Exception("对比视频失败，为识别到对比结果");
+                    throw new Exception("对比视频失败，未识别到对比结果");
                 }
                 task.Message = ssim + Environment.NewLine + psnr;
             }
@@ -367,7 +367,7 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
-        private async Task RunAsync(FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken)
+        private async Task RunAsync(FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken, bool useInstances = false)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -380,15 +380,24 @@ namespace SimpleFFmpegGUI.Manager
             {
                 Progress.Name = desc;
             }
-            Process = new FFmpegProcess(processor.Arguments);
-            Process.Output += Output;
-            try
+            if (useInstances)
             {
-                await Process.StartAsync(cancellationToken);
+                processor.CancellableThrough(cancellationToken);
+                processor.NotifyOnOutput((str, type) => Output(null, new FFmpegOutputEventArgs() { Data = str }));
+                await processor.ProcessAsynchronously();
             }
-            finally
+            else
             {
-                Process = null;
+                Process = new FFmpegProcess(processor.Arguments);
+                Process.Output += Output;
+                try
+                {
+                    await Process.StartAsync(cancellationToken);
+                }
+                finally
+                {
+                    Process = null;
+                }
             }
         }
 
@@ -575,7 +584,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             if (Process == null)
             {
-                throw new Exception("进程还未启动，不可暂停");
+                throw new Exception("进程还未启动或该任务不允许暂停");
             }
             Paused = true;
             Logger.Info(task, "暂停队列");

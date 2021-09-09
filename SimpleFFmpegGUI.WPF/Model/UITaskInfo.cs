@@ -16,6 +16,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class UITaskInfo : ModelBase, INotifyPropertyChanged
     {
+        public string Title => DescriptionConverter.GetDescription(Type) + "：" + InputText;
         public string IOText => $"{InputText} → {OutputText}";
 
         public string InputText
@@ -28,6 +29,22 @@ namespace SimpleFFmpegGUI.WPF.Model
                 }
                 string path = Path.GetFileName(inputs[0].FilePath);
                 return inputs.Count == 1 ? path : path + "等";
+            }
+        }
+
+        public string InputDetailText
+        {
+            get
+            {
+                if (inputs.Count != 1)
+                {
+                    return InputText;
+                }
+                string name = Path.GetFileName(inputs[0].FilePath);
+                return name
+                    + (inputs[0].From.HasValue ? $" 开始：{inputs[0].From.Value:hh\\:mm\\:ss\\.fff}" : "")
+                    + (inputs[0].To.HasValue ? $" 结束：{inputs[0].To.Value:hh\\:mm\\:ss\\.fff}" : "")
+                    + (inputs[0].Duration.HasValue ? $" 经过：{inputs[0].Duration.Value:hh\\:mm\\:ss\\.fff}" : "");
             }
         }
 

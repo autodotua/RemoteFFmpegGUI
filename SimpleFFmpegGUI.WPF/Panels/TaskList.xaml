@@ -173,7 +173,7 @@
                     <TextBlock
                         Grid.Row="4"
                         Grid.Column="4"
-                        Text="{Binding InputsText}"
+                        Text="{Binding InputDetailText}"
                         TextTrimming="CharacterEllipsis" />
                     <TextBlock
                         Grid.Row="6"
@@ -196,36 +196,31 @@
                     <TextBlock
                         Grid.Row="10"
                         FontWeight="Bold"
-                        Text="开始时间" />
+                        Text="执行时间"
+                        TextTrimming="CharacterEllipsis" />
                     <TextBlock
                         Grid.Row="10"
-                        Grid.Column="2"
-                        Text="{Binding StartTime, StringFormat={StaticResource DateTimeFormat}}" />
+                        Grid.Column="2">
+                        <Run Text="{Binding StartTime, StringFormat={StaticResource DateTimeFormat}, Mode=OneWay}" />
+                        <Run Text="&#160;&#160;&#160;&#160;" />
+                        <Run Text="{Binding FinishTime, StringFormat={StaticResource DateTimeFormat}, Mode=OneWay}" />
+                    </TextBlock>
                     <TextBlock
                         Grid.Row="12"
-                        FontWeight="Bold"
-                        Text="结束时间" />
-                    <TextBlock
-                        Grid.Row="12"
-                        Grid.Column="2"
-                        Text="{Binding FinishTime, StringFormat={StaticResource DateTimeFormat}}" />
-                    <TextBlock
-                        Grid.Row="14"
                         FontWeight="Bold"
                         Text="信息" />
                     <TextBlock
-                        Grid.Row="14"
+                        Grid.Row="12"
                         Grid.Column="2"
                         Text="{Binding Message}" />
                     <TextBlock
-                        Grid.Row="16"
+                        Grid.Row="14"
                         FontWeight="Bold"
                         Text="FFmpeg参数" />
                     <TextBox
-                        Grid.Row="16"
+                        Grid.Row="14"
                         Grid.Column="2"
                         BorderThickness="0"
-                        Focusable="False"
                         IsReadOnly="True"
                         MaxLines="3"
                         Text="{Binding FFmpegArguments}"
@@ -266,7 +261,9 @@
                                 <MenuItem
                                     Click="CloneButton_Click"
                                     Header="建立副本" />
-                                <MenuItem Header="查看日志"  Click="LogsButton_Click" />
+                                <MenuItem
+                                    Click="LogsButton_Click"
+                                    Header="查看日志" />
                                 <MenuItem
                                     Click="OpenOutputFileButton_Click"
                                     Header="打开目标文件"

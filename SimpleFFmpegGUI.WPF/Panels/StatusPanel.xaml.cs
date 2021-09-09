@@ -58,17 +58,29 @@ namespace SimpleFFmpegGUI.WPF.Panels
             UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
             Debug.Assert(task != null);
             Debug.Assert(task.ProcessManager != null);
-            task.ProcessManager.Cancel();
+            try
+            {
+                task.ProcessManager.Cancel();
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError("取消失败", ex);
+            }
         }
-
-
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
             UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
             Debug.Assert(task != null);
             Debug.Assert(task.ProcessManager != null);
-            task.ProcessManager.Suspend();
+            try
+            {
+                task.ProcessManager.Suspend();
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError("该任务无法暂停", ex);
+            }
         }
 
         private void ResumeButton_Click(object sender, RoutedEventArgs e)
@@ -76,8 +88,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
             UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
             Debug.Assert(task != null);
             Debug.Assert(task.ProcessManager != null);
-            task.ProcessManager.Resume();
-
+            try
+            {
+                task.ProcessManager.Resume();
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError("恢复失败", ex);
+            }
         }
     }
 }

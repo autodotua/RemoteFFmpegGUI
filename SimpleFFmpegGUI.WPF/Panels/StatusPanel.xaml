@@ -28,7 +28,7 @@
                             ClipToBounds="True">
                             <ui:SimpleStackPanel Spacing="8">
                                 <TextBlock
-                                    Text="{Binding InputText}"
+                                    Text="{Binding Title}"
                                     TextAlignment="Center" />
                                 <Grid
                                     Margin="8"
@@ -179,6 +179,6 @@
             VerticalAlignment="Center"
             Opacity="0.6"
             Text="当前没有正在执行的任务"
-            Visibility="{Binding IsRunning, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=1}" />
+            Visibility="{Binding IsRunning, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
     </Grid>
 </UserControl>
