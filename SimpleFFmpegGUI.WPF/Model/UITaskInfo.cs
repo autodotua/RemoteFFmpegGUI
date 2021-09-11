@@ -16,6 +16,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class UITaskInfo : ModelBase, INotifyPropertyChanged
     {
+        public Guid TempID = Guid.NewGuid();
         public string Title => DescriptionConverter.GetDescription(Type) + "：" + InputText;
         public string IOText => $"{InputText} → {OutputText}";
 

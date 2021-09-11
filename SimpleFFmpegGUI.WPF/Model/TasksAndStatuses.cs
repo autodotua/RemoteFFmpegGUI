@@ -8,7 +8,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
+using System;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
@@ -41,7 +43,7 @@ namespace SimpleFFmpegGUI.WPF.Model
                 {
                     Statuses.Add(unstartStatus);
                 }
-                manager.StatusChanged += Manager_StatusChanged;
+                manager.FFmpegOutput += Manager_StatusChanged;
             }
             else
             {
@@ -56,7 +58,11 @@ namespace SimpleFFmpegGUI.WPF.Model
                 task.UpdateSelf();
 
                 Statuses.Remove(status);
-                manager.StatusChanged -= Manager_StatusChanged;
+                manager.FFmpegOutput -= Manager_StatusChanged;
+                GetMainWindowAnd(mainWindow =>
+                {
+                    mainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
+                });
             }
             ProcessingTasks = Tasks.Where(p => p.ProcessStatus != null).ToList();
         }
@@ -69,7 +75,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             private set => this.SetValueAndNotify(ref processingTasks, value, nameof(ProcessingTasks));
         }
 
-        private void Manager_StatusChanged(object sender, System.EventArgs e)
+        private void Manager_StatusChanged(object sender, FFmpegOutputEventArgs e)
         {
             var manager = sender as FFmpegManager;
             var newStatus = manager.GetStatus();
@@ -79,6 +85,31 @@ namespace SimpleFFmpegGUI.WPF.Model
             Debug.Assert(task.ProcessStatus != null);
 
             task.ProcessStatus = newStatus;
+            if (manager == Queue.MainQueueManager || Queue.Managers.Count == 1)//主队列，或者只有一个任务，则在状态栏上显示进度
+            {
+                GetMainWindowAnd(mainWindow =>
+                {
+                    if (newStatus.HasDetail)
+                    {
+                        mainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+                        mainWindow.TaskbarItemInfo.ProgressValue = newStatus.Progress.Percent;
+                    }
+                    else
+                    {
+                        mainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Indeterminate;
+                    }
+                });
+            }
+        }
+
+        private static void GetMainWindowAnd(Action<MainWindow> action)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                var mainWindow = App.ServiceProvider.GetService<MainWindow>();
+                Debug.Assert(mainWindow != null);
+                action(mainWindow);
+            });
         }
 
         public void Refresh()

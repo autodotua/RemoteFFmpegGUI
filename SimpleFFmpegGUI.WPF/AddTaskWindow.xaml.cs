@@ -96,9 +96,13 @@ namespace SimpleFFmpegGUI.WPF
         public void SetAsClone(TaskInfo task)
         {
             ViewModel.AllowChangeType = false;
-            ViewModel.Type = task.Type;
             fileIOPanel.Update(task.Type, task.Inputs, task.Output);
             argumentsPanel.Update(task);
+        }
+
+        public void SetFiles(IEnumerable<string> files)
+        {
+            fileIOPanel.Update(TaskType.Code, files.Select(p => new InputArguments() { FilePath = p }).ToList(), null);
         }
 
         private void AddToQueue(bool start)

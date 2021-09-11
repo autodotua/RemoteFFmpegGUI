@@ -64,7 +64,7 @@ namespace SimpleFFmpegGUI.Manager
                     {
                         tcs.SetException(new Exception($"进程退出返回错误退出码：" + process.ExitCode));
                     }
-                    process.Dispose();
+                    Task.Delay(10000).ContinueWith(t => process.Dispose());
                 }
                 catch (Exception ex)
                 {
@@ -76,7 +76,7 @@ namespace SimpleFFmpegGUI.Manager
 
         private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if(e.Data==null)
+            if (e.Data == null)
             {
                 return;
             }

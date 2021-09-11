@@ -12,9 +12,10 @@
     Height="600"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
+    AllowDrop="True"
     mc:Ignorable="d">
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo x:Name="taskbar" />
+        <TaskbarItemInfo />
     </Window.TaskbarItemInfo>
     <Grid>
         <Grid.RowDefinitions>
@@ -38,21 +39,15 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch"
             Background="{DynamicResource TextControlBorderBrush}" />
-        <panels:StatusPanel
-            x:Name="statusPanel"
-            Grid.Column="2" />
+        <panels:StatusPanel x:Name="statusPanel" Grid.Column="2" />
 
-        <ui:CommandBar
-            Grid.Row="2"
-            Grid.ColumnSpan="99">
+        <ui:CommandBar Grid.Row="2" Grid.ColumnSpan="99">
             <ui:AppBarButton
                 Click="LogsButton_Click"
                 Icon="List"
                 Label="查看日志" />
             <ui:AppBarSeparator />
-            <ui:AppBarButton
-                Click="TrayButton_Click"
-                Label="最小化到托盘">
+            <ui:AppBarButton Click="TrayButton_Click" Label="最小化到托盘">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE972;" />
                 </ui:AppBarButton.Icon>

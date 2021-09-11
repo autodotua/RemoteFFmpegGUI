@@ -59,7 +59,7 @@ namespace SimpleFFmpegGUI.WPF
             services.AddSingleton<QueueManager>();
             services.AddSingleton<TasksAndStatuses>();
 
-            services.AddTransient<MainWindow>();
+            services.AddSingleton<MainWindow>();
             services.AddTransient<MainWindowViewModel>();
 
             services.AddTransient<AddTaskWindow>();

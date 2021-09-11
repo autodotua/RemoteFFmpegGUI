@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -129,6 +130,31 @@ namespace SimpleFFmpegGUI.WPF
             var win = App.ServiceProvider.GetService<LogsWindow>();
             win.Owner = this;
             win.Show();
+        }
+
+        protected override void OnDragOver(DragEventArgs e)
+        {
+            base.OnDragOver(e);
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Link;
+            }
+        }
+
+        protected override void OnDrop(DragEventArgs e)
+        {
+            base.OnDrop(e);
+            IEnumerable<string> files = e.Data.GetData(DataFormats.FileDrop) as string[];
+            files = files.Where(p => File.Exists(p));
+            if (files.Any())
+            {
+                var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
+                dialog.Owner = this;
+                dialog.TaskCreated += (s, e) =>
+                App.ServiceProvider.GetService<TasksAndStatuses>().Refresh();
+                dialog.SetFiles(files);
+                dialog.Show();
+            }
         }
     }
 }

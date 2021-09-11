@@ -45,8 +45,6 @@ namespace SimpleFFmpegGUI.Manager
         private FFmpegProcess Process { get; set; }
         private string lastOutput;
 
-        public event EventHandler StatusChanged;
-
         public StatusDto GetStatus()
         {
             if (Process == null)
@@ -280,7 +278,7 @@ namespace SimpleFFmpegGUI.Manager
             string psnr = null;
             try
             {
-                await RunAsync(p, null, cancellationToken, true);
+                await RunAsync(p, null, cancellationToken);
                 if (ssim == null || psnr == null)
                 {
                     throw new Exception("对比视频失败，未识别到对比结果");
@@ -406,7 +404,6 @@ namespace SimpleFFmpegGUI.Manager
             lastOutput = e.Data;
             Logger.Output(task, e.Data);
             FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(e.Data));
-            StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void ApplyInputArguments(FFMpegArgumentOptions fa, InputArguments a)
