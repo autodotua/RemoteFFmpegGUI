@@ -137,39 +137,30 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             var task = (sender as FrameworkElement).DataContext as UITaskInfo;
             Debug.Assert(task != null);
+            OpenOutputFileOrFolder(task, false);
+        }
+
+        private void OpenOutputFileOrFolder(UITaskInfo task, bool folder)
+        {
+            if (string.IsNullOrWhiteSpace(task.RealOutput))
+            {
+                this.CreateMessage().QueueError("输出为空");
+                return;
+            }
             if (!File.Exists(task.RealOutput))
             {
                 this.CreateMessage().QueueError("找不到目标文件：" + task.RealOutput);
                 return;
             }
-            new Process()
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    FileName = task.RealOutput,
-                    UseShellExecute = true
-                }
-            }.Start();
+            OpenFileOrFolder(task.RealOutput, folder);
         }
 
         private void OpenOutputDirButton_Click(object sender, RoutedEventArgs e)
         {
             var task = (sender as FrameworkElement).DataContext as UITaskInfo;
             Debug.Assert(task != null);
-            var dir = Path.GetDirectoryName(task.RealOutput);
-            if (!Directory.Exists(dir))
-            {
-                this.CreateMessage().QueueError("找不到目标文件目录：" + dir);
-                return;
-            }
-            new Process()
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    FileName = dir,
-                    UseShellExecute = true
-                }
-            }.Start();
+
+            OpenOutputFileOrFolder(task, true);
         }
 
         private void LogsButton_Click(object sender, RoutedEventArgs e)
@@ -179,6 +170,54 @@ namespace SimpleFFmpegGUI.WPF.Panels
             var logWin = App.ServiceProvider.GetService<LogsWindow>();
             logWin.FillLogs(task.Id);
             logWin.Show();
+        }
+
+        private void OpenInputFileOrFolder(InputArguments input, bool folder)
+        {
+            string path = input.FilePath;
+            if (!File.Exists(path))
+            {
+                this.CreateMessage().QueueError("找不到文件：" + path);
+                return;
+            }
+            OpenFileOrFolder(path, folder);
+        }
+
+        private void OpenInputFileMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if ((e.OriginalSource as MenuItem).DataContext is InputArguments i)
+            {
+                OpenInputFileOrFolder(i, false);
+            }
+        }
+
+        private void OpenInputDirMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if ((e.OriginalSource as MenuItem).DataContext is InputArguments i)
+            {
+                OpenInputFileOrFolder(i, true);
+            }
+        }
+
+        private void OpenFileOrFolder(string path, bool folder)
+        {
+            var p = new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    UseShellExecute = true
+                }
+            };
+            if (folder)
+            {
+                p.StartInfo.FileName = "explorer.exe";
+                p.StartInfo.Arguments = @$"/select,""{path}""";
+            }
+            else
+            {
+                p.StartInfo.FileName = path;
+            }
+            p.Start();
         }
     }
 }
