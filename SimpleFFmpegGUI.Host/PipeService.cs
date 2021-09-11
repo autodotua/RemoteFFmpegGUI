@@ -42,7 +42,7 @@ namespace SimpleFFmpegGUI
 
         public int AddTask(TaskType type, List<InputArguments> inputs, string outputPath, OutputArguments arg, bool start)
         {
-            int id = TaskManager.AddTask(type, inputs, outputPath, arg);
+            int id = TaskManager.AddTask(type, inputs, outputPath, arg).Id;
 
             if (start)
             {

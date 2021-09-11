@@ -31,7 +31,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public TaskListViewModel(QueueManager queue)
         {
             Queue = queue;
-            Tasks.Refresh();
         }
 
         public TasksAndStatuses Tasks => App.ServiceProvider.GetService<TasksAndStatuses>();
@@ -80,9 +79,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             AddTaskWindow win = App.ServiceProvider.GetService<AddTaskWindow>();
             win.SetAsClone(((sender as FrameworkElement).DataContext as UITaskInfo).ToTask());
-            win.Owner = Window.GetWindow(this); ;
-            win.TaskCreated += (s, e) =>
-       App.ServiceProvider.GetService<TasksAndStatuses>().Refresh();
+            win.Owner = Window.GetWindow(this);
             win.Show();
         }
 

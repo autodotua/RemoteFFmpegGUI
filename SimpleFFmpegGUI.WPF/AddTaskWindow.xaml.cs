@@ -3,6 +3,7 @@ using FzLib;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
+using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -113,9 +114,10 @@ namespace SimpleFFmpegGUI.WPF
                 string output = fileIOPanel.GetOutput();
                 OutputArguments args = argumentsPanel.GetOutputArguments();
 
-                TaskManager.AddTask(ViewModel.Type, inputs, output, args);
+                var task = TaskManager.AddTask(ViewModel.Type, inputs, output, args);
                 this.CreateMessage().QueueSuccess("已加入队列");
-                TaskCreated?.Invoke(this, EventArgs.Empty);
+                App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
+
                 fileIOPanel.Reset();
             }
             catch (Exception ex)
@@ -128,7 +130,7 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        public event EventHandler TaskCreated;
+        //public event EventHandler<TaskInfo> TaskCreated;
 
         private async void SaveToPresetButton_Click(object sender, RoutedEventArgs e)
         {

@@ -27,10 +27,13 @@ namespace SimpleFFmpegGUI.WPF.Panels
 {
     public class StatusPanelViewModel : INotifyPropertyChanged
     {
+        private bool created = false;
+
         public StatusPanelViewModel(QueueManager queue)
         {
+            Debug.Assert(!created);
+            created = true;
             Queue = queue;
-            Tasks.Refresh();
             queue.TaskManagersChanged += (s, e) => this.Notify(nameof(IsRunning));
         }
 

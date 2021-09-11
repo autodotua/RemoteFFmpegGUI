@@ -19,7 +19,7 @@ namespace SimpleFFmpegGUI.Manager
             db.SaveChanges();
         }
 
-        public static int AddTask(TaskType type, List<InputArguments> path, string outputPath, OutputArguments arg)
+        public static TaskInfo AddTask(TaskType type, List<InputArguments> path, string outputPath, OutputArguments arg)
         {
             using FFmpegDbContext db = FFmpegDbContext.GetNew();
             var task = new TaskInfo()
@@ -32,7 +32,7 @@ namespace SimpleFFmpegGUI.Manager
             db.Tasks.Add(task);
             db.SaveChanges();
             Logger.Info(task, "新建任务");
-            return task.Id;
+            return task;
         }
 
         public static PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)

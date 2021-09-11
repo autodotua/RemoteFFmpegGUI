@@ -64,7 +64,7 @@
                 Label="终止队列"
                 Visibility="{Binding StopMainQueueButtonVisibility}" />
             <ui:AppBarButton
-                Click="Button_Click"
+                Click="AddButton_Click"
                 Icon="Add"
                 Label="创建任务" />
         </ui:CommandBar>

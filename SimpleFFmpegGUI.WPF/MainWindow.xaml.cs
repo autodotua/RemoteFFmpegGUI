@@ -6,6 +6,7 @@ using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -56,12 +57,10 @@ namespace SimpleFFmpegGUI.WPF
             this.queue = queue;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
             dialog.Owner = this;
-            dialog.TaskCreated += (s, e) =>
-            App.ServiceProvider.GetService<TasksAndStatuses>().Refresh();
             dialog.Show();
         }
 
@@ -150,10 +149,32 @@ namespace SimpleFFmpegGUI.WPF
             {
                 var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
                 dialog.Owner = this;
-                dialog.TaskCreated += (s, e) =>
-                App.ServiceProvider.GetService<TasksAndStatuses>().Refresh();
                 dialog.SetFiles(files);
                 dialog.Show();
+            }
+        }
+
+        protected async override void OnContentRendered(EventArgs e)
+        {
+            base.OnContentRendered(e);
+            await Task.Yield();
+            try
+            {
+                await Task.Run(() => Process.Start("ffmpeg"));
+            }
+            catch (Exception ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync("找不到ffmpeg程序");
+                Close();
+            }
+            try
+            {
+                await Task.Run(() => Process.Start("ffprobe"));
+            }
+            catch (Exception ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync("找不到ffprobe程序");
+                Close();
             }
         }
     }

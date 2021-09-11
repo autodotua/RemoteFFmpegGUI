@@ -16,7 +16,6 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class UITaskInfo : ModelBase, INotifyPropertyChanged
     {
-        public Guid TempID = Guid.NewGuid();
         public string Title => DescriptionConverter.GetDescription(Type) + "：" + InputText;
         public string IOText => $"{InputText} → {OutputText}";
 
@@ -219,6 +218,11 @@ namespace SimpleFFmpegGUI.WPF.Model
         public TaskInfo ToTask()
         {
             return this.Adapt<TaskInfo>();
+        }
+
+        public static UITaskInfo FromTask(TaskInfo task)
+        {
+            return task.Adapt<UITaskInfo>();
         }
 
         public void UpdateSelf()

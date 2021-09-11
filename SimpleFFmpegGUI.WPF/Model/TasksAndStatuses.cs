@@ -11,6 +11,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System;
+using System.Windows.Shell;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
@@ -20,6 +21,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public TasksAndStatuses(QueueManager queue)
         {
+            Refresh();
             Queue = queue;
             queue.TaskManagersChanged += Queue_TaskManagersChanged;
         }
@@ -43,7 +45,7 @@ namespace SimpleFFmpegGUI.WPF.Model
                 {
                     Statuses.Add(unstartStatus);
                 }
-                manager.FFmpegOutput += Manager_StatusChanged;
+                manager.StatusChanged += Manager_StatusChanged;
             }
             else
             {
@@ -58,10 +60,15 @@ namespace SimpleFFmpegGUI.WPF.Model
                 task.UpdateSelf();
 
                 Statuses.Remove(status);
-                manager.FFmpegOutput -= Manager_StatusChanged;
-                GetMainWindowAnd(mainWindow =>
+                manager.StatusChanged -= Manager_StatusChanged;
+                GetMainWindowAnd(async mainWindow =>
                 {
-                    mainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
+                    if (task.Status is TaskStatus.Error or TaskStatus.Cancel)
+                    {
+                        mainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
+                        await System.Threading.Tasks.Task.Delay(1000);
+                    }
+                    mainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
                 });
             }
             ProcessingTasks = Tasks.Where(p => p.ProcessStatus != null).ToList();
@@ -75,7 +82,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             private set => this.SetValueAndNotify(ref processingTasks, value, nameof(ProcessingTasks));
         }
 
-        private void Manager_StatusChanged(object sender, FFmpegOutputEventArgs e)
+        private void Manager_StatusChanged(object sender, EventArgs e)
         {
             var manager = sender as FFmpegManager;
             var newStatus = manager.GetStatus();
@@ -91,12 +98,13 @@ namespace SimpleFFmpegGUI.WPF.Model
                 {
                     if (newStatus.HasDetail)
                     {
-                        mainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+                        mainWindow.TaskbarItemInfo.ProgressState =
+                        manager.Paused ? TaskbarItemProgressState.Paused : TaskbarItemProgressState.Normal;
                         mainWindow.TaskbarItemInfo.ProgressValue = newStatus.Progress.Percent;
                     }
                     else
                     {
-                        mainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Indeterminate;
+                        mainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
                     }
                 });
             }
@@ -112,7 +120,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             });
         }
 
-        public void Refresh()
+        private void Refresh()
         {
             var tasks = TaskManager.GetTasks();
             Tasks = new ObservableCollection<UITaskInfo>(tasks.List.Adapt<List<UITaskInfo>>());
