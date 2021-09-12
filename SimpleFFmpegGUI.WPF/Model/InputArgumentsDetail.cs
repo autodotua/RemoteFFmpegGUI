@@ -6,6 +6,27 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class InputArgumentsDetail : InputArguments, ITempArguments
     {
+        public InputArgumentsDetail()
+        {
+            this.PropertyChanged += InputArgumentsDetail_PropertyChanged;
+        }
+
+        private void InputArgumentsDetail_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(From):
+                    EnableFrom = From.HasValue;
+                    break;
+                case nameof(To):
+                    EnableTo = To.HasValue;
+                    break;    
+                case nameof(Duration):
+                    enableDuration = Duration.HasValue;
+                    break;
+            }
+        }
+
         public void Update()
         {
             EnableFrom = From.HasValue;
@@ -41,7 +62,15 @@ namespace SimpleFFmpegGUI.WPF.Model
         public bool EnableFrom
         {
             get => enableFrom;
-            set => this.SetValueAndNotify(ref enableFrom, value, nameof(EnableFrom));
+            set
+            {
+                this.SetValueAndNotify(ref enableFrom, value, nameof(EnableFrom));
+                if(!value&&From.HasValue)
+                {
+                    From = null;
+                }
+            }
+
         }
 
         private bool enableTo;
@@ -49,7 +78,14 @@ namespace SimpleFFmpegGUI.WPF.Model
         public bool EnableTo
         {
             get => enableTo;
-            set => this.SetValueAndNotify(ref enableTo, value, nameof(EnableTo));
+            set
+            {
+                this.SetValueAndNotify(ref enableTo, value, nameof(EnableTo)); 
+                if (!value && To.HasValue)
+                {
+                    To = null;
+                }
+            }
         }
 
         private bool enableDuration;
@@ -57,7 +93,14 @@ namespace SimpleFFmpegGUI.WPF.Model
         public bool EnableDuration
         {
             get => enableDuration;
-            set => this.SetValueAndNotify(ref enableDuration, value, nameof(EnableDuration));
+            set
+            {
+                this.SetValueAndNotify(ref enableDuration, value, nameof(EnableDuration));
+                if (!value && Duration.HasValue)
+                {
+                    Duration = null;
+                }
+            }
         }
     }
 }

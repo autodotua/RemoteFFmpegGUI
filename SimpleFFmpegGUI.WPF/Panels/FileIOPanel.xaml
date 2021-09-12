@@ -14,13 +14,9 @@
     AllowDrop="True"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <converters:TimeSpanConverter
-            x:Key="TimeSpanMMConverter"
-            Format="hh\:mm\:ss\.fff" />
+        <converters:TimeSpanConverter x:Key="TimeSpanMMConverter" Format="hh\:mm\:ss\.fff" />
         <local:Int2StringConverter x:Key="Int2StringConverter" />
-        <Style
-            BasedOn="{StaticResource DefaultComboBoxStyle}"
-            TargetType="{x:Type ComboBox}">
+        <Style BasedOn="{StaticResource DefaultComboBoxStyle}" TargetType="{x:Type ComboBox}">
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
     </UserControl.Resources>
@@ -31,9 +27,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="8" />
         </Grid.RowDefinitions>
-        <ScrollViewer
-            Padding="0,0,18,0"
-            VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Padding="0,0,18,0" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Inputs}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -79,9 +73,7 @@
                                         <ui:SymbolIcon Symbol="Delete" />
                                     </Button>
                                 </Grid>
-                                <Grid
-                                    Grid.Row="4"
-                                    Visibility="{Binding ElementName=root, Path=DataContext.ShowTimeClip, Converter={StaticResource Bool2VisibilityConverter}}">
+                                <Grid Grid.Row="4" Visibility="{Binding ElementName=root, Path=DataContext.ShowTimeClip, Converter={StaticResource Bool2VisibilityConverter}}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="60" />
                                         <ColumnDefinition Width="8" />
@@ -95,13 +87,10 @@
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
 
-                                    <CheckBox
-                                        Content="开始"
-                                        IsChecked="{Binding EnableFrom}" />
+                                    <CheckBox Content="开始" IsChecked="{Binding EnableFrom}" />
                                     <TextBox
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
-                                        IsEnabled="{Binding EnableFrom}"
                                         Text="{Binding From, Converter={StaticResource TimeSpanMMConverter}}" />
                                     <CheckBox
                                         Grid.Row="2"
@@ -111,7 +100,6 @@
                                         Grid.Row="2"
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
-                                        IsEnabled="{Binding EnableTo}"
                                         Text="{Binding To, Converter={StaticResource TimeSpanMMConverter}}" />
                                     <CheckBox
                                         Grid.Row="4"
@@ -121,7 +109,6 @@
                                         Grid.Row="4"
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
-                                        IsEnabled="{Binding EnableDuration}"
                                         Text="{Binding Duration, Converter={StaticResource TimeSpanMMConverter}}" />
                                 </Grid>
                             </Grid>
