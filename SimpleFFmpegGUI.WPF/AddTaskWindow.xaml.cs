@@ -146,5 +146,10 @@ namespace SimpleFFmpegGUI.WPF
         {
             fileIOPanel.AddInput();
         }
+
+        private void CommandBar_MouseEnter(object sender, MouseEventArgs e)
+        {
+            (sender as FrameworkElement).Focus();
+        }
     }
 }

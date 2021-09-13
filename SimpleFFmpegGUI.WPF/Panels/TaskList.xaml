@@ -24,7 +24,9 @@
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             SelectedItem="{Binding Tasks.SelectedTask}">
             <ListView.ItemContainerStyle>
-                <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="{x:Type ListViewItem}">
+                <Style
+                    BasedOn="{StaticResource DefaultListViewItemStyle}"
+                    TargetType="{x:Type ListViewItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="Padding" Value="8" />
                     <Setter Property="Margin" Value="0,0,16,0" />
@@ -85,6 +87,7 @@
                             Grid.Column="2"
                             Text="{Binding IOText}"
                             TextTrimming="CharacterEllipsis" />
+
                         <TextBlock
                             Grid.Row="2"
                             Foreground="{Binding Color}"
@@ -94,7 +97,40 @@
                             Grid.Column="2"
                             Maximum="1"
                             Minimum="0"
+                            Visibility="{Binding Status, ConverterParameter=Processing, Converter={StaticResource EqualConverter}}"
                             Value="{Binding Percent, Mode=OneWay}" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Opacity="0.7"
+                            Visibility="{Binding Status, ConverterParameter=Done, Converter={StaticResource EqualConverter}}">
+                            <Run Text="完成：" />
+                            <Run Text="{Binding FinishTime, Mode=OneWay, StringFormat={StaticResource DateTimeFormat}}" />
+                        </TextBlock>
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Opacity="0.7"
+                            Visibility="{Binding Status, ConverterParameter=Error, Converter={StaticResource EqualConverter}}">
+                            <Run Text="开始：" />
+                            <Run Text="{Binding StartTime, Mode=OneWay, StringFormat={StaticResource DateTimeFormat}}" />
+                        </TextBlock>
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Opacity="0.7"
+                            Visibility="{Binding Status, ConverterParameter=Queue, Converter={StaticResource EqualConverter}}">
+                            <Run Text="创建 ：" />
+                            <Run Text="{Binding CreateTime, Mode=OneWay, StringFormat={StaticResource DateTimeFormat}}" />
+                        </TextBlock>  
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Opacity="0.7"
+                            Visibility="{Binding Status, ConverterParameter=Cancel, Converter={StaticResource EqualConverter}}">
+                            <Run Text="创建 ：" />
+                            <Run Text="{Binding CreateTime, Mode=OneWay, StringFormat={StaticResource DateTimeFormat}}" />
+                        </TextBlock>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -111,7 +147,9 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Grid Margin="8" DataContext="{Binding Tasks.SelectedTask}">
+                <Grid
+                    Margin="8"
+                    DataContext="{Binding Tasks.SelectedTask}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="8" />
@@ -194,7 +232,9 @@
                         FontWeight="Bold"
                         Text="执行时间"
                         TextTrimming="CharacterEllipsis" />
-                    <TextBlock Grid.Row="10" Grid.Column="2">
+                    <TextBlock
+                        Grid.Row="10"
+                        Grid.Column="2">
                         <Run Text="{Binding StartTime, StringFormat={StaticResource DateTimeFormat}, Mode=OneWay}" />
                         <Run Text="&#160;&#160;&#160;&#160;" />
                         <Run Text="{Binding FinishTime, StringFormat={StaticResource DateTimeFormat}, Mode=OneWay}" />
@@ -252,8 +292,12 @@
                         Content="更多">
                         <ui:FlyoutService.Flyout>
                             <ui:MenuFlyout>
-                                <MenuItem Click="CloneButton_Click" Header="建立副本" />
-                                <MenuItem Click="LogsButton_Click" Header="查看日志" />
+                                <MenuItem
+                                    Click="CloneButton_Click"
+                                    Header="建立副本" />
+                                <MenuItem
+                                    Click="LogsButton_Click"
+                                    Header="查看日志" />
                                 <Separator Visibility="{Binding Inputs, Converter={StaticResource CountMoreThanZeroConverter}}" />
                                 <MenuItem
                                     Click="OpenInputFileMenuItem_Click"
@@ -277,15 +321,15 @@
                                         </DataTemplate>
                                     </MenuItem.ItemTemplate>
                                 </MenuItem>
-                                <Separator Visibility="{Binding Status, Converter={StaticResource Equal2VisibleConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
+                                <Separator Visibility="{Binding Status, Converter={StaticResource EqualConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
                                 <MenuItem
                                     Click="OpenOutputFileButton_Click"
                                     Header="打开目标文件"
-                                    Visibility="{Binding Status, Converter={StaticResource Equal2VisibleConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
+                                    Visibility="{Binding Status, Converter={StaticResource EqualConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
                                 <MenuItem
                                     Click="OpenOutputDirButton_Click"
                                     Header="打开目标文件目录"
-                                    Visibility="{Binding Status, Converter={StaticResource Equal2VisibleConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
+                                    Visibility="{Binding Status, Converter={StaticResource EqualConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
                             </ui:MenuFlyout>
                         </ui:FlyoutService.Flyout>
                     </Button>

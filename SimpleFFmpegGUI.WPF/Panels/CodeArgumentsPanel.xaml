@@ -227,7 +227,7 @@
                                 IsEnabled="{Binding Video.EnableSize}"
                                 Text="{Binding Video.Width}" />
                             <Label
-                                Grid.Column="1"
+                                Grid.Column="1" VerticalAlignment="Center"
                                 Margin="4,0"
                                 IsEnabled="{Binding Video.EnableSize}">
                                 ×
@@ -242,7 +242,7 @@
                 </GroupBox>
                 <GroupBox
                     Header="音频"
-                    Visibility="{Binding AudioOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource Equal2VisibleConverter}}">
+                    Visibility="{Binding AudioOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource EqualConverter}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />

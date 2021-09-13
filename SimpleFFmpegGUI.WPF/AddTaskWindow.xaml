@@ -60,7 +60,7 @@
             <panels:CodeArgumentsPanel x:Name="argumentsPanel" />
         </GroupBox>
 
-        <ui:CommandBar
+        <ui:CommandBar MouseEnter="CommandBar_MouseEnter"
             Grid.Row="4"
             Grid.ColumnSpan="99"
             Margin="-8,-8,0,-8">
