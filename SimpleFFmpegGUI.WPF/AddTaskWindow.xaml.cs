@@ -113,10 +113,25 @@ namespace SimpleFFmpegGUI.WPF
                 List<InputArguments> inputs = fileIOPanel.GetInputs();
                 string output = fileIOPanel.GetOutput();
                 OutputArguments args = argumentsPanel.GetOutputArguments();
+                switch (ViewModel.Type)
+                {
+                    case TaskType.Code:
+                        foreach (var input in inputs)
+                        {
+                            var task = TaskManager.AddTask(TaskType.Code, new List<InputArguments>() { input }, output, args);
+                            App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
+                        }
+                        this.CreateMessage().QueueSuccess($"已加入{inputs.Count}个任务队列");
+                        break;
 
-                var task = TaskManager.AddTask(ViewModel.Type, inputs, output, args);
-                this.CreateMessage().QueueSuccess("已加入队列");
-                App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
+                    default:
+                        {
+                            var task = TaskManager.AddTask(ViewModel.Type, inputs, output, args);
+                            App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
+                            this.CreateMessage().QueueSuccess("已加入队列");
+                        }
+                        break;
+                }
 
                 fileIOPanel.Reset();
             }
@@ -129,8 +144,6 @@ namespace SimpleFFmpegGUI.WPF
                 ViewModel.Queue.StartQueue();
             }
         }
-
-        //public event EventHandler<TaskInfo> TaskCreated;
 
         private async void SaveToPresetButton_Click(object sender, RoutedEventArgs e)
         {
