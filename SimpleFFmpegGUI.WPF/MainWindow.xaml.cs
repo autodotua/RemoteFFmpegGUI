@@ -160,7 +160,7 @@ namespace SimpleFFmpegGUI.WPF
             await Task.Yield();
             try
             {
-                await Task.Run(() => Process.Start("ffmpeg"));
+                await Task.Run(() => Process.Start(new ProcessStartInfo() { FileName = "ffmpeg", CreateNoWindow = true }));
             }
             catch (Exception ex)
             {
@@ -169,13 +169,24 @@ namespace SimpleFFmpegGUI.WPF
             }
             try
             {
-                await Task.Run(() => Process.Start("ffprobe"));
+                await Task.Run(() => Process.Start(new ProcessStartInfo() { FileName = "ffprobe", CreateNoWindow = true }));
             }
             catch (Exception ex)
             {
                 await CommonDialog.ShowErrorDialogAsync("找不到ffprobe程序");
                 Close();
             }
+            if (!File.Exists("MediaInfo.dll"))
+            {
+                await CommonDialog.ShowErrorDialogAsync("找不到MediaInfo.dll");
+                Close();
+            }
+        }
+
+        private void MediaInfoButton_Click(object sender, RoutedEventArgs e)
+        {
+            var win = App.ServiceProvider.GetService<MediaInfoWindow>();
+            win.Show();
         }
     }
 }

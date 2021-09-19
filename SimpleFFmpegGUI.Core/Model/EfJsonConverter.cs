@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 
 namespace SimpleFFmpegGUI.Model
 {
-    public class EfJsonConverter<T> : ValueConverter<T, string>
+    public class EFJsonConverter<T> : ValueConverter<T, string>
     {
-        public EfJsonConverter() : base(p => JsonConvert.SerializeObject(p), p => JsonConvert.DeserializeObject<T>(p))
+        public EFJsonConverter() : base(p => JsonConvert.SerializeObject(p), p => JsonConvert.DeserializeObject<T>(p))
         {
         }
     }

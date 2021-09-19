@@ -64,6 +64,8 @@ namespace SimpleFFmpegGUI.WPF
 
             services.AddTransient<AddTaskWindow>();
             services.AddTransient<AddTaskWindowViewModel>();
+            services.AddTransient<MediaInfoWindow>();
+            services.AddTransient<MediaInfoWindowViewModel>();
 
             services.AddTransient<LogsWindow>();
             services.AddTransient<LogsWindowViewModel>();

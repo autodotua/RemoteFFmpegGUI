@@ -1,0 +1,188 @@
+﻿<Window
+    x:Class="SimpleFFmpegGUI.WPF.MediaInfoWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
+    xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Title="新建任务 - FFmpeg 工具箱"
+    Width="1280"
+    Height="640"
+    ui:TitleBar.IsIconVisible="True"
+    ui:WindowHelper.UseModernWindowStyle="True"
+    AllowDrop="True"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <local:Bitrate2StringConverter x:Key="Bitrate2StringConverter" />
+        <Style
+            x:Key="KeyStyle"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="Width" Value="80" />
+        </Style>
+        <Style
+            x:Key="ValueStyle"
+            BasedOn="{StaticResource DefaultTextBoxStyle}"
+            TargetType="{x:Type TextBox}">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="IsReadOnly" Value="True" />
+            <EventSetter
+                Event="MouseLeave"
+                Handler="TextBox_MouseLeave" />
+        </Style>
+    </Window.Resources>
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.ColumnSpan="99">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Grid.Column="2">
+                <ui:SymbolIcon Symbol="BrowsePhotos" />
+            </Button>
+        </Grid>
+        <ScrollViewer
+            Grid.Row="2"
+            Visibility="{Binding MediaInfo, Converter={StaticResource NotNullConverter}}">
+            <ui:SimpleStackPanel Spacing="8">
+                <GroupBox Header="基本信息">
+                    <ui:SimpleStackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource KeyStyle}">长度</TextBlock>
+                            <TextBox
+                                Style="{StaticResource ValueStyle}"
+                                Text="{Binding MediaInfo.Duration, StringFormat=hh\\:mm\\:ss\\.fff}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource KeyStyle}">格式</TextBlock>
+                            <TextBlock>
+                                <Run Text="{Binding MediaInfo.Format.FormatName, Mode=OneWay}" />
+                                <Run Text="（" />
+                                <Run Text="{Binding MediaInfo.Format.FormatLongName, Mode=OneWay}" />
+                                <Run Text="）" />
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource KeyStyle}">码率</TextBlock>
+                            <TextBlock Text="{Binding MediaInfo.Format.BitRate, Converter={StaticResource Bitrate2StringConverter}}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource KeyStyle}">其他信息</TextBlock>
+                            <ItemsControl ItemsSource="{Binding Media.Format.Tags}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock
+                                                Style="{StaticResource KeyStyle}"
+                                                Text="{Binding Key}" />
+                                            <TextBlock Text="{Binding Value}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ui:SimpleStackPanel>
+                </GroupBox>
+                <GroupBox Header="视频">
+                    <ItemsControl ItemsSource="{Binding MediaInfo.VideoStreams}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:SimpleStackPanel
+                                    Margin="0,0,0,16"
+                                    Spacing="8">
+                                    <TextBlock FontWeight="Bold">
+                                        <Run Text="视频流" />
+                                        <Run Text="{Binding Index, Mode=OneWay}" />
+                                    </TextBlock>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Style="{StaticResource KeyStyle}">编码</TextBlock>
+                                        <TextBlock>
+                                            <Run Text="{Binding CodecName, Mode=OneWay}" />
+                                            <Run Text="（" />
+                                            <Run Text="{Binding CodecLongName, Mode=OneWay}" />
+                                            <Run Text="）" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="码率" />
+                                        <TextBlock Text="{Binding BitRate, Converter={StaticResource Bitrate2StringConverter}}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="帧率" />
+                                        <TextBlock Text="{Binding AvgFrameRate, StringFormat={}{0:0.000}}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="分辨率" />
+                                        <TextBlock>
+                                            <Run Text="{Binding Width, Mode=OneWay}" />
+                                            <Run Text="×" />
+                                            <Run Text="{Binding Height, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="比例" />
+                                        <TextBlock Text="{Binding DisplayAspectRatio}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="像素格式" />
+                                        <TextBlock Text="{Binding PixelFormat}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="色彩深度" />
+                                        <TextBlock Text="{Binding BitsPerRawSample}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="旋转" />
+                                        <TextBlock Text="{Binding Rotation}" />
+                                    </StackPanel>
+                                </ui:SimpleStackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </GroupBox>
+            </ui:SimpleStackPanel>
+        </ScrollViewer>
+        <GroupBox
+            Grid.Row="2"  Visibility="{Binding MediaInfo, Converter={StaticResource NotNullConverter}}"
+            Grid.Column="2"
+            Header="详情">
+
+            <TextBox
+                FontFamily="consolas"
+                MouseLeave="TextBox_MouseLeave"
+                Style="{StaticResource ValueStyle}"
+                Text="{Binding MediaInfo.Detail}"
+                TextWrapping="Wrap" />
+        </GroupBox>
+    </Grid>
+</Window>

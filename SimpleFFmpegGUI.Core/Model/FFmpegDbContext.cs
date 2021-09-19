@@ -41,8 +41,8 @@ namespace SimpleFFmpegGUI.Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var listConverter = new EfJsonConverter<List<InputArguments>>();
-            var argConverter = new EfJsonConverter<OutputArguments>();
+            var listConverter = new EFJsonConverter<List<InputArguments>>();
+            var argConverter = new EFJsonConverter<OutputArguments>();
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<TaskInfo>()
                 .Property(p => p.Inputs)

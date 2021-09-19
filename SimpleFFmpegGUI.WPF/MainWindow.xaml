@@ -46,6 +46,7 @@
                 Click="LogsButton_Click"
                 Icon="List"
                 Label="查看日志" />
+            <ui:AppBarButton Icon="Zoom" Label="查询媒体信息" Click="MediaInfoButton_Click" />
             <ui:AppBarSeparator />
             <ui:AppBarButton Click="TrayButton_Click" Label="最小化到托盘">
                 <ui:AppBarButton.Icon>
