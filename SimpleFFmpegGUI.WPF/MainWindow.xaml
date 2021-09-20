@@ -15,7 +15,7 @@
     AllowDrop="True"
     mc:Ignorable="d">
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo />
+        <TaskbarItemInfo Description="FFmpeg 工具箱" />
     </Window.TaskbarItemInfo>
     <Grid>
         <Grid.RowDefinitions>

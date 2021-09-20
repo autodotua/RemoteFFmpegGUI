@@ -19,7 +19,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ListView
+        <ListView         xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+            c:SmoothScrollViewerHelper.SmoothScroll="True"
             ItemsSource="{Binding Tasks.Tasks}"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             SelectedItem="{Binding Tasks.SelectedTask}">

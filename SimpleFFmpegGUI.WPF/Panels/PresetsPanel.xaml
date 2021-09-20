@@ -20,7 +20,8 @@
         </Style>
     </UserControl.Resources>
 
-    <ScrollViewer
+    <ScrollViewer        xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+            c:SmoothScrollViewerHelper.SmoothScroll="True"
         Padding="0,0,18,0"
         VerticalScrollBarVisibility="Auto">
         <ItemsControl ItemsSource="{Binding Presets}">

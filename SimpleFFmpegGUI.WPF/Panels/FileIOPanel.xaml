@@ -27,7 +27,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="8" />
         </Grid.RowDefinitions>
-        <ScrollViewer Padding="0,0,18,0" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Padding="0,0,18,0" VerticalScrollBarVisibility="Auto"         xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+            c:SmoothScrollViewerHelper.SmoothScroll="True">
             <ItemsControl ItemsSource="{Binding Inputs}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

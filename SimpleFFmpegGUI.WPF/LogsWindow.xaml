@@ -58,7 +58,8 @@
                 筛选
             </Button>
         </WrapPanel>
-        <DataGrid
+        <DataGrid         xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+            c:SmoothScrollViewerHelper.SmoothScroll="True"
             Grid.Row="2"
             AutoGenerateColumns="False"
             IsReadOnly="True"

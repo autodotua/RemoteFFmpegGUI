@@ -1,6 +1,7 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
 using FzLib;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.WindowsAPICodePack.FzExtension;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
@@ -101,6 +102,15 @@ namespace SimpleFFmpegGUI.WPF
         private void TextBox_MouseLeave(object sender, MouseEventArgs e)
         {
             Keyboard.ClearFocus();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this).GetFilePath();
+            if (path != null)
+            {
+                ViewModel.FilePath = path;
+            }
         }
     }
 

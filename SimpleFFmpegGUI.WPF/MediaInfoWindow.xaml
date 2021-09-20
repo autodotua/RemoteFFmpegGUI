@@ -8,7 +8,7 @@
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Title="新建任务 - FFmpeg 工具箱"
+    Title="媒体信息 - FFmpeg 工具箱"
     Width="1280"
     Height="640"
     ui:TitleBar.IsIconVisible="True"
@@ -21,7 +21,9 @@
         <Style
             x:Key="KeyStyle"
             TargetType="{x:Type TextBlock}">
-            <Setter Property="Width" Value="80" />
+            <Setter Property="Width" Value="160" />
+            <!--  设置Margin为了和TextBox对齐  -->
+            <Setter Property="Margin" Value="8,6,0,0" />
         </Style>
         <Style
             x:Key="ValueStyle"
@@ -29,6 +31,7 @@
             TargetType="{x:Type TextBox}">
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="IsReadOnly" Value="True" />
+
             <EventSetter
                 Event="MouseLeave"
                 Handler="TextBox_MouseLeave" />
@@ -52,16 +55,27 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBox Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Grid.Column="2">
+            <Button
+                Grid.Column="2"
+                Click="Button_Click">
                 <ui:SymbolIcon Symbol="BrowsePhotos" />
             </Button>
         </Grid>
         <ScrollViewer
+            xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
             Grid.Row="2"
+            c:SmoothScrollViewerHelper.SmoothScroll="True"
             Visibility="{Binding MediaInfo, Converter={StaticResource NotNullConverter}}">
             <ui:SimpleStackPanel Spacing="8">
                 <GroupBox Header="基本信息">
-                    <ui:SimpleStackPanel Spacing="8">
+                    <GroupBox.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                Text="{Binding}"
+                                TextAlignment="Center" />
+                        </DataTemplate>
+                    </GroupBox.HeaderTemplate>
+                    <ui:SimpleStackPanel Spacing="4">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Style="{StaticResource KeyStyle}">长度</TextBlock>
                             <TextBox
@@ -70,16 +84,20 @@
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Style="{StaticResource KeyStyle}">格式</TextBlock>
-                            <TextBlock>
-                                <Run Text="{Binding MediaInfo.Format.FormatName, Mode=OneWay}" />
-                                <Run Text="（" />
-                                <Run Text="{Binding MediaInfo.Format.FormatLongName, Mode=OneWay}" />
-                                <Run Text="）" />
-                            </TextBlock>
+                            <TextBox Style="{StaticResource ValueStyle}">
+                                <TextBox.Text>
+                                    <MultiBinding StringFormat="{}{0}（{1}）">
+                                        <Binding Path="MediaInfo.Format.FormatName" />
+                                        <Binding Path="MediaInfo.Format.FormatLongName" />
+                                    </MultiBinding>
+                                </TextBox.Text>
+                            </TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Style="{StaticResource KeyStyle}">码率</TextBlock>
-                            <TextBlock Text="{Binding MediaInfo.Format.BitRate, Converter={StaticResource Bitrate2StringConverter}}" />
+                            <TextBox
+                                Style="{StaticResource ValueStyle}"
+                                Text="{Binding MediaInfo.Format.BitRate, Converter={StaticResource Bitrate2StringConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Style="{StaticResource KeyStyle}">其他信息</TextBlock>
@@ -90,7 +108,9 @@
                                             <TextBlock
                                                 Style="{StaticResource KeyStyle}"
                                                 Text="{Binding Key}" />
-                                            <TextBlock Text="{Binding Value}" />
+                                            <TextBox
+                                                Style="{StaticResource ValueStyle}"
+                                                Text="{Binding Value}" />
                                         </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -98,91 +118,256 @@
                         </StackPanel>
                     </ui:SimpleStackPanel>
                 </GroupBox>
-                <GroupBox Header="视频">
-                    <ItemsControl ItemsSource="{Binding MediaInfo.VideoStreams}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
+
+                <ItemsControl ItemsSource="{Binding MediaInfo.VideoStreams}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <GroupBox Header="{Binding Index}">
+                                <GroupBox.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Text="{Binding ., StringFormat={}视频 {0}}"
+                                            TextAlignment="Center" />
+                                    </DataTemplate>
+                                </GroupBox.HeaderTemplate>
                                 <ui:SimpleStackPanel
                                     Margin="0,0,0,16"
-                                    Spacing="8">
-                                    <TextBlock FontWeight="Bold">
-                                        <Run Text="视频流" />
-                                        <Run Text="{Binding Index, Mode=OneWay}" />
-                                    </TextBlock>
+                                    Spacing="4">
+
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Style="{StaticResource KeyStyle}">编码</TextBlock>
-                                        <TextBlock>
-                                            <Run Text="{Binding CodecName, Mode=OneWay}" />
-                                            <Run Text="（" />
-                                            <Run Text="{Binding CodecLongName, Mode=OneWay}" />
-                                            <Run Text="）" />
-                                        </TextBlock>
+                                        <TextBox Style="{StaticResource ValueStyle}">
+                                            <TextBox.Text>
+                                                <MultiBinding StringFormat="{}{0}（{1}）">
+                                                    <Binding Path="CodecName" />
+                                                    <Binding Path="CodecLongName" />
+                                                </MultiBinding>
+                                            </TextBox.Text>
+                                        </TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="编码预设" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding Profile}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock
                                             Style="{StaticResource KeyStyle}"
                                             Text="码率" />
-                                        <TextBlock Text="{Binding BitRate, Converter={StaticResource Bitrate2StringConverter}}" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding BitRate, Converter={StaticResource Bitrate2StringConverter}}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock
                                             Style="{StaticResource KeyStyle}"
                                             Text="帧率" />
-                                        <TextBlock Text="{Binding AvgFrameRate, StringFormat={}{0:0.000}}" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding AvgFrameRate, StringFormat={}{0:0.000}}" />
                                     </StackPanel>
 
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock
                                             Style="{StaticResource KeyStyle}"
                                             Text="分辨率" />
-                                        <TextBlock>
-                                            <Run Text="{Binding Width, Mode=OneWay}" />
-                                            <Run Text="×" />
-                                            <Run Text="{Binding Height, Mode=OneWay}" />
-                                        </TextBlock>
+                                        <TextBox Style="{StaticResource ValueStyle}">
+                                            <TextBox.Text>
+                                                <MultiBinding StringFormat="{}{0}×{1}">
+                                                    <Binding Path="Width" />
+                                                    <Binding Path="Height" />
+                                                </MultiBinding>
+                                            </TextBox.Text>
+                                        </TextBox>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock
                                             Style="{StaticResource KeyStyle}"
                                             Text="比例" />
-                                        <TextBlock Text="{Binding DisplayAspectRatio}" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding DisplayAspectRatio, Mode=OneWay}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock
                                             Style="{StaticResource KeyStyle}"
                                             Text="像素格式" />
-                                        <TextBlock Text="{Binding PixelFormat}" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding PixelFormat}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock
                                             Style="{StaticResource KeyStyle}"
                                             Text="色彩深度" />
-                                        <TextBlock Text="{Binding BitsPerRawSample}" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding BitsPerRawSample}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock
                                             Style="{StaticResource KeyStyle}"
                                             Text="旋转" />
-                                        <TextBlock Text="{Binding Rotation}" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding Rotation}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="其他" />
+                                        <ItemsControl ItemsSource="{Binding Tags}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel
+                                                        Margin="0,0,0,8"
+                                                        Orientation="Horizontal">
+                                                        <TextBlock
+                                                            Style="{StaticResource KeyStyle}"
+                                                            Text="{Binding Key}" />
+                                                        <TextBox
+                                                            Style="{StaticResource ValueStyle}"
+                                                            Text="{Binding Value, Mode=OneWay}" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                     </StackPanel>
                                 </ui:SimpleStackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </GroupBox>
+                            </GroupBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ItemsControl ItemsSource="{Binding MediaInfo.AudioStreams}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <GroupBox Header="{Binding Index}">
+                                <GroupBox.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Text="{Binding ., StringFormat={}音频 {0}}"
+                                            TextAlignment="Center" />
+                                    </DataTemplate>
+                                </GroupBox.HeaderTemplate>
+                                <ui:SimpleStackPanel
+                                    Margin="0,0,0,16"
+                                    Spacing="4">
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Style="{StaticResource KeyStyle}">编码</TextBlock>
+                                        <TextBox Style="{StaticResource ValueStyle}">
+                                            <TextBox.Text>
+                                                <MultiBinding StringFormat="{}{0}（{1}）">
+                                                    <Binding Path="CodecName" />
+                                                    <Binding Path="CodecLongName" />
+                                                </MultiBinding>
+                                            </TextBox.Text>
+                                        </TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="码率" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding BitRate, Converter={StaticResource Bitrate2StringConverter}}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="声道数" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding Channels}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="声道布局" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding ChannelLayout}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="采样率" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding SampleRateHz}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="编码预设" />
+                                        <TextBox
+                                            Style="{StaticResource ValueStyle}"
+                                            Text="{Binding Profile}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="其他" />
+                                        <ItemsControl ItemsSource="{Binding Tags}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel
+                                                        Margin="0,0,0,8"
+                                                        Orientation="Horizontal">
+                                                        <TextBlock
+                                                            Style="{StaticResource KeyStyle}"
+                                                            Text="{Binding Key}" />
+                                                        <TextBox
+                                                            Style="{StaticResource ValueStyle}"
+                                                            Text="{Binding Value, Mode=OneWay}" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </ui:SimpleStackPanel>
+                            </GroupBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ui:SimpleStackPanel>
         </ScrollViewer>
-        <GroupBox
-            Grid.Row="2"  Visibility="{Binding MediaInfo, Converter={StaticResource NotNullConverter}}"
+        <ScrollViewer
+            xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+            Grid.Row="2"
             Grid.Column="2"
-            Header="详情">
-
-            <TextBox
-                FontFamily="consolas"
-                MouseLeave="TextBox_MouseLeave"
-                Style="{StaticResource ValueStyle}"
-                Text="{Binding MediaInfo.Detail}"
-                TextWrapping="Wrap" />
-        </GroupBox>
+            c:SmoothScrollViewerHelper.SmoothScroll="True">
+            <GroupBox
+                Margin="0,0,16,0"
+                Header="详情"
+                Visibility="{Binding MediaInfo, Converter={StaticResource NotNullConverter}}">
+                <GroupBox.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{Binding}"
+                            TextAlignment="Center" />
+                    </DataTemplate>
+                </GroupBox.HeaderTemplate>
+                <TextBox
+                    FontFamily="consolas,微软雅黑"
+                    MouseLeave="TextBox_MouseLeave"
+                    Style="{StaticResource ValueStyle}"
+                    Text="{Binding MediaInfo.Detail}"
+                    TextWrapping="Wrap" />
+            </GroupBox>
+        </ScrollViewer>
+        <GridSplitter
+            Grid.Row="2"
+            Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="Transparent" />
     </Grid>
 </Window>

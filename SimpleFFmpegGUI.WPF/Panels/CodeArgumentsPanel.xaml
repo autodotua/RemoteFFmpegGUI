@@ -19,7 +19,9 @@
     </UserControl.Resources>
     <Grid>
         <ScrollViewer
+            xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
             Padding="0,0,16,0"
+            c:SmoothScrollViewerHelper.SmoothScroll="True"
             HorizontalScrollBarVisibility="Disabled"
             VerticalScrollBarVisibility="Auto">
             <ui:SimpleStackPanel
@@ -227,8 +229,9 @@
                                 IsEnabled="{Binding Video.EnableSize}"
                                 Text="{Binding Video.Width}" />
                             <Label
-                                Grid.Column="1" VerticalAlignment="Center"
+                                Grid.Column="1"
                                 Margin="4,0"
+                                VerticalAlignment="Center"
                                 IsEnabled="{Binding Video.EnableSize}">
                                 ×
                             </Label>
