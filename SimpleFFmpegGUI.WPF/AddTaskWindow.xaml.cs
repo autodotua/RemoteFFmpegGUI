@@ -38,7 +38,11 @@ namespace SimpleFFmpegGUI.WPF
         public TaskType Type
         {
             get => type;
-            set => this.SetValueAndNotify(ref type, value, nameof(Type));
+            set
+            {
+                this.SetValueAndNotify(ref type, value, nameof(Type));
+                CanAddFile = value is TaskType.Code or TaskType.Concat;
+            }
         }
 
         public QueueManager Queue { get; }
@@ -50,6 +54,14 @@ namespace SimpleFFmpegGUI.WPF
             get => allowChangeType;
             set => this.SetValueAndNotify(ref allowChangeType, value, nameof(AllowChangeType));
         }
+
+        private bool canAddFile;
+        public bool CanAddFile
+        {
+            get => canAddFile;
+            set => this.SetValueAndNotify(ref canAddFile, value, nameof(CanAddFile));
+        }
+
     }
 
     /// <summary>
@@ -97,6 +109,7 @@ namespace SimpleFFmpegGUI.WPF
         public void SetAsClone(TaskInfo task)
         {
             ViewModel.AllowChangeType = false;
+            ViewModel.Type = task.Type;
             fileIOPanel.Update(task.Type, task.Inputs, task.Output);
             argumentsPanel.Update(task);
         }

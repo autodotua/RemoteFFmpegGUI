@@ -30,7 +30,8 @@
             <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ComboBox Margin="0,0,24,0"
+        <ComboBox
+            Margin="0,0,24,0"
             HorizontalAlignment="Stretch"
             IsEnabled="{Binding AllowChangeType}"
             ItemsSource="{Binding TaskTypes}"
@@ -60,12 +61,14 @@
             <panels:CodeArgumentsPanel x:Name="argumentsPanel" />
         </GroupBox>
 
-        <ui:CommandBar MouseEnter="CommandBar_MouseEnter"
+        <ui:CommandBar
             Grid.Row="4"
             Grid.ColumnSpan="99"
-            Margin="-8,-8,0,-8">
+            Margin="-8,-8,0,-8"
+            MouseEnter="CommandBar_MouseEnter">
             <ui:AppBarButton
                 Click="AddInputButton_Click"
+                IsEnabled="{Binding CanAddFile}"
                 Label="新增输入文件">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE82E;" />
@@ -73,6 +76,7 @@
             </ui:AppBarButton>
             <ui:AppBarButton
                 Click="BrowseAndAddInputButton_Click"
+                IsEnabled="{Binding CanAddFile}"
                 Label="浏览并新增输入文件">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE7C5;" />

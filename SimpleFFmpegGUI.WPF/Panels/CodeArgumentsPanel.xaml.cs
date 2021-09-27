@@ -39,6 +39,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public void Update(TaskType type, OutputArguments argument = null)
         {
             this.type = type;
+            if (type is TaskType.Concat)
+            {
+                UpdateWhenConcatArgumentsChanged();
+            }
             CanSpecifyFormat = type is TaskType.Code or TaskType.Combine;
             CanSetVideoAndAudio = type is TaskType.Code or TaskType.Concat;
             CanSetCombine = type is TaskType.Combine;
@@ -61,10 +65,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 Concat = argument.Concat;
                 Extra = argument.Extra;
             }
-            if (type is TaskType.Concat)
-            {
-                UpdateWhenConcatArgumentsChanged();
-            }
+       
         }
 
         public OutputArguments GetArguments()
