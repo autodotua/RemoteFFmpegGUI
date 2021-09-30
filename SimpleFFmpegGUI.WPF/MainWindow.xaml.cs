@@ -166,6 +166,7 @@ namespace SimpleFFmpegGUI.WPF
             {
                 await CommonDialog.ShowErrorDialogAsync("找不到ffmpeg程序");
                 Close();
+                return;
             }
             try
             {
@@ -175,12 +176,18 @@ namespace SimpleFFmpegGUI.WPF
             {
                 await CommonDialog.ShowErrorDialogAsync("找不到ffprobe程序");
                 Close();
+                return;
             }
             if (!File.Exists("MediaInfo.dll"))
             {
                 await CommonDialog.ShowErrorDialogAsync("找不到MediaInfo.dll");
                 Close();
+                return;
             }
+
+            var win = App.ServiceProvider.GetService<ClipWindow>();
+            win.Show();
+            win.SetVideo(@"C:\Users\autod\Desktop\20210927-从植物园校区过小路沿永和西路、西大河南路到震海大道.mp4");
         }
 
         private void MediaInfoButton_Click(object sender, RoutedEventArgs e)

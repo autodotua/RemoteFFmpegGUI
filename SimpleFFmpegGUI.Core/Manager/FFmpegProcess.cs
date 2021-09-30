@@ -40,7 +40,7 @@ namespace SimpleFFmpegGUI.Manager
 
         private bool started = false;
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken? cancellationToken)
         {
             if (started)
             {
@@ -48,7 +48,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             started = true;
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-            cancellationToken.Register(process.Kill);
+            cancellationToken?.Register(process.Kill);
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();

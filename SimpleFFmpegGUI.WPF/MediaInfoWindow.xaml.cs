@@ -47,9 +47,19 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        private void ShowInfo()
+        private bool working;
+
+        public bool Working
         {
-            MediaInfo = MediaInfoManager.GetMediaInfo(FilePath);
+            get => working;
+            set => this.SetValueAndNotify(ref working, value, nameof(Working));
+        }
+
+        private async void ShowInfo()
+        {
+            Working = true;
+            MediaInfo = await MediaInfoManager.GetMediaInfoAsync(FilePath);
+            Working = false;
         }
 
         private MediaInfoDto mediaInfo;
@@ -75,6 +85,22 @@ namespace SimpleFFmpegGUI.WPF
             ViewModel = viewModel;
             DataContext = ViewModel;
             InitializeComponent();
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+        }
+
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ViewModel.Working))
+            {
+                if (ViewModel.Working)
+                {
+                    ring.Show();
+                }
+                else
+                {
+                    ring.Hide();
+                }
+            }
         }
 
         protected override void OnDragOver(DragEventArgs e)
