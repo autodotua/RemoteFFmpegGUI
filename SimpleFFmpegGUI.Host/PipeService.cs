@@ -53,7 +53,7 @@ namespace SimpleFFmpegGUI
 
         public MediaInfoDto GetInfo(string path)
         {
-            return MediaInfoManager.GetMediaInfo(path);
+            return MediaInfoManager.GetMediaInfoAsync(path).Result;
         }
 
         public void Join(IEnumerable<string> path)

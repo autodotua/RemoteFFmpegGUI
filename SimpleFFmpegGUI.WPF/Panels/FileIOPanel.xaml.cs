@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -167,9 +168,43 @@ namespace SimpleFFmpegGUI.WPF.Panels
             ViewModel.Reset();
         }
 
+        private async void ClipButton_Click(object sender, RoutedEventArgs e)
+        {
+            var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
+            Debug.Assert(input != null);
+            if (string.IsNullOrEmpty(input.FilePath))
+            {
+                this.CreateMessage().QueueError("请先设置文件地址");
+                return;
+            }
+            if (!File.Exists(input.FilePath))
+            {
+                this.CreateMessage().QueueError($"找不到文件{input.FilePath}");
+                return;
+            }
+            var win = App.ServiceProvider.GetService<ClipWindow>();
+            win.Owner = Window.GetWindow(this);
+            try
+            {
+                await win.SetVideoAsync(input.FilePath, input.From, input.To);
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError($"加载视频失败", ex);
+                return;
+            }
+            if (win.ShowDialog() == true)
+            {
+                var clip = win.GetClipTime();
+                input.From = clip.From;
+                input.To = clip.To;
+                input.Duration = null;
+            }
+        }
+
         private void BrowseFileButton_Click(object sender, RoutedEventArgs e)
         {
-            var input = (sender as FrameworkElement).Tag as InputArgumentsDetail;
+            var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
             string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(Window.GetWindow(this)).GetFilePath();
             if (path != null)
             {
@@ -179,7 +214,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void DeleteFileButton_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.Inputs.Remove((sender as FrameworkElement).Tag as InputArgumentsDetail);
+            ViewModel.Inputs.Remove((sender as FrameworkElement).DataContext as InputArgumentsDetail);
         }
 
         public void Update(TaskType type, List<InputArguments> inputs, string output)

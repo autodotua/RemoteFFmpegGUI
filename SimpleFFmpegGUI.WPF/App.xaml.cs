@@ -34,6 +34,7 @@ namespace SimpleFFmpegGUI.WPF
 
 #endif
 
+            Unosquare.FFME.Library.FFmpegDirectory = FzLib.Program.App.ProgramDirectoryPath;
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 

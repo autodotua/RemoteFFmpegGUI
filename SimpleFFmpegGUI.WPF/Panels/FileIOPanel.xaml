@@ -14,9 +14,13 @@
     AllowDrop="True"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <converters:TimeSpanConverter x:Key="TimeSpanMMConverter" Format="hh\:mm\:ss\.fff" />
+        <converters:TimeSpanConverter
+            x:Key="TimeSpanMMConverter"
+            Format="hh\:mm\:ss\.fff" />
         <local:Int2StringConverter x:Key="Int2StringConverter" />
-        <Style BasedOn="{StaticResource DefaultComboBoxStyle}" TargetType="{x:Type ComboBox}">
+        <Style
+            BasedOn="{StaticResource DefaultComboBoxStyle}"
+            TargetType="{x:Type ComboBox}">
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
     </UserControl.Resources>
@@ -27,8 +31,11 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="8" />
         </Grid.RowDefinitions>
-        <ScrollViewer Padding="0,0,18,0" VerticalScrollBarVisibility="Auto"         xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
-            c:SmoothScrollViewerHelper.SmoothScroll="True">
+        <ScrollViewer
+            xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+            Padding="0,0,18,0"
+            c:SmoothScrollViewerHelper.SmoothScroll="True"
+            VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Inputs}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -51,30 +58,33 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="8" />
                                         <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="0" />
-                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
                                     <TextBox Text="{Binding FilePath}" />
-                                    <Button
+                                    <ui:SimpleStackPanel
                                         Grid.Column="2"
                                         VerticalAlignment="Bottom"
-                                        Click="BrowseFileButton_Click"
-                                        Tag="{Binding .}">
-                                        <ui:SymbolIcon Symbol="BrowsePhotos" />
-                                    </Button>
-                                    <Button
-                                        Grid.Column="4"
-                                        Margin="8,0,0,0"
-                                        VerticalAlignment="Bottom"
-                                        Click="DeleteFileButton_Click"
-                                        IsEnabled="{Binding CanDelete}"
-                                        Tag="{Binding .}"
-                                        Visibility="{Binding ElementName=root, Path=DataContext.CanChangeInputsCount, Converter={StaticResource Bool2VisibilityConverter}}">
-                                        <ui:SymbolIcon Symbol="Delete" />
-                                    </Button>
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <Button Click="BrowseFileButton_Click">
+                                            <ui:SymbolIcon Symbol="BrowsePhotos" />
+                                        </Button>
+                                        <Button
+                                            Click="ClipButton_Click"
+                                            Visibility="{Binding ElementName=root, Path=DataContext.ShowTimeClip, Converter={StaticResource Bool2VisibilityConverter}}">
+                                            <ui:SymbolIcon Symbol="Cut" />
+                                        </Button>
+                                        <Button
+                                            Click="DeleteFileButton_Click"
+                                            IsEnabled="{Binding CanDelete}"
+                                            Visibility="{Binding ElementName=root, Path=DataContext.CanChangeInputsCount, Converter={StaticResource Bool2VisibilityConverter}}">
+                                            <ui:SymbolIcon Symbol="Delete" />
+                                        </Button>
+                                    </ui:SimpleStackPanel>
                                 </Grid>
-                                <Grid Grid.Row="4" Visibility="{Binding ElementName=root, Path=DataContext.ShowTimeClip, Converter={StaticResource Bool2VisibilityConverter}}">
+                                <Grid
+                                    Grid.Row="4"
+                                    Visibility="{Binding ElementName=root, Path=DataContext.ShowTimeClip, Converter={StaticResource Bool2VisibilityConverter}}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="60" />
                                         <ColumnDefinition Width="8" />
@@ -88,7 +98,9 @@
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
 
-                                    <CheckBox Content="开始" IsChecked="{Binding EnableFrom}" />
+                                    <CheckBox
+                                        Content="开始"
+                                        IsChecked="{Binding EnableFrom}" />
                                     <TextBox
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"

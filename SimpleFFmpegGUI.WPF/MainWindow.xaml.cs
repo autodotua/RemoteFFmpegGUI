@@ -59,9 +59,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
-            dialog.Owner = this;
-            dialog.Show();
+            App.ServiceProvider.GetService<AddTaskWindow>().Show();
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
@@ -148,7 +146,6 @@ namespace SimpleFFmpegGUI.WPF
             if (files.Any())
             {
                 var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
-                dialog.Owner = this;
                 dialog.SetFiles(files);
                 dialog.Show();
             }
@@ -158,36 +155,23 @@ namespace SimpleFFmpegGUI.WPF
         {
             base.OnContentRendered(e);
             await Task.Yield();
-            try
+            string[] files = new[]
             {
-                await Task.Run(() => Process.Start(new ProcessStartInfo() { FileName = "ffmpeg", CreateNoWindow = true }));
-            }
-            catch (Exception ex)
-            {
-                await CommonDialog.ShowErrorDialogAsync("找不到ffmpeg程序");
-                Close();
-                return;
-            }
-            try
-            {
-                await Task.Run(() => Process.Start(new ProcessStartInfo() { FileName = "ffprobe", CreateNoWindow = true }));
-            }
-            catch (Exception ex)
-            {
-                await CommonDialog.ShowErrorDialogAsync("找不到ffprobe程序");
-                Close();
-                return;
-            }
-            if (!File.Exists("MediaInfo.dll"))
-            {
-                await CommonDialog.ShowErrorDialogAsync("找不到MediaInfo.dll");
-                Close();
-                return;
-            }
+                "ffmpeg.exe",
+                "ffprobe.exe",
+                "ffplay.exe",
+                "mediainfo.dll"
+            };
 
-            var win = App.ServiceProvider.GetService<ClipWindow>();
-            win.Show();
-            win.SetVideo(@"C:\Users\autod\Desktop\20210927-从植物园校区过小路沿永和西路、西大河南路到震海大道.mp4");
+            foreach (var file in files)
+            {
+                if (!File.Exists(file))
+                {
+                    await CommonDialog.ShowErrorDialogAsync("找不到" + file);
+                    Close();
+                    return;
+                }
+            }
         }
 
         private void MediaInfoButton_Click(object sender, RoutedEventArgs e)

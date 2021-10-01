@@ -69,6 +69,7 @@ namespace SimpleFFmpegGUI.WPF.Model
                         await System.Threading.Tasks.Task.Delay(1000);
                     }
                     mainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+                    Debug.Write("finish");
                 });
             }
             ProcessingTasks = Tasks.Where(p => p.ProcessStatus != null).ToList();
