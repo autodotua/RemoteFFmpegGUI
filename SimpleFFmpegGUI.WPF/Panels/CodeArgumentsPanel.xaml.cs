@@ -81,8 +81,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
             Format.Apply();
             return new OutputArguments()
             {
-                Video = VideoOutputStrategy == ChannelOutputStrategy.Code ? Video : null,
-                Audio = AudioOutputStrategy == ChannelOutputStrategy.Code ? Audio : null,
+                Video = VideoOutputStrategy == ChannelOutputStrategy.Code ? Video.Adapt<VideoCodeArguments>() : null,
+                Audio = AudioOutputStrategy == ChannelOutputStrategy.Code ? Audio.Adapt<AudioCodeArguments>() : null,
                 Format = Format.Format,
                 Combine = Combine,
                 Concat = Concat,

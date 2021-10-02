@@ -89,23 +89,42 @@ namespace SimpleFFmpegGUI.WPF.Panels
         private void ApplyButton_Click(object sender, RoutedEventArgs e)
         {
             Debug.Assert(CodeArgumentsViewModel != null);
-            var preset = (sender as FrameworkElement).Tag as CodePreset;
-            CodeArgumentsViewModel.Update(type, preset.Arguments);
+            var preset = (sender as FrameworkElement).DataContext as CodePreset;
+            CodeArgumentsViewModel.Update(type, preset.Arguments.Adapt<OutputArguments>());
             this.CreateMessage().QueueSuccess($"已加载预设“{preset.Name}”");
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
             Debug.Assert(CodeArgumentsViewModel != null);
-            var preset = (sender as FrameworkElement).Tag as CodePreset;
+            var preset = (sender as FrameworkElement).DataContext as CodePreset;
             try
             {
                 preset.Arguments = CodeArgumentsViewModel.GetArguments();
+                PresetManager.UpdatePreset(preset);
                 this.CreateMessage().QueueSuccess($"预设“{preset.Name}”更新成功");
             }
             catch (Exception ex)
             {
                 this.CreateMessage().QueueError("更新预设失败", ex);
+            }
+        }
+
+        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.Assert(CodeArgumentsViewModel != null);
+            var preset = (sender as FrameworkElement).DataContext as CodePreset;
+            if (await CommonDialog.ShowYesNoDialogAsync("删除预设", $"是否删除预设：{preset.Name}？"))
+            {
+                try
+                {
+                    PresetManager.DeletePreset(preset.Id);
+                    ViewModel.Presets.Remove(preset);
+                }
+                catch (Exception ex)
+                {
+                    this.CreateMessage().QueueError("删除预设失败", ex);
+                }
             }
         }
     }
