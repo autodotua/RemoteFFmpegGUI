@@ -79,30 +79,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private FzLib.Program.Runtime.TrayIcon tray;
 
-        private void TrayButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (tray == null)
-            {
-                var bmp = Bitmap.FromFile("icon.png");
-                var thumb = (Bitmap)bmp.GetThumbnailImage(64, 64, null, IntPtr.Zero);
-                thumb.MakeTransparent();
-                var icon = System.Drawing.Icon.FromHandle(thumb.GetHicon());
-                tray = new FzLib.Program.Runtime.TrayIcon(icon, FzLib.Program.App.ProgramName);
 
-                tray.MouseLeftClick += (s, e) =>
-                {
-                    Show();
-                    tray.Hide();
-                };
-                tray.ReShowWhenDisplayChanged = true;
-                Closed += (s, e) =>
-                {
-                    tray.Dispose();
-                };
-            }
-            tray.Show();
-            Hide();
-        }
 
         protected async override void OnClosing(CancelEventArgs e)
         {
@@ -110,15 +87,27 @@ namespace SimpleFFmpegGUI.WPF
             if (queue.Managers.Any())
             {
                 e.Cancel = true;
-                if (await CommonDialog.ShowYesNoDialogAsync("还有正在执行的任务，是否全部取消？"))
+                if (tray == null)
                 {
-                    foreach (var m in queue.Managers.ToList())
+                    var bmp = Bitmap.FromFile("icon.png");
+                    var thumb = (Bitmap)bmp.GetThumbnailImage(64, 64, null, IntPtr.Zero);
+                    thumb.MakeTransparent();
+                    var icon = System.Drawing.Icon.FromHandle(thumb.GetHicon());
+                    tray = new FzLib.Program.Runtime.TrayIcon(icon, FzLib.Program.App.ProgramName);
+
+                    tray.MouseLeftClick += (s, e) =>
                     {
-                        m.Cancel();
-                    }
-                    await Task.Delay(200);
-                    Close();
+                        Show();
+                        tray.Hide();
+                    };
+                    tray.ReShowWhenDisplayChanged = true;
+                    Closed += (s, e) =>
+                    {
+                        tray.Dispose();
+                    };
                 }
+                tray.Show();
+                Hide();
             }
         }
 
@@ -176,8 +165,12 @@ namespace SimpleFFmpegGUI.WPF
 
         private void MediaInfoButton_Click(object sender, RoutedEventArgs e)
         {
-            var win = App.ServiceProvider.GetService<MediaInfoWindow>();
-            win.Show();
+            App.ServiceProvider.GetService<MediaInfoWindow>().Show();
+        }
+
+        private void SettingButton_Click(object sender, RoutedEventArgs e)
+        {
+            App.ServiceProvider.GetService<SettingWindow>().ShowDialog();
         }
     }
 }

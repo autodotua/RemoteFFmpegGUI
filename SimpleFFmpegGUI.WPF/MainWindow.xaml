@@ -47,12 +47,7 @@
                 Icon="List"
                 Label="查看日志" />
             <ui:AppBarButton Icon="Zoom" Label="查询媒体信息" Click="MediaInfoButton_Click" />
-            <ui:AppBarSeparator />
-            <ui:AppBarButton Click="TrayButton_Click" Label="最小化到托盘">
-                <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE972;" />
-                </ui:AppBarButton.Icon>
-            </ui:AppBarButton>
+
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Click="StartButton_Click"
@@ -68,6 +63,9 @@
                 Click="AddButton_Click"
                 Icon="Add"
                 Label="创建任务" />
+            <ui:CommandBar.SecondaryCommands>
+                <ui:AppBarButton Label="设置" Icon="Setting" Click="SettingButton_Click" />
+            </ui:CommandBar.SecondaryCommands>
         </ui:CommandBar>
     </Grid>
 </Window>

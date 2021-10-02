@@ -21,7 +21,9 @@
         <ScrollViewer
             xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
             Padding="0,0,16,0"
-            c:SmoothScrollViewerHelper.SmoothScroll="True"
+                xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
+            c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
+
             HorizontalScrollBarVisibility="Disabled"
             VerticalScrollBarVisibility="Auto">
             <ui:SimpleStackPanel

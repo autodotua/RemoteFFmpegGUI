@@ -20,7 +20,9 @@
         </Grid.RowDefinitions>
 
         <ListView         xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
-            c:SmoothScrollViewerHelper.SmoothScroll="True"
+                xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
+            c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
+
             ItemsSource="{Binding Tasks.Tasks}"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             SelectedItem="{Binding Tasks.SelectedTask}">
@@ -123,7 +125,7 @@
                             Visibility="{Binding Status, ConverterParameter=Queue, Converter={StaticResource EqualConverter}}">
                             <Run Text="创建 ：" />
                             <Run Text="{Binding CreateTime, Mode=OneWay, StringFormat={StaticResource DateTimeFormat}}" />
-                        </TextBlock>  
+                        </TextBlock>
                         <TextBlock
                             Grid.Row="2"
                             Grid.Column="2"

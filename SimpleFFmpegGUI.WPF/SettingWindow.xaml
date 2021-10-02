@@ -1,0 +1,78 @@
+﻿<Window
+    x:Class="SimpleFFmpegGUI.WPF.SettingWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mext="clr-namespace:ModernWpf.FzExtension;assembly=ModernWpf.FzExtension"
+    xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
+    xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
+    xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Title="设置 - FFmpeg 工具箱"
+    Width="1280"
+    Height="640"
+    ui:TitleBar.IsIconVisible="True"
+    ui:WindowHelper.UseModernWindowStyle="True"
+    AllowDrop="True"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <Window.Resources />
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="4" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:ToggleSwitch
+            IsOn="{Binding SmoothScroll}"
+            OffContent="关闭平滑滚动"
+            OnContent="开启平滑滚动" />
+        <TextBlock
+            Grid.Row="2"
+            Text="远程管理主机：" />
+        <DataGrid
+            Grid.Row="4"
+            c:SmoothScrollViewerHelper.SmoothScroll="{Binding SmoothScroll}"
+            AutoGenerateColumns="False"
+            CanUserAddRows="False"
+            CanUserDeleteRows="True"
+            ItemsSource="{Binding ObservableRemoteHosts, UpdateSourceTrigger=PropertyChanged}">
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                    Header="名称" />
+                <DataGridTextColumn
+                    Binding="{Binding Address, UpdateSourceTrigger=PropertyChanged}"
+                    Header="地址" />
+                <DataGridTextColumn
+                    Binding="{Binding Token, UpdateSourceTrigger=PropertyChanged}"
+                    Header="连接密码" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <ui:CommandBar
+            Grid.Row="6"
+            Margin="-8"
+            MouseEnter="CommandBar_MouseEnter">
+            <ui:AppBarButton
+                Click="AddRemoteHost_Click"
+                Icon="Add"
+                Label="新增远程主机" />
+            <ui:AppBarSeparator />
+            <ui:AppBarButton
+                Click="OKButton_Click"
+                Label="完成">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Glyph="&#xE73E;" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
+        </ui:CommandBar>
+    </Grid>
+</Window>

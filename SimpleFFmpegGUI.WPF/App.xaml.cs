@@ -37,8 +37,8 @@ namespace SimpleFFmpegGUI.WPF
             Unosquare.FFME.Library.FFmpegDirectory = FzLib.Program.App.ProgramDirectoryPath;
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
-
             ServiceProvider = serviceCollection.BuildServiceProvider();
+
             MainWindow = ServiceProvider.GetService<MainWindow>();
             MainWindow.Show();
         }
@@ -57,6 +57,8 @@ namespace SimpleFFmpegGUI.WPF
 
         private void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<Config>();
+
             services.AddSingleton<QueueManager>();
             services.AddSingleton<TasksAndStatuses>();
 
@@ -65,13 +67,18 @@ namespace SimpleFFmpegGUI.WPF
 
             services.AddTransient<AddTaskWindow>();
             services.AddTransient<AddTaskWindowViewModel>();
+
             services.AddTransient<MediaInfoWindow>();
             services.AddTransient<MediaInfoWindowViewModel>();
 
             services.AddTransient<LogsWindow>();
             services.AddTransient<LogsWindowViewModel>();
+
             services.AddTransient<ClipWindow>();
             services.AddTransient<ClipWindowViewModel>();
+
+            services.AddTransient<SettingWindow>();
+            services.AddTransient<SettingWindowViewModel>();
 
             services.AddTransient<TaskListViewModel>();
             services.AddTransient<CodeArgumentsPanelViewModel>();
