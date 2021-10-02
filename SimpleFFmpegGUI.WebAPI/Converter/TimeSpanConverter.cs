@@ -12,6 +12,10 @@ namespace SimpleFFmpegGUI.WebAPI.Converter
             {
                 return TimeSpan.FromSeconds(reader.GetDouble());
             }
+            if (reader.TokenType == JsonTokenType.String && TimeSpan.TryParse(reader.GetString(), out TimeSpan ts))
+            {
+                return ts;
+            }
             return TimeSpan.Zero;
         }
 

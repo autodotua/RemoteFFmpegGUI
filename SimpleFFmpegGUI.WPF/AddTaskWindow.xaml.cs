@@ -1,6 +1,9 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
 using FzLib;
+using Mapster;
 using Microsoft.Extensions.DependencyInjection;
+using ModernWpf.FzExtension.CommonDialog;
+using Newtonsoft.Json;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
@@ -9,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -184,6 +188,81 @@ namespace SimpleFFmpegGUI.WPF
         private void CommandBar_MouseEnter(object sender, MouseEventArgs e)
         {
             (sender as FrameworkElement).Focus();
+        }
+
+        private async void AddToRemoteHostButton_Click(object sender, RoutedEventArgs e)
+        {
+            var items = Config.Instance.RemoteHosts.Select(p =>
+            new SelectDialogItem(p.Name, p.Address));
+            var index = await CommonDialog.ShowSelectItemDialogAsync("请确保在远程主机的输入文件夹中有同名文件", items);
+            if (index < 0)
+            {
+                return;
+            }
+            IsEnabled = false;
+            try
+            {
+                var host = Config.Instance.RemoteHosts[index];
+                List<InputArguments> inputs = fileIOPanel.GetInputs().Adapt<List<InputArguments>>();
+                foreach (var i in inputs)
+                {
+                    //绝对路径，仅保留文件名
+                    if (i.FilePath.Contains(':'))
+                    {
+                        i.FilePath = System.IO.Path.GetFileName(i.FilePath);
+                    }
+                }
+                string output = fileIOPanel.GetOutput();
+                output = string.IsNullOrEmpty(output) ? output : System.IO.Path.GetFileName(output);
+                OutputArguments args = argumentsPanel.GetOutputArguments();
+                var data = new
+                {
+                    Inputs = inputs,
+                    Output = output,
+                    Argument = args,
+                    Start = ViewModel.StartQueueAfterAddTask
+                }; 
+                await PostAsync(host, "Task/Add/"+ ViewModel.Type.ToString(), data);
+          
+                this.CreateMessage().QueueSuccess("已加入到远程主机" + host.Name);
+
+                fileIOPanel.Reset();
+            }
+            catch (Exception ex)
+            {
+                IsEnabled = true;
+                await CommonDialog.ShowErrorDialogAsync(ex, "加入远程主机失败");
+            }
+            finally
+            {
+                IsEnabled = true;
+            }
+        }
+
+        public static async Task PostAsync(RemoteHost host, string subUrl, object data)
+        {
+            HttpClient client = new HttpClient();
+            string str = JsonConvert.SerializeObject(data);
+            var content = new StringContent(str, Encoding.UTF8, "application/json");
+            string url = host.Address.TrimEnd('/') + "/" + subUrl.TrimStart('/');
+            if (!string.IsNullOrEmpty(host.Token))
+            {
+                client.DefaultRequestHeaders.Add("Authorization", host.Token);
+            }
+            var response = await client.PostAsync(url, content);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                if (string.IsNullOrWhiteSpace(responseString))
+                {
+                    throw new HttpRequestException($"{response.StatusCode}");
+                }
+                else
+                {
+                    throw new HttpRequestException($"{response.StatusCode}：{responseString}");
+                }
+            }
         }
     }
 }

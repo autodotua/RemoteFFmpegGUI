@@ -39,10 +39,6 @@ namespace SimpleFFmpegGUI.WPF
 
         public void Save()
         {
-            //if (!Directory.Exists(Path.GetDirectoryName(path)))
-            //{
-            //    Directory.CreateDirectory(Path.GetDirectoryName(path));
-            //}
             this.Save(path, new JsonSerializerSettings().SetIndented());
         }
 

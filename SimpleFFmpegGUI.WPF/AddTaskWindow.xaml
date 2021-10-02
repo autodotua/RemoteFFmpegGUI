@@ -92,10 +92,18 @@
                     <ui:FontIcon Glyph="&#xE756;" />
                 </ui:AppBarToggleButton.Icon>
             </ui:AppBarToggleButton>
+
+            <ui:AppBarButton
+                Click="AddToRemoteHostButton_Click"
+                Label="加入到远程主机">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Glyph="&#xE836;" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarButton
                 Click="AddToQueueButton_Click"
                 Icon="Add"
-                Label="加入队列" />
+                Label="加入" />
         </ui:CommandBar>
     </Grid>
 </Window>
