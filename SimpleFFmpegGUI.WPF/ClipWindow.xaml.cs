@@ -178,20 +178,6 @@ namespace SimpleFFmpegGUI.WPF
         {
         }
 
-        private async void NextFrame_Click(object sender, RoutedEventArgs e)
-        {
-            await media.Pause();
-            await media.StepForward();
-            await DisableBarWhenSeekingAsync();
-        }
-
-        private async void LastFrame_Click(object sender, RoutedEventArgs e)
-        {
-            await media.Pause();
-            await media.StepBackward();
-            await DisableBarWhenSeekingAsync();
-        }
-
         private async void PauseButton_Click(object sender, RoutedEventArgs e)
         {
             await media.Pause();
@@ -210,7 +196,7 @@ namespace SimpleFFmpegGUI.WPF
                 case Key.Space:
                     if (media.IsPlaying)
                     {
-                        media.Pause();
+                        await media.Pause();
                     }
                     else
                     {
@@ -298,6 +284,32 @@ namespace SimpleFFmpegGUI.WPF
         public (TimeSpan From, TimeSpan To) GetClipTime()
         {
             return (ViewModel.From, ViewModel.To);
+        }
+
+        private async void JumpButton_Click(object sender, RoutedEventArgs e)
+        {
+            switch ((sender as FrameworkElement).Tag as string)
+            {
+                case "-2":
+                    ViewModel.Current = new TimeSpan(Math.Max(0, ViewModel.Current.Ticks - TimeSpan.FromSeconds(5).Ticks));
+
+                    break;
+
+                case "-1":
+                    await media.Pause();
+                    await media.StepBackward();
+                    break;
+
+                case "1":
+                    await media.Pause();
+                    await media.StepForward();
+                    break;
+
+                case "2":
+                    ViewModel.Current = new TimeSpan(Math.Min(ViewModel.Length.Ticks, ViewModel.Current.Ticks + TimeSpan.FromSeconds(5).Ticks));
+                    break;
+            }
+            await DisableBarWhenSeekingAsync();
         }
     }
 

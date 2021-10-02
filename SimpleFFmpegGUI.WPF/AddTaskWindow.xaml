@@ -71,31 +71,31 @@
                 IsEnabled="{Binding CanAddFile}"
                 Label="新增输入文件">
                 <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE82E;" />
+                    <ui:FontIcon Glyph="&#xECC8;" />
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
             <ui:AppBarButton
                 Click="BrowseAndAddInputButton_Click"
+                Icon="OpenFile"
                 IsEnabled="{Binding CanAddFile}"
-                Label="浏览并新增输入文件">
-                <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE7C5;" />
-                </ui:AppBarButton.Icon>
-            </ui:AppBarButton>
+                Label="浏览并新增输入文件" />
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Click="SaveToPresetButton_Click"
                 Icon="Save"
                 Label="保存为预设" />
             <ui:AppBarSeparator />
+            <ui:AppBarToggleButton
+                IsChecked="{Binding StartQueueAfterAddTask}"
+                Label="加入后启动队列">
+                <ui:AppBarToggleButton.Icon>
+                    <ui:FontIcon Glyph="&#xE756;" />
+                </ui:AppBarToggleButton.Icon>
+            </ui:AppBarToggleButton>
             <ui:AppBarButton
                 Click="AddToQueueButton_Click"
                 Icon="Add"
                 Label="加入队列" />
-            <ui:AppBarButton
-                Click="AddToQueueAndStartButton_Click"
-                Icon="Add"
-                Label="加入并启动队列" />
         </ui:CommandBar>
     </Grid>
 </Window>

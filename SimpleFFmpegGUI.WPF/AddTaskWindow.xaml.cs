@@ -56,12 +56,20 @@ namespace SimpleFFmpegGUI.WPF
         }
 
         private bool canAddFile;
+
         public bool CanAddFile
         {
             get => canAddFile;
             set => this.SetValueAndNotify(ref canAddFile, value, nameof(CanAddFile));
         }
 
+        private bool startQueueAfterAddTask = true;
+
+        public bool StartQueueAfterAddTask
+        {
+            get => startQueueAfterAddTask;
+            set => this.SetValueAndNotify(ref startQueueAfterAddTask, value, nameof(StartQueueAfterAddTask));
+        }
     }
 
     /// <summary>
@@ -96,14 +104,53 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        private void AddToQueueAndStartButton_Click(object sender, RoutedEventArgs e)
+        private async void AddToQueueButton_Click(object sender, RoutedEventArgs e)
         {
-            AddToQueue(true);
-        }
+            IsEnabled = false;
+            try
+            {
+                List<InputArguments> inputs = fileIOPanel.GetInputs();
+                string output = fileIOPanel.GetOutput();
+                OutputArguments args = argumentsPanel.GetOutputArguments();
+                switch (ViewModel.Type)
+                {
+                    case TaskType.Code:
+                        foreach (var input in inputs)
+                        {
+                            TaskInfo task = null;
+                            await Task.Run(() => task = TaskManager.AddTask(TaskType.Code, new List<InputArguments>() { input }, output, args));
+                            Dispatcher.Invoke(() => App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task)));
+                        }
+                        this.CreateMessage().QueueSuccess($"已加入{inputs.Count}个任务队列");
+                        break;
 
-        private void AddToQueueButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddToQueue(false);
+                    default:
+                        {
+                            TaskInfo task = null;
+                            await Task.Run(() => task = TaskManager.AddTask(ViewModel.Type, inputs, output, args));
+                            App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
+                            this.CreateMessage().QueueSuccess("已加入队列");
+                        }
+                        break;
+                }
+
+                fileIOPanel.Reset();
+
+                if (ViewModel.StartQueueAfterAddTask)
+                {
+                    await Task.Run(() => App.ServiceProvider.GetService<QueueManager>().StartQueue());
+                    this.CreateMessage().QueueSuccess("已开始队列");
+                }
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError("加入队列失败", ex);
+            }
+            finally
+            {
+                IsEnabled = true;
+                App.ServiceProvider.GetService<MainWindow>().Activate();
+            }
         }
 
         public void SetAsClone(TaskInfo task)
@@ -117,45 +164,6 @@ namespace SimpleFFmpegGUI.WPF
         public void SetFiles(IEnumerable<string> files)
         {
             fileIOPanel.Update(TaskType.Code, files.Select(p => new InputArguments() { FilePath = p }).ToList(), null);
-        }
-
-        private void AddToQueue(bool start)
-        {
-            try
-            {
-                List<InputArguments> inputs = fileIOPanel.GetInputs();
-                string output = fileIOPanel.GetOutput();
-                OutputArguments args = argumentsPanel.GetOutputArguments();
-                switch (ViewModel.Type)
-                {
-                    case TaskType.Code:
-                        foreach (var input in inputs)
-                        {
-                            var task = TaskManager.AddTask(TaskType.Code, new List<InputArguments>() { input }, output, args);
-                            App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
-                        }
-                        this.CreateMessage().QueueSuccess($"已加入{inputs.Count}个任务队列");
-                        break;
-
-                    default:
-                        {
-                            var task = TaskManager.AddTask(ViewModel.Type, inputs, output, args);
-                            App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
-                            this.CreateMessage().QueueSuccess("已加入队列");
-                        }
-                        break;
-                }
-
-                fileIOPanel.Reset();
-            }
-            catch (Exception ex)
-            {
-                this.CreateMessage().QueueError("加入队列失败", ex);
-            }
-            if (start)
-            {
-                ViewModel.Queue.StartQueue();
-            }
         }
 
         private async void SaveToPresetButton_Click(object sender, RoutedEventArgs e)
