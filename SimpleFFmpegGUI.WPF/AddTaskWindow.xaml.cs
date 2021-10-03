@@ -66,14 +66,6 @@ namespace SimpleFFmpegGUI.WPF
             get => canAddFile;
             set => this.SetValueAndNotify(ref canAddFile, value, nameof(CanAddFile));
         }
-
-        private bool startQueueAfterAddTask = true;
-
-        public bool StartQueueAfterAddTask
-        {
-            get => startQueueAfterAddTask;
-            set => this.SetValueAndNotify(ref startQueueAfterAddTask, value, nameof(StartQueueAfterAddTask));
-        }
     }
 
     /// <summary>
@@ -137,10 +129,17 @@ namespace SimpleFFmpegGUI.WPF
                         }
                         break;
                 }
+                if (Config.Instance.CloseWindowAfterAddTask)
+                {
+                    Close();
+                    return;
+                }
+                if (Config.Instance.ClearFilesAfterAddTask)
+                {
+                    fileIOPanel.Reset();
+                }
 
-                fileIOPanel.Reset();
-
-                if (ViewModel.StartQueueAfterAddTask)
+                if (Config.Instance.StartQueueAfterAddTask)
                 {
                     await Task.Run(() => App.ServiceProvider.GetService<QueueManager>().StartQueue());
                     this.CreateMessage().QueueSuccess("已开始队列");
@@ -220,13 +219,20 @@ namespace SimpleFFmpegGUI.WPF
                     Inputs = inputs,
                     Output = output,
                     Argument = args,
-                    Start = ViewModel.StartQueueAfterAddTask
-                }; 
-                await PostAsync(host, "Task/Add/"+ ViewModel.Type.ToString(), data);
-          
-                this.CreateMessage().QueueSuccess("已加入到远程主机" + host.Name);
+                    Start = Config.Instance.StartQueueAfterAddTask
+                };
+                await PostAsync(host, "Task/Add/" + ViewModel.Type.ToString(), data);
 
-                fileIOPanel.Reset();
+                if (Config.Instance.CloseWindowAfterAddTask)
+                {
+                    Close();
+                    return;
+                }
+                if (Config.Instance.ClearFilesAfterAddTask)
+                {
+                    fileIOPanel.Reset();
+                }
+                this.CreateMessage().QueueSuccess("已加入到远程主机" + host.Name);
             }
             catch (Exception ex)
             {
@@ -263,6 +269,17 @@ namespace SimpleFFmpegGUI.WPF
                     throw new HttpRequestException($"{response.StatusCode}：{responseString}");
                 }
             }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Config.Instance.Save();
+        }
+
+        private void ClearFilesButton_Click(object sender, RoutedEventArgs e)
+        {
+            fileIOPanel.Reset();
         }
     }
 }

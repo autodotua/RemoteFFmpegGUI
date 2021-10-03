@@ -57,6 +57,30 @@ namespace SimpleFFmpegGUI.WPF
             get => remoteHosts;
             set => this.SetValueAndNotify(ref remoteHosts, value, nameof(RemoteHosts));
         }
+
+        private bool clearFilesAfterAddTask;
+
+        public bool ClearFilesAfterAddTask
+        {
+            get => clearFilesAfterAddTask;
+            set => this.SetValueAndNotify(ref clearFilesAfterAddTask, value, nameof(ClearFilesAfterAddTask));
+        }
+
+        private bool startQueueAfterAddTask = true;
+
+        public bool StartQueueAfterAddTask
+        {
+            get => startQueueAfterAddTask;
+            set => this.SetValueAndNotify(ref startQueueAfterAddTask, value, nameof(StartQueueAfterAddTask));
+        }
+
+        private bool closeWindowAfterAddTask;
+
+        public bool CloseWindowAfterAddTask
+        {
+            get => closeWindowAfterAddTask;
+            set => this.SetValueAndNotify(ref closeWindowAfterAddTask, value, nameof(CloseWindowAfterAddTask));
+        }
     }
 
     public class RemoteHost

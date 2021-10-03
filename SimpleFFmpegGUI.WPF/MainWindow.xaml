@@ -63,6 +63,7 @@
                 Click="AddButton_Click"
                 Icon="Add"
                 Label="创建任务" />
+            <ui:AppBarSeparator />
             <ui:CommandBar.SecondaryCommands>
                 <ui:AppBarButton Label="设置" Icon="Setting" Click="SettingButton_Click" />
             </ui:CommandBar.SecondaryCommands>
