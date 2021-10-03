@@ -40,14 +40,9 @@ namespace SimpleFFmpegGUI
             manager.ResumeMainQueue();
         }
 
-        public int AddTask(TaskType type, List<InputArguments> inputs, string outputPath, OutputArguments arg, bool start)
+        public int AddTask(TaskType type, List<InputArguments> inputs, string outputPath, OutputArguments arg)
         {
             int id = TaskManager.AddTask(type, inputs, outputPath, arg).Id;
-
-            if (start)
-            {
-                manager.StartQueue();
-            }
             return id;
         }
 

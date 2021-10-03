@@ -20,7 +20,7 @@ namespace SimpleFFmpegGUI
 
         void CancelTasks(IEnumerable<int> ids);
 
-        int AddTask(TaskType type, List<InputArguments> inputs, string outputPath, OutputArguments arg, bool start);
+        int AddTask(TaskType type, List<InputArguments> inputs, string outputPath, OutputArguments arg);
 
         void DeletePreset(int id);
 

@@ -106,7 +106,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public void Update(TaskType type)
         {
-            CanChangeInputsCount = type is TaskType.Code or TaskType.Combine or TaskType.Concat;
+            CanChangeInputsCount = type is TaskType.Code or TaskType.Concat;
             MinInputsCount = type switch
             {
                 TaskType.Code => 1,
@@ -273,10 +273,15 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             foreach (string file in files)
             {
+                if (ViewModel.Inputs.Count >= ViewModel.MinInputsCount && !ViewModel.CanChangeInputsCount)
+                {
+                    break;
+                }
                 if (File.Exists(file))
                 {
                     ViewModel.Inputs.Add(new InputArgumentsDetail() { FilePath = file });
                 }
+               
             }
             while (ViewModel.Inputs.Count < ViewModel.MinInputsCount)
             {

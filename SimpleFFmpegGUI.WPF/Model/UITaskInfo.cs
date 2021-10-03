@@ -38,13 +38,25 @@ namespace SimpleFFmpegGUI.WPF.Model
             {
                 if (inputs.Count != 1)
                 {
-                    return InputText;
+                    return string.Join(Environment.NewLine, inputs.Select(p => Path.GetFileName(p.FilePath)));
                 }
                 string name = Path.GetFileName(inputs[0].FilePath);
                 return name
                     + (inputs[0].From.HasValue ? $" 开始：{inputs[0].From.Value:hh\\:mm\\:ss\\.fff}" : "")
                     + (inputs[0].To.HasValue ? $" 结束：{inputs[0].To.Value:hh\\:mm\\:ss\\.fff}" : "")
                     + (inputs[0].Duration.HasValue ? $" 经过：{inputs[0].Duration.Value:hh\\:mm\\:ss\\.fff}" : "");
+            }
+        }
+
+        public string InputDetailToolTipText
+        {
+            get
+            {
+                if (inputs.Count != 1)
+                {
+                    return string.Join(Environment.NewLine, inputs.Select(p => p.FilePath));
+                }
+                return InputDetailText;
             }
         }
 
