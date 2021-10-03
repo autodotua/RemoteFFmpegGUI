@@ -16,11 +16,22 @@
     Title="视频裁剪 - FFmpeg 工具箱"
     Width="960"
     Height="680"
+    MinWidth="480"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
+    <Window.Resources>
+        <Style
+            BasedOn="{StaticResource DefaultTextBoxStyle}"
+            TargetType="{x:Type TextBox}">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="False" />
+        </Style>
+    </Window.Resources>
     <Grid>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="8" />
@@ -34,6 +45,7 @@
             x:Name="media"
             LoadedBehavior="Play"
             Position="{Binding Current}"
+            RenderingVideo="Media_RenderingVideo"
             ScrubbingEnabled="False"
             UnloadedBehavior="Manual" />
         <Grid
@@ -65,7 +77,6 @@
                 Maximum="1"
                 Minimum="0"
                 PreviewKeyDown="Slider_PreviewKeyDown"
-                PreviewMouseUp="Slider_PreviewMouseUp"
                 SelectionEnd="{Binding ToP, Mode=OneWay}"
                 SelectionStart="{Binding FromP, Mode=OneWay}"
                 TickPlacement="BottomRight"
@@ -101,13 +112,14 @@
                     Minimum="0"
                     SmallChange="0.05"
                     Value="{Binding ElementName=media, Path=Volume}" />
+                <TextBlock Text="{Binding Volume}" />
             </ui:SimpleStackPanel>
             <Button
                 Grid.Column="1"
                 Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="-2"
-                ToolTip="快退5秒">
+                ToolTip="快退5秒&#x0a;按住Shift时快退20秒&#x0a;按住Ctrl时快退1秒">
                 <ui:FontIcon Glyph="&#xEB9E;" />
             </Button>
             <Button
@@ -115,7 +127,7 @@
                 Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="2"
-                ToolTip="快进5秒">
+                ToolTip="快进5秒&#x0a;按住Shift时快进20秒&#x0a;按住Ctrl时快进1秒">
                 <ui:FontIcon Glyph="&#xEB9D;" />
             </Button>
             <Button
@@ -123,7 +135,7 @@
                 Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="-1"
-                ToolTip="切换到前一帧">
+                ToolTip="切换到前一帧&#x0a;按住Ctrl向前5帧&#x0a;按住Shift向前10帧">
                 <ui:FontIcon Glyph="&#xE973;" />
             </Button>
             <Button
@@ -131,7 +143,7 @@
                 Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="1"
-                ToolTip="切换到后一帧">
+                ToolTip="切换到后一帧&#x0a;按住Ctrl向后5帧&#x0a;按住Shift向后10帧">
                 <ui:FontIcon Glyph="&#xE76C;" />
             </Button>
             <Button
@@ -150,15 +162,21 @@
                 Visibility="{Binding ElementName=media, Path=IsPlaying, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=h}">
                 <ui:SymbolIcon Symbol="Pause" />
             </Button>
-
-            <TextBox
+            <ui:SimpleStackPanel
                 Grid.Column="99"
-                Width="120"
                 HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                BorderThickness="0"
-                Text="{Binding Current, StringFormat={StaticResource TimeSpanFormat}, UpdateSourceTrigger=PropertyChanged}" />
+                Orientation="Horizontal"
+                Spacing="16">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="{Binding Frame, StringFormat={}0帧}" />
+                <TextBox
+                    Width="120"
+                    VerticalAlignment="Bottom"
+                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                    BorderThickness="0"
+                    Text="{Binding Current, StringFormat={StaticResource TimeSpanFormat}, UpdateSourceTrigger=PropertyChanged}" />
+            </ui:SimpleStackPanel>
         </Grid>
         <ui:CommandBar
             Grid.Row="6"
@@ -179,31 +197,6 @@
                 Click="SetTo_Click"
                 Icon="Next"
                 Label="设置为出点" />
-            <!--<ui:AppBarSeparator />
-            <ui:AppBarButton
-                Click="PlayButton_Click"
-                Icon="Play"
-                IsEnabled="{Binding ElementName=media, Path=IsPaused}"
-                Label="播放" />
-            <ui:AppBarButton
-                Click="PauseButton_Click"
-                Icon="Pause"
-                IsEnabled="{Binding ElementName=media, Path=IsPlaying}"
-                Label="暂停" />
-            <ui:AppBarButton
-                Click="LastFrame_Click"
-                Label="上一帧">
-                <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE96F;" />
-                </ui:AppBarButton.Icon>
-            </ui:AppBarButton>
-            <ui:AppBarButton
-                Click="NextFrame_Click"
-                Label="下一帧">
-                <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE970;" />
-                </ui:AppBarButton.Icon>
-            </ui:AppBarButton>-->
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Click="OKButton_Click"

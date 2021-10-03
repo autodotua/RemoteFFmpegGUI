@@ -114,6 +114,14 @@ namespace SimpleFFmpegGUI.WPF
             get => isBarEnabled;
             set => this.SetValueAndNotify(ref isBarEnabled, value, nameof(IsBarEnabled));
         }
+
+        private long frame;
+
+        public long Frame
+        {
+            get => frame;
+            set => this.SetValueAndNotify(ref frame, value, nameof(Frame));
+        }
     }
 
     /// <summary>
@@ -212,30 +220,16 @@ namespace SimpleFFmpegGUI.WPF
                     await media.StepForward();
                     break;
             }
-            await DisableBarWhenSeekingAsync();
         }
 
-        public async Task DisableBarWhenSeekingAsync()
-        {
-            if (media.IsSeeking == false)
-            {
-                return;
-            }
-            ViewModel.IsBarEnabled = false;
-            await media.WaitForEventAsync(nameof(media.SeekingEnded));
-            ViewModel.IsBarEnabled = true;
-        }
-
-        private async void JumpToFrom_Click(object sender, RoutedEventArgs e)
+        private void JumpToFrom_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.Current = ViewModel.From;
-            await DisableBarWhenSeekingAsync();
         }
 
-        private async void JumpToTo_Click(object sender, RoutedEventArgs e)
+        private void JumpToTo_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.Current = ViewModel.To;
-            await DisableBarWhenSeekingAsync();
         }
 
         private void SetFrom_Click(object sender, RoutedEventArgs e)
@@ -271,11 +265,6 @@ namespace SimpleFFmpegGUI.WPF
             e.Handled = true;
         }
 
-        private async void Slider_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            await DisableBarWhenSeekingAsync();
-        }
-
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
@@ -288,28 +277,41 @@ namespace SimpleFFmpegGUI.WPF
 
         private async void JumpButton_Click(object sender, RoutedEventArgs e)
         {
+            bool shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
+            bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+            int s = shift ? 30 : (ctrl ? 1 : 5);
+            int f = shift ? 10 : (ctrl ? 5 : 1);
             switch ((sender as FrameworkElement).Tag as string)
             {
                 case "-2":
-                    ViewModel.Current = new TimeSpan(Math.Max(0, ViewModel.Current.Ticks - TimeSpan.FromSeconds(5).Ticks));
-
+                    ViewModel.Current = new TimeSpan(Math.Max(0, ViewModel.Current.Ticks - TimeSpan.FromSeconds(s).Ticks));
                     break;
 
                 case "-1":
-                    await media.Pause();
-                    await media.StepBackward();
-                    break;
-
                 case "1":
                     await media.Pause();
-                    await media.StepForward();
+                    for (int i = 0; i < f; i++)
+                    {
+                        if ((sender as FrameworkElement).Tag.Equals("-1"))
+                        {
+                            await media.StepBackward();
+                        }
+                        else
+                        {
+                            await media.StepForward();
+                        }
+                    }
                     break;
 
                 case "2":
-                    ViewModel.Current = new TimeSpan(Math.Min(ViewModel.Length.Ticks, ViewModel.Current.Ticks + TimeSpan.FromSeconds(5).Ticks));
+                    ViewModel.Current = new TimeSpan(Math.Min(ViewModel.Length.Ticks, ViewModel.Current.Ticks + TimeSpan.FromSeconds(s).Ticks));
                     break;
             }
-            await DisableBarWhenSeekingAsync();
+        }
+
+        private void Media_RenderingVideo(object sender, Unosquare.FFME.Common.RenderingVideoEventArgs e)
+        {
+            ViewModel.Frame = e.PictureNumber;
         }
     }
 
