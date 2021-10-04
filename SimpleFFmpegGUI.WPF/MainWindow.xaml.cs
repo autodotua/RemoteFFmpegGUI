@@ -79,9 +79,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private FzLib.Program.Runtime.TrayIcon tray;
 
-
-
-        protected async override void OnClosing(CancelEventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
             if (queue.Managers.Any())
@@ -170,7 +168,12 @@ namespace SimpleFFmpegGUI.WPF
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<SettingWindow>().ShowDialog();
+            App.ServiceProvider.GetService<SettingWindow>().ShowDialog(this);
+        }
+
+        private void TasksButton_Click(object sender, RoutedEventArgs e)
+        {
+            App.ServiceProvider.GetService<TasksWindow>().ShowDialog(this);
         }
     }
 }

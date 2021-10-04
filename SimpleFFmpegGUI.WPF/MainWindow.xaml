@@ -39,14 +39,28 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch"
             Background="{DynamicResource TextControlBorderBrush}" />
-        <panels:StatusPanel x:Name="statusPanel" Grid.Column="2" />
+        <panels:StatusPanel
+            x:Name="statusPanel"
+            Grid.Column="2" />
 
-        <ui:CommandBar Grid.Row="2" Grid.ColumnSpan="99">
+        <ui:CommandBar
+            Grid.Row="2"
+            Grid.ColumnSpan="99">
+            <ui:AppBarButton
+                Click="TasksButton_Click"
+                Icon="List"
+                Label="查看所有任务" />
             <ui:AppBarButton
                 Click="LogsButton_Click"
-                Icon="List"
-                Label="查看日志" />
-            <ui:AppBarButton Icon="Zoom" Label="查询媒体信息" Click="MediaInfoButton_Click" />
+                Label="查看日志">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Glyph="&#xE81C;" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
+            <ui:AppBarButton
+                Click="MediaInfoButton_Click"
+                Icon="Zoom"
+                Label="查询媒体信息" />
 
             <ui:AppBarSeparator />
             <ui:AppBarButton
@@ -65,7 +79,10 @@
                 Label="创建任务" />
             <ui:AppBarSeparator />
             <ui:CommandBar.SecondaryCommands>
-                <ui:AppBarButton Label="设置" Icon="Setting" Click="SettingButton_Click" />
+                <ui:AppBarButton
+                    Click="SettingButton_Click"
+                    Icon="Setting"
+                    Label="设置" />
             </ui:CommandBar.SecondaryCommands>
         </ui:CommandBar>
     </Grid>

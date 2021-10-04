@@ -6,7 +6,6 @@ using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
@@ -15,10 +14,8 @@ using System.Windows.Shell;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
-    public class TasksAndStatuses : INotifyPropertyChanged
+    public class TasksAndStatuses : TaskCollectionBase
     {
-        private ObservableCollection<UITaskInfo> tasks;
-
         public TasksAndStatuses(QueueManager queue)
         {
             Refresh();
@@ -121,30 +118,22 @@ namespace SimpleFFmpegGUI.WPF.Model
             });
         }
 
-        private void Refresh()
+        public override void Refresh()
         {
-            var tasks = TaskManager.GetTasks();
-            Tasks = new ObservableCollection<UITaskInfo>(tasks.List.Adapt<List<UITaskInfo>>());
-        }
-
-        public ObservableCollection<UITaskInfo> Tasks
-        {
-            get => tasks;
-            set => this.SetValueAndNotify(ref tasks, value, nameof(Tasks));
+            var tasks = TaskManager.GetCurrentTasks(App.AppStartTime);
+            Tasks = new ObservableCollection<UITaskInfo>(tasks.Adapt<List<UITaskInfo>>());
         }
 
         public ObservableCollection<StatusDto> Statuses { get; } = new ObservableCollection<StatusDto>();
 
         public QueueManager Queue { get; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private UITaskInfo selectedTask;
-
-        public UITaskInfo SelectedTask
+        public void NotifyTaskReseted(UITaskInfo task)
         {
-            get => selectedTask;
-            set => this.SetValueAndNotify(ref selectedTask, value, nameof(SelectedTask));
+            if(!Tasks.Any(p=>p.Id==task.Id))
+            {
+                Tasks.Add(task);
+            }
         }
     }
 }

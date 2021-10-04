@@ -35,6 +35,23 @@ namespace SimpleFFmpegGUI.Manager
             return task;
         }
 
+        public static List<TaskInfo> GetCurrentTasks(DateTime startTime)
+        {
+            using var db = FFmpegDbContext.GetNew();
+            var tasks = db.Tasks.Where(p => p.IsDeleted == false);
+            var runningTasks = tasks.Where(p => p.Status == TaskStatus.Processing);
+            var queueTasks = tasks.Where(p => p.Status == TaskStatus.Queue);
+            var doneTasks = tasks.Where(p => p.Status == TaskStatus.Done).Where(p => p.StartTime > startTime);
+            var errorTasks = tasks.Where(p => p.Status == TaskStatus.Done).Where(p => p.StartTime > startTime);
+            var cancelTasks = tasks.Where(p => p.Status == TaskStatus.Done).Where(p => p.StartTime > startTime);
+            return runningTasks
+                .Concat(queueTasks)
+                .Concat(doneTasks)
+                .Concat(errorTasks)
+                .Concat(cancelTasks)
+                .ToList();
+        }
+
         public static PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)
         {
             using var db = FFmpegDbContext.GetNew();

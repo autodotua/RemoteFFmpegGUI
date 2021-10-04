@@ -1,0 +1,88 @@
+﻿<Window
+    x:Class="SimpleFFmpegGUI.WPF.TasksWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:f="clr-namespace:FzLib.WPF;assembly=FzCoreLib.Windows"
+    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
+    xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    x:Name="root"
+    Title="所有任务 - FFmpeg 工具箱"
+    Width="960"
+    Height="680"
+    MinWidth="480"
+    ui:TitleBar.IsIconVisible="True"
+    ui:WindowHelper.UseModernWindowStyle="True"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+    <Window.Resources />
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Margin="8,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock VerticalAlignment="Center">
+                <Run Text="共" />
+                <Run Text="{Binding AllTasks.Count, Mode=OneWay}" />
+                <Run Text="条，共" />
+                <Run Text="{Binding AllTasks.PageCount, Mode=OneWay}" />
+                <Run Text="页" />
+            </TextBlock>
+            <ListBox
+                Grid.Column="2"
+                Background="Transparent"
+                DisplayMemberPath="Value1"
+                ItemsSource="{Binding Pages}"
+                SelectedValuePath="Value"
+                SelectedValue="{Binding AllTasks.Page}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ListBox>
+            <ComboBox
+                Grid.Column="4"
+                DisplayMemberPath="Label"
+                ItemsSource="{Binding Pages}"
+                SelectedValue="{Binding AllTasks.Page}"
+                SelectedValuePath="Value" />
+            <ComboBox
+                Grid.Column="6"
+                SelectedItem="{Binding AllTasks.CountPerPage}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding ., StringFormat={}每页{0}条}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+                <system:Int32>10</system:Int32>
+                <system:Int32>20</system:Int32>
+                <system:Int32>50</system:Int32>
+                <system:Int32>100</system:Int32>
+                <system:Int32>500</system:Int32>
+                <system:Int32>1000</system:Int32>
+            </ComboBox>
+        </Grid>
+        <panels:TaskList
+            Grid.Row="2"
+            Margin="8"
+            ShowAllTasks="True" />
+    </Grid>
+</Window>

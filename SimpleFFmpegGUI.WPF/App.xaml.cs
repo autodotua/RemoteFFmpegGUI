@@ -23,6 +23,8 @@ namespace SimpleFFmpegGUI.WPF
     {
         public static ServiceProvider ServiceProvider { get; private set; }
 
+        public static DateTime AppStartTime { get; } = DateTime.Now;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -61,6 +63,7 @@ namespace SimpleFFmpegGUI.WPF
 
             services.AddSingleton<QueueManager>();
             services.AddSingleton<TasksAndStatuses>();
+            services.AddSingleton<AllTasks>();
 
             services.AddSingleton<MainWindow>();
             services.AddTransient<MainWindowViewModel>();
@@ -76,6 +79,9 @@ namespace SimpleFFmpegGUI.WPF
 
             services.AddTransient<ClipWindow>();
             services.AddTransient<ClipWindowViewModel>();
+
+            services.AddTransient<TasksWindow>();
+            services.AddTransient<TasksWindowViewModel>();
 
             services.AddTransient<SettingWindow>();
             services.AddTransient<SettingWindowViewModel>();

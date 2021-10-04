@@ -33,9 +33,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
             Queue = queue;
         }
 
-        public TasksAndStatuses Tasks => App.ServiceProvider.GetService<TasksAndStatuses>();
+        public TaskCollectionBase Tasks => ShowAllTasks ?
+               App.ServiceProvider.GetService<AllTasks>()
+            : App.ServiceProvider.GetService<TasksAndStatuses>();
 
         public QueueManager Queue { get; }
+        public bool ShowAllTasks { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
@@ -44,8 +47,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
     {
         public TaskList()
         {
-            DataContext = ViewModel;
             InitializeComponent();
+            (Content as FrameworkElement).DataContext = ViewModel;
+        }
+
+        public bool ShowAllTasks
+        {
+            get => ViewModel.ShowAllTasks;
+            set => ViewModel.ShowAllTasks = value;
         }
 
         public TaskListViewModel ViewModel { get; } = App.ServiceProvider.GetService<TaskListViewModel>();
@@ -89,6 +98,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             Debug.Assert(task != null);
             TaskManager.ResetTask(task.Id, ViewModel.Queue);
             task.UpdateSelf();
+            App.ServiceProvider.GetService<TasksAndStatuses>().NotifyTaskReseted(task);
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
@@ -104,10 +114,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
             {
                 this.CreateMessage().QueueError("启动失败", ex);
             }
-        }
-
-        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
-        {
         }
 
         private void ArgumentsButton_Click(object sender, RoutedEventArgs e)

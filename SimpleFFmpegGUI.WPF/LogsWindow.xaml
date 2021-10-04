@@ -61,9 +61,8 @@
         <DataGrid
             xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
             xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
-            c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
-
             Grid.Row="2"
+            c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
             AutoGenerateColumns="False"
             IsReadOnly="True"
             ItemsSource="{Binding Logs}"

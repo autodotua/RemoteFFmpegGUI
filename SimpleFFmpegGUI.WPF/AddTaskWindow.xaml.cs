@@ -152,7 +152,7 @@ namespace SimpleFFmpegGUI.WPF
             finally
             {
                 IsEnabled = true;
-                App.ServiceProvider.GetService<MainWindow>().Activate();
+                App.ServiceProvider.GetService<MainWindow>().BringToFront();
             }
         }
 
