@@ -47,6 +47,10 @@
             Grid.Row="2"
             Grid.ColumnSpan="99">
             <ui:AppBarButton
+                    Click="SettingButton_Click"
+                    Icon="Setting"
+                    Label="设置" />
+            <ui:AppBarButton
                 Click="TasksButton_Click"
                 Icon="List"
                 Label="查看所有任务" />
@@ -77,13 +81,6 @@
                 Click="AddButton_Click"
                 Icon="Add"
                 Label="创建任务" />
-            <ui:AppBarSeparator />
-            <ui:CommandBar.SecondaryCommands>
-                <ui:AppBarButton
-                    Click="SettingButton_Click"
-                    Icon="Setting"
-                    Label="设置" />
-            </ui:CommandBar.SecondaryCommands>
         </ui:CommandBar>
     </Grid>
 </Window>

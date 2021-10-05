@@ -38,7 +38,13 @@ namespace SimpleFFmpegGUI.WPF.Panels
             : App.ServiceProvider.GetService<TasksAndStatuses>();
 
         public QueueManager Queue { get; }
-        public bool ShowAllTasks { get; set; }
+        private bool showAllTasks;
+        public bool ShowAllTasks
+        {
+            get => showAllTasks;
+            set => this.SetValueAndNotify(ref showAllTasks, value, nameof(ShowAllTasks), nameof(Tasks));
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

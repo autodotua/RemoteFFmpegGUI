@@ -8,11 +8,10 @@
     xmlns:model="clr-namespace:SimpleFFmpegGUI.Model;assembly=SimpleFFmpegGUI.Core"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:uimodel="clr-namespace:SimpleFFmpegGUI.WPF.Model"
-    x:Name="root"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <Grid>
+    <Grid x:Name="root">
         <Grid.Resources />
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -274,27 +273,25 @@
                 <ui:SimpleStackPanel
                     Grid.Column="2"
                     VerticalAlignment="Center"
-                    DataContext="{Binding Tasks.SelectedTask}"
                     Spacing="8">
                     <Button
                         HorizontalAlignment="Stretch"
                         Click="StartButton_Click"
                         Content="独立执行"
-                        IsEnabled="{Binding StartButtonEnabled}"
-                        Visibility="{Binding ShowAllTasks, ElementName=root, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
-
+                        IsEnabled="{Binding Tasks.SelectedTask.StartButtonEnabled}"
+                        Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
                         HorizontalAlignment="Stretch"
                         Click="CancelButton_Click"
                         Content="取消"
-                        IsEnabled="{Binding CancelButtonEnabled}"
+                        IsEnabled="{Binding Tasks.SelectedTask.CancelButtonEnabled}"
                         ToolTip="取消执行任务，正在执行的任务会被停止"
-                        Visibility="{Binding ShowAllTasks, ElementName=root, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                        Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
                         HorizontalAlignment="Stretch"
                         Click="ResetButton_Click"
                         Content="重置"
-                        IsEnabled="{Binding ResetButtonEnabled}"
+                        IsEnabled="{Binding Tasks.SelectedTask.ResetButtonEnabled}"
                         ToolTip="将任务设置为排队状态" />
                     <Button
                         HorizontalAlignment="Stretch"
@@ -304,7 +301,8 @@
                     <Button
                         Margin="0,16,0,0"
                         HorizontalAlignment="Stretch"
-                        Content="更多">
+                        Content="更多"
+                        DataContext="{Binding Tasks.SelectedTask}">
                         <ui:FlyoutService.Flyout>
                             <ui:MenuFlyout>
                                 <MenuItem
