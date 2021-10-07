@@ -39,12 +39,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public QueueManager Queue { get; }
         private bool showAllTasks;
+
         public bool ShowAllTasks
         {
             get => showAllTasks;
             set => this.SetValueAndNotify(ref showAllTasks, value, nameof(ShowAllTasks), nameof(Tasks));
         }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
@@ -67,7 +67,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            var task = ViewModel.Tasks.SelectedTask;
             Debug.Assert(task != null);
             TaskManager.CancelTask(task.Id, ViewModel.Queue);
             task.UpdateSelf();
@@ -82,7 +82,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             if (delete)
             {
-                var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+                var task = ViewModel.Tasks.SelectedTask;
                 App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Remove(task);
                 Debug.Assert(task != null);
                 TaskManager.DeleteTask(task.Id, ViewModel.Queue);
@@ -100,7 +100,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            var task = ViewModel.Tasks.SelectedTask;
             Debug.Assert(task != null);
             TaskManager.ResetTask(task.Id, ViewModel.Queue);
             task.UpdateSelf();
@@ -111,7 +111,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             try
             {
-                var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+                var task = ViewModel.Tasks.SelectedTask;
                 Debug.Assert(task != null);
                 ViewModel.Queue.StartStandalone(task.Id);
                 task.UpdateSelf();
@@ -124,7 +124,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void ArgumentsButton_Click(object sender, RoutedEventArgs e)
         {
-            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            var task = ViewModel.Tasks.SelectedTask;
             Debug.Assert(task != null);
             var panel = new CodeArgumentsPanel
             {
@@ -147,7 +147,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void OpenOutputFileButton_Click(object sender, RoutedEventArgs e)
         {
-            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            var task = ViewModel.Tasks.SelectedTask;
             Debug.Assert(task != null);
             OpenOutputFileOrFolder(task, false);
         }
@@ -169,7 +169,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void OpenOutputDirButton_Click(object sender, RoutedEventArgs e)
         {
-            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            var task = ViewModel.Tasks.SelectedTask;
             Debug.Assert(task != null);
 
             OpenOutputFileOrFolder(task, true);
@@ -177,7 +177,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void LogsButton_Click(object sender, RoutedEventArgs e)
         {
-            var task = (sender as FrameworkElement).DataContext as UITaskInfo;
+            var task = ViewModel.Tasks.SelectedTask;
             Debug.Assert(task != null);
             var logWin = App.ServiceProvider.GetService<LogsWindow>();
             logWin.FillLogs(task.Id);
