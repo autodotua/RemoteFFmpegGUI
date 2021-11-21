@@ -203,6 +203,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public IEnumerable ConcatTypes => Enum.GetValues<ConcatType>();
 
+        public IEnumerable Fpses => new double[] { 10, 20, 23.976, 24, 25, 29.97, 30, 48, 59.94, 60, 120 };
+
         private string extra;
 
         public string Extra

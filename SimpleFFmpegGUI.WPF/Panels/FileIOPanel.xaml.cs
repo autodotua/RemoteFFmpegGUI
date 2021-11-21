@@ -225,6 +225,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public void Update(TaskType type)
         {
             ViewModel.Update(type);
+            Reset();
         }
 
         public void AddInput()

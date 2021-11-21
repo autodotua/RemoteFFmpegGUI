@@ -175,5 +175,10 @@ namespace SimpleFFmpegGUI.WPF
         {
             App.ServiceProvider.GetService<TasksWindow>().ShowDialog(this);
         }
+
+        private void PresetsButton_Click(object sender, RoutedEventArgs e)
+        {
+            App.ServiceProvider.GetService<PresetsWindow>().ShowDialog(this);
+        }
     }
 }

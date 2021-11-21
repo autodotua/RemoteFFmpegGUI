@@ -20,10 +20,9 @@
     <Grid>
         <ScrollViewer
             xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+            xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
             Padding="0,0,16,0"
-                xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
             c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
-
             HorizontalScrollBarVisibility="Disabled"
             VerticalScrollBarVisibility="Auto">
             <ui:SimpleStackPanel
@@ -110,6 +109,8 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="8" />
                             <RowDefinition Height="Auto" />
@@ -213,6 +214,7 @@
                             Maximum="10"
                             Minimum="0.5"
                             Value="{Binding Video.MaxBitrateBuffer}" />
+                        <!--  分辨率  -->
                         <CheckBox
                             Grid.Row="12"
                             Content="分辨率"
@@ -243,6 +245,17 @@
                                 IsEnabled="{Binding Video.EnableSize}"
                                 Text="{Binding Video.Height}" />
                         </Grid>
+                        <!--  帧率  -->
+                        <CheckBox
+                            Grid.Row="14"
+                            Content="帧率"
+                            IsChecked="{Binding Video.EnableFps}" />
+                        <ComboBox
+                            Grid.Row="14"
+                            Grid.Column="2"
+                            IsEnabled="{Binding Video.EnableFps}"
+                            ItemsSource="{Binding Fpses}"
+                            Text="{Binding Video.Fps}" />
                     </Grid>
                 </GroupBox>
                 <GroupBox

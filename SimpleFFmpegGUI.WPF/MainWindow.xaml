@@ -8,8 +8,9 @@
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="FFmpeg 工具箱"
-    Width="1200"
-    Height="600"
+    Width="1400" 
+    WindowStartupLocation="CenterScreen"
+    Height="800"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
@@ -54,6 +55,13 @@
                 Click="TasksButton_Click"
                 Icon="List"
                 Label="查看所有任务" />
+            <ui:AppBarButton
+                Click="PresetsButton_Click"
+                Label="查看预设" >
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Glyph="&#xE179;"/>
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarButton
                 Click="LogsButton_Click"
                 Label="查看日志">
