@@ -1,7 +1,6 @@
 
 <template>
   <el-select
-    style="width: 280px"
     filterable
     v-model="selectedFile"
     @change="selectChanged"
@@ -17,21 +16,20 @@
 import Vue from "vue";
 import Cookies from "js-cookie";
 import * as net from "../net";
-import {  showError, jump, formatDateTime } from "../common";
+import { showError, jump, formatDateTime } from "../common";
 export default Vue.component("file-select", {
   data() {
     return {
       files: null,
-      selectedFile:this.file
+      selectedFile: this.file,
     };
   },
   props: ["file"],
-  computed: {
-  },
-  watch:{
-    file(){
-      this.selectedFile=this.file;
-    }
+  computed: {},
+  watch: {
+    file() {
+      this.selectedFile = this.file;
+    },
   },
   methods: {
     selectChanged(e) {
@@ -52,4 +50,19 @@ export default Vue.component("file-select", {
 });
 </script>
 <style scoped>
+.el-select-dropdown__item {
+  max-width: 100%;
+  height: auto;
+  min-height: 34px;
+  white-space: break-spaces;
+  padding-left: 28px;
+  padding-right: 28px;
+}
+
+</style>
+<style>
+
+.el-collapse-item__header{
+  white-space: nowrap;
+}
 </style>
