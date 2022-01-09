@@ -42,7 +42,7 @@ namespace SimpleFFmpegGUI.WPF
                 this.SetValueAndNotify(ref filePath, value, nameof(FilePath));
                 if (!string.IsNullOrWhiteSpace(filePath) && System.IO.File.Exists(value))
                 {
-                    ShowInfo();
+                    ShowInfoAsync();
                 }
             }
         }
@@ -55,11 +55,20 @@ namespace SimpleFFmpegGUI.WPF
             set => this.SetValueAndNotify(ref working, value, nameof(Working));
         }
 
-        private async void ShowInfo()
+        private async Task ShowInfoAsync()
         {
             Working = true;
-            MediaInfo = await MediaInfoManager.GetMediaInfoAsync(FilePath);
-            Working = false;
+            try
+            {
+                MediaInfo = await MediaInfoManager.GetMediaInfoAsync(FilePath);
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                Working = false;
+            }
         }
 
         private MediaInfoDto mediaInfo;
