@@ -68,6 +68,16 @@ namespace SimpleFFmpegGUI.Manager
             return false;
         }
 
+        public static void DeletePresets()
+        {
+            using var db = FFmpegDbContext.GetNew();
+            foreach (var preset in db.Presets)
+            {
+                preset.IsDeleted = true;
+                db.Entry(preset).State=Microsoft.EntityFrameworkCore.EntityState.Modified;
+            }
+            db.SaveChanges();
+        }
         public static void DeletePreset(int id)
         {
             using var db = FFmpegDbContext.GetNew();
@@ -84,6 +94,11 @@ namespace SimpleFFmpegGUI.Manager
         {
             using var db = FFmpegDbContext.GetNew();
             return db.Presets.Where(p => !p.IsDeleted).OrderBy(p => p.Type).ToList();
+        }
+        public static List<CodePreset> GetPresets(TaskType type)
+        {
+            using var db = FFmpegDbContext.GetNew();
+            return db.Presets.Where(p => !p.IsDeleted).Where(p=>p.Type==type).ToList();
         }
     }
 }

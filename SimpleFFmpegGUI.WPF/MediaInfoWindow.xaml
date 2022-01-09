@@ -9,7 +9,7 @@
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Title="媒体信息 - FFmpeg 工具箱"
+    Title="媒体信息 - FFmpeg 工具箱" 
     Width="1280"
     Height="640"
     ui:TitleBar.IsIconVisible="True"

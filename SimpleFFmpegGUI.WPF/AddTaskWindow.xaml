@@ -14,7 +14,7 @@
     Height="640"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
-    WindowStartupLocation="CenterOwner"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Grid Margin="8,8,0,8">
         <Grid.ColumnDefinitions>

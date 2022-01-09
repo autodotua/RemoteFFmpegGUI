@@ -33,8 +33,8 @@ namespace SimpleFFmpegGUI.WebAPI
             {
             }
             ServiceProvider serviceProvider = new ServiceCollection()
-.AddNamedPipeIpcClient<IPipeService>("m", pipeName: pipeName)
-.BuildServiceProvider();
+                .AddNamedPipeIpcClient<IPipeService>("m", pipeName: pipeName)
+                .BuildServiceProvider();
 
             // resolve IPC client factory
             IIpcClientFactory<IPipeService> clientFactory = serviceProvider
