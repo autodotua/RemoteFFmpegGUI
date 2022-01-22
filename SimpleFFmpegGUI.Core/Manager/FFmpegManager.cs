@@ -55,7 +55,9 @@ namespace SimpleFFmpegGUI.Manager
         public ProgressDto Progress { get; private set; }
         public TaskInfo Task => task;
         private FFmpegProcess Process { get; set; }
+
         public event EventHandler StatusChanged;
+
         public void Cancel()
         {
             Logger.Info(task, "取消当前任务");
@@ -83,7 +85,7 @@ namespace SimpleFFmpegGUI.Manager
                 throw new Exception("进程还未启动，不可暂停或恢复");
             }
             Paused = false;
-            Progress.PauseTime = DateTime.Now - pauseStartTime;
+            Progress.PauseTime += DateTime.Now - pauseStartTime;
             Logger.Info(task, "恢复队列");
             ProcessExtension.ResumeProcess(Process.Id);
             StatusChanged?.Invoke(this, EventArgs.Empty);
