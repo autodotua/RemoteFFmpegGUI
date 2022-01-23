@@ -182,6 +182,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 this.CreateMessage().QueueError($"找不到文件{input.FilePath}");
                 return;
             }
+            (sender as Button).IsEnabled = false;
             var win = App.ServiceProvider.GetService<ClipWindow>();
             win.Owner = Window.GetWindow(this);
             try
@@ -190,7 +191,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             catch (Exception ex)
             {
-                this.CreateMessage().QueueError($"加载视频失败", ex);
+                this.CreateMessage().QueueError($"加载视频失败", ex); 
+                (sender as Button).IsEnabled = true;
                 return;
             }
             if (win.ShowDialog() == true)
@@ -199,7 +201,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 input.From = clip.From;
                 input.To = clip.To;
                 input.Duration = null;
-            }
+            } 
+            (sender as Button).IsEnabled = true;
         }
 
         private void BrowseFileButton_Click(object sender, RoutedEventArgs e)

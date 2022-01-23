@@ -20,5 +20,8 @@ namespace SimpleFFmpegGUI.FFMpegArgumentExtension
 
         public static FFMpegArgumentOptions WithMapping(this FFMpegArgumentOptions opt, int inputIndex, Channel channel, int? streamIndex)
             => opt.WithArgument(new MapArgument(inputIndex, channel, streamIndex));
+
+        public static FFMpegArgumentOptions WithVideoResolution(this FFMpegArgumentOptions opt, int width, int height)
+            => opt.WithArgument(new VideoResolutionArgument(width, height));
     }
 }

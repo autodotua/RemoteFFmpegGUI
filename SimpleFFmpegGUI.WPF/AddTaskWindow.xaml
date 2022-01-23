@@ -12,6 +12,8 @@
     Title="新建任务 - FFmpeg 工具箱"
     Width="1280"
     Height="640"
+    MinWidth="1080"
+    MinHeight="480"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     WindowStartupLocation="CenterScreen"

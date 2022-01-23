@@ -262,10 +262,11 @@
                         <TextBox
                             Grid.Row="14"
                             Grid.Column="2"
-                            Margin="0,-3,0,0"
+                            Margin="0,-3,24,0"
                             BorderThickness="0"
                             IsReadOnly="True"
                             MaxLines="3"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
                             Text="{Binding FFmpegArguments}"
                             TextWrapping="Wrap" />
                     </Grid>
@@ -301,8 +302,9 @@
                     <Button
                         Margin="0,16,0,0"
                         HorizontalAlignment="Stretch"
-                        Content="更多"
+                        Background="Transparent"
                         DataContext="{Binding Tasks.SelectedTask}">
+                        <ui:SymbolIcon Symbol="More" />
                         <ui:FlyoutService.Flyout>
                             <ui:MenuFlyout>
                                 <MenuItem

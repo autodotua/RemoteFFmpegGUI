@@ -241,14 +241,12 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     fa.WithVideoMMaxBitrate(a.Video.MaxBitrate.Value, a.Video.MaxBitrateBuffer.Value);
                 }
+
                 if (a.Video.Width.HasValue && a.Video.Height.HasValue)
                 {
                     fa.WithVideoFilters(o =>
                     {
-                        if (a.Video.Width.HasValue && a.Video.Height.HasValue)
-                        {
-                            o.Scale(a.Video.Width.Value, a.Video.Height.Value);
-                        }
+                        o.Scale(a.Video.Width.Value, a.Video.Height.Value);
                     });
                 }
             }
@@ -574,7 +572,7 @@ namespace SimpleFFmpegGUI.Manager
         {
             FFMpegArguments f = null;
             string message = null;
-            if (task.Inputs.Count() < 2)
+            if (task.Inputs.Count < 2)
             {
                 throw new ArgumentException("拼接视频，输入文件必须为2个或更多");
             }

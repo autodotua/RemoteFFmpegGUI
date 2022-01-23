@@ -28,31 +28,58 @@
             <ui:SimpleStackPanel
                 Margin="8"
                 Spacing="8">
-                <ui:SimpleStackPanel
-                    Orientation="Horizontal"
-                    Spacing="16"
+                <!--  输出  -->
+                <Grid
+                    HorizontalAlignment="Center"
                     Visibility="{Binding CanSetVideoAndAudio, Converter={StaticResource Bool2VisibilityConverter}}">
-                    <ComboBox
-                        ui:ControlHelper.Header="视频导出选项"
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="视频输出" />
+                    <ListBox
+                        Grid.Row="2"
+                        Height="40"
                         ItemsSource="{Binding ChannelOutputStrategies}"
                         SelectedItem="{Binding VideoOutputStrategy}">
-                        <ComboBox.ItemTemplate>
+                        <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
                             </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                    <ComboBox
-                        ui:ControlHelper.Header="音频导出选项"
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                    <TextBlock
+                        Grid.Column="2"
+                        Text="音频输出" />
+                    <ListBox
+                        Grid.Row="2"
+                        Grid.Column="2"
                         ItemsSource="{Binding ChannelOutputStrategies}"
                         SelectedItem="{Binding AudioOutputStrategy}">
-                        <ComboBox.ItemTemplate>
+                        <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
                             </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </ui:SimpleStackPanel>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </Grid>
+                <!--  容器  -->
                 <GroupBox
                     Header="容器"
                     Visibility="{Binding CanSpecifyFormat, Converter={StaticResource Bool2VisibilityConverter}}">
@@ -99,6 +126,7 @@
                         </ComboBox>
                     </Grid>
                 </GroupBox>
+                <!--  视频  -->
                 <GroupBox
                     Header="视频"
                     Visibility="{Binding VideoOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource EqualConverter}}">
@@ -109,6 +137,8 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="8" />
                             <RowDefinition Height="Auto" />
@@ -258,6 +288,7 @@
                             Text="{Binding Video.Fps}" />
                     </Grid>
                 </GroupBox>
+                <!--  音频  -->
                 <GroupBox
                     Header="音频"
                     Visibility="{Binding AudioOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource EqualConverter}}">
@@ -308,6 +339,7 @@
                             SelectedItem="{Binding Audio.SamplingRate}" />
                     </Grid>
                 </GroupBox>
+                <!--  合并参数  -->
                 <GroupBox
                     Header="合并参数"
                     Visibility="{Binding CanSetCombine, Converter={StaticResource Bool2VisibilityConverter}}">
@@ -315,6 +347,7 @@
                         Content="裁剪到视频长度"
                         IsChecked="{Binding Combine.Shortest}" />
                 </GroupBox>
+                <!--  拼接参数  -->
                 <GroupBox
                     Header="拼接参数"
                     Visibility="{Binding CanSetConcat, Converter={StaticResource Bool2VisibilityConverter}}">
@@ -330,6 +363,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </GroupBox>
+                <!--  额外参数  -->
                 <GroupBox Header="额外参数">
                     <TextBox
                         ui:ControlHelper.PlaceholderText="请输入ffmpeg参数"
