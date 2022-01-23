@@ -159,9 +159,10 @@
                         <Label Content="编码" />
                         <ComboBox
                             Grid.Column="2"
+                            IsEditable="True"
                             ItemsSource="{Binding VideoCodes}"
                             SelectedIndex="1"
-                            SelectedItem="{Binding Video.Code}" />
+                            Text="{Binding Video.Code}" />
                         <!--  预设  -->
                         <Label
                             Grid.Row="2"
@@ -311,9 +312,10 @@
                             Content="编码" />
                         <ComboBox
                             Grid.Column="2"
+                            IsEditable="True"
                             ItemsSource="{Binding AudioCodes}"
                             SelectedIndex="1"
-                            SelectedItem="{Binding Audio.Code}" />
+                            Text="{Binding Audio.Code}" />
 
                         <!--  平均码率  -->
                         <CheckBox

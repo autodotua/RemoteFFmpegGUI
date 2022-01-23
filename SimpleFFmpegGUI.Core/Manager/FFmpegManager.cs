@@ -213,12 +213,15 @@ namespace SimpleFFmpegGUI.Manager
 
             if (a.Video != null)
             {
-                Codec code = a.Video.Code.ToLower().Replace(".", "") switch
+                string code = a.Video.Code.ToLower().Replace(".", "") switch
                 {
-                    "h265" => FFMpeg.GetCodec("libx265"),
-                    "h264" => FFMpeg.GetCodec("libx264"),
-                    "vp9" => FFMpeg.GetCodec("libvpx-vp9"),
-                    _ => null
+                    "h265" => "libx265",
+                    "h264" => "libx264",
+                    "vp9" => "libvpx-vp9",
+                    "自动" => null,
+                    "auto" => null,
+                    null => null,
+                    _ => a.Video.Code
                 };
                 if (code != null)
                 {
@@ -252,12 +255,13 @@ namespace SimpleFFmpegGUI.Manager
             }
             if (a.Audio != null)
             {
-                Codec code = a.Audio.Code.ToLower().Replace(".", "") switch
+                string code = a.Audio.Code.ToLower().Replace(".", "") switch
                 {
-                    "aac" => FFMpeg.GetCodec("aac"),
-                    "ac3" => FFMpeg.GetCodec("ac3"),
-                    "opus" => FFMpeg.GetCodec("libopus"),
-                    _ => null
+                    "opus" => "libopus",
+                    "自动" => null,
+                    "auto" => null,
+                    null => null,
+                    _ => a.Audio.Code
                 };
                 if (code != null)
                 {
