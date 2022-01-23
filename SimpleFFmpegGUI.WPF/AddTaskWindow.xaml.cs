@@ -81,9 +81,9 @@ namespace SimpleFFmpegGUI.WPF
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             DataContext = ViewModel;
             InitializeComponent();
-            ViewModel.Type = TaskType.Code;
             presetsPanel.CodeArgumentsViewModel = argumentsPanel.ViewModel;
         }
+        private bool canInitializeType = true;
 
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -158,6 +158,7 @@ namespace SimpleFFmpegGUI.WPF
 
         public void SetAsClone(TaskInfo task)
         {
+            canInitializeType=false; 
             ViewModel.AllowChangeType = false;
             ViewModel.Type = task.Type;
             fileIOPanel.Update(task.Type, task.Inputs, task.Output);
@@ -287,11 +288,19 @@ namespace SimpleFFmpegGUI.WPF
             try
             {
                 OutputArguments args = argumentsPanel.GetOutputArguments();
-                await CommonDialog.ShowOkDialogAsync("输出参数",FFmpegManager.TestOutputArguments(args));
+                await CommonDialog.ShowOkDialogAsync("输出参数", FFmpegManager.TestOutputArguments(args));
             }
             catch (Exception ex)
             {
                 await CommonDialog.ShowErrorDialogAsync(ex, "获取参数失败");
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (canInitializeType)
+            {
+                ViewModel.Type = TaskType.Code;
             }
         }
     }

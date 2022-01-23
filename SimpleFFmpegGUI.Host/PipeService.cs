@@ -178,5 +178,15 @@ namespace SimpleFFmpegGUI
         {
             return VideoFormat.Formats;
         }
+
+        public void SetDefaultPreset(int id)
+        {
+            PresetManager.SetDefaultPreset(id);
+        }
+
+        public CodePreset GetDefaultPreset(TaskType type)
+        {
+            return PresetManager.GetDefaultPreset(type);
+        }
     }
 }

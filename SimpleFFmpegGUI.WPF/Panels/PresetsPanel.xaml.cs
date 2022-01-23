@@ -90,8 +90,24 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             Debug.Assert(CodeArgumentsViewModel != null);
             var preset = (sender as FrameworkElement).DataContext as CodePreset;
+            Debug.Assert(preset != null);
             CodeArgumentsViewModel.Update(type, preset.Arguments.Adapt<OutputArguments>());
             this.CreateMessage().QueueSuccess($"已加载预设“{preset.Name}”");
+        }
+
+        private void MakeDefaultButton_Click(object sender, RoutedEventArgs e)
+        {
+            var preset = (sender as FrameworkElement).DataContext as CodePreset;
+            Debug.Assert(preset != null);
+            try
+            {
+                PresetManager.SetDefaultPreset(preset.Id);
+                this.CreateMessage().QueueSuccess($"已将“{preset.Name}”设置为当前任务类型的默认预设");
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError("设置默认预设失败", ex);
+            }
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)

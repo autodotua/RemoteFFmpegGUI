@@ -61,6 +61,10 @@
                                             Click="DeleteButton_Click"
                                             Header="删除"
                                             ToolTip="删除该预设" />
+                                        <MenuItem
+                                            Click="MakeDefaultButton_Click"
+                                            Header="设为默认"
+                                            ToolTip="设置为当前任务类型的默认预设" />
                                     </ui:MenuFlyout>
                                 </ui:FlyoutService.Flyout>
                             </Button>

@@ -32,6 +32,10 @@ namespace SimpleFFmpegGUI
 
         List<CodePreset> GetPresets();
 
+        void SetDefaultPreset(int id);
+
+        CodePreset GetDefaultPreset(TaskType type);
+
         StatusDto GetStatus();
 
         PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0);
