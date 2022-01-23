@@ -148,7 +148,14 @@ namespace SimpleFFmpegGUI.Manager
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private void ApplyInputArguments(FFMpegArgumentOptions fa, InputArguments a)
+        public static string TestOutputArguments(OutputArguments args)
+        {
+            FFMpegArguments f = Activator.CreateInstance(typeof(FFMpegArguments), true) as FFMpegArguments;
+            var p = f.OutputToFile("输出", true, a => ApplyOutputArguments(a, args));
+            return p.Arguments;
+        }
+
+        private static void ApplyInputArguments(FFMpegArgumentOptions fa, InputArguments a)
         {
             if (a == null)
             {
@@ -168,7 +175,7 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
-        private void ApplyOutputArguments(FFMpegArgumentOptions fa, OutputArguments a)
+        private static void ApplyOutputArguments(FFMpegArgumentOptions fa, OutputArguments a)
         {
             if (a.DisableVideo && a.DisableAudio)
             {

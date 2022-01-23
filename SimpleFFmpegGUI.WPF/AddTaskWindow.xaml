@@ -124,6 +124,13 @@
                         <ui:FontIcon Glyph="&#xE944;" />
                     </ui:AppBarToggleButton.Icon>
                 </ui:AppBarToggleButton>
+                <ui:AppBarButton
+                    Click="FFmpegArgsButton_Click"
+                    Label="查看当前的输出参数">
+                    <ui:AppBarButton.Icon>
+                        <ui:FontIcon Glyph="&#xE943;" />
+                    </ui:AppBarButton.Icon>
+                </ui:AppBarButton>
             </ui:CommandBar.SecondaryCommands>
         </ui:CommandBar>
     </Grid>

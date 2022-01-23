@@ -281,5 +281,18 @@ namespace SimpleFFmpegGUI.WPF
         {
             fileIOPanel.Reset();
         }
+
+        private async void FFmpegArgsButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OutputArguments args = argumentsPanel.GetOutputArguments();
+                await CommonDialog.ShowOkDialogAsync("输出参数",FFmpegManager.TestOutputArguments(args));
+            }
+            catch (Exception ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync(ex, "获取参数失败");
+            }
+        }
     }
 }
