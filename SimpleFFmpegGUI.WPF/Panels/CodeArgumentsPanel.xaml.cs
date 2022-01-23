@@ -65,7 +65,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 Concat = argument.Concat;
                 Extra = argument.Extra;
             }
-       
         }
 
         public OutputArguments GetArguments()
@@ -216,7 +215,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public string[] VideoCodes { get; } = new[] { "自动", "H265", "H264", "VP9" };
         public string[] AudioCodes { get; } = new[] { "自动", "AAC", "OPUS" };
         public VideoFormat[] Formats => VideoFormat.Formats;
+
+        public string[] PixelFormats => new[] { "yuv420p", "yuvj420p", "yuv422p", "yuvj422p", "rgb24", "gray" , "yuv420p10le" };
         public int[] AudioBitrates { get; } = new[] { 32, 64, 96, 128, 192, 256, 320 };
+
         public int[] AudioSamplingRates { get; } = new[] { 8000, 16000, 32000, 44100, 48000, 96000, 192000 };
 
         public event PropertyChangedEventHandler PropertyChanged;

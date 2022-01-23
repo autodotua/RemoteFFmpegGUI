@@ -23,5 +23,8 @@ namespace SimpleFFmpegGUI.FFMpegArgumentExtension
 
         public static FFMpegArgumentOptions WithVideoResolution(this FFMpegArgumentOptions opt, int width, int height)
             => opt.WithArgument(new VideoResolutionArgument(width, height));
+
+        public static FFMpegArgumentOptions WithVideoPixelFormat(this FFMpegArgumentOptions opt, string format)
+            => opt.WithArgument(new VideoPixelFormatArgument(format));
     }
 }

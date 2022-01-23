@@ -287,6 +287,17 @@
                             IsEnabled="{Binding Video.EnableFps}"
                             ItemsSource="{Binding Fpses}"
                             Text="{Binding Video.Fps}" />
+                        <CheckBox
+                            Grid.Row="16"
+                            Content="像素格式"
+                            IsChecked="{Binding Video.EnablePixelFormat}" />
+                        <ComboBox
+                            Grid.Row="16"
+                            Grid.Column="2"
+                            IsEditable="True"
+                            IsEnabled="{Binding Video.EnablePixelFormat}"
+                            ItemsSource="{Binding PixelFormats}"
+                            Text="{Binding Video.PixelFormat}" />
                     </Grid>
                 </GroupBox>
                 <!--  音频  -->

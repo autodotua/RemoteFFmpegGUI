@@ -50,11 +50,18 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         private bool enableMaxBitrate;
 
-
         public bool EnableMaxBitrate
         {
             get => enableMaxBitrate;
             set => this.SetValueAndNotify(ref enableMaxBitrate, value, nameof(EnableMaxBitrate));
+        }
+
+        private bool enablePixelFormat;
+
+        public bool EnablePixelFormat
+        {
+            get => enablePixelFormat;
+            set => this.SetValueAndNotify(ref enablePixelFormat, value, nameof(EnablePixelFormat));
         }
 
         public void Apply()
@@ -65,6 +72,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             Fps = EnableFps ? Fps : null;
             AverageBitrate = EnableAverageBitrate ? AverageBitrate : null;
             MaxBitrate = EnableMaxBitrate ? MaxBitrate : null;
+            PixelFormat = EnablePixelFormat ? PixelFormat : null;
         }
 
         public void Update()
@@ -74,6 +82,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             EnableFps = Fps.HasValue;
             EnableAverageBitrate = AverageBitrate.HasValue;
             EnableMaxBitrate = MaxBitrate.HasValue;
+            EnablePixelFormat = !string.IsNullOrEmpty(PixelFormat);
         }
     }
 }

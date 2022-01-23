@@ -78,5 +78,13 @@ namespace SimpleFFmpegGUI.Model
             get => maxBitrateBuffer;
             set => this.SetValueAndNotify(ref maxBitrateBuffer, value, nameof(MaxBitrateBuffer));
         }
+
+        private string pixelFormat;
+
+        public string PixelFormat
+        {
+            get => pixelFormat;
+            set => this.SetValueAndNotify(ref pixelFormat, value, nameof(PixelFormat));
+        }
     }
 }

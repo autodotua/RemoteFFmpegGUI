@@ -221,6 +221,7 @@ namespace SimpleFFmpegGUI.Manager
                     "自动" => null,
                     "auto" => null,
                     null => null,
+                    "" => null,
                     _ => a.Video.Code
                 };
                 if (code != null)
@@ -244,6 +245,10 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     fa.WithVideoMMaxBitrate(a.Video.MaxBitrate.Value, a.Video.MaxBitrateBuffer.Value);
                 }
+                if (a.Video.PixelFormat != null)
+                {
+                    fa.WithVideoPixelFormat(a.Video.PixelFormat);
+                }
 
                 if (a.Video.Width.HasValue && a.Video.Height.HasValue)
                 {
@@ -260,6 +265,7 @@ namespace SimpleFFmpegGUI.Manager
                     "opus" => "libopus",
                     "自动" => null,
                     "auto" => null,
+                    "" => null,
                     null => null,
                     _ => a.Audio.Code
                 };
