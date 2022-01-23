@@ -1,4 +1,5 @@
 ﻿using FFMpegCore;
+using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
 using System;
 
@@ -26,5 +27,14 @@ namespace SimpleFFmpegGUI.FFMpegArgumentExtension
 
         public static FFMpegArgumentOptions WithVideoPixelFormat(this FFMpegArgumentOptions opt, string format)
             => opt.WithArgument(new VideoPixelFormatArgument(format));
+
+        public static FFMpegArgumentOptions WithVideoAspect(this FFMpegArgumentOptions opt, string aspect)
+            => opt.WithArgument(new VideoAspectArgument(aspect));
+
+        public static VideoFilterOptions Scale(this VideoFilterOptions opt, string size)
+        {
+            opt.Arguments.Add(new ScaleArgument(size));
+            return opt;
+        }
     }
 }

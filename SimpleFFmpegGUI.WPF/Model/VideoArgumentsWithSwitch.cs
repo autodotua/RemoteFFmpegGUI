@@ -32,6 +32,14 @@ namespace SimpleFFmpegGUI.WPF.Model
             set => this.SetValueAndNotify(ref enableSize, value, nameof(EnableSize));
         }
 
+        private bool enableAspectRatio;
+
+        public bool EnableAspectRatio
+        {
+            get => enableAspectRatio;
+            set => this.SetValueAndNotify(ref enableAspectRatio, value, nameof(EnableAspectRatio));
+        }
+
         private bool enableFps;
 
         public bool EnableFps
@@ -67,22 +75,23 @@ namespace SimpleFFmpegGUI.WPF.Model
         public void Apply()
         {
             Crf = EnableCrf ? Crf : null;
-            Width = EnableSize ? Width : null;
-            Height = EnableSize ? Height : null;
             Fps = EnableFps ? Fps : null;
             AverageBitrate = EnableAverageBitrate ? AverageBitrate : null;
             MaxBitrate = EnableMaxBitrate ? MaxBitrate : null;
+            Size = EnableSize ? Size : null;
             PixelFormat = EnablePixelFormat ? PixelFormat : null;
+            AspectRatio = EnablePixelFormat ? AspectRatio : null;
         }
 
         public void Update()
         {
             EnableCrf = Crf.HasValue;
-            EnableSize = Width.HasValue && Height.HasValue;
             EnableFps = Fps.HasValue;
             EnableAverageBitrate = AverageBitrate.HasValue;
             EnableMaxBitrate = MaxBitrate.HasValue;
+            EnableSize = !string.IsNullOrEmpty(Size);
             EnablePixelFormat = !string.IsNullOrEmpty(PixelFormat);
+            EnableAspectRatio = !string.IsNullOrEmpty(AspectRatio);
         }
     }
 }

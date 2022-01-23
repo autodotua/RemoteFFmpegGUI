@@ -256,12 +256,15 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     fa.WithVideoPixelFormat(a.Video.PixelFormat);
                 }
-
-                if (a.Video.Width.HasValue && a.Video.Height.HasValue)
+                if (a.Video.AspectRatio != null)
+                {
+                    fa.WithVideoAspect(a.Video.AspectRatio);
+                }
+                if (a.Video.Size != null)
                 {
                     fa.WithVideoFilters(o =>
                     {
-                        o.Scale(a.Video.Width.Value, a.Video.Height.Value);
+                        o.Scale(a.Video.Size);
                     });
                 }
             }

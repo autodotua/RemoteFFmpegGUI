@@ -29,20 +29,20 @@ namespace SimpleFFmpegGUI.Model
             set => this.SetValueAndNotify(ref crf, value, nameof(Crf));
         }
 
-        private int? width;
+        private string aspect;
 
-        public int? Width
+        public string AspectRatio
         {
-            get => width;
-            set => this.SetValueAndNotify(ref width, value, nameof(Width));
+            get => aspect;
+            set => this.SetValueAndNotify(ref aspect, value, nameof(AspectRatio));
         }
 
-        private int? height;
+        private string size;
 
-        public int? Height
+        public string Size
         {
-            get => height;
-            set => this.SetValueAndNotify(ref height, value, nameof(Height));
+            get => size;
+            set => this.SetValueAndNotify(ref size, value, nameof(Size));
         }
 
         private double? fps;

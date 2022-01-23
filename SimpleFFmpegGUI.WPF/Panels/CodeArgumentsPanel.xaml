@@ -154,6 +154,8 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="8" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <!--  编码  -->
                         <Label Content="编码" />
@@ -250,49 +252,45 @@
                             Grid.Row="12"
                             Content="分辨率"
                             IsChecked="{Binding Video.EnableSize}" />
-                        <Grid
+                        <ComboBox
                             Grid.Row="12"
-                            Grid.Column="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBox
-                                Grid.Column="0"
-                                ui:ControlHelper.PlaceholderText="宽度"
-                                IsEnabled="{Binding Video.EnableSize}"
-                                Text="{Binding Video.Width}" />
-                            <Label
-                                Grid.Column="1"
-                                Margin="4,0"
-                                VerticalAlignment="Center"
-                                IsEnabled="{Binding Video.EnableSize}">
-                                ×
-                            </Label>
-                            <TextBox
-                                Grid.Column="2"
-                                ui:ControlHelper.PlaceholderText="高度"
-                                IsEnabled="{Binding Video.EnableSize}"
-                                Text="{Binding Video.Height}" />
-                        </Grid>
-                        <!--  帧率  -->
+                            Grid.Column="2"
+                            ui:ControlHelper.PlaceholderText="示例：640:480 或 640:-1 或 iw/2:ih/2"
+                            IsEditable="True"
+                            IsEnabled="{Binding Video.EnableSize}"
+                            ItemsSource="{Binding Sizes}"
+                            Text="{Binding Video.Size}" />
+                        <!--  比例  -->
                         <CheckBox
                             Grid.Row="14"
-                            Content="帧率"
-                            IsChecked="{Binding Video.EnableFps}" />
+                            Content="画面比例"
+                            IsChecked="{Binding Video.EnableAspectRatio}" />
                         <ComboBox
                             Grid.Row="14"
                             Grid.Column="2"
+                            ui:ControlHelper.PlaceholderText="示例：4:3 或 1.3333"
+                            IsEditable="True"
+                            IsEnabled="{Binding Video.EnableAspectRatio}"
+                            ItemsSource="{Binding AspectRatios}"
+                            Text="{Binding Video.AspectRatio}" />
+                        <!--  帧率  -->
+                        <CheckBox
+                            Grid.Row="16"
+                            Content="帧率"
+                            IsChecked="{Binding Video.EnableFps}" />
+                        <ComboBox
+                            Grid.Row="16"
+                            Grid.Column="2"
+                            IsEditable="True"
                             IsEnabled="{Binding Video.EnableFps}"
                             ItemsSource="{Binding Fpses}"
                             Text="{Binding Video.Fps}" />
                         <CheckBox
-                            Grid.Row="16"
+                            Grid.Row="18"
                             Content="像素格式"
                             IsChecked="{Binding Video.EnablePixelFormat}" />
                         <ComboBox
-                            Grid.Row="16"
+                            Grid.Row="18"
                             Grid.Column="2"
                             IsEditable="True"
                             IsEnabled="{Binding Video.EnablePixelFormat}"
