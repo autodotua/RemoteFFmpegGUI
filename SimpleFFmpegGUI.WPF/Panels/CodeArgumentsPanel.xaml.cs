@@ -215,7 +215,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public IEnumerable VideoCodes { get; } = new[] { "自动", "H265", "H264", "VP9" };
         public IEnumerable AudioCodes { get; } = new[] { "自动", "AAC", "OPUS" };
         public IEnumerable Formats => VideoFormat.Formats;
-        public IEnumerable Sizes { get; } = new[] { "4320x3240", "2560x1440", "1920x1080", "1280x720", "1024x576", "1024x768", "720x480", "640x480" };
+        public IEnumerable Sizes { get; } = new[] { "-1:2160", "-1:1440", "-1:1080", "-1:720", "-1:576", "-1:480" };
         public IEnumerable AspectRatios { get; } = new[] { "16:9", "4:3", "1:1", "3:4", "16:9", "2.35" };
         public IEnumerable PixelFormats { get; } = new[] { "yuv420p", "yuvj420p", "yuv422p", "yuvj422p", "rgb24", "gray", "yuv420p10le" };
         public IEnumerable AudioBitrates { get; } = new[] { 32, 64, 96, 128, 192, 256, 320 };
@@ -232,15 +232,18 @@ namespace SimpleFFmpegGUI.WPF.Panels
             DataContext = ViewModel;
             InitializeComponent();
         }
+
         private bool canApplyDefaultPreset = false;
+
         public void SetAsClone()
         {
             canApplyDefaultPreset = false;
         }
+
         public void Update(TaskType type)
         {
             var defaultPreset = PresetManager.GetDefaultPreset(type);
-            if (defaultPreset != null&& canApplyDefaultPreset)
+            if (defaultPreset != null && canApplyDefaultPreset)
             {
                 ViewModel.Update(type, defaultPreset.Arguments);
                 this.CreateMessage().QueueSuccess($"已加载默认预设“{defaultPreset.Name}”");

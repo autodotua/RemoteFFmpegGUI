@@ -87,14 +87,14 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                 file.FilePath = Path.Combine(InputDir, file.FilePath);
 
                 ids.Add(await pipeClient.InvokeAsync(p =>
-                 p.AddTask(TaskType.Code, 
+                 p.AddTask(TaskType.Code,
                  new List<InputArguments>() { file },
               GetOutput(request, i),
                  request.Argument)));
             }
             if (request.Start)
             {
-                await pipeClient.InvokeAsync(p => p.StartQueue());
+                await pipeClient.InvokeAsync(p => p.StartQueue()).ConfigureAwait(false);
             }
             return ids;
         }
@@ -116,13 +116,13 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                 file.FilePath = Path.Combine(InputDir, file.FilePath);
             }
             ids.Add(await pipeClient.InvokeAsync(p =>
-                 p.AddTask(TaskType.Concat, 
+                 p.AddTask(TaskType.Concat,
                  request.Inputs,
                  GetOutput(request, 0),
                  request.Argument)));
             if (request.Start)
             {
-                await pipeClient.InvokeAsync(p => p.StartQueue());
+                await pipeClient.InvokeAsync(p => p.StartQueue()).ConfigureAwait(false);
             }
             return ids;
         }
@@ -152,7 +152,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                request.Argument));
             if (request.Start)
             {
-                await pipeClient.InvokeAsync(p => p.StartQueue());
+                await pipeClient.InvokeAsync(p => p.StartQueue()).ConfigureAwait(false);
             }
             return id;
         }
@@ -179,7 +179,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                p.AddTask(TaskType.Compare, request.Inputs, null, null));
             if (request.Start)
             {
-                await pipeClient.InvokeAsync(p => p.StartQueue());
+                await pipeClient.InvokeAsync(p => p.StartQueue()).ConfigureAwait(false);
             }
             return id;
         }
@@ -195,7 +195,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                request.Argument));
             if (request.Start)
             {
-                await pipeClient.InvokeAsync(p => p.StartQueue());
+                await pipeClient.InvokeAsync(p => p.StartQueue()).ConfigureAwait(false);
             }
             return id;
         }

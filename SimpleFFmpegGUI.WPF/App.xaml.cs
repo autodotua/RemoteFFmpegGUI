@@ -54,7 +54,7 @@ namespace SimpleFFmpegGUI.WPF
             catch (Exception ex)
             {
             }
-            MessageBox.Show(e.Exception.ToString(), "MapBoard - 未捕获的异常", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(e.Exception.ToString(), FzLib.Program.App.ProgramName + " - 未捕获的异常", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void ConfigureServices(IServiceCollection services)

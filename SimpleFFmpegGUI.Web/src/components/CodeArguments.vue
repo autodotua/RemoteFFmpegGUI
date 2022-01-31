@@ -177,7 +177,7 @@
         <el-form-item label="帧率"
           ><el-switch v-model="code.video.enableFps" class="right24">
           </el-switch>
-          <div v-show="code.video.enableFps" style="display: inline">
+          <div v-show="code.video.enableFps" class="inline">
             <el-input-number
               size="small"
               v-model="code.video.fps"
@@ -187,46 +187,80 @@
               :max="120"
             >
             </el-input-number>
-            <el-button type="text" class="right24" @click="code.video.fps = 10"
-              >10帧</el-button
+            <el-button
+              type="text"
+              class="right24"
+              @click="code.video.fps = f"
+              v-for="f in fpses"
+              :key="f"
+              >{{ f }}帧</el-button
             >
-            <el-button type="text" class="right24" @click="code.video.fps = 24"
-              >24帧</el-button
-            >
-            <el-button type="text" class="right24" @click="code.video.fps = 25"
-              >25帧</el-button
-            >
-            <el-button type="text" class="right24" @click="code.video.fps = 30"
-              >30帧</el-button
-            >
-            <el-button type="text" @click="code.video.fps = 60">60帧</el-button>
           </div>
         </el-form-item>
         <el-form-item label="分辨率">
-          <el-switch v-model="code.video.enableScale" class="right24">
+          <el-switch v-model="code.video.enableSize" class="right24">
           </el-switch>
-          <el-input-number
-            size="small"
-            class="right24 width80"
-            :min="1"
-            :max="20000"
-            placeholder="宽度"
-            v-model="code.video.width"
-            :controls="false"
-            v-show="code.video.enableScale"
-          ></el-input-number>
-          <a v-show="code.video.enableScale" class="right24">×</a>
-          <el-input-number
-            size="small"
-            class="width80"
-            :min="1"
-            :max="20000"
-            placeholder="高度"
-            v-model="code.video.height"
-            :controls="false"
-            v-show="code.video.enableScale"
-          ></el-input-number>
+          <div class="inline" v-show="code.video.enableSize">
+            <el-input
+              size="small"
+              class="right24 width160"
+              placeholder="示例：640:480 或 640:-1 或 iw/2:ih/2"
+              v-model="code.video.size"
+            ></el-input>
+
+            <el-button
+              v-for="(v, k) in sizes"
+              :key="k"
+              type="text"
+              class="right24"
+              @click="code.video.size = v"
+              >{{ k }}</el-button
+            >
+          </div>
         </el-form-item>
+
+        <el-form-item label="画面比例">
+          <el-switch v-model="code.video.enableAspectRatio" class="right24">
+          </el-switch>
+          <div class="inline" v-show="code.video.enableAspectRatio">
+            <el-input
+              size="small"
+              class="right24 width160"
+              placeholder="示例：4:3或1.3333"
+              v-model="code.video.aspectRatio"
+            ></el-input>
+
+            <el-button
+              v-for="i in aspectRatios"
+              :key="i"
+              type="text"
+              class="right24"
+              @click="code.video.aspectRatio = i"
+              >{{ i }}</el-button
+            >
+          </div></el-form-item
+        >
+
+        <el-form-item label="像素格式">
+          <el-switch v-model="code.video.enablePixelFormat" class="right24">
+          </el-switch>
+          <div class="inline" v-show="code.video.enablePixelFormat">
+            <el-input
+              size="small"
+              class="right24 width160"
+              v-model="code.video.pixelFormat"
+            ></el-input>
+
+            <el-button
+              v-for="p in pixelFormats"
+              :key="p"
+              type="text"
+              class="right24"
+              @click="code.video.pixelFormat = p"
+              >{{p }}</el-button
+            >
+          </div></el-form-item
+        >
       </div>
     </div>
     <div v-if="showVideosAndAudios">
@@ -344,6 +378,16 @@ export default Vue.component("code-arguments", {
       audioCodes: ["自动", "AAC", "OPUS"],
       audioSamples: [8000, 16000, 32000, 44100, 48000, 96000],
       formats: [],
+      aspectRatios: ["4:3", "16:9", "2.35"],
+      fpses: [10, 24, 25, 29.97, 30, 59.94, 60],
+      sizes: {
+        "480P": "-1:480",
+        "720P": "-1:720",
+        "1080P": "-1:1080",
+        "1440P": "-1:1440",
+        "2160P": "-1:2160",
+      },
+      pixelFormats :["yuv420p", "yuvj420p", "yuv422p", "yuvj422p", "rgb24", "gray", "yuv420p10le" ],
       code: {
         enableVideo: true,
         enableAudio: true,
@@ -354,9 +398,8 @@ export default Vue.component("code-arguments", {
           preset: 3,
           crf: 23,
           enableCrf: true,
-          width: 1920,
-          height: 1080,
-          enableScale: false,
+          size: "1920:1080",
+          enableSize: false,
           bitrate: 6,
           enableBitrate: false,
           maxBitrate: 24,
@@ -364,6 +407,10 @@ export default Vue.component("code-arguments", {
           enableMaxBitrate: false,
           fps: 30,
           enableFps: false,
+          enableAspectRatio: false,
+          aspectRatio: "16:9",
+          enablePixelFormat: false,
+          pixelFormat: "",
         },
         audio: {
           code: "AAC",
@@ -478,14 +525,15 @@ export default Vue.component("code-arguments", {
             code: video.code,
             preset: video.preset,
             crf: video.enableCrf ? video.crf : null,
-            width: video.enableScale ? video.width : null,
-            height: video.enableScale ? video.height : null,
+            size: video.enableSize ? video.size : null,
             fps: video.enableFps ? video.fps : null,
             averageBitrate: video.enableBitrate ? video.bitrate : null,
             maxBitrate: video.enableMaxBitrate ? video.maxBitrate : null,
             maxBitrateBuffer: video.enableMaxBitrate
               ? video.maxBitrateBuffer
               : null,
+              aspectRatio:video.enableAspectRatio?video.aspectRatio:null,
+              pixelFormat:video.enablePixelFormat?video.pixelFormat:null,
           }
         : null;
       const audio = this.code.audio;
@@ -534,12 +582,11 @@ export default Vue.component("code-arguments", {
           uiV.enableCrf = false;
         }
 
-        if (video.width != null && video.height != null) {
-          uiV.enableScale = true;
-          uiV.width = video.width;
-          uiV.height = video.height;
+        if (video.size != null) {
+          uiV.enableSize = true;
+          uiV.size = video.size;
         } else {
-          uiV.enableScale = false;
+          uiV.enableSize = false;
         }
 
         if (video.fps != null) {
@@ -562,6 +609,22 @@ export default Vue.component("code-arguments", {
           uiV.maxBitrateBuffer = video.maxBitrateBuffer;
         } else {
           uiV.enableMaxBitrate = false;
+        }
+
+        if(video.aspectRatio){
+          uiV.enableAspectRatio=true;
+          uiV.aspectRatio=video.aspectRatio;
+        }
+        else{
+             uiV.enableAspectRatio=false;
+        }
+
+        if(video.pixelFormat){
+          uiV.enablePixelFormat=true;
+          uiV.pixelFormat=video.pixelFormat;
+        }
+        else{
+             uiV.enablePixelFormat=false;
         }
       } else {
         this.code.enableVideo = false;

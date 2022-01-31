@@ -32,6 +32,15 @@
       <el-descriptions-item label="最高码率缓冲倍率" v-if="showVideo">{{
         args.video.maxBitrateBuffer ? args.video.maxBitrateBuffer : "未定义"
       }}</el-descriptions-item>
+      <el-descriptions-item label="分辨率" v-if="showVideo">{{
+        args.video.size ? args.video.size : "未定义"
+      }}</el-descriptions-item>
+      <el-descriptions-item label="画面比例" v-if="showVideo">{{
+        args.video.aspectRatio ? args.video.aspectRatio : "未定义"
+      }}</el-descriptions-item>
+      <el-descriptions-item label="像素格式" v-if="showVideo">{{
+        args.video.pixelFormat ? args.video.pixelFormat : "未定义"
+      }}</el-descriptions-item>
     </el-descriptions>
     <el-descriptions title="音频" v-if="type == 0||type==4&&args.concat.type!=1">
       <el-descriptions-item label="策略">{{

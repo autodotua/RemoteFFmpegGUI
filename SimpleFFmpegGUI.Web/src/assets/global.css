@@ -26,6 +26,10 @@
 }
 
 
+.width160 {
+    width: 160px;
+}
+
 .width120 {
     width: 120px;
 }
@@ -77,4 +81,8 @@ body {
 
   .s{
     white-space: pre-wrap
+  }
+
+  .inline{
+    display: inline
   }
