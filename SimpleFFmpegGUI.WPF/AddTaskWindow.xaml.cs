@@ -83,6 +83,7 @@ namespace SimpleFFmpegGUI.WPF
             InitializeComponent();
             presetsPanel.CodeArgumentsViewModel = argumentsPanel.ViewModel;
         }
+
         private bool canInitializeType = true;
 
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -158,7 +159,7 @@ namespace SimpleFFmpegGUI.WPF
 
         public void SetAsClone(TaskInfo task)
         {
-            canInitializeType=false; 
+            canInitializeType = false;
             ViewModel.AllowChangeType = false;
             ViewModel.Type = task.Type;
             fileIOPanel.Update(task.Type, task.Inputs, task.Output);
@@ -167,6 +168,7 @@ namespace SimpleFFmpegGUI.WPF
 
         public void SetFiles(IEnumerable<string> files)
         {
+            canInitializeType = false;
             fileIOPanel.Update(TaskType.Code, files.Select(p => new InputArguments() { FilePath = p }).ToList(), null);
         }
 
