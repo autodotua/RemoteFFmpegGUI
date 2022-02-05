@@ -147,6 +147,11 @@ namespace SimpleFFmpegGUI.WPF
                 ViewModel.FilePath = path;
             }
         }
+
+        public void SetFile(string file)
+        {
+            ViewModel.FilePath = file;
+        }
     }
 
     public class Bitrate2StringConverter : IValueConverter

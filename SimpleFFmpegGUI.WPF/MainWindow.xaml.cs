@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
+using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections.Generic;
@@ -125,20 +126,39 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        protected override void OnDrop(DragEventArgs e)
+        protected override async void OnDrop(DragEventArgs e)
         {
             base.OnDrop(e);
             IEnumerable<string> files = e.Data.GetData(DataFormats.FileDrop) as string[];
             files = files.Where(p => File.Exists(p));
             if (files.Any())
             {
-                var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
-                dialog.SetFiles(files);
-                dialog.Show();
+                List<SelectDialogItem> items = Enum
+                    .GetValues(typeof(TaskType))
+                    .Cast<TaskType>()
+                    .ToList()
+                    .Select(p => new SelectDialogItem(FzLib.WPF.Converters.DescriptionConverter.GetDescription(p)))
+                    .ToList();
+                items.Add(new SelectDialogItem("查询信息", "查看媒体的元数据信息"));
+                int typeCount = Enum.GetValues(typeof(TaskType)).Length;
+
+                var index = await CommonDialog.ShowSelectItemDialogAsync("选择操作", items);
+                if (index < typeCount)
+                {
+                    var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
+                    dialog.SetFiles(files, (TaskType)index);
+                    dialog.Show();
+                }
+                else if (index == typeCount)
+                {
+                    var dialog = App.ServiceProvider.GetService<MediaInfoWindow>();
+                    dialog.SetFile(files.First());
+                    dialog.Show();
+                }
             }
         }
 
-        protected async override void OnContentRendered(EventArgs e)
+        protected override async void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
             await Task.Yield();

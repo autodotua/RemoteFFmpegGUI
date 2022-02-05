@@ -8,12 +8,12 @@
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="FFmpeg 工具箱"
-    Width="1400" 
-    WindowStartupLocation="CenterScreen"
+    Width="1400"
     Height="800"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="FFmpeg 工具箱" />
@@ -33,6 +33,7 @@
             x:Name="taskPanel"
             Grid.Column="0"
             Margin="8,0,0,0" />
+
         <GridSplitter
             Grid.Column="1"
             Width="2"
@@ -48,18 +49,18 @@
             Grid.Row="2"
             Grid.ColumnSpan="99">
             <ui:AppBarButton
-                    Click="SettingButton_Click"
-                    Icon="Setting"
-                    Label="设置" />
+                Click="SettingButton_Click"
+                Icon="Setting"
+                Label="设置" />
             <ui:AppBarButton
                 Click="TasksButton_Click"
                 Icon="List"
                 Label="查看所有任务" />
             <ui:AppBarButton
                 Click="PresetsButton_Click"
-                Label="查看预设" >
+                Label="查看预设">
                 <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE179;"/>
+                    <ui:FontIcon Glyph="&#xE179;" />
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
             <ui:AppBarButton
@@ -70,6 +71,7 @@
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
             <ui:AppBarButton
+                x:Name="btnMediaInfo"
                 Click="MediaInfoButton_Click"
                 Icon="Zoom"
                 Label="查询媒体信息" />

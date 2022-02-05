@@ -145,6 +145,7 @@ namespace SimpleFFmpegGUI.WPF
                     await Task.Run(() => App.ServiceProvider.GetService<QueueManager>().StartQueue());
                     this.CreateMessage().QueueSuccess("已开始队列");
                 }
+                App.ServiceProvider.GetService<MainWindow>().BringToFront();
             }
             catch (Exception ex)
             {
@@ -153,7 +154,6 @@ namespace SimpleFFmpegGUI.WPF
             finally
             {
                 IsEnabled = true;
-                App.ServiceProvider.GetService<MainWindow>().BringToFront();
             }
         }
 
@@ -166,10 +166,11 @@ namespace SimpleFFmpegGUI.WPF
             argumentsPanel.Update(task);
         }
 
-        public void SetFiles(IEnumerable<string> files)
+        public void SetFiles(IEnumerable<string> files, TaskType type)
         {
             canInitializeType = false;
-            fileIOPanel.Update(TaskType.Code, files.Select(p => new InputArguments() { FilePath = p }).ToList(), null);
+            ViewModel.Type = type;
+            fileIOPanel.Update(type, files.Select(p => new InputArguments() { FilePath = p }).ToList(), null);
         }
 
         private async void SaveToPresetButton_Click(object sender, RoutedEventArgs e)

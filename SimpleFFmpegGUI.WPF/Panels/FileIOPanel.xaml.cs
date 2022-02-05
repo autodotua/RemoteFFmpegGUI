@@ -40,6 +40,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
             Inputs.CollectionChanged += Inputs_CollectionChanged;
         }
 
+        private int maxInputsCount = int.MaxValue;
+
+        public int MaxInputsCount
+        {
+            get => maxInputsCount;
+            set => this.SetValueAndNotify(ref maxInputsCount, value, nameof(MaxInputsCount));
+        }
+
         private int minInputsCount = 1;
 
         public int MinInputsCount
@@ -113,6 +121,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 TaskType.Combine or TaskType.Concat or TaskType.Compare => 2,
                 _ => 0
             };
+            MaxInputsCount = type switch
+            {
+                TaskType.Code or TaskType.Concat => int.MaxValue,
+                TaskType.Combine or TaskType.Compare => 2,
+                _ => 0
+            };
             ShowTimeClip = type switch
             {
                 TaskType.Code => true,
@@ -120,17 +134,26 @@ namespace SimpleFFmpegGUI.WPF.Panels
             };
         }
 
-        internal void Update(TaskType type, List<InputArguments> inputs, string output)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="inputs"></param>
+        /// <param name="output"></param>
+        /// <returns>若所有文件都被接受，返回True；若文件数量超过允许范围，返回False</returns>
+        public bool Update(TaskType type, List<InputArguments> inputs, string output)
         {
             Update(type);
             Inputs.Clear();
-            foreach (var input in inputs)
+
+            foreach (var input in inputs.Take(MaxInputsCount))
             {
                 var newInput = input.Adapt<InputArgumentsDetail>();
                 newInput.Update();
                 Inputs.Add(newInput);
             }
             Output = output;
+            return inputs.Count <= MaxInputsCount;
         }
     }
 
@@ -191,7 +214,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             catch (Exception ex)
             {
-                this.CreateMessage().QueueError($"加载视频失败", ex); 
+                this.CreateMessage().QueueError($"加载视频失败", ex);
                 (sender as Button).IsEnabled = true;
                 return;
             }
@@ -201,7 +224,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 input.From = clip.From;
                 input.To = clip.To;
                 input.Duration = null;
-            } 
+            }
             (sender as Button).IsEnabled = true;
         }
 
@@ -222,7 +245,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public void Update(TaskType type, List<InputArguments> inputs, string output)
         {
-            ViewModel.Update(type, inputs, output);
+            if (!ViewModel.Update(type, inputs, output))
+            {
+                Window.GetWindow(this).CreateMessage().QueueError("输入文件超过该类型最大数量");
+            }
         }
 
         public void Update(TaskType type)
@@ -285,7 +311,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 {
                     ViewModel.Inputs.Add(new InputArgumentsDetail() { FilePath = file });
                 }
-               
             }
             while (ViewModel.Inputs.Count < ViewModel.MinInputsCount)
             {
