@@ -127,9 +127,8 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             return status;
         }
 
-        [HttpPost]
+        [HttpPost,HttpOptions]
         [Route("Upload")]
-        [HttpOptions]
         [DisableRequestSizeLimit]
         public async Task UploadFile([FromQuery] IFormFile file)
         {

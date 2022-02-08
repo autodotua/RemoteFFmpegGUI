@@ -188,5 +188,15 @@ namespace SimpleFFmpegGUI
         {
             return PresetManager.GetDefaultPreset(type);
         }
+
+        public void ImportPresets(string json)
+        {
+            PresetManager.Import(json);
+        }
+
+        public string ExportPresets()
+        {
+            return PresetManager.Export();
+        }
     }
 }

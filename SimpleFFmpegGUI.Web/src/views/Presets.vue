@@ -1,9 +1,24 @@
 <template>
   <div>
+    <el-button style="float: right" class="right12" @click="exportPresets()"
+      >导出</el-button
+    ><el-upload
+      style="float: right"
+      :headers="getHeader()"
+      class="right12"
+      :action="getImportPresetsUrl()"
+      :on-success="fillData"
+      accept="application/json"
+    >
+      <el-button size="small">导入</el-button>
+    </el-upload>
     <el-table ref="table" :data="list">
       <el-table-column type="expand">
         <template slot-scope="props">
-          <code-arguments-description :args="props.row.arguments" :type="props.row.type"></code-arguments-description>
+          <code-arguments-description
+            :args="props.row.arguments"
+            :type="props.row.type"
+          ></code-arguments-description>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="预设名" min-width="80" />
@@ -35,14 +50,14 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog title="编辑预设" :visible.sync="dialogVisible" width="80%" >
-      <code-arguments    ref="args" :type="type" :showPresets="false" ></code-arguments>
+    <el-dialog title="编辑预设" :visible.sync="dialogVisible" width="80%">
+      <code-arguments
+        ref="args"
+        :type="type"
+        :showPresets="false"
+      ></code-arguments>
       <span slot="footer" class="dialog-footer">
-        <el-button
-       
-          type="primary"
-          @click="savePreset"
-          :loading="saving"
+        <el-button type="primary" @click="savePreset" :loading="saving"
           >保存</el-button
         >
       </span>
@@ -82,6 +97,8 @@ export default Vue.extend({
   props: [],
   watch: {},
   methods: {
+    getHeader: net.getHeader,
+    getImportPresetsUrl: net.getImportPresetsUrl,
     remake(item: any) {
       jumpByArgs(item.arguments, item.inputs, item.output, item.type);
     },
@@ -116,6 +133,9 @@ export default Vue.extend({
       this.editingPreset = item;
       this.type = item.type;
       this.dialogVisible = true;
+    },
+    exportPresets() {
+      net.downloadExportPresetsUrl();
     },
     fillData() {
       showLoading();

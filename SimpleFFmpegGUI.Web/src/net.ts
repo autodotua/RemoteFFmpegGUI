@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie';
 import Vue from "vue";
 import { AxiosResponse } from "axios";
+import { Dictionary } from 'vue-router/types/router';
 
 function getUrl(controller: string): string {
         if (process.env.NODE_ENV === 'production') {
@@ -74,7 +75,7 @@ export function postAddCustomTask(item: any): Promise<AxiosResponse<any>> {
 export function getQueueStatus(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("Queue/Status"))
-} 
+}
 export function getTask(id: number) {
         return Vue.axios
                 .get(getUrl("Task?id=" + id))
@@ -121,6 +122,7 @@ export function getPresets(type: number | null = null): Promise<AxiosResponse<an
                 Vue.axios
                         .get(getUrl("Preset/List"))
 }
+
 export function postAddOrUpdatePreset(name: string, type: number, args: any): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .post(getUrl("Preset/Add"), { name: name, type: type, arguments: args });
@@ -164,6 +166,22 @@ export function getUploadUrl(): string {
         return getUrl("File/Upload");
 }
 
+export function getImportPresetsUrl(): string {
+        return getUrl("Preset/Import");
+}
+
+export function downloadExportPresetsUrl(): void {
+        Vue.axios.get(getUrl("Preset/Export"), {
+                responseType: 'arraybuffer'
+        }).then(r => {
+                const blob = new Blob([r.data]);
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "远程 FFmpeg工具箱 预设.json";
+                link.click();
+        })
+}
+
 export function getFormats(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("Task/Formats"))
@@ -171,6 +189,15 @@ export function getFormats(): Promise<AxiosResponse<any>> {
 
 export function setHeader(): void {
         Vue.axios.defaults.headers.common['Authorization'] = Cookies.get("token");
+}
+
+export function getHeader(): any
+{
+        if(Cookies.get("token")==null)
+        {
+                return {}
+        }
+        return {"Authorization":Cookies.get("token")};
 }
 
 export function getNeedToken(): Promise<AxiosResponse<any>> {

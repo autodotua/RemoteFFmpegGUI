@@ -1,4 +1,5 @@
-﻿using SimpleFFmpegGUI.Model;
+﻿using Newtonsoft.Json;
+using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -130,6 +131,37 @@ namespace SimpleFFmpegGUI.Manager
         {
             using var db = FFmpegDbContext.GetNew();
             return db.Presets.FirstOrDefault(p => p.Type == type && p.Default && !p.IsDeleted);
+        }
+
+        public static string Export()
+        {
+            var presets = GetPresets();
+            return JsonConvert.SerializeObject(presets, Formatting.Indented);
+        }
+
+        public static void Import(string json)
+        {
+
+            var presets = JsonConvert.DeserializeObject<List<CodePreset>>(json);
+
+            using var db = FFmpegDbContext.GetNew();
+            foreach (var preset in presets)
+            {
+                string name=preset.Name;
+                var type=preset.Type;
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    throw new ArgumentException("名称为空");
+                }
+                preset.Id = 0;
+                preset.Id = 0;
+                if (db.Presets.Where(p => p.IsDeleted == false).Any(p => p.Name == name && p.Type == type))
+                {
+                    db.Presets.RemoveRange(db.Presets.Where(p => p.IsDeleted == false).Where(p => p.Name == name && p.Type == type).ToArray());
+                }
+                db.Presets.Add(preset);
+            }
+            db.SaveChanges();
         }
     }
 }

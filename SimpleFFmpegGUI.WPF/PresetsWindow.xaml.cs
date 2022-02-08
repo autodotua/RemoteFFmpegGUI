@@ -40,7 +40,6 @@ namespace SimpleFFmpegGUI.WPF
         public IEnumerable TaskTypes => Enum.GetValues(typeof(TaskType));
         private TaskType type = TaskType.Code;
 
-
         public TaskType Type
         {
             get => type;
@@ -49,8 +48,8 @@ namespace SimpleFFmpegGUI.WPF
                 this.SetValueAndNotify(ref type, value, nameof(Type));
                 FillPresets();
             }
-
         }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private ObservableCollection<CodePreset> presets;
@@ -60,7 +59,6 @@ namespace SimpleFFmpegGUI.WPF
             get => presets;
             set => this.SetValueAndNotify(ref presets, value, nameof(Presets));
         }
-
 
         public void FillPresets()
         {
@@ -87,6 +85,7 @@ namespace SimpleFFmpegGUI.WPF
             DataContext = ViewModel;
             InitializeComponent();
         }
+
         protected override void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
@@ -108,9 +107,8 @@ namespace SimpleFFmpegGUI.WPF
             if (path != null)
 
             {
-                var presets = PresetManager.GetPresets();
-                var json = JsonConvert.SerializeObject(presets, Formatting.Indented);
-                File.WriteAllText(path, json);
+                var json = PresetManager.Export();
+                File.WriteAllText(path, json, new UTF8Encoding());
                 this.CreateMessage().QueueSuccess("导出成功");
             }
         }
@@ -123,11 +121,7 @@ namespace SimpleFFmpegGUI.WPF
             {
                 try
                 {
-                    var presets = JsonConvert.DeserializeObject<List<CodePreset>>(File.ReadAllText(path));
-                    foreach (var preset in presets)
-                    {
-                        PresetManager.AddOrUpdatePreset(preset.Name, preset.Type, preset.Arguments);
-                    }
+                    PresetManager.Import(File.ReadAllText(path, new UTF8Encoding()));
                     ViewModel.FillPresets();
                     this.CreateMessage().QueueSuccess("导入成功，同名预设已被更新");
                 }

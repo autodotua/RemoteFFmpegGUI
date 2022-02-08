@@ -69,5 +69,9 @@ namespace SimpleFFmpegGUI
         VideoFormat[] GetSuggestedFormats();
 
         TaskInfo GetTask(int id);
+
+        void ImportPresets(string json);
+
+        string ExportPresets();
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Furion.FriendlyException;
+using FzLib;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -39,9 +41,30 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 
         [HttpPost]
         [Route("Delete")]
-        public async Task DeleteAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             await pipeClient.InvokeAsync(p => p.DeletePreset(id));
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("Export")]
+        public async Task<FileResult> ExportAsync()
+        {
+            string json = await pipeClient.InvokeAsync(p => p.ExportPresets());
+            return File(json.ToUTF8Bytes(), "application/json");
+        }
+
+        [HttpPost, HttpOptions]
+        [Route("Import")]
+        public async Task<IActionResult> ImportAsync([FromQuery] IFormFile file)
+        {
+            using var s = file.OpenReadStream();
+            byte[] buffer = new byte[s.Length];
+            await s.ReadAsync(buffer, 0, buffer.Length);
+            string json = buffer.ToUTF8String();
+            await pipeClient.InvokeAsync(p => p.ImportPresets(json));
+            return Ok();
         }
     }
 }

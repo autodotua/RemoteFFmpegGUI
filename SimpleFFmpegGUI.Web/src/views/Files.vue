@@ -38,6 +38,7 @@
         class="top12"
         :action="getUploadUrl()"
         :auto-upload="false"
+        :headers="getHeader()"
         ref="upload"
       >
         <el-button slot="trigger" size="small" type="primary" class="right24"
@@ -48,41 +49,35 @@
         >
       </el-upload>
     </div>
-    <div v-if="files!=null" class="top24">
+    <div v-if="files != null" class="top24">
       <h2>输出文件下载</h2>
-    <el-table
-      ref="table" 
-      :data="files"
-    >
-
-      <el-table-column prop="name" label="文件名" min-width="120" />
-      <el-table-column prop="lengthText" label="大小" width="120" />
-      <el-table-column prop="lastWriteTime" label="修改时间" width="200">
+      <el-table ref="table" :data="files">
+        <el-table-column prop="name" label="文件名" min-width="120" />
+        <el-table-column prop="lengthText" label="大小" width="120" />
+        <el-table-column prop="lastWriteTime" label="修改时间" width="200">
           <template slot-scope="scope">
-            {{formatDateTime(scope.row.lastWriteTime)}}
+            {{ formatDateTime(scope.row.lastWriteTime) }}
           </template>
-      </el-table-column>
+        </el-table-column>
 
-      <el-table-column label="操作" width="50">
-        <template slot-scope="scope">
+        <el-table-column label="操作" width="50">
+          <template slot-scope="scope">
+            <el-button
+              slot="reference"
+              type="text"
+              size="small"
+              @click="download(scope.row)"
+              >下载</el-button
+            >
+          </template>
+        </el-table-column>
 
-          <el-button
-            slot="reference"
-            type="text"
-            size="small"
-            @click="download(scope.row)"
-            >下载</el-button
-          >
-        </template>
-      </el-table-column>
-
-      <el-table-column align="right">
-        <template slot="header">
-          <el-button type="text" @click="fillData()">刷新</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
+        <el-table-column align="right">
+          <template slot="header">
+            <el-button type="text" @click="fillData()">刷新</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -109,12 +104,12 @@ export default Vue.extend({
   },
   computed: {},
   methods: {
+    getHeader: net.getHeader,
     getUploadUrl: net.getUploadUrl,
-    formatDateTime:formatDateTime,
-    download(file:any){
-      const name=file.name;
+    formatDateTime: formatDateTime,
+    download(file: any) {
+      const name = file.name;
       net.download(name);
-
     },
     upload() {
       (this.$refs.upload as any).submit();
@@ -134,9 +129,10 @@ export default Vue.extend({
           this.getStatus();
         })
         .catch(showError);
-    },   fillData() {
+    },
+    fillData() {
       showLoading();
-     return net
+      return net
         .getMediaDetails()
         .then((response) => {
           this.files = response.data;
