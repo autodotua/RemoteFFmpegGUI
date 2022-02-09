@@ -35,45 +35,49 @@
 
 ## 构建与部署
 
+### 准备工作
+
+1. 确保安装了 .NET 6 SDK：
+2. 确保安装了npm（Node.js）：
+3. 确保在`bin`目录中放置了ffmpeg二进制文件（shared版）：[下载](https://www.ffmpeg.org/download.html) 。测试使用的版本为4.4.1：[下载](https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-4.4.1-full_build-shared.7z) 。共有三个exe文件和8个dll文件。
+4. 确保在`/bin`目录中放置了MediaInfo.dll：[下载](https://mediaarea.net/en/MediaInfo/Download)
+
 ### 自动构建
 
-1. 确保已安装.NET 6 SDK和npm，并且npm包已经还原。
-2. 执行PowerShell：`./build.ps1`。生成文件位于`Generation/Publish`下，其中`WebPackage`为Web部署包，`WPF`为桌面程序。
-3. 将ffmpeg和MediaInfo相关二进制文件放到`Generation/Publish/WPF`和`Generation/Publish/WebPackage/host`中。
-4. 部署到IIS中，相关要求参见下方。
+执行PowerShell：`./build.ps1`。
 
-### 基于Windows +IIS的Web版本部署
+若提示“无法加载文件 ******.ps1，因为在此系统中禁止执行脚本”，需要首先在管理员模式下运行PowerShell并执行`set-executionpolicy remotesigned`，然后按Y确认。
+生成文件位于`Generation/Publish`下，其中`WebPackage`为Web部署包，`WPF`为桌面程序。
 
-1. 在VS中发布Host和WebAPI，在Web项目中命令行运行`npm run build`发布前端包
-2. 将ffmpeg二进制文件和MediaInfo.dll二进制文件放到Host生成的文件夹中。ffmpeg的二进制文件可以使用static包，必须包含ffmpeg.exe和ffpobe.exe；也可以使用shared包。
-3. 修改WebAPI的`appsettings.json`，主要修改`InputDir`和`OutputDir`项，指定输入和输出目录
-4. 新建一个网站文件夹，放置前端文件，新建api文件夹放置WebAPI文件，新建Host文件夹放置Host文件
-4. 确保安装了.Net 6 Hosting Bundle，并在Windows中启用了IIS
-4. 在IIS中新建网站，指定物理目录为之前新建的目录，设置api为虚拟应用程序
-7. 运行Host的exe，然后打开设置的url即可使用
+### 部署基于Windows +IIS的Web版本
+
+1. 进入`Generation/Publish/WebPackage`
+2. 编辑`api`的`appsettings.json`，主要修改`InputDir`和`OutputDir`项，指定输入和输出目录。其它修改项详见文件内的注释。
+3. 在合适的位置新建一个网站文件夹，将`Generation/Publish/WebPackage`内的所有内容复制到新建的文件夹之中。
+4. 确保安装了DotNET 6 Hosting Bundle，并在Windows中启用了IIS。
+5. 在IIS中新建网站，指定物理目录为之前新建的目录。右键其中的api目录，设置为虚拟应用程序。
+6. 运行Host的exe，然后打开设置的url即可使用。
 
 - 若要在IIS中启用自动启动Host功能，还需要：
-    1. IIS > 应用程序池
-    2. 为网站选择高级设置
-    3. 将标识（Identity）更改为 LocalSystem
-    4. 重启 IIS
+    1. IIS > 应用程序池。
+    2. 为网站选择高级设置。
+    3. 将标识（Identity）更改为 LocalSystem。
+    4. 重启 IIS。
 
 - 若输入或输出文件夹位于网络位置等IIS无权限的位置，则需要：
-    - 设置`appsettings.json`中的 `InputDirAccessable`和/或`OutputDirAccessable`为`false`，告知程序无权限访问，那么后端将通过Host对文件进行访问
-    - 关闭自动启动Host功能，因为自动启动的Host将继承IIS的权限，依旧无法访问
-    - 这种模式下，HTTP上传和下载功能将不可用（懒得写）
+    1. 设置`appsettings.json`中的 `InputDirAccessable`和/或`OutputDirAccessable`为`false`，告知程序无权限访问，那么后端将通过Host对文件进行访问。
+    2. 关闭通过WebAPI自动启动Host功能，因为自动启动的Host将继承IIS的权限，依旧无法访问。
+    3. 这种模式下，HTTP上传和下载功能将不可用（懒得写）。
 
+- Host启动参数：
+    ```
+    -s           (默认： false) 注册开机启动
+    -u           (默认： false) 取消开机启动
+    -d           (默认： false) 设置工作目录为程序所在目录
+    --help       显示帮助信息
+    ```
 
-### 桌面包装版本部署（过时）
+## 开发注意事项
 
-1. 在VS中发布或生成WebApp，在Web项目中命令行运行`npm run build`发布前端包
-2. 将前端包放入WebApp生成或发布的文件夹中：
-   - 方式1：运行一次WebApp的程序，即可自动复制
-   - 方式2：将Web项目中的dist文件夹复制到WebApp程序目录并改名为html
-3. 将ffmpeg二进制文件和MediaInfo.dll二进制文件放到Host生成的文件夹中。ffmpeg的二进制文件可以使用static包，必须包含ffmpeg.exe和ffpobe.exe；也可以使用shared包。
-
-
-### 桌面WPF版本部署
-
-1. 在VS中生成WPF版（Release）
-2. 将ffmpeg二进制文件和MediaInfo.dll二进制文件放到Host生成的文件夹（net5.0-windows10.0.18362.0）中。ffmpeg的二进制文件必须使用shared包，需要将3个exe文件和其他所有dll文件放入生成的文件夹中
+- Clone仓库后，只需安装好相关SDK，即可进行构建，无需额外设置。
+- `libs`目录中二进制文件来自于：[FzLib](https://github.com/autodotua/FzLib)和[Wpf.Notifications](https://github.com/autodotua/Wpf.Notifications)，均为开源产品。
