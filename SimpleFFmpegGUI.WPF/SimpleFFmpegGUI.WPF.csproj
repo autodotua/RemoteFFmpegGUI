@@ -73,23 +73,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="PresetsWindow.xaml">
+    <Page Update="Pages\PresetsPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="TasksWindow.xaml">
+    <Page Update="Pages\TasksPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="SettingWindow.xaml">
+    <Page Update="Pages\SettingPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="MediaInfoWindow.xaml">
+    <Page Update="Pages\MediaInfoPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="LogsWindow.xaml">
+    <Page Update="Pages\LogsPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
@@ -105,7 +105,7 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="AddTaskWindow.xaml">
+    <Page Update="Pages\AddTaskPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

@@ -1,23 +1,17 @@
-﻿<Window
-    x:Class="SimpleFFmpegGUI.WPF.MediaInfoWindow"
+﻿<UserControl
+    x:Class="SimpleFFmpegGUI.WPF.Pages.MediaInfoPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mext="clr-namespace:ModernWpf.FzExtension;assembly=ModernWpf.FzExtension"
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Title="媒体信息 - FFmpeg 工具箱" 
-    Width="1280"
-    Height="640"
-    ui:TitleBar.IsIconVisible="True"
-    ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
-    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <Window.Resources>
+    <UserControl.Resources>
         <local:Bitrate2StringConverter x:Key="Bitrate2StringConverter" />
         <Style
             x:Key="KeyStyle"
@@ -37,7 +31,7 @@
                 Event="MouseLeave"
                 Handler="TextBox_MouseLeave" />
         </Style>
-    </Window.Resources>
+    </UserControl.Resources>
     <Grid Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -378,4 +372,4 @@
             Grid.ColumnSpan="99"
             Margin="-8" />
     </Grid>
-</Window>
+</UserControl>

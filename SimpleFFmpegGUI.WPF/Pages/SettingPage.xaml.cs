@@ -25,11 +25,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Pages
 {
-    public class SettingWindowViewModel : Config
+    public class SettingPageViewModel : Config
     {
-        public SettingWindowViewModel()
+        public SettingPageViewModel()
         {
             Config.Instance.Adapt(this);
             ObservableRemoteHosts = new ObservableCollection<RemoteHost>(RemoteHosts);
@@ -40,25 +40,25 @@ namespace SimpleFFmpegGUI.WPF
     }
 
     /// <summary>
-    /// Interaction logic for SettingWindow.xaml
+    /// Interaction logic for SettingPage.xaml
     /// </summary>
-    public partial class SettingWindow : Window
+    public partial class SettingPage : UserControl
     {
-        public SettingWindow(SettingWindowViewModel viewModel)
+        public SettingPage(SettingPageViewModel viewModel)
         {
             ViewModel = viewModel;
             DataContext = ViewModel;
             InitializeComponent();
         }
 
-        public SettingWindowViewModel ViewModel { get; set; }
+        public SettingPageViewModel ViewModel { get; set; }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.RemoteHosts = ViewModel.ObservableRemoteHosts.ToList();
             ViewModel.Adapt(Config.Instance);
             Config.Instance.Save();
-            Close();
+            this.GetWindow<MainWindow>().RemoveTab(this);
         }
 
         private void AddRemoteHost_Click(object sender, RoutedEventArgs e)
@@ -68,7 +68,6 @@ namespace SimpleFFmpegGUI.WPF
 
         private void CommandBar_MouseEnter(object sender, MouseEventArgs e)
         {
-
             Keyboard.ClearFocus();
         }
     }

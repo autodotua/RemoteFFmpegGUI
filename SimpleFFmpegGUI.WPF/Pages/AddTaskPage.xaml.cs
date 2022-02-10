@@ -25,11 +25,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Pages
 {
-    public class AddTaskWindowViewModel : INotifyPropertyChanged
+    public class AddTaskPageViewModel : INotifyPropertyChanged
     {
-        public AddTaskWindowViewModel(QueueManager queue)
+        public AddTaskPageViewModel(QueueManager queue)
         {
             Queue = queue;
         }
@@ -69,13 +69,13 @@ namespace SimpleFFmpegGUI.WPF
     }
 
     /// <summary>
-    /// Interaction logic for AddTaskWindow.xaml
+    /// Interaction logic for AddTaskPage.xaml
     /// </summary>
-    public partial class AddTaskWindow : Window
+    public partial class AddTaskPage : UserControl
     {
-        public AddTaskWindowViewModel ViewModel { get; set; }
+        public AddTaskPageViewModel ViewModel { get; set; }
 
-        public AddTaskWindow(AddTaskWindowViewModel viewModel)
+        public AddTaskPage(AddTaskPageViewModel viewModel)
         {
             ViewModel = viewModel;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -129,11 +129,6 @@ namespace SimpleFFmpegGUI.WPF
                             this.CreateMessage().QueueSuccess("已加入队列");
                         }
                         break;
-                }
-                if (Config.Instance.CloseWindowAfterAddTask)
-                {
-                    Close();
-                    return;
                 }
                 if (Config.Instance.ClearFilesAfterAddTask)
                 {
@@ -227,11 +222,6 @@ namespace SimpleFFmpegGUI.WPF
                 };
                 await PostAsync(host, "Task/Add/" + ViewModel.Type.ToString(), data);
 
-                if (Config.Instance.CloseWindowAfterAddTask)
-                {
-                    Close();
-                    return;
-                }
                 if (Config.Instance.ClearFilesAfterAddTask)
                 {
                     fileIOPanel.Reset();
@@ -275,11 +265,11 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e);
-            Config.Instance.Save();
-        }
+        //protected override void OnClosed(EventArgs e)
+        //{
+        //    base.OnClosed(e);
+        //    Config.Instance.Save();
+        //}
 
         private void ClearFilesButton_Click(object sender, RoutedEventArgs e)
         {

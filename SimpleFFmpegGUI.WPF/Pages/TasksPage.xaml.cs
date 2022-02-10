@@ -34,11 +34,11 @@ using System.Windows.Shapes;
 using Path = System.IO.Path;
 using Size = System.Drawing.Size;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Pages
 {
-    public class TasksWindowViewModel : INotifyPropertyChanged
+    public class TasksPageViewModel : INotifyPropertyChanged
     {
-        public TasksWindowViewModel()
+        public TasksPageViewModel()
         {
             AllTasks.PropertyChanged += AllTasks_PropertyChanged;
             RefreshPages();
@@ -78,16 +78,16 @@ namespace SimpleFFmpegGUI.WPF
     }
 
     /// <summary>
-    /// Interaction logic for TasksWindow.xaml
+    /// Interaction logic for TasksPage.xaml
     /// </summary>
-    public partial class TasksWindow : Window
+    public partial class TasksPage : UserControl
     {
-        public TasksWindowViewModel ViewModel { get; set; }
+        public TasksPageViewModel ViewModel { get; set; }
 
         //private TimeSpan length;
         //private double fps;
 
-        public TasksWindow(TasksWindowViewModel viewModel)
+        public TasksPage(TasksPageViewModel viewModel)
         {
             InitializeComponent();
             ViewModel = viewModel;

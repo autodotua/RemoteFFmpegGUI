@@ -28,5 +28,15 @@ namespace SimpleFFmpegGUI.WPF
             win.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             return win.ShowDialog();
         }
+
+        public static T GetWindow<T>(this DependencyObject element) where T : Window
+        {
+            return Window.GetWindow(element) as T;
+        }
+
+        public static Window GetWindow(this DependencyObject element)
+        {
+            return Window.GetWindow(element);
+        }
     }
 }

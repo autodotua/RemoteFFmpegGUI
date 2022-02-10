@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.Pages;
 using SimpleFFmpegGUI.WPF.Panels;
 using System;
 using System.Collections.Generic;
@@ -68,26 +69,26 @@ namespace SimpleFFmpegGUI.WPF
             services.AddSingleton<MainWindow>();
             services.AddTransient<MainWindowViewModel>();
 
-            services.AddTransient<AddTaskWindow>();
-            services.AddTransient<AddTaskWindowViewModel>();
+            services.AddTransient<AddTaskPage>();
+            services.AddTransient<AddTaskPageViewModel>();
 
-            services.AddTransient<MediaInfoWindow>();
-            services.AddTransient<MediaInfoWindowViewModel>();
+            services.AddTransient<MediaInfoPage>();
+            services.AddTransient<MediaInfoPageViewModel>();
 
-            services.AddTransient<LogsWindow>();
-            services.AddTransient<LogsWindowViewModel>();
+            services.AddTransient<LogsPage>();
+            services.AddTransient<LogsPageViewModel>();
 
-            services.AddTransient<ClipWindow>();
-            services.AddTransient<ClipWindowViewModel>();
+            services.AddTransient<CutPage>();
+            services.AddTransient<CutPageViewModel>();
 
-            services.AddTransient<TasksWindow>();
-            services.AddTransient<TasksWindowViewModel>();
+            services.AddTransient<TasksPage>();
+            services.AddTransient<TasksPageViewModel>();
 
-            services.AddTransient<SettingWindow>();
-            services.AddTransient<SettingWindowViewModel>();
+            services.AddTransient<SettingPage>();
+            services.AddTransient<SettingPageViewModel>();
 
-            services.AddTransient<PresetsWindow>();
-            services.AddTransient<PresetsWindowViewModel>();
+            services.AddTransient<PresetsPage>();
+            services.AddTransient<PresetsPageViewModel>();
 
             services.AddTransient<TaskListViewModel>();
             services.AddTransient<CodeArgumentsPanelViewModel>();

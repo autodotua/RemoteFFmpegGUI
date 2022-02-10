@@ -6,6 +6,7 @@ using Microsoft.WindowsAPICodePack.FzExtension;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.Pages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -135,7 +136,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="type"></param>
         /// <param name="inputs"></param>
@@ -206,11 +207,11 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 return;
             }
             (sender as Button).IsEnabled = false;
-            var win = App.ServiceProvider.GetService<ClipWindow>();
-            win.Owner = Window.GetWindow(this);
+            (TimeSpan From, TimeSpan To)? result = null;
             try
             {
-                await win.SetVideoAsync(input.FilePath, input.From, input.To);
+                var panel = await this.GetWindow<MainWindow>().ShowTopTabAsync<CutPage>(async p => await p.SetVideoAsync(input.FilePath, input.From, input.To));
+                result = panel.GetTime();
             }
             catch (Exception ex)
             {
@@ -218,11 +219,11 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 (sender as Button).IsEnabled = true;
                 return;
             }
-            if (win.ShowDialog() == true)
+            if (result.HasValue)
             {
-                var clip = win.GetClipTime();
-                input.From = clip.From;
-                input.To = clip.To;
+                var time = result.Value;
+                input.From = time.From;
+                input.To = time.To;
                 input.Duration = null;
             }
             (sender as Button).IsEnabled = true;
@@ -231,7 +232,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         private void BrowseFileButton_Click(object sender, RoutedEventArgs e)
         {
             var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
-            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(Window.GetWindow(this)).GetFilePath();
+            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
             if (path != null)
             {
                 input.FilePath = path;
@@ -247,7 +248,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             if (!ViewModel.Update(type, inputs, output))
             {
-                Window.GetWindow(this).CreateMessage().QueueError("输入文件超过该类型最大数量");
+                this.GetWindow().CreateMessage().QueueError("输入文件超过该类型最大数量");
             }
         }
 
@@ -264,7 +265,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public void BrowseAndAddInput()
         {
-            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(Window.GetWindow(this)).GetFilePath();
+            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
             if (path != null)
             {
                 var input = new InputArgumentsDetail();
@@ -275,7 +276,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void BrowseOutputFileButton_Click(object sender, RoutedEventArgs e)
         {
-            string path = new FileFilterCollection().AddAll().CreateSaveFileDialog().SetParent(Window.GetWindow(this)).GetFilePath();
+            string path = new FileFilterCollection().AddAll().CreateSaveFileDialog().SetParent(this.GetWindow()).GetFilePath();
             if (path != null)
             {
                 path = path.RemoveEnd(".*");

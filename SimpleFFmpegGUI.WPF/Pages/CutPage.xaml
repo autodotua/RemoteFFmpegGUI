@@ -1,11 +1,11 @@
-﻿<Window
-    x:Class="SimpleFFmpegGUI.WPF.ClipWindow"
+﻿<UserControl
+    x:Class="SimpleFFmpegGUI.WPF.Pages.CutPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:f="clr-namespace:FzLib.WPF;assembly=FzCoreLib.Windows"
     xmlns:ffme="clr-namespace:Unosquare.FFME;assembly=ffme.win"
-    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Pages"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
@@ -13,15 +13,8 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
     x:Name="root"
-    Title="视频裁剪 - FFmpeg 工具箱"
-    Width="960"
-    Height="680"
-    MinWidth="480"
-    ui:TitleBar.IsIconVisible="True"
-    ui:WindowHelper.UseModernWindowStyle="True"
-    WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
-    <Window.Resources>
+    <UserControl.Resources>
         <Style
             BasedOn="{StaticResource DefaultTextBoxStyle}"
             TargetType="{x:Type TextBox}">
@@ -29,7 +22,7 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="False" />
         </Style>
-    </Window.Resources>
+    </UserControl.Resources>
     <Grid>
 
         <Grid.RowDefinitions>
@@ -199,6 +192,10 @@
                 Label="设置为出点" />
             <ui:AppBarSeparator />
             <ui:AppBarButton
+                Click="CancelButton_Click"
+                Icon="Cancel"
+                Label="取消" />
+            <ui:AppBarButton
                 Click="OKButton_Click"
                 Label="完成">
                 <ui:AppBarButton.Icon>
@@ -207,4 +204,4 @@
             </ui:AppBarButton>
         </ui:CommandBar>
     </Grid>
-</Window>
+</UserControl>

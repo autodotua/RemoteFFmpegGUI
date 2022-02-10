@@ -73,14 +73,6 @@ namespace SimpleFFmpegGUI.WPF
             get => startQueueAfterAddTask;
             set => this.SetValueAndNotify(ref startQueueAfterAddTask, value, nameof(StartQueueAfterAddTask));
         }
-
-        private bool closeWindowAfterAddTask;
-
-        public bool CloseWindowAfterAddTask
-        {
-            get => closeWindowAfterAddTask;
-            set => this.SetValueAndNotify(ref closeWindowAfterAddTask, value, nameof(CloseWindowAfterAddTask));
-        }
     }
 
     public class RemoteHost

@@ -16,8 +16,6 @@
 
 ![](imgs/wpf_main.png)
 
-![](imgs/wpf_create.png)
-
 ![](imgs/wpf_clip.jpg)
 
 ![](imgs/wpf_info.png)

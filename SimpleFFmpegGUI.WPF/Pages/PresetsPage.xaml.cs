@@ -29,11 +29,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Pages
 {
-    public class PresetsWindowViewModel : INotifyPropertyChanged
+    public class PresetsPageViewModel : INotifyPropertyChanged
     {
-        public PresetsWindowViewModel()
+        public PresetsPageViewModel()
         {
         }
 
@@ -73,23 +73,18 @@ namespace SimpleFFmpegGUI.WPF
     }
 
     /// <summary>
-    /// Interaction logic for PresetsWindow.xaml
+    /// Interaction logic for PresetsPage.xaml
     /// </summary>
-    public partial class PresetsWindow : Window
+    public partial class PresetsPage : UserControl
     {
-        public PresetsWindowViewModel ViewModel { get; set; }
+        public PresetsPageViewModel ViewModel { get; set; }
 
-        public PresetsWindow(PresetsWindowViewModel viewModel)
+        public PresetsPage(PresetsPageViewModel viewModel)
         {
             ViewModel = viewModel;
             DataContext = ViewModel;
             InitializeComponent();
-        }
-
-        protected override void OnContentRendered(EventArgs e)
-        {
-            base.OnContentRendered(e);
-            ViewModel.FillPresets();
+            Loaded += (s, e) => ViewModel.FillPresets();
         }
 
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -103,7 +98,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            var path = new FileFilterCollection().Add("配置文件", "json").CreateSaveFileDialog().SetParent(this).SetDefault("FFmpeg工具箱 预设.json").GetFilePath();
+            var path = new FileFilterCollection().Add("配置文件", "json").CreateSaveFileDialog().SetParent(this.GetWindow()).SetDefault("FFmpeg工具箱 预设.json").GetFilePath();
             if (path != null)
 
             {
@@ -115,7 +110,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private async void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            var path = new FileFilterCollection().Add("配置文件", "json").CreateOpenFileDialog().SetParent(this).GetFilePath();
+            var path = new FileFilterCollection().Add("配置文件", "json").CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
             if (path != null)
 
             {
@@ -138,7 +133,7 @@ namespace SimpleFFmpegGUI.WPF
             {
                 IsEnabled = false;
                 PresetManager.DeletePresets();
-                Close();
+                ViewModel.FillPresets();
             }
         }
     }

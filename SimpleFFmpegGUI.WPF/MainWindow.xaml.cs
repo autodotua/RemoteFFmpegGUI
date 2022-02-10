@@ -4,6 +4,7 @@ using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.Pages;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,6 +38,15 @@ namespace SimpleFFmpegGUI.WPF
 
         public Visibility StartMainQueueButtonVisibility => queue.MainQueueTask == null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility StopMainQueueButtonVisibility => queue.MainQueueTask == null ? Visibility.Collapsed : Visibility.Visible;
+        private bool isTabControlVisiable = true;
+        public Visibility TabControlVisibility => isTabControlVisiable ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility TopTabVisibility => isTabControlVisiable ? Visibility.Collapsed : Visibility.Visible;
+
+        public void SetTabVisiable(bool isTabControlVisiable)
+        {
+            this.isTabControlVisiable = isTabControlVisiable;
+            this.Notify(nameof(TabControlVisibility), nameof(TopTabVisibility));
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
@@ -58,9 +68,62 @@ namespace SimpleFFmpegGUI.WPF
             this.queue = queue;
         }
 
+        /// <summary>
+        /// 新增一个Tab项
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="title"></param>
+        /// <param name="beforeLoad"></param>
+        public void AddNewTab<T>(string title = null, Action<T> beforeLoad = null) where T : UserControl
+        {
+            title = title ?? PageHelper.GetTitle<T>();
+            T panel = App.ServiceProvider.GetService<T>();
+            beforeLoad?.Invoke(panel);
+            var tabItem = new TabItem() { Header = title, Content = panel };
+            tab.Items.Add(tabItem);
+            tab.SelectedIndex = tab.Items.Count - 1;
+        }
+
+        /// <summary>
+        /// 显示顶级对话框级别的页面，并等待其关闭
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="beforeLoad"></param>
+        /// <returns></returns>
+        public async Task<T> ShowTopTabAsync<T>(Func<T, Task> beforeLoad = null) where T : UserControl, ICloseablePage
+        {
+            T panel = App.ServiceProvider.GetService<T>();
+            await beforeLoad?.Invoke(panel);
+            topTab.Content = panel;
+            ViewModel.SetTabVisiable(false);
+            TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
+            panel.RequestToClose += (s, e) =>
+            {
+                topTab.Content = null;
+                ViewModel.SetTabVisiable(true);
+                tcs.SetResult(panel);
+            };
+            return await tcs.Task;
+        }
+
+        /// <summary>
+        /// 移除一项Tab
+        /// </summary>
+        /// <param name="content">TabItem的内容，页面</param>
+        /// <exception cref="ArgumentException"></exception>
+        public void RemoveTab(object content)
+        {
+            var tabItem = tab.Items.Cast<TabItem>().Where(p => p.Content == content).FirstOrDefault();
+            if (tabItem != null)
+            {
+                tab.Items.Remove(tabItem);
+            }
+            throw new ArgumentException();
+        }
+
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<AddTaskWindow>().Show();
+            AddNewTab<AddTaskPage>();
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
@@ -112,9 +175,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void LogsButton_Click(object sender, RoutedEventArgs e)
         {
-            var win = App.ServiceProvider.GetService<LogsWindow>();
-            win.Owner = this;
-            win.Show();
+            AddNewTab<LogsPage>();
         }
 
         protected override void OnDragOver(DragEventArgs e)
@@ -129,6 +190,10 @@ namespace SimpleFFmpegGUI.WPF
         protected override async void OnDrop(DragEventArgs e)
         {
             base.OnDrop(e);
+            if (e.GetPosition(this).X > (Content as Grid).ColumnDefinitions[0].ActualWidth && tab.SelectedIndex >= 0)
+            {
+                return;
+            }
             IEnumerable<string> files = e.Data.GetData(DataFormats.FileDrop) as string[];
             files = files.Where(p => File.Exists(p));
             if (files.Any())
@@ -141,19 +206,19 @@ namespace SimpleFFmpegGUI.WPF
                     .ToList();
                 items.Add(new SelectDialogItem("查询信息", "查看媒体的元数据信息"));
                 int typeCount = Enum.GetValues(typeof(TaskType)).Length;
-
+                this.Activate();
                 var index = await CommonDialog.ShowSelectItemDialogAsync("选择操作", items);
+                if (index == -1)
+                {
+                    return;
+                }
                 if (index < typeCount)
                 {
-                    var dialog = App.ServiceProvider.GetService<AddTaskWindow>();
-                    dialog.SetFiles(files, (TaskType)index);
-                    dialog.Show();
+                    AddNewTab<AddTaskPage>(beforeLoad: p => p.SetFiles(files, (TaskType)index));
                 }
                 else if (index == typeCount)
                 {
-                    var dialog = App.ServiceProvider.GetService<MediaInfoWindow>();
-                    dialog.SetFile(files.First());
-                    dialog.Show();
+                    AddNewTab<MediaInfoPage>(beforeLoad: p => p.SetFile(files.First()));
                 }
             }
         }
@@ -183,22 +248,35 @@ namespace SimpleFFmpegGUI.WPF
 
         private void MediaInfoButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<MediaInfoWindow>().Show();
+            AddNewTab<MediaInfoPage>();
         }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<SettingWindow>().ShowDialog(this);
+            AddNewTab<SettingPage>();
         }
 
         private void TasksButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<TasksWindow>().ShowDialog(this);
+            AddNewTab<TasksPage>();
         }
 
         private void PresetsButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<PresetsWindow>().ShowDialog(this);
+            AddNewTab<PresetsPage>();
+        }
+
+        private void CloseTabButton_Click(object sender, RoutedEventArgs e)
+        {
+            DependencyObject obj = e.Source as DependencyObject;
+            while (obj != null)
+            {
+                obj = VisualTreeHelper.GetParent(obj);
+                if (obj is TabItem item)
+                {
+                    tab.Items.Remove(item);
+                }
+            }
         }
     }
 }

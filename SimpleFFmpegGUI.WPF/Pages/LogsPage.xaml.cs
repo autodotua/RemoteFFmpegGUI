@@ -24,11 +24,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Pages
 {
-    public class LogsWindowViewModel : INotifyPropertyChanged
+    public class LogsPageViewModel : INotifyPropertyChanged
     {
-        public LogsWindowViewModel()
+        public LogsPageViewModel()
         {
             Tasks = TaskManager.GetTasks().List.Adapt<List<UITaskInfo>>();
         }
@@ -77,7 +77,7 @@ namespace SimpleFFmpegGUI.WPF
 
         public void FillLogs()
         {
-            Logs = LogManager.GetLogs(type: Type, taskId: SelectedTask?.Id??0, from: From, to: To).List;
+            Logs = LogManager.GetLogs(type: Type, taskId: SelectedTask?.Id ?? 0, from: From, to: To).List;
         }
 
         private int typeIndex;
@@ -99,13 +99,13 @@ namespace SimpleFFmpegGUI.WPF
     }
 
     /// <summary>
-    /// Interaction logic for LogsWindow.xaml
+    /// Interaction logic for LogsPage.xaml
     /// </summary>
-    public partial class LogsWindow : Window
+    public partial class LogsPage : UserControl
     {
-        public LogsWindowViewModel ViewModel { get; set; }
+        public LogsPageViewModel ViewModel { get; set; }
 
-        public LogsWindow(LogsWindowViewModel viewModel)
+        public LogsPage(LogsPageViewModel viewModel)
         {
             ViewModel = viewModel;
             DataContext = ViewModel;

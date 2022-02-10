@@ -10,6 +10,7 @@ using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.Pages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,11 +35,11 @@ using System.Windows.Shapes;
 using Path = System.IO.Path;
 using Size = System.Drawing.Size;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Pages
 {
-    public class ClipWindowViewModel : INotifyPropertyChanged
+    public class CutPageViewModel : INotifyPropertyChanged
     {
-        public ClipWindowViewModel()
+        public CutPageViewModel()
         {
         }
 
@@ -125,22 +126,23 @@ namespace SimpleFFmpegGUI.WPF
     }
 
     /// <summary>
-    /// Interaction logic for ClipWindow.xaml
+    /// Interaction logic for CutPage.xaml
     /// </summary>
-    public partial class ClipWindow : Window
+    public partial class CutPage : UserControl, ICloseablePage
     {
-        public ClipWindowViewModel ViewModel { get; set; }
+        private bool ok = false;
+        public CutPageViewModel ViewModel { get; set; }
 
-        //private TimeSpan length;
-        //private double fps;
-
-        public ClipWindow(ClipWindowViewModel viewModel)
+        public CutPage(CutPageViewModel viewModel)
         {
             InitializeComponent();
             ViewModel = viewModel;
             DataContext = ViewModel;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+            Unloaded += (s, e) => media.Close();
         }
+
+        public event EventHandler RequestToClose;
 
         public async Task SetVideoAsync(string path, TimeSpan? from, TimeSpan? to)
         {
@@ -196,7 +198,7 @@ namespace SimpleFFmpegGUI.WPF
             await media.Play();
         }
 
-        protected async override void OnPreviewKeyDown(KeyEventArgs e)
+        protected override async void OnPreviewKeyDown(KeyEventArgs e)
         {
             base.OnPreviewKeyDown(e);
             switch (e.Key)
@@ -254,12 +256,6 @@ namespace SimpleFFmpegGUI.WPF
             this.CreateMessage().QueueSuccess("已将结束时间设置为" + ViewModel.To.ToString(FindResource("TimeSpanFormat") as string));
         }
 
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            base.OnClosing(e);
-            media.Close();
-        }
-
         private void Slider_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
@@ -267,12 +263,21 @@ namespace SimpleFFmpegGUI.WPF
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            ok = true;
+            Debug.Assert(RequestToClose != null);
+            RequestToClose(this, new EventArgs());
         }
 
-        public (TimeSpan From, TimeSpan To) GetClipTime()
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            return (ViewModel.From, ViewModel.To);
+            ok = false;
+            Debug.Assert(RequestToClose != null);
+            RequestToClose(this, new EventArgs());
+        }
+
+        public (TimeSpan From, TimeSpan To)? GetTime()
+        {
+            return ok ? (ViewModel.From, ViewModel.To) : null;
         }
 
         private async void JumpButton_Click(object sender, RoutedEventArgs e)

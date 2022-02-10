@@ -6,6 +6,7 @@ using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF;
 using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.Pages;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -92,10 +93,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void CloneButton_Click(object sender, RoutedEventArgs e)
         {
-            AddTaskWindow win = App.ServiceProvider.GetService<AddTaskWindow>();
-            win.SetAsClone(((sender as FrameworkElement).DataContext as UITaskInfo).ToTask());
-            win.Owner = Window.GetWindow(this);
-            win.Show();
+            this.GetWindow<MainWindow>().AddNewTab<AddTaskPage>(beforeLoad:
+                p => p.SetAsClone(((sender as FrameworkElement).DataContext as UITaskInfo).ToTask()));
         }
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
@@ -135,7 +134,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             scr.Content = panel;
             Window win = new Window()
             {
-                Owner = Window.GetWindow(this),
+                Owner = this.GetWindow(),
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Content = scr,
                 Width = 600,
@@ -179,9 +178,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             var task = ViewModel.Tasks.SelectedTask;
             Debug.Assert(task != null);
-            var logWin = App.ServiceProvider.GetService<LogsWindow>();
-            logWin.FillLogs(task.Id);
-            logWin.Show();
+
+            this.GetWindow<MainWindow>().AddNewTab<LogsPage>(beforeLoad: p => p.FillLogs(task.Id));
         }
 
         private void OpenInputFileOrFolder(InputArguments input, bool folder)

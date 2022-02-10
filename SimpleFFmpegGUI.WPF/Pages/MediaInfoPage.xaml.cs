@@ -24,11 +24,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SimpleFFmpegGUI.WPF
+namespace SimpleFFmpegGUI.WPF.Pages
 {
-    public class MediaInfoWindowViewModel : INotifyPropertyChanged
+    public class MediaInfoPageViewModel : INotifyPropertyChanged
     {
-        public MediaInfoWindowViewModel()
+        public MediaInfoPageViewModel()
         {
         }
 
@@ -83,13 +83,13 @@ namespace SimpleFFmpegGUI.WPF
     }
 
     /// <summary>
-    /// Interaction logic for MediaInfoWindow.xaml
+    /// Interaction logic for MediaInfoPage.xaml
     /// </summary>
-    public partial class MediaInfoWindow : Window
+    public partial class MediaInfoPage : UserControl
     {
-        public MediaInfoWindowViewModel ViewModel { get; set; }
+        public MediaInfoPageViewModel ViewModel { get; set; }
 
-        public MediaInfoWindow(MediaInfoWindowViewModel viewModel)
+        public MediaInfoPage(MediaInfoPageViewModel viewModel)
         {
             ViewModel = viewModel;
             DataContext = ViewModel;
@@ -141,7 +141,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this).GetFilePath();
+            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
             if (path != null)
             {
                 ViewModel.FilePath = path;
