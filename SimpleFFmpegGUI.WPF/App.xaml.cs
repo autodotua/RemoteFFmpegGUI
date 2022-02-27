@@ -1,4 +1,7 @@
 ﻿using FzLib.Program.Runtime;
+using log4net;
+using log4net.Appender;
+using log4net.Layout;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.WPF.Model;
@@ -15,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
 namespace SimpleFFmpegGUI.WPF
 {
     /// <summary>
@@ -22,14 +26,13 @@ namespace SimpleFFmpegGUI.WPF
     /// </summary>
     public partial class App : Application
     {
-        public static ServiceProvider ServiceProvider { get; private set; }
-
         public static DateTime AppStartTime { get; } = DateTime.Now;
-
+        public static ILog Log { get; private set; }
+        public static ServiceProvider ServiceProvider { get; private set; }
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
+            InitializeLogs();
 #if !DEBUG
 
             UnhandledException.RegistAll();
@@ -41,21 +44,8 @@ namespace SimpleFFmpegGUI.WPF
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
             ServiceProvider = serviceCollection.BuildServiceProvider();
-
             MainWindow = ServiceProvider.GetService<MainWindow>();
             MainWindow.Show();
-        }
-
-        private void UnhandledException_UnhandledExceptionCatched(object sender, FzLib.Program.Runtime.UnhandledExceptionEventArgs e)
-        {
-            try
-            {
-                File.AppendAllText("error.log", DateTime.Now.ToString() + Environment.NewLine + e.Exception.ToString() + Environment.NewLine + Environment.NewLine);
-            }
-            catch (Exception ex)
-            {
-            }
-            MessageBox.Show(e.Exception.ToString(), FzLib.Program.App.ProgramName + " - 未捕获的异常", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void ConfigureServices(IServiceCollection services)
@@ -95,6 +85,42 @@ namespace SimpleFFmpegGUI.WPF
             services.AddTransient<FileIOPanelViewModel>();
             services.AddTransient<PresetsPanelViewModel>();
             services.AddTransient<StatusPanelViewModel>();
+        }
+
+        private void InitializeLogs()
+        {
+            Log = log4net.LogManager.GetLogger(GetType());
+            Log.Info("程序启动");
+
+            Logger.Log += Logger_Log;
+            void Logger_Log(object sender, LogEventArgs e)
+            {
+                switch (e.Log.Type)
+                {
+                    case 'E': Log.Error(e.Log.Message); break;
+                    case 'W': Log.Warn(e.Log.Message); break;
+                    case 'I': Log.Info(e.Log.Message); break;
+                }
+            }
+        }
+
+        private void UnhandledException_UnhandledExceptionCatched(object sender, FzLib.Program.Runtime.UnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                Log.Error(e.Exception);
+                Dispatcher.Invoke(() =>
+                {
+                    var result = MessageBox.Show("程序发生异常，可能出现数据丢失等问题。是否关闭？" + Environment.NewLine + Environment.NewLine + e.Exception.ToString(), FzLib.Program.App.ProgramName+" - 未捕获的异常", MessageBoxButton.YesNo, MessageBoxImage.Error);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        Shutdown(-1);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }
