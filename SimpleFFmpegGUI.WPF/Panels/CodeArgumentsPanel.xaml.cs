@@ -233,7 +233,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             InitializeComponent();
         }
 
-        private bool canApplyDefaultPreset = false;
+        private bool canApplyDefaultPreset = true;
 
         public void SetAsClone()
         {
