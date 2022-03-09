@@ -2,6 +2,7 @@
 using FzLib.DataStorage.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -73,6 +74,16 @@ namespace SimpleFFmpegGUI.WPF
             get => startQueueAfterAddTask;
             set => this.SetValueAndNotify(ref startQueueAfterAddTask, value, nameof(StartQueueAfterAddTask));
         }
+
+        private bool rememberLastArguments = true;
+
+        public bool RememberLastArguments
+        {
+            get => rememberLastArguments;
+            set => this.SetValueAndNotify(ref rememberLastArguments, value, nameof(RememberLastArguments));
+        }
+
+        public Dictionary<TaskType, OutputArguments> LastOutputArguments { get; set; } = new Dictionary<TaskType, OutputArguments>();
     }
 
     public class RemoteHost

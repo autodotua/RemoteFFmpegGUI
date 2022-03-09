@@ -117,6 +117,7 @@ namespace SimpleFFmpegGUI.WPF
             if (tabItem != null)
             {
                 tab.Items.Remove(tabItem);
+                return;
             }
             throw new ArgumentException();
         }

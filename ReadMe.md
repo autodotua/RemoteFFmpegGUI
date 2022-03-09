@@ -25,7 +25,7 @@
 |项目名|项目名（中文）|介绍|
 |-|-|-|
 |Core|核心|提供Host和WPF、Web的契约以及公共方法|
-|Host|主机|对FFmpeg进行包装，实现其功能，并通过NamedPipe进行发布|
+|Host|主机|通过NamedPipe向WebAPI发布服务|
 |WebAPI|服务端|使用ASP.NetCore实现的服务器|
 |Web|Web客户端|使用Vue.js实现的网页端|
 |WPF|桌面GUI|桌面端的GUI实现|
@@ -37,8 +37,8 @@
 
 1. 确保安装了 .NET 6 SDK：
 2. 确保安装了npm（Node.js）：
-3. 确保在`bin`目录中放置了ffmpeg二进制文件（shared版）：[下载](https://www.ffmpeg.org/download.html) 。测试使用的版本为4.4.1：[下载](https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-4.4.1-full_build-shared.7z) 。共有三个exe文件和8个dll文件。
-4. 确保在`/bin`目录中放置了MediaInfo.dll：[下载](https://mediaarea.net/en/MediaInfo/Download)
+3. 确保在根目录下（与ReadMe同级目录）的`bin`目录中放置了ffmpeg二进制文件（shared版）：[下载页面](https://www.ffmpeg.org/download.html) 。测试使用的版本为4.4.1：[下载](https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-4.4.1-full_build-shared.7z) 。共有三个exe文件和8个dll文件。
+4. 确保在根目录（与ReadMe同级目录）下的`bin`目录中放置了MediaInfo.dll：[下载页面](https://mediaarea.net/en/MediaInfo/Download)
 
 ### 自动构建
 
@@ -75,7 +75,37 @@
     --help       显示帮助信息
     ```
 
-## 开发注意事项
+## 开发
+
+### 项目结构
+
+- Core：提供Host和WPF、Web的契约以及公共方法
+  - Model：数据库实体和相关非结构化数据模型
+  - Dto：用于API与Host交换、前后端交换的数据结构
+  - FFMpegArgumentExtension：用于FFMpegCore库上的一些扩展参数
+  - Manager：对数据和服务的管理
+  - IPipeService：API与Host之间通信的管道契约
+  - Logger：日志管理
+  - MediaInfoModule：调用MediaInfo.dll
+- Host：通过NamedPipe向WebAPI发布服务
+  - ConsoleLogger：命令行的Logger
+  - FtpManager：FTP相关操作
+  - PipeService：对IPipeService的实现，向WebAPI提供服务
+- WebAPI：使用ASP.NetCore实现的服务器
+  - Controllers：控制器，提供Web接口
+  - Converter：使用JSON序列化数据时用到的转换器
+  - Dto：与前端交换数据时用到的数据结构
+  - PipeClient：用于调用Host发布的服务
+  - TokenFilter：在处理请求之前进行拦截，验证是否带有正确的Token
+- Web：使用Vue.js实现的网页端
+- WPF：桌面端的GUI实现
+  - Model：桌面GUI中用到的一些数据结构
+  - Pages：在主界面右侧显示的页面
+  - Panels：组成页面或窗口的、具有比较单一的功能的面板
+  - MainWindow：主窗口
+
+
+### 注意事项
 
 - Clone仓库后，只需安装好相关SDK，即可进行构建，无需额外设置。
 - `libs`目录中二进制文件来自于：[FzLib](https://github.com/autodotua/FzLib)和[Wpf.Notifications](https://github.com/autodotua/Wpf.Notifications)，均为开源产品。

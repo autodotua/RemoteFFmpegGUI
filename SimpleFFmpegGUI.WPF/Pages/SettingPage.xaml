@@ -15,40 +15,50 @@
     <Grid Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="4" />
+            <RowDefinition Height="16" />
             <RowDefinition Height="*" />
             <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        <GroupBox Header="基本">
+            <ui:SimpleStackPanel
+                Orientation="Vertical"
+                Spacing="8">
+                <CheckBox
+                    Content="平滑滚动"
+                    IsChecked="{Binding SmoothScroll}" />
 
-        <ui:ToggleSwitch
-            IsOn="{Binding SmoothScroll}"
-            OffContent="关闭平滑滚动"
-            OnContent="开启平滑滚动" />
-        <TextBlock
+                <CheckBox
+                    Content="记住上次的输出参数"
+                    IsChecked="{Binding RememberLastArguments}" />
+                <TextBlock
+                    Opacity="0.5"
+                    Text="开启该选项时，默认预设功能将不可用"
+                    Visibility="{Binding RememberLastArguments, Converter={StaticResource Bool2VisibilityConverter}}" />
+            </ui:SimpleStackPanel>
+        </GroupBox>
+        <GroupBox
             Grid.Row="2"
-            Text="远程管理主机：" />
-        <DataGrid
-            Grid.Row="4"
-            c:SmoothScrollViewerHelper.SmoothScroll="{Binding SmoothScroll}"
-            AutoGenerateColumns="False"
-            CanUserAddRows="False"
-            CanUserDeleteRows="True"
-            ItemsSource="{Binding ObservableRemoteHosts, UpdateSourceTrigger=PropertyChanged}">
-            <DataGrid.Columns>
-                <DataGridTextColumn
-                    Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                    Header="名称" />
-                <DataGridTextColumn
-                    Binding="{Binding Address, UpdateSourceTrigger=PropertyChanged}"
-                    Header="地址" />
-                <DataGridTextColumn
-                    Binding="{Binding Token, UpdateSourceTrigger=PropertyChanged}"
-                    Header="连接密码" />
-            </DataGrid.Columns>
-        </DataGrid>
+            Header="远程管理主机">
+            <DataGrid
+                c:SmoothScrollViewerHelper.SmoothScroll="{Binding SmoothScroll}"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="True"
+                ItemsSource="{Binding ObservableRemoteHosts, UpdateSourceTrigger=PropertyChanged}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                        Header="名称" />
+                    <DataGridTextColumn
+                        Binding="{Binding Address, UpdateSourceTrigger=PropertyChanged}"
+                        Header="地址" />
+                    <DataGridTextColumn
+                        Binding="{Binding Token, UpdateSourceTrigger=PropertyChanged}"
+                        Header="连接密码" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
         <ui:CommandBar
             Grid.Row="6"
             Margin="-8"
@@ -60,7 +70,7 @@
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Click="OKButton_Click"
-                Label="完成">
+                Label="保存">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE73E;" />
                 </ui:AppBarButton.Icon>

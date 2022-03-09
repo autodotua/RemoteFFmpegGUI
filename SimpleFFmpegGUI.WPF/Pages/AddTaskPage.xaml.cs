@@ -1,5 +1,6 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
 using FzLib;
+using FzLib.Collection;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.FzExtension.CommonDialog;
@@ -140,7 +141,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
                     await Task.Run(() => App.ServiceProvider.GetService<QueueManager>().StartQueue());
                     this.CreateMessage().QueueSuccess("已开始队列");
                 }
-                App.ServiceProvider.GetService<MainWindow>().BringToFront();
+                SaveAsLastOutputArguments(args);
             }
             catch (Exception ex)
             {
@@ -226,6 +227,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
                 {
                     fileIOPanel.Reset();
                 }
+                SaveAsLastOutputArguments(args);
                 this.CreateMessage().QueueSuccess("已加入到远程主机" + host.Name);
             }
             catch (Exception ex)
@@ -265,11 +267,15 @@ namespace SimpleFFmpegGUI.WPF.Pages
             }
         }
 
-        //protected override void OnClosed(EventArgs e)
-        //{
-        //    base.OnClosed(e);
-        //    Config.Instance.Save();
-        //}
+        private void SaveAsLastOutputArguments(OutputArguments arguments)
+        {
+            if (!Config.Instance.RememberLastArguments)
+            {
+                return;
+            }
+            Config.Instance.LastOutputArguments.AddOrSetValue(ViewModel.Type, arguments);
+            Config.Instance.Save();
+        }
 
         private void ClearFilesButton_Click(object sender, RoutedEventArgs e)
         {

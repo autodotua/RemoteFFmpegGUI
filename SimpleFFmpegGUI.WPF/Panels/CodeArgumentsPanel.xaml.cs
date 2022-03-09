@@ -1,4 +1,5 @@
 ﻿using FzLib;
+using FzLib.Collection;
 using Mapster;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -242,13 +243,29 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public void Update(TaskType type)
         {
-            var defaultPreset = PresetManager.GetDefaultPreset(type);
-            if (defaultPreset != null && canApplyDefaultPreset)
+            bool updated = false;
+            if (canApplyDefaultPreset)//允许修改参数
             {
-                ViewModel.Update(type, defaultPreset.Arguments);
-                this.CreateMessage().QueueSuccess($"已加载默认预设“{defaultPreset.Name}”");
+                if (Config.Instance.RememberLastArguments)//记住上次输出参数
+                {
+                    if (Config.Instance.LastOutputArguments.GetOrDefault(type) is OutputArguments lastArguments)
+                    {
+                        ViewModel.Update(type, lastArguments);
+                        this.CreateMessage().QueueSuccess($"已加载上次任务的参数");
+                        updated = true;
+                    }
+                }
+                if (!updated)//记住上次输出参数为False，或不存在上次的参数
+                {
+                    if (PresetManager.GetDefaultPreset(type) is CodePreset defaultPreset)
+                    {
+                        ViewModel.Update(type, defaultPreset.Arguments);
+                        this.CreateMessage().QueueSuccess($"已加载默认预设“{defaultPreset.Name}”");
+                        updated = true;
+                    }
+                }
             }
-            else
+            if (!updated)
             {
                 ViewModel.Update(type);
             }

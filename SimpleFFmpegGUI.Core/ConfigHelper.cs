@@ -10,6 +10,7 @@ namespace SimpleFFmpegGUI
     public static class ConfigHelper
     {
         private const string TempDirKey = nameof(TempDir);
+        //private const string RememberLastArgumentsKey = nameof(RememberLastArguments);
 
         public static string TempDir
         {
@@ -28,9 +29,25 @@ namespace SimpleFFmpegGUI
             set
             {
                 using var db = FFmpegDbContext.GetNew();
-                db.Configs.Add(new Config(TempDir, value));
+                db.Configs.Update(new Config(TempDir, value));
                 db.SaveChanges();
             }
         }
+
+        //public static bool RememberLastArguments
+        //{
+        //    get
+        //    {
+        //        using var db = FFmpegDbContext.GetNew();
+        //        var value = db.Configs.FirstOrDefault(p => p.Key == TempDirKey)?.Value ?? bool.FalseString;
+        //        return value == bool.TrueString;
+        //    }
+        //    set
+        //    {
+        //        using var db = FFmpegDbContext.GetNew();
+        //        db.Configs.Update(new Config(RememberLastArgumentsKey, value.ToString()));
+        //        db.SaveChanges();
+        //    }
+        //}
     }
 }
