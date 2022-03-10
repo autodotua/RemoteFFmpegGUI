@@ -33,10 +33,9 @@
         </Grid.RowDefinitions>
         <ScrollViewer
             xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+            xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
             Padding="0,0,18,0"
-               xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
             c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
-
             VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Inputs}">
                 <ItemsControl.ItemTemplate>

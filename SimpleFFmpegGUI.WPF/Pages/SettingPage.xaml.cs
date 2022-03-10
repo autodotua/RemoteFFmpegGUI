@@ -2,11 +2,13 @@
 using FzLib;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.FzExtension;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -36,13 +38,15 @@ namespace SimpleFFmpegGUI.WPF.Pages
             this.Notify(nameof(ObservableRemoteHosts));
         }
 
+        public IEnumerable DefaultOutputDirTypes => Enum.GetValues<DefaultOutputDirType>();
+
         public ObservableCollection<RemoteHost> ObservableRemoteHosts { get; set; }
     }
 
     /// <summary>
     /// Interaction logic for SettingPage.xaml
     /// </summary>
-    public partial class SettingPage : UserControl
+    public partial class SettingPage : UserControl, ICloseablePage
     {
         public SettingPage(SettingPageViewModel viewModel)
         {
@@ -53,12 +57,18 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         public SettingPageViewModel ViewModel { get; set; }
 
+        public event EventHandler RequestToClose;
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            RequestToClose?.Invoke(sender, e);
+        }
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.RemoteHosts = ViewModel.ObservableRemoteHosts.ToList();
             ViewModel.Adapt(Config.Instance);
             Config.Instance.Save();
-            this.GetWindow<MainWindow>().RemoveTab(this);
+            RequestToClose?.Invoke(sender, e);
         }
 
         private void AddRemoteHost_Click(object sender, RoutedEventArgs e)
@@ -69,6 +79,16 @@ namespace SimpleFFmpegGUI.WPF.Pages
         private void CommandBar_MouseEnter(object sender, MouseEventArgs e)
         {
             Keyboard.ClearFocus();
+        }
+
+        private void BrowseSpecialDirPathButton_Click(object sender, RoutedEventArgs e)
+        {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            var path = dialog.GetFolderPath();
+            if(path != null)
+            {
+                ViewModel.DefaultOutputDirSpecialDirPath = path;
+            }
         }
     }
 }

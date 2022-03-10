@@ -93,7 +93,10 @@ namespace SimpleFFmpegGUI.WPF
         public async Task<T> ShowTopTabAsync<T>(Func<T, Task> beforeLoad = null) where T : UserControl, ICloseablePage
         {
             T panel = App.ServiceProvider.GetService<T>();
-            await beforeLoad?.Invoke(panel);
+            if (beforeLoad != null)
+            {
+                await beforeLoad(panel);
+            }
             topTab.Content = panel;
             ViewModel.SetTabVisiable(false);
             TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
@@ -252,9 +255,9 @@ namespace SimpleFFmpegGUI.WPF
             AddNewTab<MediaInfoPage>();
         }
 
-        private void SettingButton_Click(object sender, RoutedEventArgs e)
+        private async void SettingButton_Click(object sender, RoutedEventArgs e)
         {
-            AddNewTab<SettingPage>();
+            await ShowTopTabAsync<SettingPage>();
         }
 
         private void TasksButton_Click(object sender, RoutedEventArgs e)

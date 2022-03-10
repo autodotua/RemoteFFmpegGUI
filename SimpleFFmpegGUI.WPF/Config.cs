@@ -84,6 +84,26 @@ namespace SimpleFFmpegGUI.WPF
         }
 
         public Dictionary<TaskType, OutputArguments> LastOutputArguments { get; set; } = new Dictionary<TaskType, OutputArguments>();
+        private DefaultOutputDirType defaultOutputDirType = DefaultOutputDirType.InputDir;
+        public DefaultOutputDirType DefaultOutputDirType
+        {
+            get => defaultOutputDirType;
+            set => this.SetValueAndNotify(ref defaultOutputDirType, value, nameof(DefaultOutputDirType));
+        }
+
+        private string defaultOutputDirInputNewDirName = "output";
+        public string DefaultOutputDirInputNewDirName
+        {
+            get => defaultOutputDirInputNewDirName;
+            set => this.SetValueAndNotify(ref defaultOutputDirInputNewDirName, value, nameof(DefaultOutputDirInputNewDirName));
+        }
+        private string defaultOutputDirSpecialDirPath = "C:\\output";
+        public string DefaultOutputDirSpecialDirPath
+        {
+            get => defaultOutputDirSpecialDirPath;
+            set => this.SetValueAndNotify(ref defaultOutputDirSpecialDirPath, value, nameof(DefaultOutputDirSpecialDirPath));
+        }
+
     }
 
     public class RemoteHost
@@ -91,5 +111,15 @@ namespace SimpleFFmpegGUI.WPF
         public string Name { get; set; }
         public string Address { get; set; }
         public string Token { get; set; }
+    }
+
+    public enum DefaultOutputDirType
+    {
+        [Description("输入文件所在文件夹")]
+        InputDir,
+        [Description("输入文件下指定文件夹")]
+        InputNewDir,
+        [Description("指定文件夹")]
+        SpecialDir
     }
 }
