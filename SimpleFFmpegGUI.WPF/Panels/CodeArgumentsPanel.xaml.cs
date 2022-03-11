@@ -241,7 +241,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             canApplyDefaultPreset = false;
         }
 
-        public void Update(TaskType type)
+        public async void Update(TaskType type)
         {
             bool updated = false;
             if (canApplyDefaultPreset)//允许修改参数
@@ -251,7 +251,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                     if (Config.Instance.LastOutputArguments.GetOrDefault(type) is OutputArguments lastArguments)
                     {
                         ViewModel.Update(type, lastArguments);
-                        this.CreateMessage().QueueSuccess($"已加载上次任务的参数");
+                        (await this.CreateMessageAsync()).QueueSuccess($"已加载上次任务的参数");
                         updated = true;
                     }
                 }
@@ -260,7 +260,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                     if (PresetManager.GetDefaultPreset(type) is CodePreset defaultPreset)
                     {
                         ViewModel.Update(type, defaultPreset.Arguments);
-                        this.CreateMessage().QueueSuccess($"已加载默认预设“{defaultPreset.Name}”");
+                        (await this.CreateMessageAsync()).QueueSuccess($"已加载默认预设“{defaultPreset.Name}”");
                         updated = true;
                     }
                 }

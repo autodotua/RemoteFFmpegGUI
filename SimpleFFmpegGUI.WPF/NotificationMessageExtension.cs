@@ -1,9 +1,11 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
 using Enterwell.Clients.Wpf.Notifications.Controls;
+using FzLib.WPF;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.WPF;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -24,13 +26,13 @@ namespace SimpleFFmpegGUI.WPF
         public static void QueueError(this NotificationMessageBuilder builder, string message, Exception ex)
         {
             builder.Background("#B71C1C")
-                       .HasMessage(message+"："+ex.Message)
+                       .HasMessage(message + "：" + ex.Message)
                        .Animates(true)
                        .Dismiss().WithDelay(5000)
                        .Dismiss().WithButton("详情", b => CommonDialog.ShowErrorDialogAsync(ex))
                        .Queue();
         }
-           public static void QueueError(this NotificationMessageBuilder builder, string message)
+        public static void QueueError(this NotificationMessageBuilder builder, string message)
         {
             builder.Background("#B71C1C")
                        .HasMessage(message)
@@ -39,8 +41,25 @@ namespace SimpleFFmpegGUI.WPF
                        .Queue();
         }
 
-        public static NotificationMessageBuilder CreateMessage(this DependencyObject element)
+        public static async Task<NotificationMessageBuilder> CreateMessageAsync(this FrameworkElement element)
         {
+            ArgumentNullException.ThrowIfNull(element);
+            await element.WaitForLoadedAsync();
+            return CreateMessage(element);
+        }
+        public static NotificationMessageBuilder CreateMessage(this FrameworkElement element)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+            //if(!element.IsLoaded)
+            //{
+            //    void ElementLoaded(object sender,EventArgs e)
+            //    {
+            //        element.Loaded -= ElementLoaded;
+            //        CreateMessage(element);
+            //    }
+            //    element.Loaded += ElementLoaded;
+            //    return;
+            //}
             var window = Window.GetWindow(element);
             if (window == null)
             {
