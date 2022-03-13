@@ -91,11 +91,11 @@ namespace SimpleFFmpegGUI.WPF
             set => this.SetValueAndNotify(ref defaultOutputDirType, value, nameof(DefaultOutputDirType));
         }
 
-        private string defaultOutputDirInputNewDirName = "output";
-        public string DefaultOutputDirInputNewDirName
+        private string defaultOutputDirInputSubDirName = "output";
+        public string DefaultOutputDirInputSubDirName
         {
-            get => defaultOutputDirInputNewDirName;
-            set => this.SetValueAndNotify(ref defaultOutputDirInputNewDirName, value, nameof(DefaultOutputDirInputNewDirName));
+            get => defaultOutputDirInputSubDirName;
+            set => this.SetValueAndNotify(ref defaultOutputDirInputSubDirName, value, nameof(DefaultOutputDirInputSubDirName));
         }
         private string defaultOutputDirSpecialDirPath = "C:\\output";
         public string DefaultOutputDirSpecialDirPath

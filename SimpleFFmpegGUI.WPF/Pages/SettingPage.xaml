@@ -53,7 +53,7 @@
                     <TextBox
                         Width="360"
                         ui:ControlHelper.Header="指定文件夹的名称"
-                        Text="{Binding DefaultOutputDirInputNewDirName}"
+                        Text="{Binding DefaultOutputDirInputSubDirName}"
                         Visibility="{Binding DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=InputNewDir}" />
                     <TextBox
                         Width="360"
@@ -64,8 +64,7 @@
                         VerticalAlignment="Bottom"
                         Click="BrowseSpecialDirPathButton_Click"
                         Visibility="{Binding DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=SpecialDir}">
-
-                        <ui:SymbolIcon Symbol="BrowsePhotos" />
+                        <ui:SymbolIcon Symbol="OpenFile" />
                     </Button>
                 </ui:SimpleStackPanel>
             </ui:SimpleStackPanel>

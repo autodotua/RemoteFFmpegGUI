@@ -108,24 +108,30 @@ namespace SimpleFFmpegGUI.WPF.Pages
             try
             {
                 List<InputArguments> inputs = fileIOPanel.GetInputs();
-                string output = fileIOPanel.GetOutput();
                 OutputArguments args = argumentsPanel.GetOutputArguments();
                 switch (ViewModel.Type)
                 {
-                    case TaskType.Code:
+                    case TaskType.Code://需要将输入文件单独加入任务
                         foreach (var input in inputs)
                         {
                             TaskInfo task = null;
-                            await Task.Run(() => task = TaskManager.AddTask(TaskType.Code, new List<InputArguments>() { input }, output, args));
+                            await Task.Run(() => task = TaskManager.AddTask(TaskType.Code, new List<InputArguments>() { input }, fileIOPanel.GetOutput(input), args));
                             Dispatcher.Invoke(() => App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task)));
                         }
                         this.CreateMessage().QueueSuccess($"已加入{inputs.Count}个任务队列");
                         break;
-
+                    case TaskType.Custom or TaskType.Compare://不存在文件输出
+                        {
+                            TaskInfo task = null;
+                            await Task.Run(() => task = TaskManager.AddTask(ViewModel.Type, inputs, null, args));
+                            App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
+                            this.CreateMessage().QueueSuccess("已加入队列");
+                        }
+                        break;
                     default:
                         {
                             TaskInfo task = null;
-                            await Task.Run(() => task = TaskManager.AddTask(ViewModel.Type, inputs, output, args));
+                            await Task.Run(() => task = TaskManager.AddTask(ViewModel.Type, inputs, fileIOPanel.GetOutput(inputs[0]), args));
                             App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
                             this.CreateMessage().QueueSuccess("已加入队列");
                         }
@@ -211,8 +217,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
                         i.FilePath = System.IO.Path.GetFileName(i.FilePath);
                     }
                 }
-                string output = fileIOPanel.GetOutput();
-                output = string.IsNullOrEmpty(output) ? output : System.IO.Path.GetFileName(output);
+                string output = fileIOPanel.GetOutputFileName();
                 OutputArguments args = argumentsPanel.GetOutputArguments();
                 var data = new
                 {

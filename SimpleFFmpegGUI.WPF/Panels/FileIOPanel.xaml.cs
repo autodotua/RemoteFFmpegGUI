@@ -1,4 +1,5 @@
 ﻿using FzLib;
+using FzLib.WPF.Converters;
 using Mapster;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,11 +28,26 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Path = System.IO.Path;
 
 namespace SimpleFFmpegGUI.WPF.Panels
 {
     public class FileIOPanelViewModel : INotifyPropertyChanged
     {
+        private bool canChangeInputsCount;
+
+        private int maxInputsCount = int.MaxValue;
+
+        private int minInputsCount = 1;
+
+        private string outputDir;
+
+        private string outputFileName;
+
+        private bool showTimeClip;
+
+        private TaskType type;
+
         public FileIOPanelViewModel()
         {
             for (int i = 0; i < MinInputsCount; i++)
@@ -39,18 +55,38 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 Inputs.Add(new InputArgumentsDetail() { Index = i + 1, });
             }
             Inputs.CollectionChanged += Inputs_CollectionChanged;
+            Config.Instance.PropertyChanged += (s, e) => this.Notify(nameof(OutputDirPlaceholder));
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// 是否可以修改输入文件数量
+        /// </summary>
+        public bool CanChangeInputsCount
+        {
+            get => canChangeInputsCount;
+            set => this.SetValueAndNotify(ref canChangeInputsCount, value, nameof(CanChangeInputsCount));
         }
 
-        private int maxInputsCount = int.MaxValue;
+        /// <summary>
+        /// 是否可以设置输出文件名
+        /// </summary>
+        public bool CanSetOutputFileName => !(Type == TaskType.Code && Inputs.Count > 1);
 
+        public ObservableCollection<InputArgumentsDetail> Inputs { get; } = new ObservableCollection<InputArgumentsDetail>();
+
+        /// <summary>
+        /// 最多输入文件的个数
+        /// </summary>
         public int MaxInputsCount
         {
             get => maxInputsCount;
             set => this.SetValueAndNotify(ref maxInputsCount, value, nameof(MaxInputsCount));
         }
 
-        private int minInputsCount = 1;
-
+        /// <summary>
+        /// 最少输入文件的个数
+        /// </summary>
         public int MinInputsCount
         {
             get => minInputsCount;
@@ -68,42 +104,56 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
         }
 
-        private bool showTimeClip;
+        /// <summary>
+        /// 输出目录
+        /// </summary>
+        public string OutputDir
+        {
+            get => outputDir;
+            set => this.SetValueAndNotify(ref outputDir, value, nameof(OutputDir));
+        }
 
+        /// <summary>
+        /// 输出目录的提示
+        /// </summary>
+        public string OutputDirPlaceholder => "若为空，则保存到" +
+            Config.Instance.DefaultOutputDirType switch
+            {
+                DefaultOutputDirType.InputDir => DescriptionConverter.GetDescription(DefaultOutputDirType.InputDir),
+                DefaultOutputDirType.InputNewDir => $"输入文件同级的{Config.Instance.DefaultOutputDirInputSubDirName}目录",
+                DefaultOutputDirType.SpecialDir => Config.Instance.DefaultOutputDirSpecialDirPath,
+                _ => throw new NotImplementedException()
+            };
+        /// <summary>
+        /// 输出文件名
+        /// </summary>
+        public string OutputFileName
+        {
+            get => outputFileName;
+            set => this.SetValueAndNotify(ref outputFileName, value, nameof(OutputFileName));
+        }
+
+        /// <summary>
+        /// 是否可用视频分割
+        /// </summary>
         public bool ShowTimeClip
         {
             get => showTimeClip;
             set => this.SetValueAndNotify(ref showTimeClip, value, nameof(ShowTimeClip));
         }
 
-        private void Inputs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        /// <summary>
+        /// 任务类型
+        /// </summary>
+        public TaskType Type
         {
-            for (int i = 0; i < Inputs.Count; i++)
-            {
-                Inputs[i].Index = i + 1;
-                Inputs[i].CanDelete = Inputs.Count > MinInputsCount;
-            }
+            get => type;
+            set => this.SetValueAndNotify(ref type, value, nameof(Type), nameof(CanSetOutputFileName));
         }
 
-        public ObservableCollection<InputArgumentsDetail> Inputs { get; } = new ObservableCollection<InputArgumentsDetail>();
-        private string output;
-
-        public string Output
-        {
-            get => output;
-            set => this.SetValueAndNotify(ref output, value, nameof(Output));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private bool canChangeInputsCount;
-
-        public bool CanChangeInputsCount
-        {
-            get => canChangeInputsCount;
-            set => this.SetValueAndNotify(ref canChangeInputsCount, value, nameof(CanChangeInputsCount));
-        }
-
+        /// <summary>
+        /// 重置
+        /// </summary>
         public void Reset()
         {
             Inputs.Clear();
@@ -113,8 +163,13 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
         }
 
+        /// <summary>
+        /// 更新任务类型
+        /// </summary>
+        /// <param name="type"></param>
         public void Update(TaskType type)
         {
+            Type = type;
             CanChangeInputsCount = type is TaskType.Code or TaskType.Concat;
             MinInputsCount = type switch
             {
@@ -133,6 +188,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 TaskType.Code => true,
                 _ => false
             };
+
         }
 
         /// <summary>
@@ -153,8 +209,18 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 newInput.Update();
                 Inputs.Add(newInput);
             }
-            Output = output;
+            OutputDir = output;
             return inputs.Count <= MaxInputsCount;
+        }
+
+        private void Inputs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            for (int i = 0; i < Inputs.Count; i++)
+            {
+                Inputs[i].Index = i + 1;
+                Inputs[i].CanDelete = Inputs.Count > MinInputsCount;
+            }
+            this.Notify(nameof(CanSetOutputFileName));
         }
     }
 
@@ -167,6 +233,26 @@ namespace SimpleFFmpegGUI.WPF.Panels
         }
 
         public FileIOPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<FileIOPanelViewModel>();
+
+        public void AddInput()
+        {
+            if (ViewModel.Inputs.Count >= ViewModel.MaxInputsCount)
+            {
+                throw new NotSupportedException("无法继续增加输入文件");
+            }
+            ViewModel.Inputs.Add(new InputArgumentsDetail());
+        }
+
+        public void BrowseAndAddInput()
+        {
+            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
+            if (path != null)
+            {
+                var input = new InputArgumentsDetail();
+                input.FilePath = path;
+                ViewModel.Inputs.Add(input);
+            }
+        }
 
         public List<InputArguments> GetInputs()
         {
@@ -182,14 +268,122 @@ namespace SimpleFFmpegGUI.WPF.Panels
             return inputs.Cast<InputArguments>().ToList();
         }
 
-        public string GetOutput()
+        public string GetOutput(InputArguments inputArgs)
         {
-            return ViewModel.Output;
+            var input = inputArgs.FilePath;
+            string dir = ViewModel.OutputDir;
+            if (string.IsNullOrWhiteSpace(dir))//没有指定输出位置
+            {
+                dir = Config.Instance.DefaultOutputDirType switch
+                {
+                    DefaultOutputDirType.InputDir => Path.GetDirectoryName(input),
+                    DefaultOutputDirType.InputNewDir => Path.Combine(Path.GetDirectoryName(input), Config.Instance.DefaultOutputDirInputSubDirName),
+                    DefaultOutputDirType.SpecialDir => Config.Instance.DefaultOutputDirSpecialDirPath,
+                    _ => throw new NotImplementedException()
+                };
+
+            }
+            if (ViewModel.CanSetOutputFileName && !string.IsNullOrWhiteSpace(ViewModel.OutputFileName))
+            {
+                return Path.Combine(dir, ViewModel.OutputFileName);
+            }
+            return Path.Combine(dir, Path.GetFileName(input));
+        }
+        /// <summary>
+        /// 用于添加到远程主机，获取输出文件名
+        /// </summary>
+        /// <returns></returns>
+        public string GetOutputFileName()
+        {
+            if (ViewModel.CanSetOutputFileName)//需要可以设置输出文件名
+            {
+                if (!string.IsNullOrWhiteSpace(ViewModel.OutputFileName))//如果手动指定
+                {
+                    return ViewModel.OutputFileName;
+                }
+                if (ViewModel.Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath)).Any())//如果未手动指定并且存在输入文件
+                {
+                    return Path.GetFileName(ViewModel.Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath)).First().FilePath);
+                }
+            }
+            return null;
         }
 
         public void Reset()
         {
             ViewModel.Reset();
+        }
+
+        public void Update(TaskType type, List<InputArguments> inputs, string output)
+        {
+            if (!ViewModel.Update(type, inputs, output))
+            {
+                this.GetWindow().CreateMessage().QueueError("输入文件超过该类型最大数量");
+            }
+        }
+
+        public void Update(TaskType type)
+        {
+            ViewModel.Update(type);
+            Reset();
+        }
+
+        protected override void OnDragOver(DragEventArgs e)
+        {
+            base.OnDragOver(e);
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Link;
+            }
+        }
+
+        protected override void OnDrop(DragEventArgs e)
+        {
+            base.OnDrop(e);
+            var files = e.Data.GetData(DataFormats.FileDrop) as string[];
+
+            foreach (var file in ViewModel.Inputs.Where(p => string.IsNullOrEmpty(p.FilePath)).ToList())
+            {
+                ViewModel.Inputs.Remove(file);
+            }
+            foreach (string file in files)
+            {
+                if (ViewModel.Inputs.Count >= ViewModel.MinInputsCount && !ViewModel.CanChangeInputsCount)
+                {
+                    break;
+                }
+                if (File.Exists(file))
+                {
+                    ViewModel.Inputs.Add(new InputArgumentsDetail() { FilePath = file });
+                }
+            }
+            while (ViewModel.Inputs.Count < ViewModel.MinInputsCount)
+            {
+                ViewModel.Inputs.Add(new InputArgumentsDetail());
+            }
+        }
+
+        private void BrowseFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
+            string path = new FileFilterCollection()
+                .AddAll()
+                .CreateOpenFileDialog()
+                .SetParent(this.GetWindow())
+                .GetFilePath();
+            if (path != null)
+            {
+                input.FilePath = path;
+            }
+        }
+
+        private void BrowseOutputFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            string path = new FileFilterCollection().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFolderPath();
+            if (path != null)
+            {
+                ViewModel.OutputDir = path;
+            }
         }
 
         private async void ClipButton_Click(object sender, RoutedEventArgs e)
@@ -229,94 +423,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
             (sender as Button).IsEnabled = true;
         }
 
-        private void BrowseFileButton_Click(object sender, RoutedEventArgs e)
-        {
-            var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
-            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
-            if (path != null)
-            {
-                input.FilePath = path;
-            }
-        }
-
         private void DeleteFileButton_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.Inputs.Remove((sender as FrameworkElement).DataContext as InputArgumentsDetail);
         }
-
-        public void Update(TaskType type, List<InputArguments> inputs, string output)
-        {
-            if (!ViewModel.Update(type, inputs, output))
-            {
-                this.GetWindow().CreateMessage().QueueError("输入文件超过该类型最大数量");
-            }
-        }
-
-        public void Update(TaskType type)
-        {
-            ViewModel.Update(type);
-            Reset();
-        }
-
-        public void AddInput()
-        {
-            ViewModel.Inputs.Add(new InputArgumentsDetail());
-        }
-
-        public void BrowseAndAddInput()
-        {
-            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
-            if (path != null)
-            {
-                var input = new InputArgumentsDetail();
-                input.FilePath = path;
-                ViewModel.Inputs.Add(input);
-            }
-        }
-
-        private void BrowseOutputFileButton_Click(object sender, RoutedEventArgs e)
-        {
-            string path = new FileFilterCollection().AddAll().CreateSaveFileDialog().SetParent(this.GetWindow()).GetFilePath();
-            if (path != null)
-            {
-                path = path.RemoveEnd(".*");
-                ViewModel.Output = path;
-            }
-        }
-
-        protected override void OnDragOver(DragEventArgs e)
-        {
-            base.OnDragOver(e);
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                e.Effects = DragDropEffects.Link;
-            }
-        }
-
-        protected override void OnDrop(DragEventArgs e)
-        {
-            base.OnDrop(e);
-            var files = e.Data.GetData(DataFormats.FileDrop) as string[];
-
-            foreach (var file in ViewModel.Inputs.Where(p => string.IsNullOrEmpty(p.FilePath)).ToList())
-            {
-                ViewModel.Inputs.Remove(file);
-            }
-            foreach (string file in files)
-            {
-                if (ViewModel.Inputs.Count >= ViewModel.MinInputsCount && !ViewModel.CanChangeInputsCount)
-                {
-                    break;
-                }
-                if (File.Exists(file))
-                {
-                    ViewModel.Inputs.Add(new InputArgumentsDetail() { FilePath = file });
-                }
-            }
-            while (ViewModel.Inputs.Count < ViewModel.MinInputsCount)
-            {
-                ViewModel.Inputs.Add(new InputArgumentsDetail());
-            }
-        }
     }
+
 }

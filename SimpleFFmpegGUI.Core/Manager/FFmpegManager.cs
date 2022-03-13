@@ -350,6 +350,10 @@ namespace SimpleFFmpegGUI.Manager
                 }
             }
             task.RealOutput = FileSystem.GetNoDuplicateFile(output);
+            if(!new FileInfo(task.RealOutput).Directory.Exists)
+            {
+                new FileInfo(task.RealOutput).Directory.Create();
+            }
         }
 
         private ProgressDto GetConvertToTsProgress(string file)

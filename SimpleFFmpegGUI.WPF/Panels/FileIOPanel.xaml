@@ -30,6 +30,8 @@
             <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
         </Grid.RowDefinitions>
         <ScrollViewer
             xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
@@ -138,16 +140,23 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBox
-                x:Name="txtOutput"
-                ui:ControlHelper.Header="输出路径"
-                ui:ControlHelper.PlaceholderText="（输出至源文件目录）"
-                Text="{Binding Output}" />
+                ui:ControlHelper.Header="输出目录"
+                ui:ControlHelper.PlaceholderText="{Binding OutputDirPlaceholder}"
+                Text="{Binding OutputDir}" />
             <Button
                 Grid.Column="2"
                 VerticalAlignment="Bottom"
                 Click="BrowseOutputFileButton_Click">
-                <ui:SymbolIcon Symbol="BrowsePhotos" />
+                <ui:SymbolIcon Symbol="OpenFile" />
             </Button>
         </Grid>
+
+        <TextBox
+            Grid.Row="4"
+            ui:ControlHelper.Header="输出文件名"
+            ui:ControlHelper.PlaceholderText="若为空，则为输入文件名（自动重命名）"
+            IsEnabled="{Binding CanSetOutputFileName}"
+            Text="{Binding OutputFileName}" />
+
     </Grid>
 </UserControl>

@@ -52,25 +52,27 @@ namespace SimpleFFmpegGUI.Manager
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
-            process.Exited += (s, e) =>
-            {
-                try
-                {
-                    if (process.ExitCode == 0)
-                    {
-                        tcs.SetResult(true);
-                    }
-                    else
-                    {
-                        tcs.SetException(new Exception($"进程退出返回错误退出码：" + process.ExitCode));
-                    }
-                    Task.Delay(10000).ContinueWith(t => process.Dispose());
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(new Exception($"进程处理程序发生错误：" + ex.Message, ex));
-                }
-            };
+            process.Exited += async (s, e) =>
+             {
+                 try
+                 {
+                     await Task.Delay(1000);
+                     if (process.ExitCode == 0)
+                     {
+                         tcs.SetResult(true);
+                     }
+                     else
+                     {
+                         tcs.SetException(new Exception($"进程退出返回错误退出码：" + process.ExitCode));
+                     }
+                     await Task.Delay(10000);
+                     process.Dispose();
+                 }
+                 catch (Exception ex)
+                 {
+                     tcs.SetException(new Exception($"进程处理程序发生错误：" + ex.Message, ex));
+                 }
+             };
             return tcs.Task;
         }
 
