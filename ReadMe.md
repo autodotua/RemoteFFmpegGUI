@@ -109,3 +109,6 @@
 
 - Clone仓库后，只需安装好相关SDK，即可进行构建，无需额外设置。
 - `libs`目录中二进制文件来自于：[FzLib](https://github.com/autodotua/FzLib)和[Wpf.Notifications](https://github.com/autodotua/Wpf.Notifications)，均为开源产品。
+
+### 已知问题
+- 在裁剪视频时，对于部分视频（特别是OBS录制出来的视频），在进入裁剪界面-退出-第二次进入时会崩溃。目前查明的原因是和ModernWpf的XamlControlsResources有冲突，只要新建了该实例，就会崩溃。

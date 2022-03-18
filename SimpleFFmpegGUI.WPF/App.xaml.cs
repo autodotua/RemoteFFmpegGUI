@@ -35,8 +35,7 @@ namespace SimpleFFmpegGUI.WPF
             InitializeLogs();
 #if !DEBUG
 
-            UnhandledException.RegistAll();
-            UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
+                WPFUnhandledExceptionCatcher.RegistAll().UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
 
 #endif
 
