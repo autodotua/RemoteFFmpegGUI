@@ -1,4 +1,5 @@
 ﻿using FzLib;
+using FzLib.WPF;
 using FzLib.WPF.Converters;
 using Mapster;
 using Microsoft.DotNet.PlatformAbstractions;
@@ -402,16 +403,29 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             (sender as Button).IsEnabled = false;
             (TimeSpan From, TimeSpan To)? result = null;
-            try
+            Process p = new Process()
             {
-                var panel = await this.GetWindow<MainWindow>().ShowTopTabAsync<CutPage>(async p => await p.SetVideoAsync(input.FilePath, input.From, input.To));
-                result = panel.GetTime();
-            }
-            catch (Exception ex)
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = "SimpleFFmpegGUI.WPF.Cut.exe",
+                    RedirectStandardOutput = true,
+                }
+            };
+            p.StartInfo.ArgumentList.Add(input.FilePath);
+            p.StartInfo.ArgumentList.Add(input.From.HasValue ? input.From.Value.ToString() : "-");
+            p.StartInfo.ArgumentList.Add(input.To.HasValue ? input.To.Value.ToString() : "-");
+            p.Start();
+            var output = await p.StandardOutput.ReadToEndAsync();
+            string[] outputs = output.Split(',');
+            if (outputs.Length == 2)
             {
-                this.CreateMessage().QueueError($"加载视频失败", ex);
-                (sender as Button).IsEnabled = true;
-                return;
+                if (TimeSpan.TryParse(outputs[0], out TimeSpan from))
+                {
+                    if (TimeSpan.TryParse(outputs[1], out TimeSpan to))
+                    {
+                        result = (from, to);
+                    }
+                }
             }
             if (result.HasValue)
             {

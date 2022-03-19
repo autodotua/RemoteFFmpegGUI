@@ -53,7 +53,8 @@
     dotnet publish SimpleFFmpegGUI.Host -c Release -o Generation/Publish/WebPackage/host
 
     Write-Output "正在发布WPF"
-    dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained
+    dotnet publish SimpleFFmpegGUI.WPF.Cut -c Release -o Generation/Publish/WPF -r win-x64 --self-contained true
+    dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained true
 
     
     Write-Output "正在复制二进制库"

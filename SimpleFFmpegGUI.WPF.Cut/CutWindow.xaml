@@ -1,0 +1,213 @@
+﻿<Window
+    x:Class="SimpleFFmpegGUI.WPF.CutWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:f="clr-namespace:FzLib.WPF;assembly=FzCoreLib.Windows"
+    xmlns:ffme="clr-namespace:Unosquare.FFME;assembly=ffme.win"
+    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+    x:Name="root"
+    Title="FFmpeg 工具箱 - 视频裁剪"
+    Width="1400"
+    Height="800"
+    ui:TitleBar.IsIconVisible="True"
+    ui:WindowHelper.UseModernWindowStyle="True"
+    Loaded="Window_Loaded"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <Style
+            BasedOn="{StaticResource DefaultTextBoxStyle}"
+            TargetType="{x:Type TextBox}">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="False" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ffme:MediaElement
+            x:Name="media"
+            LoadedBehavior="Play"
+            Position="{Binding Current}"
+            RenderingVideo="Media_RenderingVideo"
+            ScrubbingEnabled="False"
+            UnloadedBehavior="Manual" />
+        <Grid
+            Grid.Row="2"
+            Margin="8,0"
+            IsHitTestVisible="{Binding IsBarEnabled}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox
+                Grid.Column="0"
+                Width="120"
+                ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                Text="{Binding From, StringFormat={StaticResource TimeSpanFormat}}" />
+            <TextBox
+                Grid.Column="4"
+                Width="120"
+                ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                Text="{Binding To, StringFormat={StaticResource TimeSpanFormat}}" />
+            <Slider
+                Grid.Column="2"
+                VerticalAlignment="Bottom"
+                IsMoveToPointEnabled="True"
+                IsSelectionRangeEnabled="True"
+                Maximum="1"
+                Minimum="0"
+                PreviewKeyDown="Slider_PreviewKeyDown"
+                SelectionEnd="{Binding ToP, Mode=OneWay}"
+                SelectionStart="{Binding FromP, Mode=OneWay}"
+                TickPlacement="BottomRight"
+                Ticks="0 1"
+                Value="{Binding CurrentP}" />
+        </Grid>
+        <Grid
+            Grid.Row="4"
+            Margin="8,0"
+            IsHitTestVisible="{Binding IsBarEnabled}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ui:SimpleStackPanel
+                Orientation="Horizontal"
+                Spacing="8">
+                <ui:SymbolIcon
+                    Margin="0,2,0,0"
+                    Symbol="Volume" />
+                <Slider
+                    Width="90"
+                    Margin="0,3,0,0"
+                    VerticalAlignment="Center"
+                    IsMoveToPointEnabled="True"
+                    LargeChange="0.1"
+                    Maximum="1"
+                    Minimum="0"
+                    SmallChange="0.05"
+                    Value="{Binding ElementName=media, Path=Volume}" />
+                <TextBlock Text="{Binding Volume}" />
+            </ui:SimpleStackPanel>
+            <Button
+                Grid.Column="1"
+                Background="Transparent"
+                Click="JumpButton_Click"
+                Tag="-2"
+                ToolTip="快退5秒&#x0a;按住Shift时快退20秒&#x0a;按住Ctrl时快退1秒">
+                <ui:FontIcon Glyph="&#xEB9E;" />
+            </Button>
+            <Button
+                Grid.Column="5"
+                Background="Transparent"
+                Click="JumpButton_Click"
+                Tag="2"
+                ToolTip="快进5秒&#x0a;按住Shift时快进20秒&#x0a;按住Ctrl时快进1秒">
+                <ui:FontIcon Glyph="&#xEB9D;" />
+            </Button>
+            <Button
+                Grid.Column="2"
+                Background="Transparent"
+                Click="JumpButton_Click"
+                Tag="-1"
+                ToolTip="切换到前一帧&#x0a;按住Ctrl向前5帧&#x0a;按住Shift向前10帧">
+                <ui:FontIcon Glyph="&#xE973;" />
+            </Button>
+            <Button
+                Grid.Column="4"
+                Background="Transparent"
+                Click="JumpButton_Click"
+                Tag="1"
+                ToolTip="切换到后一帧&#x0a;按住Ctrl向后5帧&#x0a;按住Shift向后10帧">
+                <ui:FontIcon Glyph="&#xE76C;" />
+            </Button>
+            <Button
+                Grid.Column="3"
+                Background="Transparent"
+                Click="PlayButton_Click"
+                ToolTip="播放"
+                Visibility="{Binding ElementName=media, Path=IsPaused, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=h}">
+                <ui:SymbolIcon Symbol="Play" />
+            </Button>
+            <Button
+                Grid.Column="3"
+                Background="Transparent"
+                Click="PauseButton_Click"
+                ToolTip="暂停"
+                Visibility="{Binding ElementName=media, Path=IsPlaying, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=h}">
+                <ui:SymbolIcon Symbol="Pause" />
+            </Button>
+            <ui:SimpleStackPanel
+                Grid.Column="99"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                Spacing="16">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="{Binding Frame, StringFormat={}0帧}" />
+                <TextBox
+                    Width="120"
+                    VerticalAlignment="Bottom"
+                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                    BorderThickness="0"
+                    Text="{Binding Current, StringFormat={StaticResource TimeSpanFormat}, UpdateSourceTrigger=PropertyChanged}" />
+            </ui:SimpleStackPanel>
+        </Grid>
+        <ui:CommandBar
+            Grid.Row="6"
+            IsEnabled="{Binding IsBarEnabled}">
+            <ui:AppBarButton
+                Click="JumpToFrom_Click"
+                Icon="Undo"
+                Label="跳转到入点" />
+            <ui:AppBarButton
+                Click="JumpToTo_Click"
+                Icon="Redo"
+                Label="跳转到出点" />
+            <ui:AppBarButton
+                Click="SetFrom_Click"
+                Icon="Previous"
+                Label="设置为入点" />
+            <ui:AppBarButton
+                Click="SetTo_Click"
+                Icon="Next"
+                Label="设置为出点" />
+            <ui:AppBarSeparator />
+            <ui:AppBarButton
+                Click="CancelButton_Click"
+                Icon="Cancel"
+                Label="取消" />
+            <ui:AppBarButton
+                Click="OKButton_Click"
+                Label="完成">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Glyph="&#xE73E;" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
+        </ui:CommandBar>
+    </Grid>
+</Window>

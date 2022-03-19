@@ -1,5 +1,6 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
 using FzLib;
+using FzLib.WPF;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAPICodePack.FzExtension;

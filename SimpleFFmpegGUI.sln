@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31321.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleFFmpegGUI.WPF", "SimpleFFmpegGUI.WPF\SimpleFFmpegGUI.WPF.csproj", "{CD3D63A2-ED0B-4C46-AF94-9FC072321CA5}"
 EndProject
@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleFFmpegGUI.WebApp", "SimpleFFmpegGUI.WebApp\SimpleFFmpegGUI.WebApp.csproj", "{21FF2C12-FDF6-460C-8DAF-25FCF74AFEE7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleFFmpegGUI.WPF.Cut", "SimpleFFmpegGUI.WPF.Cut\SimpleFFmpegGUI.WPF.Cut.csproj", "{137DC35B-D353-49E5-A546-A30A43461413}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,14 @@ Global
 		{21FF2C12-FDF6-460C-8DAF-25FCF74AFEE7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{21FF2C12-FDF6-460C-8DAF-25FCF74AFEE7}.Release|x64.ActiveCfg = Release|x64
 		{21FF2C12-FDF6-460C-8DAF-25FCF74AFEE7}.Release|x64.Build.0 = Release|x64
+		{137DC35B-D353-49E5-A546-A30A43461413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{137DC35B-D353-49E5-A546-A30A43461413}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{137DC35B-D353-49E5-A546-A30A43461413}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{137DC35B-D353-49E5-A546-A30A43461413}.Debug|x64.Build.0 = Debug|Any CPU
+		{137DC35B-D353-49E5-A546-A30A43461413}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{137DC35B-D353-49E5-A546-A30A43461413}.Release|Any CPU.Build.0 = Release|Any CPU
+		{137DC35B-D353-49E5-A546-A30A43461413}.Release|x64.ActiveCfg = Release|Any CPU
+		{137DC35B-D353-49E5-A546-A30A43461413}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
