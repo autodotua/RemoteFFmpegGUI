@@ -17,8 +17,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
+
 namespace SimpleFFmpegGUI.WPF
 {
     /// <summary>
@@ -29,6 +31,7 @@ namespace SimpleFFmpegGUI.WPF
         public static DateTime AppStartTime { get; } = DateTime.Now;
         public static ILog Log { get; private set; }
         public static ServiceProvider ServiceProvider { get; private set; }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -43,8 +46,26 @@ namespace SimpleFFmpegGUI.WPF
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
             ServiceProvider = serviceCollection.BuildServiceProvider();
-            MainWindow = ServiceProvider.GetService<MainWindow>();
-            MainWindow.Show();
+
+            if (e.Args.Length > 1)
+            {
+                if (e.Args[0] == "cut")
+                {
+                    MainWindow = new CutWindow(new CutWindowViewModel(), e.Args[2..]);
+                    WindowInteropHelper helper = new WindowInteropHelper(MainWindow);
+                    helper.Owner = IntPtr.Parse(e.Args[1]);
+                    MainWindow.ShowDialog();
+                }
+                else
+                {
+                    throw new ArgumentException("未知参数：" + e.Args[0]);
+                }
+            }
+            else
+            {
+                MainWindow = ServiceProvider.GetService<MainWindow>();
+                MainWindow.Show();
+            }
         }
 
         private void ConfigureServices(IServiceCollection services)
@@ -66,9 +87,6 @@ namespace SimpleFFmpegGUI.WPF
 
             services.AddTransient<LogsPage>();
             services.AddTransient<LogsPageViewModel>();
-
-            services.AddTransient<CutPage>();
-            services.AddTransient<CutPageViewModel>();
 
             services.AddTransient<TasksPage>();
             services.AddTransient<TasksPageViewModel>();
@@ -110,7 +128,7 @@ namespace SimpleFFmpegGUI.WPF
                 Log.Error(e.Exception);
                 Dispatcher.Invoke(() =>
                 {
-                    var result = MessageBox.Show("程序发生异常，可能出现数据丢失等问题。是否关闭？" + Environment.NewLine + Environment.NewLine + e.Exception.ToString(), FzLib.Program.App.ProgramName+" - 未捕获的异常", MessageBoxButton.YesNo, MessageBoxImage.Error);
+                    var result = MessageBox.Show("程序发生异常，可能出现数据丢失等问题。是否关闭？" + Environment.NewLine + Environment.NewLine + e.Exception.ToString(), FzLib.Program.App.ProgramName + " - 未捕获的异常", MessageBoxButton.YesNo, MessageBoxImage.Error);
                     if (result == MessageBoxResult.Yes)
                     {
                         Shutdown(-1);

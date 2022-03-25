@@ -19,8 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleFFmpegGUI.WebApp", "SimpleFFmpegGUI.WebApp\SimpleFFmpegGUI.WebApp.csproj", "{21FF2C12-FDF6-460C-8DAF-25FCF74AFEE7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleFFmpegGUI.WPF.Cut", "SimpleFFmpegGUI.WPF.Cut\SimpleFFmpegGUI.WPF.Cut.csproj", "{137DC35B-D353-49E5-A546-A30A43461413}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,14 +67,6 @@ Global
 		{21FF2C12-FDF6-460C-8DAF-25FCF74AFEE7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{21FF2C12-FDF6-460C-8DAF-25FCF74AFEE7}.Release|x64.ActiveCfg = Release|x64
 		{21FF2C12-FDF6-460C-8DAF-25FCF74AFEE7}.Release|x64.Build.0 = Release|x64
-		{137DC35B-D353-49E5-A546-A30A43461413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{137DC35B-D353-49E5-A546-A30A43461413}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{137DC35B-D353-49E5-A546-A30A43461413}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{137DC35B-D353-49E5-A546-A30A43461413}.Debug|x64.Build.0 = Debug|Any CPU
-		{137DC35B-D353-49E5-A546-A30A43461413}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{137DC35B-D353-49E5-A546-A30A43461413}.Release|Any CPU.Build.0 = Release|Any CPU
-		{137DC35B-D353-49E5-A546-A30A43461413}.Release|x64.ActiveCfg = Release|Any CPU
-		{137DC35B-D353-49E5-A546-A30A43461413}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

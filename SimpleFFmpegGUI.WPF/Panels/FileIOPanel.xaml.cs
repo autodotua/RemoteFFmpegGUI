@@ -5,6 +5,7 @@ using Mapster;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAPICodePack.FzExtension;
+using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
@@ -25,6 +26,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -58,6 +60,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             Inputs.CollectionChanged += Inputs_CollectionChanged;
             Config.Instance.PropertyChanged += (s, e) => this.Notify(nameof(OutputDirPlaceholder));
         }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
@@ -125,6 +128,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 DefaultOutputDirType.SpecialDir => Config.Instance.DefaultOutputDirSpecialDirPath,
                 _ => throw new NotImplementedException()
             };
+
         /// <summary>
         /// 输出文件名
         /// </summary>
@@ -189,7 +193,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 TaskType.Code => true,
                 _ => false
             };
-
         }
 
         /// <summary>
@@ -282,7 +285,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
                     DefaultOutputDirType.SpecialDir => Config.Instance.DefaultOutputDirSpecialDirPath,
                     _ => throw new NotImplementedException()
                 };
-
             }
             if (ViewModel.CanSetOutputFileName && !string.IsNullOrWhiteSpace(ViewModel.OutputFileName))
             {
@@ -290,6 +292,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             return Path.Combine(dir, Path.GetFileName(input));
         }
+
         /// <summary>
         /// 用于添加到远程主机，获取输出文件名
         /// </summary>
@@ -389,52 +392,64 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private async void ClipButton_Click(object sender, RoutedEventArgs e)
         {
-            var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
-            Debug.Assert(input != null);
-            if (string.IsNullOrEmpty(input.FilePath))
+            try
             {
-                this.CreateMessage().QueueError("请先设置文件地址");
-                return;
-            }
-            if (!File.Exists(input.FilePath))
-            {
-                this.CreateMessage().QueueError($"找不到文件{input.FilePath}");
-                return;
-            }
-            (sender as Button).IsEnabled = false;
-            (TimeSpan From, TimeSpan To)? result = null;
-            Process p = new Process()
-            {
-                StartInfo = new ProcessStartInfo()
+                var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
+                Debug.Assert(input != null);
+                if (string.IsNullOrEmpty(input.FilePath))
                 {
-                    FileName = "SimpleFFmpegGUI.WPF.Cut.exe",
-                    RedirectStandardOutput = true,
+                    this.CreateMessage().QueueError("请先设置文件地址");
+                    return;
                 }
-            };
-            p.StartInfo.ArgumentList.Add(input.FilePath);
-            p.StartInfo.ArgumentList.Add(input.From.HasValue ? input.From.Value.ToString() : "-");
-            p.StartInfo.ArgumentList.Add(input.To.HasValue ? input.To.Value.ToString() : "-");
-            p.Start();
-            var output = await p.StandardOutput.ReadToEndAsync();
-            string[] outputs = output.Split(',');
-            if (outputs.Length == 2)
-            {
-                if (TimeSpan.TryParse(outputs[0], out TimeSpan from))
+                if (!File.Exists(input.FilePath))
                 {
-                    if (TimeSpan.TryParse(outputs[1], out TimeSpan to))
+                    this.CreateMessage().QueueError($"找不到文件{input.FilePath}");
+                    return;
+                }
+                this.GetWindow().IsEnabled = false;
+                (TimeSpan From, TimeSpan To)? result = null;
+                Process p = new Process()
+                {
+                    StartInfo = new ProcessStartInfo()
                     {
-                        result = (from, to);
+                        FileName = FzLib.Program.App.ProgramFilePath,
+                        RedirectStandardOutput = true,
+                    }
+                };
+                p.StartInfo.ArgumentList.Add("cut");
+                p.StartInfo.ArgumentList.Add(new WindowInteropHelper(this.GetWindow()).Handle.ToString());
+                p.StartInfo.ArgumentList.Add(input.FilePath);
+                p.StartInfo.ArgumentList.Add(input.From.HasValue ? input.From.Value.ToString() : "-");
+                p.StartInfo.ArgumentList.Add(input.To.HasValue ? input.To.Value.ToString() : "-");
+                p.Start();
+                var output = await p.StandardOutput.ReadToEndAsync();
+                string[] outputs = output.Split(',');
+                if (outputs.Length == 2)
+                {
+                    if (TimeSpan.TryParse(outputs[0], out TimeSpan from))
+                    {
+                        if (TimeSpan.TryParse(outputs[1], out TimeSpan to))
+                        {
+                            result = (from, to);
+                        }
                     }
                 }
+                if (result.HasValue)
+                {
+                    var time = result.Value;
+                    input.From = time.From;
+                    input.To = time.To;
+                    input.Duration = null;
+                }
             }
-            if (result.HasValue)
+            catch (Exception ex)
             {
-                var time = result.Value;
-                input.From = time.From;
-                input.To = time.To;
-                input.Duration = null;
+                await CommonDialog.ShowErrorDialogAsync(ex);
             }
-            (sender as Button).IsEnabled = true;
+            finally
+            {
+                this.GetWindow().IsEnabled = true;
+            }
         }
 
         private void DeleteFileButton_Click(object sender, RoutedEventArgs e)
@@ -442,5 +457,4 @@ namespace SimpleFFmpegGUI.WPF.Panels
             ViewModel.Inputs.Remove((sender as FrameworkElement).DataContext as InputArgumentsDetail);
         }
     }
-
 }
