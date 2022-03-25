@@ -305,6 +305,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
             if (canInitializeType)
             {
                 ViewModel.Type = TaskType.Code;
+                canInitializeType = false;
             }
         }
     }
