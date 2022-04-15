@@ -133,8 +133,19 @@ namespace SimpleFFmpegGUI.WPF.Pages
             if (await CommonDialog.ShowYesNoDialogAsync("删除预设", $"是否删除所有类型的所有预设？"))
             {
                 IsEnabled = false;
-                PresetManager.DeletePresets();
-                ViewModel.FillPresets();
+                try
+                {
+                    PresetManager.DeletePresets();
+                    ViewModel.FillPresets();
+                }
+                catch (Exception ex)
+                {
+                    await CommonDialog.ShowErrorDialogAsync(ex, "删除失败");
+                }
+                finally
+                {
+                    IsEnabled = true;
+                }
             }
         }
     }
