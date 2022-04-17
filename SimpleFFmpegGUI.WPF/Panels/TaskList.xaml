@@ -97,6 +97,7 @@
                         <ProgressBar
                             Grid.Row="2"
                             Grid.Column="2"
+                            IsIndeterminate="{Binding IsIndeterminate}"
                             Maximum="1"
                             Minimum="0"
                             Visibility="{Binding Status, ConverterParameter=Processing, Converter={StaticResource EqualConverter}}"

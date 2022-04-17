@@ -96,7 +96,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public string StatusText => Status switch
         {
-            TaskStatus.Processing => Percent.ToString("0.00%"),
+            TaskStatus.Processing => IsIndeterminate ? "进行中" : Percent.ToString("0.00%"),
             _ => DescriptionConverter.GetDescription(Status)
         };
 
@@ -123,6 +123,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public FFmpegManager ProcessManager { get; set; }
         public double Percent => ProcessStatus == null || ProcessStatus.HasDetail == false ? 0 : ProcessStatus.Progress.Percent;
+        public bool IsIndeterminate => ProcessStatus == null || ProcessStatus.HasDetail == false || ProcessStatus.Progress.IsIndeterminate;
         public bool CancelButtonEnabled => Status is TaskStatus.Queue or TaskStatus.Processing;
         public bool ResetButtonEnabled => Status is TaskStatus.Done or TaskStatus.Cancel or TaskStatus.Error;
         public bool StartButtonEnabled => Status is TaskStatus.Queue;

@@ -74,12 +74,16 @@
                                         Grid.Column="2">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="0" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding ProcessStatus.Progress.Percent, StringFormat={}0.00%}" />
+                                        <TextBlock
+                                            Margin="0,0,8,0"
+                                            Text="{Binding ProcessStatus.Progress.Percent, StringFormat={}0.00%}"
+                                            Visibility="{Binding ProcessStatus.Progress.IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                                         <ui:ProgressBar
                                             Grid.Column="2"
+                                            IsIndeterminate="{Binding ProcessStatus.Progress.IsIndeterminate}"
                                             Maximum="1"
                                             Minimum="0"
                                             ShowPaused="{Binding ProcessStatus.IsPaused}"
@@ -131,7 +135,8 @@
                                     <TextBlock
                                         Grid.Row="12"
                                         Grid.Column="2"
-                                        Text="{Binding ProcessStatus.Progress.FinishTime, StringFormat={StaticResource DateTimeFormat}}" />
+                                        Text="{Binding ProcessStatus.Progress.FinishTime, StringFormat={StaticResource DateTimeFormat}}"
+                                        Visibility="{Binding ProcessStatus.Progress.IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                                     <TextBlock
                                         Grid.Row="14"
                                         FontWeight="Bold"
@@ -139,7 +144,8 @@
                                     <TextBlock
                                         Grid.Row="14"
                                         Grid.Column="2"
-                                        Text="{Binding ProcessStatus.Progress.LastTime, StringFormat={}hh\\:mm\\:ss}" />
+                                        Text="{Binding ProcessStatus.Progress.LastTime, StringFormat={}hh\\:mm\\:ss}"
+                                        Visibility="{Binding ProcessStatus.Progress.IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                                 </Grid>
                                 <TextBox
                                     Background="Transparent"

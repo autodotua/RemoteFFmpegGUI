@@ -350,7 +350,7 @@ namespace SimpleFFmpegGUI.Manager
                 }
             }
             task.RealOutput = FileSystem.GetNoDuplicateFile(output);
-            if(!new FileInfo(task.RealOutput).Directory.Exists)
+            if (!new FileInfo(task.RealOutput).Directory.Exists)
             {
                 new FileInfo(task.RealOutput).Directory.Create();
             }
@@ -380,16 +380,32 @@ namespace SimpleFFmpegGUI.Manager
             }
             else
             {
-                p.VideoLength = TimeSpan.FromTicks(task.Inputs.Select(p => GetVideoDuration(p).Ticks).Sum());
+                var durations = task.Inputs.Select(p => GetVideoDuration(p));
+                if (durations.All(p => p.HasValue))
+                {
+                    p.VideoLength = TimeSpan.FromTicks(durations.Select(p => p.Value.Ticks).Sum());
+                }
+                else
+                {
+                    p.VideoLength = null;
+                }
             }
             p.StartTime = DateTime.Now;
             return p;
         }
 
-        private TimeSpan GetVideoDuration(InputArguments arg)
+        private TimeSpan? GetVideoDuration(InputArguments arg)
         {
             var path = arg.FilePath;
-            TimeSpan realLength = FFProbe.Analyse(path).Duration;
+            TimeSpan realLength = default;
+            try
+            {
+                realLength = FFProbe.Analyse(path).Duration;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
             if (arg == null || arg.From == null && arg.To == null && arg.Duration == null)
             {
                 return realLength;
