@@ -1,9 +1,32 @@
-﻿namespace SimpleFFmpegGUI.Model
+﻿using FzLib;
+using System.ComponentModel;
+
+namespace SimpleFFmpegGUI.Model
 {
-    public class AudioCodeArguments
+    public class AudioCodeArguments : INotifyPropertyChanged
     {
-        public string Code { get; set; }
-        public int? Bitrate { get; set; }
-        public int? SamplingRate { get; set; }
+        private int? bitrate;
+        private string code;
+        private int? samplingRate;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public int? Bitrate
+        {
+            get => bitrate;
+            set => this.SetValueAndNotify(ref bitrate, value, nameof(Bitrate));
+        }
+
+        public string Code
+        {
+            get => code;
+            set => this.SetValueAndNotify(ref code, value, nameof(Code));
+        }
+        public int? SamplingRate
+        {
+            get => samplingRate;
+            set => this.SetValueAndNotify(ref samplingRate, value, nameof(SamplingRate));
+        }
+
     }
 }

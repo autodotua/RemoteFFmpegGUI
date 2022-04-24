@@ -150,7 +150,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public ChannelOutputStrategy VideoOutputStrategy
         {
             get => videoOutputStrategy;
-            set => this.SetValueAndNotify(ref videoOutputStrategy, value, nameof(VideoOutputStrategy));
+            set
+            {
+                this.SetValueAndNotify(ref videoOutputStrategy, value, nameof(VideoOutputStrategy));
+                if(value == ChannelOutputStrategy.Code&&Audio==null)
+                {
+                    Video = new VideoArgumentsWithSwitch();
+                }
+            }
         }
 
         private ChannelOutputStrategy audioOutputStrategy = ChannelOutputStrategy.Code;
@@ -158,7 +165,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public ChannelOutputStrategy AudioOutputStrategy
         {
             get => audioOutputStrategy;
-            set => this.SetValueAndNotify(ref audioOutputStrategy, value, nameof(AudioOutputStrategy));
+            set
+            {
+                this.SetValueAndNotify(ref audioOutputStrategy, value, nameof(AudioOutputStrategy));
+                if (value == ChannelOutputStrategy.Code && Audio == null)
+                {
+                    Audio = new AudioArgumentsWithSwitch();
+                }
+            }
         }
 
         private VideoArgumentsWithSwitch video = new VideoArgumentsWithSwitch();

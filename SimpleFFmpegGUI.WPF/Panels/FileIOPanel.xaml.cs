@@ -213,7 +213,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 newInput.Update();
                 Inputs.Add(newInput);
             }
-            OutputDir = output;
+            OutputDir=Path.GetDirectoryName(output);
+            OutputFileName=Path.GetFileName(output);
             return inputs.Count <= MaxInputsCount;
         }
 
