@@ -118,7 +118,8 @@ namespace SimpleFFmpegGUI.WPF.Model
                 nameof(ProcessStatus),
                 nameof(Percent),
                 nameof(Status),
-                nameof(StatusText));
+                nameof(StatusText),
+                nameof(IsIndeterminate));
         }
 
         public FFmpegManager ProcessManager { get; set; }
