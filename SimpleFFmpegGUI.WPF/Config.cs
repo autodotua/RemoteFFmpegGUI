@@ -103,7 +103,7 @@ namespace SimpleFFmpegGUI.WPF
             get => defaultOutputDirSpecialDirPath;
             set => this.SetValueAndNotify(ref defaultOutputDirSpecialDirPath, value, nameof(DefaultOutputDirSpecialDirPath));
         }
-
+        public string PerformanceTestFileName { get; set; } = "test.mp4";
     }
 
     public class RemoteHost

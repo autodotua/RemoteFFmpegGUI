@@ -99,6 +99,13 @@
                         <ui:AppBarButton.Icon>
                             <ui:FontIcon Glyph="&#xE81C;" />
                         </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>   
+                    <ui:AppBarButton
+                        Click="TestButton_Click"
+                        Label="编码性能测试">
+                        <ui:AppBarButton.Icon>
+                            <ui:FontIcon Glyph="&#xE916;" />
+                        </ui:AppBarButton.Icon>
                     </ui:AppBarButton>
                 </ui:CommandBar.SecondaryCommands>
             </ui:CommandBar>

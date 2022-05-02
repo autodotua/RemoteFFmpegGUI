@@ -220,7 +220,7 @@ namespace SimpleFFmpegGUI.Manager
 
             if (a.Video != null)
             {
-                string code = a.Video.Code.ToLower().Replace(".", "") switch
+                string code = a.Video.Code?.ToLower()?.Replace(".", "") switch
                 {
                     "h265" => "libx265",
                     "h264" => "libx264",
@@ -270,7 +270,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             if (a.Audio != null)
             {
-                string code = a.Audio.Code.ToLower().Replace(".", "") switch
+                string code = a.Audio.Code?.ToLower()?.Replace(".", "") switch
                 {
                     "opus" => "libopus",
                     "自动" => null,

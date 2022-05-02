@@ -1,4 +1,5 @@
 ﻿using FzLib;
+using FzLib.WPF;
 using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
@@ -281,6 +282,12 @@ namespace SimpleFFmpegGUI.WPF
                     tab.Items.Remove(item);
                 }
             }
+        }
+
+        private void TestButton_Click(object sender, RoutedEventArgs e)
+        {
+            var window = App.ServiceProvider.GetService<TestWindow>();
+            window.ShowDialog(this);
         }
     }
 }
