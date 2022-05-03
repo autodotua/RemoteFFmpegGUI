@@ -39,6 +39,7 @@
 2. 确保安装了npm（Node.js）：
 3. 确保在根目录下（与ReadMe同级目录）的`bin`目录中放置了ffmpeg二进制文件（shared版）：[下载页面](https://www.ffmpeg.org/download.html) 。测试使用的版本为4.4.1：[下载](https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-4.4.1-full_build-shared.7z) 。共有三个exe文件和8个dll文件。
 4. 确保在根目录（与ReadMe同级目录）下的`bin`目录中放置了MediaInfo.dll：[下载页面](https://mediaarea.net/en/MediaInfo/Download)
+5. 确保在根目录（与ReadMe同级目录）下的`bin`目录中放置了测试视频`test.mp4`。选取的视频宜使用H.264格式，4K分辨率，20秒以上的长度。
 
 ### 自动构建
 
@@ -103,6 +104,7 @@
   - Pages：在主界面右侧显示的页面
   - Panels：组成页面或窗口的、具有比较单一的功能的面板
   - MainWindow：主窗口
+  - TestWindow：编码性能测试窗口
 
 
 ### 注意事项

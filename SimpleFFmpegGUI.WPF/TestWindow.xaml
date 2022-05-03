@@ -8,29 +8,20 @@
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="FFmpeg 工具箱"
-    Width="1400"
-    Height="800"
+    Width="480"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
     ResizeMode="NoResize"
-    SizeToContent="WidthAndHeight"
+    ShowInTaskbar="False"
+    SizeToContent="Height"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
-    <Grid Margin="8">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <ui:SimpleStackPanel
+        Margin="8"
+        Orientation="Vertical"
+        Spacing="8">
+
         <DataGrid
             AutoGenerateColumns="False"
             CanUserAddRows="False"
@@ -43,67 +34,31 @@
             ItemsSource="{Binding Tests}">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Header}" />
-                <DataGridTemplateColumn
+
+                <DataGridTextColumn
                     Width="120"
-                    Header="H264">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ui:SimpleStackPanel Orientation="Horizontal">
-                                <CheckBox
-                                    Margin="0,0,-80,0"
-                                    IsChecked="{Binding Items[0].IsChecked}" />
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    Text="{Binding Items[0].Score}" />
-                            </ui:SimpleStackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn
+                    Binding="{Binding Items[0].Score}"
+                    Header="H264" />
+                <DataGridTextColumn
                     Width="120"
-                    Header="H265">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ui:SimpleStackPanel Orientation="Horizontal">
-                                <CheckBox
-                                    Margin="0,0,-80,0"
-                                    IsChecked="{Binding Items[1].IsChecked}" />
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    Text="{Binding Items[1].Score}" />
-                            </ui:SimpleStackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn
+                    Binding="{Binding Items[1].Score}"
+                    Header="H265" />
+                <DataGridTextColumn
                     Width="120"
-                    Header="VP9">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ui:SimpleStackPanel Orientation="Horizontal">
-                                <CheckBox
-                                    Margin="0,0,-80,0"
-                                    IsChecked="{Binding Items[2].IsChecked}" />
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    Text="{Binding Items[2].Score}" />
-                            </ui:SimpleStackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    Binding="{Binding Items[2].Score}"
+                    Header="VP9" />
             </DataGrid.Columns>
         </DataGrid>
-        <TextBlock
-            Grid.Row="2"
-            Text="{Binding Message}" />
+        <TextBlock Text="{Binding Message}" />
         <ProgressBar
-            Grid.Row="4"
+            Maximum="1"
+            Minimum="0"
+            Value="{Binding DetailProgress}" />
+        <ProgressBar
             Maximum="12"
             Minimum="0"
             Value="{Binding Progress}" />
-        <TextBlock
-            Grid.Row="8"
-            Opacity="0.7">
+        <TextBlock Opacity="0.7">
             <Run>本测试将模拟不同编码格式和分辨率下视频编码的速度，单位为帧每秒。</Run>
             <LineBreak />
             <Run>测试视频视频长度越长（左），测试耗时越长，测试结果越准确。</Run>
@@ -112,9 +67,7 @@
             <LineBreak />
             <Run>不同速度预设、不同测试视频的测试分数没有参考性。</Run>
         </TextBlock>
-        <DockPanel
-            Grid.Row="6"
-            LastChildFill="True">
+        <DockPanel LastChildFill="True">
             <TextBlock
                 VerticalAlignment="Center"
                 DockPanel.Dock="Left"
@@ -130,7 +83,6 @@
                 Value="{Binding Preset}" />
         </DockPanel>
         <ui:SimpleStackPanel
-            Grid.Row="99"
             HorizontalAlignment="Right"
             Orientation="Horizontal"
             Spacing="8">
@@ -145,5 +97,5 @@
                 Content="开始测试"
                 Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
         </ui:SimpleStackPanel>
-    </Grid>
+    </ui:SimpleStackPanel>
 </Window>

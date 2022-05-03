@@ -4,7 +4,7 @@
     Write-Output "请确保："
     Write-Output "已经安装npm（Node.JS）"
     Write-Output "已经安装.NET 6 SDK"
-    Write-Output "已经将ffmpeg相关二进制文件和MediaInfo.dll放置到./bin中"
+    Write-Output "已经将ffmpeg相关二进制文件、MediaInfo.dll、性能测试视频（test.mp4）放置到./bin中"
     Write-Output "按任意键继续"
 
     [Console]::ReadKey()

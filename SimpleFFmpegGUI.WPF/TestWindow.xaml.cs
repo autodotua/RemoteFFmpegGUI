@@ -59,7 +59,13 @@ namespace SimpleFFmpegGUI.WPF
             get => progress;
             set => this.SetValueAndNotify(ref progress, value, nameof(Progress));
         }
-        private int preset = 4;
+        private double detailProgress = 0;
+        public double DetailProgress
+        {
+            get => detailProgress;
+            set => this.SetValueAndNotify(ref detailProgress, value, nameof(DetailProgress));
+        }
+        private int preset = 3;
         public int Preset
         {
             get => preset;
@@ -78,7 +84,7 @@ namespace SimpleFFmpegGUI.WPF
 
         public TestWindowViewModel ViewModel { get; set; }
 
-        public TestWindow(TestWindowViewModel viewModel, QueueManager queue)
+        public TestWindow(TestWindowViewModel viewModel)
         {
             ViewModel = viewModel;
             DataContext = ViewModel;
@@ -125,10 +131,17 @@ namespace SimpleFFmpegGUI.WPF
             finally
             {
                 ViewModel.IsTesting = false;
+                ViewModel.DetailProgress = 1;
                 IsEnabled = true;
             }
         }
 
+        /// <summary>
+        /// 测试核心代码
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private async Task TestAsync(string input)
         {
             double sum = 0;
@@ -142,7 +155,7 @@ namespace SimpleFFmpegGUI.WPF
                 Arguments = new OutputArguments()
                 {
                     Video = new VideoCodeArguments() { Preset = ViewModel.Preset },
-                    Audio = new AudioCodeArguments()
+                    Audio = null
                 },
                 Type = TaskType.Code
             };
@@ -150,8 +163,12 @@ namespace SimpleFFmpegGUI.WPF
             {
                 for (int j = 0; j < sizes.Length; j++)
                 {
+                    var item = ViewModel.Tests[j].Items[i];
+
+
                     ViewModel.Message = $"正在测试{codes[i]}，{sizes[j].Split('x')[1]}P";
                     ViewModel.Progress += 0.5;
+                    ViewModel.DetailProgress = 0;
                     task.Arguments.Video.Code = codes[i];
                     task.Arguments.Video.Size = sizes[j];
                     task.Arguments.Format = formats[i];
@@ -164,6 +181,10 @@ namespace SimpleFFmpegGUI.WPF
                         if (status.HasDetail && status.Fps > 0)
                         {
                             fps = status.Fps;
+                        }
+                        if (status.HasDetail && status.Progress != null && status.Progress.Percent is >= 0 and <= 1)
+                        {
+                            ViewModel.DetailProgress = status.Progress.Percent;
                         }
                     };
                     try
@@ -184,7 +205,7 @@ namespace SimpleFFmpegGUI.WPF
                         throw new Exception("无法获取编码帧速度");
                     }
                     sum += fps;
-                    ViewModel.Tests[j].Items[i].Score = fps;
+                    item.Score = fps;
                     if (stopping)
                     {
                         return;
