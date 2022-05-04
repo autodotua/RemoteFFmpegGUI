@@ -12,10 +12,10 @@
     Height="800"
     MinWidth="1280"
     MinHeight="720"
-    Closing="Window_Closing"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
+    Closing="Window_Closing"
     StateChanged="Window_StateChanged"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
@@ -207,7 +207,7 @@
                                                         TextElement.FontSize="{DynamicResource TabViewItemHeaderFontSize}"
                                                         TextElement.FontWeight="{TemplateBinding FontWeight}"
                                                         TextElement.Foreground="{DynamicResource TabViewItemHeaderForeground}" />
-                                                    <Button
+                                                    <Button x:Name="CloseButton"
                                                         Grid.Column="4"
                                                         Padding="3"
                                                         Background="Transparent"
@@ -260,9 +260,9 @@
                                     </Trigger>
                                     <!--  Selected  -->
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Shadow" Property="IsShadowEnabled" Value="{DynamicResource {x:Static SystemParameters.DropShadowKey}}" />
+                                        <Setter TargetName="CloseButton" Property="Foreground" Value="{DynamicResource SystemControlHighlightAltAltHighBrush}" />
+                                        <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource SystemControlHighlightAltAltHighBrush}" />
                                         <Setter TargetName="TabContainer" Property="Background" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
-                                        <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource TabViewItemHeaderForegroundSelected}" />
                                         <Setter TargetName="IconControl" Property="Foreground" Value="{DynamicResource TabViewItemIconForegroundSelected}" />
                                         <Setter Property="Panel.ZIndex" Value="1" />
                                     </Trigger>

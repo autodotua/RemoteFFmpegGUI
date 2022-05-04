@@ -86,7 +86,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
         }
 
-        private void ApplyButton_Click(object sender, RoutedEventArgs e)
+        private void ApplyButton_Click(object sender, MouseButtonEventArgs e)
         {
             Debug.Assert(CodeArgumentsViewModel != null);
             var preset = (sender as FrameworkElement).DataContext as CodePreset;
@@ -143,5 +143,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 }
             }
         }
+
     }
 }
