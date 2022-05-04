@@ -142,7 +142,7 @@ namespace SimpleFFmpegGUI.WPF
             double[,] weights = new[,] {
                 { 1, 0.64, 0.4, 0.2 },
                 { 1, 0.6, 0.35, 0.16 },
-                { 1, 0.6, 0.4, 0.25 } };
+                { 1, 0.6, 0.4, 0.2 } };
 
             var task = new TaskInfo()
             {
