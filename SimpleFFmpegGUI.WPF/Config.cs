@@ -104,6 +104,7 @@ namespace SimpleFFmpegGUI.WPF
             set => this.SetValueAndNotify(ref defaultOutputDirSpecialDirPath, value, nameof(DefaultOutputDirSpecialDirPath));
         }
         public string PerformanceTestFileName { get; set; } = "test.mp4";
+        public bool WindowMaximum { get; set; } = false;
     }
 
     public class RemoteHost

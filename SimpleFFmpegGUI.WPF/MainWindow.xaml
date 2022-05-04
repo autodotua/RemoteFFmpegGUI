@@ -10,12 +10,14 @@
     Title="FFmpeg 工具箱"
     Width="1400"
     Height="800"
-    MinHeight="720"
     MinWidth="1280"
+    MinHeight="720"
+    Closing="Window_Closing"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
-    WindowState="Maximized"
+    StateChanged="Window_StateChanged"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="FFmpeg 工具箱" />
@@ -99,7 +101,7 @@
                         <ui:AppBarButton.Icon>
                             <ui:FontIcon Glyph="&#xE81C;" />
                         </ui:AppBarButton.Icon>
-                    </ui:AppBarButton>   
+                    </ui:AppBarButton>
                     <ui:AppBarButton
                         Click="TestButton_Click"
                         Label="编码性能测试">

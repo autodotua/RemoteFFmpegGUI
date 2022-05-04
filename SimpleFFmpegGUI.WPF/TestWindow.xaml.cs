@@ -130,6 +130,7 @@ namespace SimpleFFmpegGUI.WPF
             }
             finally
             {
+                Directory.Delete("test", true);
                 ViewModel.IsTesting = false;
                 ViewModel.DetailProgress = 1;
                 IsEnabled = true;
@@ -147,9 +148,30 @@ namespace SimpleFFmpegGUI.WPF
             double sum = 0;
             string[] codes = new string[] { "H264", "H265", "VP9" };
             string[] sizes = new string[] { "1280x720", "1920x1080", "2560x1440", "3840x2160" };
-            TaskInfo task = new TaskInfo()
+
+            //ViewModel.Message = $"正在准备";
+            //TaskInfo task = new TaskInfo()
+            //{
+
+            //    Inputs = new List<InputArguments>() { new InputArguments() { FilePath = input } },
+
+            //    Output = Path.GetFullPath("test/pic%04d.jpg"),
+            //    Arguments = new OutputArguments()
+            //    {
+            //        Video = new VideoCodeArguments() { Code = null, PixelFormat = "bgr8" },
+            //        Audio = new AudioCodeArguments() { Code = null },
+            //    }
+            //};
+            //await new FFmpegManager(task).RunAsync();
+           var task = new TaskInfo()
             {
-                Inputs = new List<InputArguments>() { new InputArguments() { FilePath = input } },
+                Inputs = new List<InputArguments>() 
+                {
+                    new InputArguments() 
+                    {
+                        FilePath = input,
+                    }
+                },
                 Output = Path.GetFullPath("test/temp"),
                 Arguments = new OutputArguments()
                 {
@@ -165,7 +187,6 @@ namespace SimpleFFmpegGUI.WPF
                 for (int j = 0; j < sizes.Length; j++)
                 {
                     var item = ViewModel.Tests[j].Items[i];
-
 
                     ViewModel.Message = $"正在测试{codes[i]}，{sizes[j].Split('x')[1]}P";
                     ViewModel.Progress += 0.5;
@@ -212,7 +233,6 @@ namespace SimpleFFmpegGUI.WPF
                     }
                 }
             }
-            Directory.Delete("test", true);
             ViewModel.Message = $"总得分：{sum:0.00}";
         }
     }

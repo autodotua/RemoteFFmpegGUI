@@ -63,6 +63,10 @@ namespace SimpleFFmpegGUI.WPF
 
         public MainWindow(MainWindowViewModel viewModel, QueueManager queue)
         {
+            if(Config.Instance.WindowMaximum)
+            {
+                WindowState = WindowState.Maximized;
+            }
             ViewModel = viewModel;
             DataContext = ViewModel;
             InitializeComponent();
@@ -288,6 +292,16 @@ namespace SimpleFFmpegGUI.WPF
         {
             var window = App.ServiceProvider.GetService<TestWindow>();
             window.ShowDialog(this);
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            Config.Instance.WindowMaximum = WindowState == WindowState.Maximized;
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            Config.Instance.Save();
         }
     }
 }
