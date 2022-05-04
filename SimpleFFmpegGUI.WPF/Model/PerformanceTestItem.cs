@@ -10,9 +10,11 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class PerformanceTestLine
     {
+        public const int CodecsCount = 3;
+        public const int SizesCount = 4;
         public PerformanceTestLine()
         {
-            Items = new PerformanceTestItem[3]
+            Sizes = new PerformanceTestItem[CodecsCount]
             {
                 new PerformanceTestItem(){IsChecked=true },
                 new PerformanceTestItem(){IsChecked=true },
@@ -20,7 +22,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             };
         }
         public string Header { get; set; }
-        public PerformanceTestItem[] Items { get; }
+        public PerformanceTestItem[] Sizes { get; }
     }
     public class PerformanceTestItem:INotifyPropertyChanged
     {

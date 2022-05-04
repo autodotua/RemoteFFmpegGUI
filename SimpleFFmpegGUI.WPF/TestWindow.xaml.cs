@@ -1,29 +1,15 @@
 ﻿using FzLib;
-using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
-using SimpleFFmpegGUI.WPF.Pages;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Path = System.IO.Path;
+using static SimpleFFmpegGUI.WPF.Model.PerformanceTestLine;
 
 namespace SimpleFFmpegGUI.WPF
 {
@@ -39,6 +25,7 @@ namespace SimpleFFmpegGUI.WPF
             new PerformanceTestLine(){Header="1080P"},
             new PerformanceTestLine(){Header="1440P"},
             new PerformanceTestLine(){Header="2160P"},
+            new PerformanceTestLine(){Header="总得分"},
         };
         private string message = "";
         public string Message
@@ -105,6 +92,7 @@ namespace SimpleFFmpegGUI.WPF
                 stopping = false;
                 ViewModel.Progress = 0;
                 ViewModel.IsTesting = true;
+                ViewModel.Tests[^1].Sizes.ForEach(p => p.Score = 0);
                 if (!Directory.Exists("test"))
                 {
                     Directory.CreateDirectory("test");
@@ -145,29 +133,21 @@ namespace SimpleFFmpegGUI.WPF
         /// <exception cref="Exception"></exception>
         private async Task TestAsync(string input)
         {
-            double sum = 0;
-            string[] codes = new string[] { "H264", "H265", "VP9" };
-            string[] sizes = new string[] { "1280x720", "1920x1080", "2560x1440", "3840x2160" };
+            double[] sums = new double[CodecsCount];
+            int[] counts = new int[CodecsCount];
+            string[] codecs = new string[CodecsCount] { "H264", "H265", "VP9" };
+            string[] sizes = new string[SizesCount] { "1280x720", "1920x1080", "2560x1440", "3840x2160" };
+            //不同分辨率不同编码的权重矩阵，即一般情况下不同分辨率的编码帧速率与720P的帧速率之比
+            double[,] weights = new[,] {
+                { 1, 0.64, 0.4, 0.2 },
+                { 1, 0.6, 0.35, 0.16 },
+                { 1, 0.6, 0.4, 0.25 } };
 
-            //ViewModel.Message = $"正在准备";
-            //TaskInfo task = new TaskInfo()
-            //{
-
-            //    Inputs = new List<InputArguments>() { new InputArguments() { FilePath = input } },
-
-            //    Output = Path.GetFullPath("test/pic%04d.jpg"),
-            //    Arguments = new OutputArguments()
-            //    {
-            //        Video = new VideoCodeArguments() { Code = null, PixelFormat = "bgr8" },
-            //        Audio = new AudioCodeArguments() { Code = null },
-            //    }
-            //};
-            //await new FFmpegManager(task).RunAsync();
-           var task = new TaskInfo()
+            var task = new TaskInfo()
             {
-                Inputs = new List<InputArguments>() 
+                Inputs = new List<InputArguments>()
                 {
-                    new InputArguments() 
+                    new InputArguments()
                     {
                         FilePath = input,
                     }
@@ -182,16 +162,16 @@ namespace SimpleFFmpegGUI.WPF
                 },
                 Type = TaskType.Code,
             };
-            for (int i = 0; i < codes.Length; i++)
+            for (int i = 0; i < codecs.Length; i++)
             {
                 for (int j = 0; j < sizes.Length; j++)
                 {
-                    var item = ViewModel.Tests[j].Items[i];
+                    var item = ViewModel.Tests[j].Sizes[i];
 
-                    ViewModel.Message = $"正在测试{codes[i]}，{sizes[j].Split('x')[1]}P";
+                    ViewModel.Message = $"正在测试{codecs[i]}，{sizes[j].Split('x')[1]}P";
                     ViewModel.Progress += 0.5;
                     ViewModel.DetailProgress = 0;
-                    task.Arguments.Video.Code = codes[i];
+                    task.Arguments.Video.Code = codecs[i];
                     task.Arguments.Video.Size = sizes[j];
 
                     runningFFmpeg = new FFmpegManager(task);
@@ -212,6 +192,10 @@ namespace SimpleFFmpegGUI.WPF
                     {
                         await runningFFmpeg.RunAsync();
                     }
+                    catch (TaskCanceledException)
+                    {
+                        goto end;
+                    }
                     catch (Exception ex)
                     {
                         throw new Exception("编码失败", ex);
@@ -225,7 +209,8 @@ namespace SimpleFFmpegGUI.WPF
                     {
                         throw new Exception("无法获取编码帧速度");
                     }
-                    sum += fps;
+                    sums[i] += fps / weights[i, j];
+                    counts[i]++;
                     item.Score = fps;
                     if (stopping)
                     {
@@ -233,7 +218,12 @@ namespace SimpleFFmpegGUI.WPF
                     }
                 }
             }
-            ViewModel.Message = $"总得分：{sum:0.00}";
+        end:
+            for (int i = 0; i < CodecsCount; i++)
+            {
+                ViewModel.Tests[^1].Sizes[i].Score = counts[i] == 0 ? 0 : Math.Round(sums[i] / counts[i], 2);
+            }
+            ViewModel.Message = "";
         }
     }
 }

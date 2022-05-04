@@ -48,7 +48,12 @@ namespace SimpleFFmpegGUI.Manager
             }
             started = true;
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-            cancellationToken?.Register(process.Kill);
+            bool exit = false;
+            cancellationToken?.Register(() =>
+            {
+                exit = true;
+                process.Kill();
+            });
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -60,6 +65,10 @@ namespace SimpleFFmpegGUI.Manager
                      if (process.ExitCode == 0)
                      {
                          tcs.SetResult(true);
+                     }
+                     else if (exit)
+                     {
+                         tcs.SetException(new TaskCanceledException("进程被取消"));
                      }
                      else
                      {
