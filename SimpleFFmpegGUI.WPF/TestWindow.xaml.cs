@@ -147,7 +147,6 @@ namespace SimpleFFmpegGUI.WPF
             double sum = 0;
             string[] codes = new string[] { "H264", "H265", "VP9" };
             string[] sizes = new string[] { "1280x720", "1920x1080", "2560x1440", "3840x2160" };
-            string[] formats = new string[] { "mp4", "mp4", "webm" };
             TaskInfo task = new TaskInfo()
             {
                 Inputs = new List<InputArguments>() { new InputArguments() { FilePath = input } },
@@ -155,9 +154,11 @@ namespace SimpleFFmpegGUI.WPF
                 Arguments = new OutputArguments()
                 {
                     Video = new VideoCodeArguments() { Preset = ViewModel.Preset },
-                    Audio = null
+                    Audio = null,
+                    DisableAudio = true,
+                    Format = "mp4"
                 },
-                Type = TaskType.Code
+                Type = TaskType.Code,
             };
             for (int i = 0; i < codes.Length; i++)
             {
@@ -171,7 +172,6 @@ namespace SimpleFFmpegGUI.WPF
                     ViewModel.DetailProgress = 0;
                     task.Arguments.Video.Code = codes[i];
                     task.Arguments.Video.Size = sizes[j];
-                    task.Arguments.Format = formats[i];
 
                     runningFFmpeg = new FFmpegManager(task);
                     double fps = 0;
