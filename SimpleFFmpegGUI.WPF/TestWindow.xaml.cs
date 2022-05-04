@@ -136,6 +136,7 @@ namespace SimpleFFmpegGUI.WPF
             double[] sums = new double[CodecsCount];
             int[] counts = new int[CodecsCount];
             string[] codecs = new string[CodecsCount] { "H264", "H265", "VP9" };
+            string[] extraArgs = new string[CodecsCount] { "", "", "-row-mt 1" };
             string[] sizes = new string[SizesCount] { "1280x720", "1920x1080", "2560x1440", "3840x2160" };
             //不同分辨率不同编码的权重矩阵，即一般情况下不同分辨率的编码帧速率与720P的帧速率之比
             double[,] weights = new[,] {
@@ -173,6 +174,7 @@ namespace SimpleFFmpegGUI.WPF
                     ViewModel.DetailProgress = 0;
                     task.Arguments.Video.Code = codecs[i];
                     task.Arguments.Video.Size = sizes[j];
+                    task.Arguments.Extra = extraArgs[i];
 
                     runningFFmpeg = new FFmpegManager(task);
                     double fps = 0;
@@ -224,6 +226,14 @@ namespace SimpleFFmpegGUI.WPF
                 ViewModel.Tests[^1].Sizes[i].Score = counts[i] == 0 ? 0 : Math.Round(sums[i] / counts[i], 2);
             }
             ViewModel.Message = "";
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            if(ViewModel.IsTesting)
+            {
+                e.Cancel=true; 
+            }
         }
     }
 }

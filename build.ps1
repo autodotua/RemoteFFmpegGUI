@@ -1,5 +1,14 @@
-﻿try
+﻿param(
+    [Parameter()]
+    [String]$skip
+)
+try
 {
+    
+    Write-Output "-skip wpf：跳过生成WPF"
+    Write-Output "-skip web：跳过生成Web、WebAPI、Host"
+    Write-Output ("当前参数："+$skip)   
+    
     Write-Output "请先阅读ReadMe"
     Write-Output "请确保："
     Write-Output "已经安装npm（Node.JS）"
@@ -31,38 +40,51 @@
     {
         throw "未安装.NET SDK"
     }
-    
-    mkdir -Force Generation/Publish/WebPackage
-    mkdir -Force Generation/Publish/WebPackage/api
-    mkdir -Force Generation/Publish/WebPackage/host
 
+    
     Clear-Host
+    
+    if($skip.ToLower() -ne "web")
+    {
+        mkdir -Force Generation/Publish/WebPackage
+        mkdir -Force Generation/Publish/WebPackage/api
+        mkdir -Force Generation/Publish/WebPackage/host
 
-    Write-Output "正在发布Web"
-    Set-Location SimpleFFmpegGUI.Web
-    npm install
-    npm run build
-    Set-Location ..
-    Write-Output "正在复制Web"
-    Copy-Item SimpleFFmpegGUI.Web/dist/* Generation/Publish/WebPackage -Force -Recurse
+        Write-Output "正在发布Web"
+        Set-Location SimpleFFmpegGUI.Web
+        npm install
+        npm run build
+        Set-Location ..
+        Write-Output "正在复制Web"
+        Copy-Item SimpleFFmpegGUI.Web/dist/* Generation/Publish/WebPackage -Force -Recurse
 
-    Write-Output "正在发布WebAPI"
-    dotnet publish SimpleFFmpegGUI.WebAPI -c Release -o Generation/Publish/WebPackage/api
+        Write-Output "正在发布WebAPI"
+        dotnet publish SimpleFFmpegGUI.WebAPI -c Release -o Generation/Publish/WebPackage/api
 
-    Write-Output "正在发布Host"
-    dotnet publish SimpleFFmpegGUI.Host -c Release -o Generation/Publish/WebPackage/host
+        Write-Output "正在发布Host"
+        dotnet publish SimpleFFmpegGUI.Host -c Release -o Generation/Publish/WebPackage/host
 
-    Write-Output "正在发布WPF"
-    dotnet publish SimpleFFmpegGUI.WPF.Cut -c Release -o Generation/Publish/WPF -r win-x64 --self-contained true
-    dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained true
+        
+        Write-Output "正在复制二进制库"
+        Copy-Item bin/* Generation/Publish/WebPackage/host -Force -Recurse
+        
+        Write-Output "正在清理"
+        Remove-Item SimpleFFmpegGUI.Web/dist -Recurse
+    }
 
     
-    Write-Output "正在复制二进制库"
-    Copy-Item bin/* Generation/Publish/WebPackage/host -Force -Recurse
-    Copy-Item bin/* Generation/Publish/WPF -Force -Recurse
+    if($skip.ToLower() -ne "wpf")
+    {
+        Write-Output "正在发布WPF"
+        dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained true
 
+        
+        Write-Output "正在复制二进制库"
+        Copy-Item bin/* Generation/Publish/WPF -Force -Recurse
+
+    }
+    
     Write-Output "正在清理"
-    Remove-Item SimpleFFmpegGUI.Web/dist -Recurse
     Remove-Item Generation/Release -Recurse
 
     Write-Output "操作完成"

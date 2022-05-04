@@ -14,7 +14,7 @@
     AllowDrop="True"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
-    SizeToContent="Height"
+    SizeToContent="Height" Closing="Window_Closing"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
     <ui:SimpleStackPanel
