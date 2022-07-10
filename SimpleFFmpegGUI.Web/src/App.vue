@@ -116,6 +116,7 @@ export default Vue.extend({
         ["/tasks", "el-icon-document", "任务列表"],
         ["/preset", "el-icon-document-copy", "预设"],
         ["/file", "el-icon-folder-opened", "文件服务"],
+        ["/power", "el-icon-set-up", "电源管理"],
         ["/log", "el-icon-takeaway-box", "日志"],
         // ["/about", "el-icon-info", "关于"],
       ],

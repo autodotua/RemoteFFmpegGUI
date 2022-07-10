@@ -14,6 +14,7 @@ import Tasks from '../views/Tasks.vue'
 import Files from '../views/Files.vue'
 import Presets from '../views/Presets.vue'
 import Logs from '../views/Logs.vue'
+import Power from '../views/Power.vue'
 
 Vue.use(VueRouter)
 
@@ -47,6 +48,11 @@ Vue.use(VueRouter)
     path: '/tasks',
     name: 'Tasks',
     component: Tasks
+  },
+  {
+    path: '/power',
+    name: 'Power',
+    component: Power
   },
   {
     path: '/add/'+TaskType.GetByID(0).Route,
