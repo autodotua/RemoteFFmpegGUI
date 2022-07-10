@@ -46,7 +46,13 @@ export default Vue.extend({
     getUploadUrl: net.getUploadUrl,
     formatDateTime: formatDateTime,
     shutdown() {
-      net.postShutdown();
+      net.postShutdown()
+        .then(() => {
+          showSuccess("发送关机命令成功，计算机将在3分钟后关机。");
+        })
+        .catch(() => {
+          showSuccess("发送关机命令失败");
+        });
     },
     abortShutdown() {
       net
@@ -61,12 +67,6 @@ export default Vue.extend({
     setShutdownQueue(value: boolean) {
       net
         .postShutdownQueue(value)
-        .then(() => {
-          showSuccess("发送关机命令成功");
-        })
-        .catch(() => {
-          showSuccess("发送关机命令失败");
-        });
     },
     updateShutdownQueue() {
       net.getShutdownQueue().then((v) => {
