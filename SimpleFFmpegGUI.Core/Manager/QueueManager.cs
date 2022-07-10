@@ -23,6 +23,7 @@ namespace SimpleFFmpegGUI.Manager
         private List<FFmpegManager> taskProcessManagers = new List<FFmpegManager>();
 
         public TaskInfo MainQueueTask { get; private set; }
+        public PowerManager PowerManager { get; } = new PowerManager();
         public FFmpegManager MainQueueManager => Managers.FirstOrDefault(p => p.Task == MainQueueTask);
         public IReadOnlyList<FFmpegManager> Managers => taskProcessManagers.AsReadOnly();
         public IEnumerable<TaskInfo> StandaloneTasks => Managers.Where(p => p.Task != MainQueueTask).Select(p => p.Task);
@@ -85,8 +86,13 @@ namespace SimpleFFmpegGUI.Manager
                 await ProcessTaskAsync(db, task, true);
             }
             running = false;
+            bool cancelManually = cancelQueue;
             cancelQueue = false;
             Logger.Info("队列完成");
+            if (!cancelManually && PowerManager.ShutdownAfterQueueFinished)
+            {
+                PowerManager.Shutdown();
+            }
         }
 
         private async Task ProcessTaskAsync(FFmpegDbContext db, TaskInfo task, bool main)

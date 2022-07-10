@@ -73,5 +73,13 @@ namespace SimpleFFmpegGUI
         void ImportPresets(string json);
 
         string ExportPresets();
+
+        void SetShutdownAfterQueueFinished(bool v);
+
+        bool IsShutdownAfterQueueFinished();
+
+        void Shutdown();
+
+        void AbortShutdown();
     }
 }

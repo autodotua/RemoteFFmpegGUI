@@ -2,23 +2,23 @@
   <div>
     <div class="top24">
       <h2>立即关机</h2>
-      <el-popconfirm title="是否立即关机？" @confirm="cancel" class="right12">
+      <el-popconfirm title="是否立即关机？" @confirm="shutdown" class="right12">
         <el-button type="danger" slot="reference"
           >立即关机</el-button
         ></el-popconfirm
+      >
+      <el-button type="secondary" slot="reference" @click="abortShutdown"
+        >终止关机</el-button
       >
     </div>
 
     <div class="top24">
-      <h2>定时关机</h2>
-      <a>定时：</a>
-      <el-input style="width: 128px" class="right12"></el-input>
-      <a class="right24">分钟</a>
-      <el-popconfirm title="是否立即关机？" @confirm="cancel" class="right12">
-        <el-button type="danger" slot="reference"
-          >立即关机</el-button
-        ></el-popconfirm
-      >
+      <h2>队列结束后关机</h2>
+      <a class="right12">是否在完成当前队列后自动关机</a>
+      <el-switch
+        v-model="shutdown_queue"
+        @change="setShutdownQueue"
+      ></el-switch>
     </div>
   </div>
 </template>
@@ -27,20 +27,17 @@ import Vue from "vue";
 import Cookies from "js-cookie";
 import {
   showError,
-  jump,
+  showSuccess,
   formatDateTime,
-  formatDoubleTimeSpan,
   showLoading,
   closeLoading,
 } from "../common";
 import * as net from "../net";
-import FileSelect from "@/components/FileSelect.vue";
 export default Vue.extend({
   name: "Home",
   data() {
     return {
-      status: null,
-      files: [],
+      shutdown_queue: false,
     };
   },
   computed: {},
@@ -48,46 +45,47 @@ export default Vue.extend({
     getHeader: net.getHeader,
     getUploadUrl: net.getUploadUrl,
     formatDateTime: formatDateTime,
-    download(file: any) {
-      const name = file.name;
-      net.download(name);
+    shutdown() {
+      net.postShutdown();
     },
-    upload() {
-      (this.$refs.upload as any).submit();
-    },
-    getStatus() {
-      return net
-        .getFtpStatus()
-        .then((r) => {
-          this.status = r.data;
-        })
-        .catch(showError);
-    },
-    post(input: boolean, on: boolean) {
+    abortShutdown() {
       net
-        .postFtp(input, on)
-        .then((r) => {
-          this.getStatus();
+        .postAbortShutdown()
+        .then(() => {
+          showSuccess("发送终止关机命令成功");
         })
-        .catch(showError);
+        .catch(() => {
+          showSuccess("发送终止关机命令失败");
+        });
     },
-    fillData() {
-      showLoading();
-      return net
-        .getMediaDetails()
-        .then((response) => {
-          this.files = response.data;
+    setShutdownQueue(value: boolean) {
+      net
+        .postShutdownQueue(value)
+        .then(() => {
+          showSuccess("发送关机命令成功");
         })
-        .catch(showError)
-        .finally(closeLoading);
+        .catch(() => {
+          showSuccess("发送关机命令失败");
+        });
+    },
+    updateShutdownQueue() {
+      net.getShutdownQueue().then((v) => {
+        if (v.data === true) {
+          this.shutdown_queue = true;
+        } else if (v.data === false) {
+          this.shutdown_queue = false;
+        } else {
+          showError("获取是否在队列结束后自动关机的状态失败");
+        }
+        closeLoading();
+      });
     },
   },
   components: {},
   mounted: function () {
     showLoading();
     this.$nextTick(function () {
-      this.fillData();
-      this.getStatus().finally(closeLoading);
+      this.updateShutdownQueue();
     });
   },
 });

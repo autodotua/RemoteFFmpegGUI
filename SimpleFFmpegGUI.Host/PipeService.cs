@@ -22,7 +22,7 @@ namespace SimpleFFmpegGUI
 
         public PipeService()
         {
-            Logger.Info("实例化新的PipeService类");
+            Logger.Info("已建立与客户端的连接");
         }
 
         public void StartQueue()
@@ -197,6 +197,24 @@ namespace SimpleFFmpegGUI
         public string ExportPresets()
         {
             return PresetManager.Export();
+        }
+
+        public void SetShutdownAfterQueueFinished(bool v)
+        {
+            Manager.PowerManager.ShutdownAfterQueueFinished = v;
+        }
+        public bool IsShutdownAfterQueueFinished()
+        {
+            return Manager.PowerManager.ShutdownAfterQueueFinished;
+        }
+
+        public void Shutdown()
+        {
+            Manager.PowerManager.Shutdown();
+        }
+        public void AbortShutdown()
+        {
+            Manager.PowerManager.AbortShutdown();
         }
     }
 }

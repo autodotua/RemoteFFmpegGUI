@@ -182,6 +182,28 @@ export function downloadExportPresetsUrl(): void {
         })
 }
 
+
+export function getShutdownQueue(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+        .get(getUrl("Power/ShutdownQueue"))
+}
+
+export function postShutdownQueue(on:boolean): Promise<AxiosResponse<any>> {
+        const  form = new FormData();
+        form.append("on",String(on))
+        return Vue.axios
+        .post(getUrl("Power/ShutdownQueue"),form)
+}
+export function postShutdown(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+        .post(getUrl("Power/Shutdown"))
+}
+
+export function postAbortShutdown(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+        .post(getUrl("Power/AbortShutdown"))
+}
+
 export function getFormats(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("Task/Formats"))
