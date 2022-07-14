@@ -38,5 +38,12 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             return await pipeClient.InvokeAsync(p => p.IsShutdownAfterQueueFinished());
         }
+
+        [HttpGet]
+        [Route("CpuCoreUsage")]
+        public async Task<CpuCoreUsageDto[]> GetCpuCoreUsage()
+        {
+            return await pipeClient.InvokeAsync(p => p.GetCpuUsage(TimeSpan.FromSeconds(0.1)));
+        }
     }
 }

@@ -76,6 +76,10 @@ export function getQueueStatus(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("Queue/Status"))
 }
+export function getCpuCoreUsage(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .get(getUrl("Power/CpuCoreUsage"))
+}
 export function getTask(id: number) {
         return Vue.axios
                 .get(getUrl("Task?id=" + id))

@@ -99,6 +99,17 @@
   - PipeClient：用于调用Host发布的服务
   - TokenFilter：在处理请求之前进行拦截，验证是否带有正确的Token
 - Web：使用Vue.js实现的网页端
+  - public：静态文件
+  - src：Web源码，使用WebPack打包
+    - assets：静态资源
+    - components：Vue组件
+    - router：路由设置
+    - views：Vue视图
+      - Add：新增任务视图
+    - common.ts：一些通用方法
+    - main.ts：启动文件
+    - net.ts：网络相关（Vue.axios）代码
+    - parameters.ts：一些固定参数
 - WPF：桌面端的GUI实现
   - Model：桌面GUI中用到的一些数据结构
   - Pages：在主界面右侧显示的页面

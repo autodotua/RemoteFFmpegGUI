@@ -216,5 +216,10 @@ namespace SimpleFFmpegGUI
         {
             Manager.PowerManager.AbortShutdown();
         }
+
+        public CpuCoreUsageDto[] GetCpuUsage(TimeSpan sampleSpan)
+        {
+            return PowerManager.GetCpuUsage(sampleSpan);
+        }
     }
 }
