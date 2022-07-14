@@ -58,7 +58,7 @@ export default Vue.extend({
       cpuCoreUsages: Array<any>(),
       colors: [
         { color: "green", percentage: 50 },
-        { color: "organe", percentage: 80 },
+        { color: "orange", percentage: 80 },
         { color: "red", percentage: 100 },
       ],
     };
