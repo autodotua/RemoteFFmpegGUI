@@ -83,5 +83,11 @@ namespace SimpleFFmpegGUI
         void AbortShutdown();
 
         CpuCoreUsageDto[] GetCpuUsage(TimeSpan sampleSpan);
+
+        void ScheduleQueue(DateTime time);
+
+        void CancelQueueSchedule();
+
+        DateTime? GetQueueScheduleTime();
     }
 }

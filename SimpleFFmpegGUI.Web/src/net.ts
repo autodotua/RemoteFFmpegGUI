@@ -235,3 +235,17 @@ export function getCheckToken(token: string): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("Token/Check?token=") + token)
 }
+
+export function getQueueScheduleTime(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .get(getUrl("Queue/QueueScheduleTime"))
+}
+export function postSchedule(time:any): Promise<AxiosResponse<any>> {
+        return Vue.axios
+        .post(getUrl("Queue/Schedule?time="+encodeURI(time)))
+}
+
+export function postCancelSchedule(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+        .post(getUrl("Queue/CancelSchedule"))
+}

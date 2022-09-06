@@ -221,5 +221,20 @@ namespace SimpleFFmpegGUI
         {
             return PowerManager.GetCpuUsage(sampleSpan);
         }
+
+        public void ScheduleQueue(DateTime time)
+        {
+            Manager.ScheduleQueue(time);
+        }
+
+        public void CancelQueueSchedule()
+        {
+            Manager.CancelQueueSchedule();
+        }
+
+        public DateTime? GetQueueScheduleTime()
+        {
+            return Manager.GetQueueScheduleTime();
+        }
     }
 }

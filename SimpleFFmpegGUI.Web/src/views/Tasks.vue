@@ -2,6 +2,34 @@
   <div>
     <div>
       <span style="float: right">
+        <a class="right12" v-if="isProcessing == false && hasSchedule"
+          >已计划开始时间</a
+        >
+        <el-date-picker
+          class="right12"
+          v-model="scheduleTime"
+          value-format="yyyy-MM-dd[T]HH:mm:ss[Z]"
+          placeholder="计划开始时间"
+          type="datetime"
+          :disabled="hasSchedule"
+        ></el-date-picker>
+
+        <el-button
+          v-if="isProcessing == false && hasSchedule == false"
+          type="secondary"
+          @click="schedule"
+          class="right24"
+          >设置计划</el-button
+        >
+
+        <el-button
+          v-if="isProcessing == false && hasSchedule"
+          type="secondary"
+          @click="cancelSchedule"
+          class="right24"
+          >取消计划</el-button
+        >
+
         <el-button v-if="isProcessing == false" type="primary" @click="start"
           >开始队列</el-button
         >
@@ -74,7 +102,9 @@
                 </a>
                 <a v-if="file.from" class="right12"> 开始：{{ file.from }}s</a>
                 <a v-if="file.to" class="right12"> 结束：{{ file.to }}s</a>
-                <a v-if="file.duration" class="right12"> 经过：{{ file.duration }}s</a>
+                <a v-if="file.duration" class="right12">
+                  经过：{{ file.duration }}s</a
+                >
               </div>
             </el-form-item>
             <el-form-item label="输出">{{ props.row.output }} </el-form-item>
@@ -90,7 +120,9 @@
             <el-form-item label="FFmpeg参数"
               >{{ props.row.fFmpegArguments }}
             </el-form-item>
-            <el-form-item label="信息" class="s">{{ props.row.message }} </el-form-item>
+            <el-form-item label="信息" class="s"
+              >{{ props.row.message }}
+            </el-form-item>
             <el-form-item label="参数">
               <code-arguments-description
                 :type="props.row.type"
@@ -170,7 +202,7 @@
             slot="reference"
             type="text"
             size="small"
-            @click="jump('log?id='+scope.row.id)"
+            @click="jump('log?id=' + scope.row.id)"
             >日志</el-button
           >
         </template>
@@ -244,6 +276,8 @@ export default Vue.extend({
       page: 1,
       countPerPage: 10,
       statusFilter: null,
+      scheduleTime: "",
+      hasSchedule: false,
     };
   },
   props: ["status"],
@@ -263,6 +297,24 @@ export default Vue.extend({
   },
   methods: {
     jump,
+    schedule(item: any) {
+      net
+        .postSchedule(this.scheduleTime)
+        .then((r) => {
+          showSuccess("设置成功");
+          this.hasSchedule = true;
+        })
+        .catch(showError);
+    },
+    cancelSchedule(item: any) {
+      net
+        .postCancelSchedule()
+        .then((r) => {
+          showSuccess("取消成功");
+          this.hasSchedule = false;
+        })
+        .catch(showError);
+    },
     remake(item: any) {
       jumpByArgs(item.arguments, item.inputs, item.output, item.type);
     },
@@ -389,11 +441,17 @@ export default Vue.extend({
     showLoading();
     this.$nextTick(function () {
       this.fillData();
-      // setInterval(() => {
-      //   if (this.selection.length == 0) {
-      //     this.fillData();
-      //   }
-      // }, 20000);
+      net
+        .getQueueScheduleTime()
+        .then((r) => {
+          const time = r.data;
+          console.log(r);
+          if (time != null && time != "") {
+            this.scheduleTime = time;
+            this.hasSchedule = true;
+          }
+        })
+        .catch(showError);
     });
   },
   components: { CodeArgumentsDescription },

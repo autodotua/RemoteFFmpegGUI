@@ -75,7 +75,7 @@ export default Vue.extend({
           showSuccess("发送关机命令成功，计算机将在3分钟后关机。");
         })
         .catch(() => {
-          showSuccess("发送关机命令失败");
+          showError("发送关机命令失败");
         });
     },
     abortShutdown() {
@@ -85,7 +85,7 @@ export default Vue.extend({
           showSuccess("发送终止关机命令成功");
         })
         .catch(() => {
-          showSuccess("发送终止关机命令失败");
+          showError("发送终止关机命令失败");
         });
     },
     setShutdownQueue(value: boolean) {
