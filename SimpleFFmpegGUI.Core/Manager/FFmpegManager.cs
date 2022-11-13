@@ -661,5 +661,12 @@ namespace SimpleFFmpegGUI.Manager
 
             await RunAsync(p, null, cancellationToken);
         }
+
+        public string GetErrorMessage()
+        {
+            var logs = LogManager.GetLogs('O', Task.Id, DateTime.Now.AddSeconds(-5));
+            var log = logs.List.Where(p => p.Message.StartsWith("Error")).OrderByDescending(p => p.Time).FirstOrDefault();
+            return log?.Message;
+        }
     }
 }

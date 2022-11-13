@@ -224,7 +224,7 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     Logger.Error(task, "运行错误：" + ex.ToString());
                     task.Status = TaskStatus.Error;
-                    task.Message = ex.Message;
+                    task.Message = ffmpegManager.GetErrorMessage() ?? "运行错误，请查看日志";
                 }
                 else
                 {

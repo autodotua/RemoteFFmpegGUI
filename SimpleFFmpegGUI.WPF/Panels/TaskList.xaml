@@ -145,15 +145,16 @@
             BorderThickness="0,1,0,0"
             Visibility="{Binding Tasks.SelectedTask, Converter={StaticResource NotNullConverter}}">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="16" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="4" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <ScrollViewer
                     xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
                     xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
-                    Margin="8"
+                    Margin="8,8,0,8"
+                    Padding="0,0,24,0"
                     c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
                     HorizontalScrollBarVisibility="Disabled"
                     VerticalScrollBarVisibility="Auto">
@@ -226,7 +227,8 @@
                             Grid.Row="6"
                             Grid.Column="2"
                             Text="{Binding OutputText}"
-                            TextTrimming="CharacterEllipsis" />
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="Wrap" />
 
                         <TextBlock
                             Grid.Row="8"
@@ -252,10 +254,13 @@
                             Grid.Row="12"
                             FontWeight="Bold"
                             Text="信息" />
-                        <TextBlock
+                        <TextBox
                             Grid.Row="12"
                             Grid.Column="2"
-                            Text="{Binding Message}" />
+                            BorderThickness="0"
+                            IsReadOnly="True"
+                            Text="{Binding Message}"
+                            TextWrapping="Wrap" />
                         <TextBlock
                             Grid.Row="14"
                             FontWeight="Bold"
@@ -263,46 +268,41 @@
                         <TextBox
                             Grid.Row="14"
                             Grid.Column="2"
-                            Margin="0,-3,24,0"
                             BorderThickness="0"
                             IsReadOnly="True"
-                            MaxLines="3"
-                            ScrollViewer.VerticalScrollBarVisibility="Auto"
                             Text="{Binding FFmpegArguments}"
                             TextWrapping="Wrap" />
                     </Grid>
                 </ScrollViewer>
                 <ui:SimpleStackPanel
-                    Grid.Column="2"
-                    VerticalAlignment="Center"
+                    Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
                     Spacing="8">
                     <Button
-                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
                         Click="StartButton_Click"
                         Content="独立执行"
                         IsEnabled="{Binding Tasks.SelectedTask.StartButtonEnabled}"
                         Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
-                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
                         Click="CancelButton_Click"
                         Content="取消"
                         IsEnabled="{Binding Tasks.SelectedTask.CancelButtonEnabled}"
                         ToolTip="取消执行任务，正在执行的任务会被停止"
                         Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
-                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
                         Click="ResetButton_Click"
                         Content="重置"
                         IsEnabled="{Binding Tasks.SelectedTask.ResetButtonEnabled}"
                         ToolTip="将任务设置为排队状态" />
                     <Button
-                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
                         Click="DeleteButton_Click"
                         Content="删除"
                         Visibility="Collapsed" />
                     <Button
-                        Margin="0,16,0,0"
-                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
                         Background="Transparent"
                         DataContext="{Binding Tasks.SelectedTask}">
                         <ui:SymbolIcon Symbol="More" />
