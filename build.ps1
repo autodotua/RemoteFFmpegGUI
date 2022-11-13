@@ -1,13 +1,17 @@
 ﻿param(
     [Parameter()]
-    [String]$skip
+    [switch]$d,
+    [switch]$w,
+    [switch]$s,
+    [switch]$f
 )
-try
-{
+try {
     
-    Write-Output "-skip wpf：跳过生成WPF"
-    Write-Output "-skip web：跳过生成Web、WebAPI、Host"
-    Write-Output ("当前参数："+$skip)   
+    Write-Output "-d：仅生成WPF"
+    Write-Output "-w：仅生成Web（Web、WebAPI、Host）"
+    Write-Output "-s：WPF生成到单文件"
+    Write-Output "-f：WPF包含框架"
+    Write-Output ""  
     
     Write-Output "请先阅读ReadMe"
     Write-Output "请确保："
@@ -19,33 +23,29 @@ try
     [Console]::ReadKey()
     Clear-Host
     
-    if(!(Test-Path bin))
-    {
+    if (!(Test-Path bin)) {
         throw "不存在bin目录"
     }
-    try
-    {
+    try {
         npm
     }
-    catch
-    {
+    catch {
         throw "不存在npm命令"
     }
     
-    try
-    {
+    try {
         dotnet
     }
-    catch
-    {
+    catch {
         throw "未安装.NET SDK"
     }
 
     
     Clear-Host
+
+    Remove-Item Generation/Publish -Recurse
     
-    if($skip.ToLower() -ne "web")
-    {
+    if ($d -eq $false) {
         mkdir -Force Generation/Publish/WebPackage
         mkdir -Force Generation/Publish/WebPackage/api
         mkdir -Force Generation/Publish/WebPackage/host
@@ -73,10 +73,20 @@ try
     }
 
     
-    if($skip.ToLower() -ne "wpf")
-    {
+    if ($w -eq $false) {
         Write-Output "正在发布WPF"
-        dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained true
+        if ($s) {
+            dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained false /p:PublishSingleFile=true
+        }
+        else {
+            if ($f) {
+                dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained true
+            }
+            else {
+                dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained false
+            }
+        }
+        
 
         
         Write-Output "正在复制二进制库"
@@ -91,7 +101,6 @@ try
     Write-Output "Web包位于Generation/Publish/WebPackage，WPF包位于Generation/Publish/WPF。"
     [Console]::ReadKey()
 }
-catch
-{
+catch {
     Write-Error $_
 }

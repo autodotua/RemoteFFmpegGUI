@@ -45,8 +45,8 @@
                         <Border
                             Margin="4"
                             Padding="10,6,10,4"
-                            Background="{DynamicResource SystemControlBackgroundListLowBrush}"
-                            CornerRadius="8">
+                            BorderBrush="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                            BorderThickness="0,0,0,2">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
