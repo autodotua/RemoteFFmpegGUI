@@ -125,6 +125,9 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Bottom"
             Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}" />
+        <ui:CommandBar
+            Grid.Column="2"
+            VerticalAlignment="Bottom" />
         <TabControl
             x:Name="tab"
             Grid.RowSpan="99"
@@ -202,18 +205,21 @@
                                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                                         ContentSource="Header"
                                                         Focusable="False"
+                                                        Opacity="0.9"
                                                         RecognizesAccessKey="True"
                                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                                         TextElement.FontSize="{DynamicResource TabViewItemHeaderFontSize}"
                                                         TextElement.FontWeight="{TemplateBinding FontWeight}"
                                                         TextElement.Foreground="{DynamicResource TabViewItemHeaderForeground}" />
-                                                    <Button x:Name="CloseButton"
+                                                    <Button
+                                                        x:Name="CloseButton"
                                                         Grid.Column="4"
                                                         Padding="3"
                                                         Background="Transparent"
                                                         Click="CloseTabButton_Click"
                                                         FocusVisualStyle="{x:Null}"
-                                                        Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}">
+                                                        Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                                        Opacity="0.8">
                                                         <Button.Template>
                                                             <ControlTemplate TargetType="Button">
                                                                 <Border
@@ -260,8 +266,8 @@
                                     </Trigger>
                                     <!--  Selected  -->
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="CloseButton" Property="Foreground" Value="{DynamicResource SystemControlHighlightAltAltHighBrush}" />
-                                        <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource SystemControlHighlightAltAltHighBrush}" />
+                                        <Setter TargetName="CloseButton" Property="Foreground" Value="White" />
+                                        <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="White" />
                                         <Setter TargetName="TabContainer" Property="Background" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
                                         <Setter TargetName="IconControl" Property="Foreground" Value="{DynamicResource TabViewItemIconForegroundSelected}" />
                                         <Setter Property="Panel.ZIndex" Value="1" />

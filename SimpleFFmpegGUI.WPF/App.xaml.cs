@@ -3,6 +3,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Layout;
 using Microsoft.Extensions.DependencyInjection;
+using ModernWpf.Controls;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.WPF.Model;
 using SimpleFFmpegGUI.WPF.Pages;
@@ -46,7 +47,7 @@ namespace SimpleFFmpegGUI.WPF
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
             ServiceProvider = serviceCollection.BuildServiceProvider();
-
+    
             if (e.Args.Length > 1)
             {
                 if (e.Args[0] == "cut")

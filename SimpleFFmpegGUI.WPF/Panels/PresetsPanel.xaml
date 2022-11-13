@@ -27,20 +27,26 @@
         c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
         VerticalScrollBarVisibility="Auto">
         <ItemsControl ItemsSource="{Binding Presets}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel HorizontalAlignment="Center" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border
-                        Margin="4,8"
-                        Padding="12"
-                        Background="{DynamicResource SystemControlBackgroundListLowBrush}"
-                        CornerRadius="8"
+                        Margin="4,0"
+                        Padding="10,2"
+                        BorderBrush="{DynamicResource SystemControlBackgroundListLowBrush}"
+                        BorderThickness="0,1"
                         Cursor="Hand"
                         MouseLeftButtonDown="ApplyButton_Click">
+                        <Border.Style>
+                            <Style TargetType="{x:Type Border}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.Setters>
+                                            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundListLowBrush}" />
+                                        </Trigger.Setters>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />

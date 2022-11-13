@@ -43,8 +43,8 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border
-                            Margin="4,8"
-                            Padding="12"
+                            Margin="4"
+                            Padding="10,6,10,4"
                             Background="{DynamicResource SystemControlBackgroundListLowBrush}"
                             CornerRadius="8">
                             <Grid>
@@ -63,10 +63,12 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBox Text="{Binding FilePath}" />
+                                    <TextBox
+                                        Text="{Binding FilePath}"
+                                        TextWrapping="Wrap" />
                                     <ui:SimpleStackPanel
                                         Grid.Column="2"
-                                        VerticalAlignment="Bottom"
+                                        VerticalAlignment="Center"
                                         Orientation="Horizontal"
                                         Spacing="8">
                                         <Button Click="BrowseFileButton_Click">
@@ -92,13 +94,17 @@
                                         <ColumnDefinition Width="60" />
                                         <ColumnDefinition Width="8" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="60" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="8" />
                                         <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />
+                                        <!--<RowDefinition Height="8" />
+                                        <RowDefinition Height="Auto" />-->
                                     </Grid.RowDefinitions>
 
                                     <CheckBox
@@ -109,23 +115,22 @@
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
                                         Text="{Binding From, Converter={StaticResource TimeSpanMMConverter}}" />
                                     <CheckBox
-                                        Grid.Row="2"
+                                        Grid.Column="4"
                                         Content="结束"
                                         IsChecked="{Binding EnableTo}" />
                                     <TextBox
-                                        Grid.Row="2"
-                                        Grid.Column="2"
+                                        Grid.Column="6"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
                                         Text="{Binding To, Converter={StaticResource TimeSpanMMConverter}}" />
-                                    <CheckBox
+                                    <!--<CheckBox
                                         Grid.Row="4"
                                         Content="经过"
                                         IsChecked="{Binding EnableDuration}" />
                                     <TextBox
-                                        Grid.Row="4"
+                                        Grid.Row="4" Grid.ColumnSpan="99"
                                         Grid.Column="2"
                                         ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
-                                        Text="{Binding Duration, Converter={StaticResource TimeSpanMMConverter}}" />
+                                        Text="{Binding Duration, Converter={StaticResource TimeSpanMMConverter}}" />-->
                                 </Grid>
                             </Grid>
                         </Border>
