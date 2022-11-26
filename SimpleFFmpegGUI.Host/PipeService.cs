@@ -236,5 +236,19 @@ namespace SimpleFFmpegGUI
         {
             return Manager.GetQueueScheduleTime();
         }
+
+        public string GetSingleFileInDir(string dir, string name)
+        {
+            var files = Directory.EnumerateFiles(dir, name, SearchOption.AllDirectories);
+            if (!files.Any())
+            {
+                throw new Exception("不存在文件" + name);
+            }
+            if (files.Count() > 2)
+            {
+                throw new Exception($"存在多个文件名为{name}的文件");
+            }
+            return files.First();
+        }
     }
 }

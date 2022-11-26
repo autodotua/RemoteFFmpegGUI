@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SimpleFFmpegGUI.Model;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,24 +48,59 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
         }
 
-        protected async Task CheckInputFileExistAsync(string name)
+        protected async Task<string> CheckAndGetInputFilePathAsync(string name)
         {
-            string path = Path.Combine(InputDir, name);
-            if (CanAccessInputDir())
+            if (name.StartsWith(':'))
             {
-                if (!System.IO.File.Exists(path))
+                name = name[1..];
+                if (CanAccessInputDir())
                 {
-                    throw Oops.Oh("不存在文件" + name);
+                    var files=Directory.EnumerateFiles(InputDir,name, SearchOption.AllDirectories);
+                    if(!files.Any())
+                    {
+                        throw Oops.Oh("不存在文件" + name);
+                    }
+                    if(files.Count()>2)
+                    {
+                        throw Oops.Oh($"存在多个文件名为{name}的文件");
+                    }
+                    return files.First() ;
+                }
+                else
+                {
+                    try
+                    {
+                        return await pipeClient.InvokeAsync(p => p.GetSingleFileInDir(InputDir, name));
+                    }
+                    catch(Exception ex)
+                    {
+                      throw  Oops.Oh(ex.Message);
+                    }
                 }
             }
             else
             {
-                if (!await pipeClient.InvokeAsync(p => p.IsFileExist(path)))
+                string path = Path.Combine(InputDir, name);
+                if (CanAccessInputDir())
                 {
-                    throw Oops.Oh("不存在文件" + name);
+                    if (System.IO.File.Exists(path))
+                    {
+                        throw Oops.Oh("不存在文件" + name);
+                    }
+                    return path;
+                }
+
+                else
+                {
+                    if (!await pipeClient.InvokeAsync(p => p.IsFileExist(path)))
+                    {
+                        throw Oops.Oh("不存在文件" + name);
+                    }
+                    return path;
                 }
             }
-        }
+        } 
+        
 
         protected TaskInfo HideAbsolutePath(TaskInfo task)
         {

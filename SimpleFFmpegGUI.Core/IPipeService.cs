@@ -66,6 +66,8 @@ namespace SimpleFFmpegGUI
 
         bool IsFileExist(string path);
 
+        string GetSingleFileInDir(string dir, string name);
+
         VideoFormat[] GetSuggestedFormats();
 
         TaskInfo GetTask(int id);
