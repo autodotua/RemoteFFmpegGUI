@@ -28,7 +28,7 @@
             <ColumnDefinition Width="24" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Grid>
+        <Grid x:Name="grdLeft">
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*" />
                 <RowDefinition Height="16" />

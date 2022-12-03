@@ -12,6 +12,7 @@
     xmlns:system="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     x:Name="root"
+    Margin="0,0,0,42"
     mc:Ignorable="d">
     <Grid>
 
@@ -42,8 +43,8 @@
                 Background="Transparent"
                 DisplayMemberPath="Value1"
                 ItemsSource="{Binding Pages}"
-                SelectedValuePath="Value"
-                SelectedValue="{Binding AllTasks.Page}">
+                SelectedValue="{Binding AllTasks.Page}"
+                SelectedValuePath="Value">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal" />

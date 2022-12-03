@@ -52,6 +52,10 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             Debug.Assert(inputIndex >= 0 && inputIndex < request.Inputs.Count);
             string output = request.Output;
+            if(output.StartsWith(':'))
+            {
+                output=output[1..];
+            }
             if (string.IsNullOrWhiteSpace(output))
             {
                 if (request.Inputs.Count > 0)
