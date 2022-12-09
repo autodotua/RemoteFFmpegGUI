@@ -216,6 +216,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
                     {
                         i.FilePath = System.IO.Path.GetFileName(i.FilePath);
                     }
+                    i.FilePath = ":" + i.FilePath;
                 }
                 string output = fileIOPanel.GetOutputFileName();
                 OutputArguments args = argumentsPanel.GetOutputArguments();

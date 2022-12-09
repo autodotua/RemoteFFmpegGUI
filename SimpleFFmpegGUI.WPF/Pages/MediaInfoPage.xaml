@@ -9,6 +9,7 @@
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
+    Margin="0,0,0,42"
     AllowDrop="True"
     mc:Ignorable="d">
     <UserControl.Resources>

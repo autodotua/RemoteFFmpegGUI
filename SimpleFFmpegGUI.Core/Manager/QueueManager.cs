@@ -25,8 +25,8 @@ namespace SimpleFFmpegGUI.Manager
         /// 用于判断是否为有效计划的队列计划ID
         /// </summary>
         private int currentScheduleID = 0;
-        private DateTime? scheduleTime = null;
         private bool running = false;
+        private DateTime? scheduleTime = null;
         private List<FFmpegManager> taskProcessManagers = new List<FFmpegManager>();
 
         public QueueManager()
@@ -80,6 +80,11 @@ namespace SimpleFFmpegGUI.Manager
             scheduleTime = null;
         }
 
+        public DateTime? GetQueueScheduleTime()
+        {
+            return scheduleTime;
+        }
+
         public void ResumeMainQueue()
         {
             CheckMainQueueProcessingTaskManager();
@@ -104,11 +109,6 @@ namespace SimpleFFmpegGUI.Manager
             {
                 StartQueue();
             }
-        }
-
-        public DateTime? GetQueueScheduleTime()
-        {
-            return scheduleTime;
         }
         /// <summary>
         /// 开始队列

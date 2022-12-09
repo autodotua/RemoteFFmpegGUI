@@ -52,6 +52,10 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             Debug.Assert(inputIndex >= 0 && inputIndex < request.Inputs.Count);
             string output = request.Output;
+            if(output.StartsWith(':'))
+            {
+                output=output[1..];
+            }
             if (string.IsNullOrWhiteSpace(output))
             {
                 if (request.Inputs.Count > 0)
@@ -82,9 +86,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 var file = request.Inputs[i];
                 //检查输入文件存在
-                await CheckInputFileExistAsync(file.FilePath);
-                //拼接输入路径
-                file.FilePath = Path.Combine(InputDir, file.FilePath);
+                file.FilePath = await CheckAndGetInputFilePathAsync(file.FilePath);
 
                 ids.Add(await pipeClient.InvokeAsync(p =>
                  p.AddTask(TaskType.Code,
@@ -112,8 +114,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 
             foreach (var file in request.Inputs)
             {
-                await CheckInputFileExistAsync(file.FilePath);
-                file.FilePath = Path.Combine(InputDir, file.FilePath);
+                file.FilePath = await CheckAndGetInputFilePathAsync(file.FilePath);
             }
             ids.Add(await pipeClient.InvokeAsync(p =>
                  p.AddTask(TaskType.Concat,
@@ -141,8 +142,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             foreach (var file in request.Inputs)
             {
-                await CheckInputFileExistAsync(file.FilePath);
-                file.FilePath = Path.Combine(InputDir, file.FilePath);
+                file.FilePath = await CheckAndGetInputFilePathAsync(file.FilePath);
             }
             request.Inputs.ForEach(p => p.FilePath = Path.Combine(InputDir, p.FilePath));
             var id = await pipeClient.InvokeAsync(p =>
@@ -171,8 +171,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             foreach (var file in request.Inputs)
             {
-                await CheckInputFileExistAsync(file.FilePath);
-                file.FilePath = Path.Combine(InputDir, file.FilePath);
+                file.FilePath = await CheckAndGetInputFilePathAsync(file.FilePath);
             }
             request.Inputs.ForEach(p => p.FilePath = Path.Combine(InputDir, p.FilePath));
             var id = await pipeClient.InvokeAsync(p =>

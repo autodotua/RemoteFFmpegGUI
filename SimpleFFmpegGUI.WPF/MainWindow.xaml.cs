@@ -81,7 +81,7 @@ namespace SimpleFFmpegGUI.WPF
         /// <param name="beforeLoad"></param>
         public void AddNewTab<T>(string title = null, Action<T> beforeLoad = null) where T : UserControl
         {
-            title = title ?? PageHelper.GetTitle<T>();
+            title ??= PageHelper.GetTitle<T>();
             T panel = App.ServiceProvider.GetService<T>();
             beforeLoad?.Invoke(panel);
             var tabItem = new TabItem() { Header = title, Content = panel };
@@ -97,6 +97,7 @@ namespace SimpleFFmpegGUI.WPF
         /// <returns></returns>
         public async Task<T> ShowTopTabAsync<T>(Func<T, Task> beforeLoad = null) where T : UserControl, ICloseablePage
         {
+            grdLeft.IsEnabled = false;
             T panel = App.ServiceProvider.GetService<T>();
             if (beforeLoad != null)
             {
@@ -110,6 +111,7 @@ namespace SimpleFFmpegGUI.WPF
                 topTab.Content = null;
                 ViewModel.SetTabVisiable(true);
                 tcs.SetResult(panel);
+                grdLeft.IsEnabled = true;
             };
             return await tcs.Task;
         }
