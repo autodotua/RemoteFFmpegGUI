@@ -1,16 +1,16 @@
 ﻿param(
     [Parameter()]
-    [switch]$d,
     [switch]$w,
+    [switch]$d,
     [switch]$s,
     [switch]$f
 )
 try {
     
-    Write-Output "-d：仅生成WPF"
-    Write-Output "-w：仅生成Web（Web、WebAPI、Host）"
-    Write-Output "-s：WPF生成到单文件"
-    Write-Output "-f：WPF包含框架"
+    Write-Output "-w：生成Web（Web、WebAPI、Host）"
+    Write-Output "-d：生成WPF"
+    Write-Output "-s：生成WPF（单文件）"
+    Write-Output "-f：生成WPF（包含框架）"
     Write-Output ""  
     
     Write-Output "请先阅读ReadMe"
@@ -20,8 +20,13 @@ try {
     Write-Output "已经将ffmpeg相关二进制文件、MediaInfo.dll、性能测试视频（test.mp4）放置到./bin中"
     Write-Output "按任意键继续"
 
-    [Console]::ReadKey()
+    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
     Clear-Host
+
+    
+    if(!$w -and !$d -and !$s -and !$f){
+        throw "未指定构建类型"
+    }
     
     if (!(Test-Path bin)) {
         throw "不存在bin目录"
@@ -39,13 +44,12 @@ try {
     catch {
         throw "未安装.NET SDK"
     }
-
     
     Clear-Host
 
     Remove-Item Generation/Publish -Recurse
     
-    if ($d -eq $false) {
+    if ($w) {
         mkdir -Force Generation/Publish/WebPackage
         mkdir -Force Generation/Publish/WebPackage/api
         mkdir -Force Generation/Publish/WebPackage/host
@@ -73,26 +77,30 @@ try {
     }
 
     
-    if ($w -eq $false) {
+    if ($d) {
         Write-Output "正在发布WPF"
-        if ($s) {
-            dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained false /p:PublishSingleFile=true
-        }
-        else {
-            if ($f) {
-                dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained true
-            }
-            else {
-                dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained false
-            }
-        }
-        
-
-        
+        dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained false
         Write-Output "正在复制二进制库"
         Copy-Item bin/* Generation/Publish/WPF -Force -Recurse
-
     }
+
+    if ($s) {
+        Write-Output "正在发布WPF（单文件）"
+        dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF_SingleFile -r win-x64 --self-contained false /p:PublishSingleFile=true
+        Write-Output "正在复制二进制库"
+        Copy-Item bin/* Generation/Publish/WPF_SingleFile -Force -Recurse  
+    }
+        
+    if ($f) {
+        Write-Output "正在发布WPF（自包含）"
+        dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF_SelfContained -r win-x64 --self-contained true
+        Write-Output "正在复制二进制库"
+        Copy-Item bin/* Generation/Publish/WPF_SelfContained -Force -Recurse
+    }
+            
+            
+        
+
     
     Write-Output "正在清理"
     Remove-Item Generation/Release -Recurse
