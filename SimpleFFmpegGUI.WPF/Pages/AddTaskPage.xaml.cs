@@ -238,7 +238,6 @@ namespace SimpleFFmpegGUI.WPF.Pages
             }
             catch (Exception ex)
             {
-                IsEnabled = true;
                 await CommonDialog.ShowErrorDialogAsync(ex, "加入远程主机失败");
             }
             finally
