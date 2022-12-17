@@ -285,9 +285,9 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
         }
 
-        public void Update(TaskInfo task)
+        public void Update(TaskType type,OutputArguments arguments)
         {
-            ViewModel.Update(task.Type, task.Arguments);
+            ViewModel.Update(type, arguments);
         }
 
         public OutputArguments GetOutputArguments()

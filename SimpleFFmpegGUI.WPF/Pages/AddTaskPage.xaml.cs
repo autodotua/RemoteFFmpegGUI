@@ -165,7 +165,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
             ViewModel.AllowChangeType = false;
             ViewModel.Type = task.Type;
             fileIOPanel.Update(task.Type, task.Inputs, task.Output);
-            argumentsPanel.Update(task);
+            argumentsPanel.Update(task.Type,task.Arguments);
         }
 
         public void SetFiles(IEnumerable<string> files, TaskType type)

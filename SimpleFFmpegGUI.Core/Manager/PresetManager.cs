@@ -96,13 +96,19 @@ namespace SimpleFFmpegGUI.Manager
         public static List<CodePreset> GetPresets()
         {
             using var db = FFmpegDbContext.GetNew();
-            return db.Presets.Where(p => !p.IsDeleted).OrderBy(p => p.Type).ToList();
+            return db.Presets.Where(p => !p.IsDeleted)
+                             .OrderBy(p => p.Type)
+                             .ThenBy(p => p.Name)
+                             .ToList();
         }
 
         public static List<CodePreset> GetPresets(TaskType type)
         {
             using var db = FFmpegDbContext.GetNew();
-            return db.Presets.Where(p => !p.IsDeleted).Where(p => p.Type == type).ToList();
+            return db.Presets.Where(p => !p.IsDeleted)
+                             .Where(p => p.Type == type)
+                             .OrderBy(p => p.Name)
+                             .ToList();
         }
 
         public static void SetDefaultPreset(int id)

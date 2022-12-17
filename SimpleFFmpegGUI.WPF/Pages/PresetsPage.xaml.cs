@@ -32,60 +32,39 @@ using System.Windows.Shapes;
 
 namespace SimpleFFmpegGUI.WPF.Pages
 {
-    public class PresetsPageViewModel : INotifyPropertyChanged
-    {
-        public PresetsPageViewModel()
-        {
-        }
-
-        public IEnumerable TaskTypes => Enum.GetValues(typeof(TaskType));
-        private TaskType type = TaskType.Code;
-
-        public TaskType Type
-        {
-            get => type;
-            set
-            {
-                this.SetValueAndNotify(ref type, value, nameof(Type));
-                FillPresets();
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private ObservableCollection<CodePreset> presets;
-
-        public ObservableCollection<CodePreset> Presets
-        {
-            get => presets;
-            set => this.SetValueAndNotify(ref presets, value, nameof(Presets));
-        }
-
-        public void FillPresets()
-        {
-            Presets = new ObservableCollection<CodePreset>(PresetManager.GetPresets(Type));
-        }
-
-        public void DeletePreset(CodePreset preset)
-        {
-            PresetManager.DeletePreset(preset.Id);
-            Presets.Remove(preset);
-        }
-    }
-
     /// <summary>
     /// Interaction logic for PresetsPage.xaml
     /// </summary>
     public partial class PresetsPage : UserControl
     {
-        public PresetsPageViewModel ViewModel { get; set; }
-
         public PresetsPage(PresetsPageViewModel viewModel)
         {
             ViewModel = viewModel;
             DataContext = ViewModel;
             InitializeComponent();
             Loaded += (s, e) => ViewModel.FillPresets();
+        }
+
+        public PresetsPageViewModel ViewModel { get; set; }
+        private async void DeleteAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (await CommonDialog.ShowYesNoDialogAsync("删除预设", $"是否删除所有类型的所有预设？"))
+            {
+                IsEnabled = false;
+                try
+                {
+                    PresetManager.DeletePresets();
+                    ViewModel.FillPresets();
+                }
+                catch (Exception ex)
+                {
+                    await CommonDialog.ShowErrorDialogAsync(ex, "删除失败");
+                }
+                finally
+                {
+                    IsEnabled = true;
+                }
+            }
         }
 
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -128,25 +107,102 @@ namespace SimpleFFmpegGUI.WPF.Pages
             }
         }
 
-        private async void DeleteAllButton_Click(object sender, RoutedEventArgs e)
+        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (await CommonDialog.ShowYesNoDialogAsync("删除预设", $"是否删除所有类型的所有预设？"))
+            if (e.RemovedItems.Count > 0 && e.RemovedItems[0] is CodePreset oldPreset)
             {
-                IsEnabled = false;
-                try
-                {
-                    PresetManager.DeletePresets();
-                    ViewModel.FillPresets();
-                }
-                catch (Exception ex)
-                {
-                    await CommonDialog.ShowErrorDialogAsync(ex, "删除失败");
-                }
-                finally
-                {
-                    IsEnabled = true;
-                }
+            }
+            if (e.AddedItems.Count > 0 && e.AddedItems[0] is CodePreset preset)
+            {
+
+                grd.RowDefinitions[2].Height = new GridLength(48);
+                lvw.IsHitTestVisible = false;
+                lvw.ScrollIntoView(preset);
+                grd.RowDefinitions[4].Height = new GridLength(1,GridUnitType.Star);
+                argumentsPanel.Update(preset.Type, preset.Arguments);
+            }
+            else
+            {
+                grd.RowDefinitions[2].Height = new GridLength(1,GridUnitType.Star);
+                lvw.IsHitTestVisible = true;
+                grd.RowDefinitions[4].Height = new GridLength(0);
             }
         }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.Assert(ViewModel.SelectedPreset!=null); 
+            try
+            {
+                ViewModel.SelectedPreset.Arguments = argumentsPanel.GetOutputArguments();
+                PresetManager.UpdatePreset(ViewModel.SelectedPreset);
+                ViewModel.SelectedPreset = null;
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError("更新预设失败", ex);
+            }
+        }
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.SelectedPreset = null;
+        }
+
+        private void SetDefaultButton_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.Assert(ViewModel.SelectedPreset != null);
+            ViewModel.Presets.ForEach(p => p.Default = false);
+            ViewModel.SelectedPreset.Default = true;
+            PresetManager.SetDefaultPreset(ViewModel.SelectedPreset.Id);
+        }
+    }
+
+    public class PresetsPageViewModel : INotifyPropertyChanged
+    {
+        private ObservableCollection<CodePreset> presets;
+
+        private CodePreset selectedPreset;
+
+        private TaskType type = TaskType.Code;
+
+        public PresetsPageViewModel()
+        {
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public ObservableCollection<CodePreset> Presets
+        {
+            get => presets;
+            set => this.SetValueAndNotify(ref presets, value, nameof(Presets));
+        }
+
+        public CodePreset SelectedPreset
+        {
+            get => selectedPreset;
+            set => this.SetValueAndNotify(ref selectedPreset, value, nameof(SelectedPreset));
+        }
+
+
+        public IEnumerable TaskTypes => Enum.GetValues(typeof(TaskType));
+        public TaskType Type
+        {
+            get => type;
+            set
+            {
+                this.SetValueAndNotify(ref type, value, nameof(Type));
+                FillPresets();
+            }
+        }
+        public void DeletePreset(CodePreset preset)
+        {
+            PresetManager.DeletePreset(preset.Id);
+            Presets.Remove(preset);
+        }
+
+        public void FillPresets()
+        {
+            Presets = new ObservableCollection<CodePreset>(PresetManager.GetPresets(Type));
+        }
+
     }
 }

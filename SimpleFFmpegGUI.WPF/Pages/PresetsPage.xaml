@@ -10,62 +10,11 @@
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     mc:Ignorable="d">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="0" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid>
-            <ListBox
-                Margin="8"
-                HorizontalAlignment="Stretch"
-                Background="Transparent"
-                ItemsSource="{Binding TaskTypes}"
-                SelectedItem="{Binding Type}">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel IsItemsHost="True" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
+    <DockPanel>
 
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Grid>
-        <ItemsControl
-            xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
-            xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
-            Grid.Row="2"
-            c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
-            ItemsSource="{Binding Presets}"
-            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Grid Margin="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            Text="{Binding Name}"
-                            TextTrimming="CharacterEllipsis" />
-                        <Button
-                            Grid.Column="2"
-                            Click="DeleteButton_Click"
-                            Content="删除" />
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-        <ui:CommandBar Grid.Row="4">
+        <ui:CommandBar
+            Grid.Row="99"
+            DockPanel.Dock="Bottom">
             <ui:AppBarButton
                 Click="DeleteAllButton_Click"
                 Icon="Delete"
@@ -79,5 +28,116 @@
                 Icon="Upload"
                 Label="导出所有预设" />
         </ui:CommandBar>
-    </Grid>
+        <Grid x:Name="grd">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="0" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="0" />
+            </Grid.RowDefinitions>
+
+            <Grid>
+                <ListBox
+                    Margin="8"
+                    HorizontalAlignment="Center"
+                    Background="Transparent"
+                    ItemsSource="{Binding TaskTypes}"
+                    SelectedItem="{Binding Type}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+            <ListView
+                xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+                xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
+                x:Name="lvw"
+                Grid.Row="2"
+                c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
+                ItemsSource="{Binding Presets}"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                SelectedItem="{Binding SelectedPreset}"
+                SelectionChanged="ListView_SelectionChanged">
+                <ListView.ItemContainerStyle>
+                    <Style
+                        BasedOn="{StaticResource DefaultListViewItemStyle}"
+                        TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding Name}"
+                                TextTrimming="CharacterEllipsis" />
+                            <ui:FontIcon
+                                Grid.Column="2"
+                                Foreground="Yellow"
+                                Glyph="&#xE1CF;"
+                                Visibility="{Binding Default, Converter={StaticResource Bool2VisibilityConverter}}" />
+                            <Button
+                                Grid.Column="4"
+                                Background="Transparent"
+                                Click="DeleteButton_Click">
+                                <ui:SymbolIcon Symbol="Delete" />
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ListView>
+            <Border
+                Grid.Row="4"
+                Margin="16,8"
+                Padding="12"
+                Background="{DynamicResource SystemControlBackgroundListLowBrush}"
+                ClipToBounds="True"
+                IsEnabled="{Binding SelectedPreset, Converter={StaticResource NotNullConverter}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <panels:CodeArgumentsPanel x:Name="argumentsPanel" />
+                    <ui:SimpleStackPanel
+                        Grid.Row="2"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <Button
+                            Width="96"
+                            Click="SetDefaultButton_Click"
+                            Content="设为默认"
+                            IsEnabled="{Binding SelectedPreset.Default, Converter={StaticResource InverseBoolConverter}}" />
+                        <Button
+                            Width="96"
+                            Click="CancelButton_Click"
+                            Content="取消" />
+                        <Button
+                            Width="96"
+                            Click="SaveButton_Click"
+                            Content="保存" />
+                    </ui:SimpleStackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </DockPanel>
 </UserControl>
