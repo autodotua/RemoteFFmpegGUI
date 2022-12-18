@@ -45,6 +45,13 @@
 
 执行PowerShell：`./build.ps1`。
 
+参数：
+
+- -w：生成Web（Web、WebAPI、Host）
+- -d：生成WPF（标准）
+- -s：生成WPF（主执行文件为单文件，需要Runtime）
+- -f：生成WPF（包含框架，运行前无需单独安装.NET6 Desktop Runtime）
+
 若提示“无法加载文件 ******.ps1，因为在此系统中禁止执行脚本”，需要首先在管理员模式下运行PowerShell并执行 `set-executionpolicy remotesigned`，然后按Y确认。
 生成文件位于 `Generation/Publish`下，其中 `WebPackage`为Web部署包，`WPF`为桌面程序。
 
@@ -122,3 +129,4 @@
 
 - Clone仓库后，只需安装好相关SDK，即可进行构建，无需额外设置。
 - `libs`目录中二进制文件来自于：[FzLib](https://github.com/autodotua/FzLib)和[Wpf.Notifications](https://github.com/autodotua/Wpf.Notifications)，均为开源产品。
+- 开发者对WPF比较了解，对ASP.NET略有涉猎，但对前端技术技艺不精，因此网页端做得比较简单。欢迎大家在此基础上进行二次开发。
