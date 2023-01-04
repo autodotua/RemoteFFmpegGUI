@@ -275,29 +275,35 @@
                     </Grid>
                 </ScrollViewer>
                 <ui:SimpleStackPanel
-                    Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                    Grid.Row="2"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal"
                     Spacing="8">
+                    <ui:SimpleStackPanel.Resources>
+                        <Style
+                            BasedOn="{StaticResource DefaultButtonStyle}"
+                            TargetType="{x:Type Button}">
+                            <Setter Property="Width" Value="84" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </ui:SimpleStackPanel.Resources>
                     <Button
-                        VerticalAlignment="Center"
                         Click="StartButton_Click"
                         Content="独立执行"
                         IsEnabled="{Binding Tasks.SelectedTask.StartButtonEnabled}"
                         Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
-                        VerticalAlignment="Center"
                         Click="CancelButton_Click"
                         Content="取消"
                         IsEnabled="{Binding Tasks.SelectedTask.CancelButtonEnabled}"
                         ToolTip="取消执行任务，正在执行的任务会被停止"
                         Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
-                        VerticalAlignment="Center"
                         Click="ResetButton_Click"
                         Content="重置"
                         IsEnabled="{Binding Tasks.SelectedTask.ResetButtonEnabled}"
                         ToolTip="将任务设置为排队状态" />
                     <Button
-                        VerticalAlignment="Center"
                         Click="DeleteButton_Click"
                         Content="删除"
                         Visibility="Collapsed" />

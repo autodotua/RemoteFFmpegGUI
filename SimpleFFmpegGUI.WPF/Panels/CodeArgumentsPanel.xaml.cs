@@ -265,7 +265,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                     if (Config.Instance.LastOutputArguments.GetOrDefault(type) is OutputArguments lastArguments)
                     {
                         ViewModel.Update(type, lastArguments);
-                        (await this.CreateMessageAsync()).QueueSuccess($"已加载上次任务的参数");
+                        //(await this.CreateMessageAsync()).QueueSuccess($"已加载上次任务的参数");
                         updated = true;
                     }
                 }

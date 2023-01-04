@@ -79,14 +79,15 @@ namespace SimpleFFmpegGUI.WPF
         /// <typeparam name="T"></typeparam>
         /// <param name="title"></param>
         /// <param name="beforeLoad"></param>
-        public void AddNewTab<T>(string title = null, Action<T> beforeLoad = null) where T : UserControl
+        public T AddNewTab<T>(string title = null/*, Action<T> beforeLoad = null*/) where T : UserControl
         {
             title ??= PageHelper.GetTitle<T>();
             T panel = App.ServiceProvider.GetService<T>();
-            beforeLoad?.Invoke(panel);
+            //beforeLoad?.Invoke(panel);
             var tabItem = new TabItem() { Header = title, Content = panel };
             tab.Items.Add(tabItem);
             tab.SelectedIndex = tab.Items.Count - 1;
+            return panel;
         }
 
         /// <summary>
@@ -225,11 +226,12 @@ namespace SimpleFFmpegGUI.WPF
                 }
                 if (index < typeCount)
                 {
-                    AddNewTab<AddTaskPage>(beforeLoad: p => p.SetFiles(files, (TaskType)index));
+                    var panel=AddNewTab<AddTaskPage>();
+                    panel.SetFiles(files, (TaskType)index);
                 }
                 else if (index == typeCount)
                 {
-                    AddNewTab<MediaInfoPage>(beforeLoad: p => p.SetFile(files.First()));
+                    AddNewTab<MediaInfoPage>().SetFile(files.First());
                 }
             }
         }

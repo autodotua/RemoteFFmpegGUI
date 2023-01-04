@@ -94,8 +94,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void CloneButton_Click(object sender, RoutedEventArgs e)
         {
-            this.GetWindow<MainWindow>().AddNewTab<AddTaskPage>(beforeLoad:
-                p => p.SetAsClone(((sender as FrameworkElement).DataContext as UITaskInfo).ToTask()));
+            this.GetWindow<MainWindow>().AddNewTab<AddTaskPage>()
+                .SetAsClone(((sender as FrameworkElement).DataContext as UITaskInfo).ToTask());
         }
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
@@ -180,7 +180,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             var task = ViewModel.Tasks.SelectedTask;
             Debug.Assert(task != null);
 
-            this.GetWindow<MainWindow>().AddNewTab<LogsPage>(beforeLoad: p => p.FillLogs(task.Id));
+            this.GetWindow<MainWindow>().AddNewTab<LogsPage>().FillLogs(task.Id);
         }
 
         private void OpenInputFileOrFolder(InputArguments input, bool folder)

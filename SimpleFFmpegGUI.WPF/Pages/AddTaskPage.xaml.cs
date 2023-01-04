@@ -162,7 +162,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
         public void SetAsClone(TaskInfo task)
         {
             canInitializeType = false;
-            ViewModel.AllowChangeType = false;
+            //ViewModel.AllowChangeType = false;
             ViewModel.Type = task.Type;
             fileIOPanel.Update(task.Type, task.Inputs, task.Output);
             argumentsPanel.Update(task.Type,task.Arguments);
