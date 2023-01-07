@@ -28,7 +28,7 @@ namespace SimpleFFmpegGUI.Dto
                 {
                     Percent = 1;
                 }
-                var totalTime = (DateTime.Now - (StartTime + PauseTime)) / Percent;
+                var totalTime = Percent==0?TimeSpan.Zero:(DateTime.Now - (StartTime + PauseTime)) / Percent;
                 FinishTime = StartTime + PauseTime + totalTime;
                 LastTime = totalTime - (DateTime.Now - (StartTime + PauseTime));
                 Duration = DateTime.Now - StartTime;

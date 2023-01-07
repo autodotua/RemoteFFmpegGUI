@@ -132,12 +132,15 @@
           >
           </el-slider
         ></el-form-item>
+        <el-form-item label="二次编码" class="top24">
+          <el-switch v-model="code.video.twoPass"> </el-switch>
+        </el-form-item>
         <el-form-item label="平均码率" class="bottom24">
           <el-switch v-model="code.video.enableBitrate"> </el-switch>
           <el-slider
             v-show="code.video.enableBitrate"
             style="width: 90%"
-            :max="500"
+            :max="200"
             :min="0.1"
             show-input
             :step="0.1"
@@ -257,7 +260,7 @@
               type="text"
               class="right24"
               @click="code.video.pixelFormat = p"
-              >{{p }}</el-button
+              >{{ p }}</el-button
             >
           </div></el-form-item
         >
@@ -387,7 +390,15 @@ export default Vue.component("code-arguments", {
         "1440P": "-1:1440",
         "2160P": "-1:2160",
       },
-      pixelFormats :["yuv420p", "yuvj420p", "yuv422p", "yuvj422p", "rgb24", "gray", "yuv420p10le" ],
+      pixelFormats: [
+        "yuv420p",
+        "yuvj420p",
+        "yuv422p",
+        "yuvj422p",
+        "rgb24",
+        "gray",
+        "yuv420p10le",
+      ],
       code: {
         enableVideo: true,
         enableAudio: true,
@@ -398,6 +409,7 @@ export default Vue.component("code-arguments", {
           preset: 3,
           crf: 23,
           enableCrf: true,
+          twoPass: false,
           size: "1920:1080",
           enableSize: false,
           bitrate: 6,
@@ -520,11 +532,13 @@ export default Vue.component("code-arguments", {
     },
     getArgs() {
       const video = this.code.video;
+
       let videoArg = this.code.enableVideo
         ? {
             code: video.code,
             preset: video.preset,
             crf: video.enableCrf ? video.crf : null,
+            twoPass: video.twoPass,
             size: video.enableSize ? video.size : null,
             fps: video.enableFps ? video.fps : null,
             averageBitrate: video.enableBitrate ? video.bitrate : null,
@@ -532,8 +546,8 @@ export default Vue.component("code-arguments", {
             maxBitrateBuffer: video.enableMaxBitrate
               ? video.maxBitrateBuffer
               : null,
-              aspectRatio:video.enableAspectRatio?video.aspectRatio:null,
-              pixelFormat:video.enablePixelFormat?video.pixelFormat:null,
+            aspectRatio: video.enableAspectRatio ? video.aspectRatio : null,
+            pixelFormat: video.enablePixelFormat ? video.pixelFormat : null,
           }
         : null;
       const audio = this.code.audio;
@@ -581,6 +595,7 @@ export default Vue.component("code-arguments", {
         } else {
           uiV.enableCrf = false;
         }
+        uiV.twoPass = video.twoPass;
 
         if (video.size != null) {
           uiV.enableSize = true;
@@ -611,20 +626,18 @@ export default Vue.component("code-arguments", {
           uiV.enableMaxBitrate = false;
         }
 
-        if(video.aspectRatio){
-          uiV.enableAspectRatio=true;
-          uiV.aspectRatio=video.aspectRatio;
-        }
-        else{
-             uiV.enableAspectRatio=false;
+        if (video.aspectRatio) {
+          uiV.enableAspectRatio = true;
+          uiV.aspectRatio = video.aspectRatio;
+        } else {
+          uiV.enableAspectRatio = false;
         }
 
-        if(video.pixelFormat){
-          uiV.enablePixelFormat=true;
-          uiV.pixelFormat=video.pixelFormat;
-        }
-        else{
-             uiV.enablePixelFormat=false;
+        if (video.pixelFormat) {
+          uiV.enablePixelFormat = true;
+          uiV.pixelFormat = video.pixelFormat;
+        } else {
+          uiV.enablePixelFormat = false;
         }
       } else {
         this.code.enableVideo = false;

@@ -14,6 +14,22 @@ namespace SimpleFFmpegGUI.WPF.Model
             AverageBitrate = 10;
             MaxBitrate = 20;
             MaxBitrateBuffer = 2;
+            PropertyChanged += VideoArgumentsWithSwitch_PropertyChanged;
+        }
+
+        private void VideoArgumentsWithSwitch_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(TwoPass) when TwoPass:
+                    EnableCrf = false;
+                    EnableAverageBitrate = true;
+                    break;
+                case nameof(EnableCrf) when EnableCrf:
+                    TwoPass = false;
+                    EnableAverageBitrate = false;
+                    break;
+            }
         }
 
         private bool enableCrf;
@@ -92,6 +108,11 @@ namespace SimpleFFmpegGUI.WPF.Model
             EnableSize = !string.IsNullOrEmpty(Size);
             EnablePixelFormat = !string.IsNullOrEmpty(PixelFormat);
             EnableAspectRatio = !string.IsNullOrEmpty(AspectRatio);
+            //从数据库提取的Argument，若某些开关没有启动，则其值为null，这不符合UI，因此需要对null值进行赋初始值。
+            Crf ??= 25; 
+            MaxBitrate ??= 20;
+            AverageBitrate = AverageBitrate?? 10;
+            MaxBitrateBuffer ??= 2;
         }
     }
 }

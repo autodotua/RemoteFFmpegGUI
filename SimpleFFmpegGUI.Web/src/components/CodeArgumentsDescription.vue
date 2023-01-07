@@ -20,6 +20,9 @@
       <el-descriptions-item label="CRF" v-if="showVideo">{{
         args.video.crf ? args.video.crf : "未定义"
       }}</el-descriptions-item>
+      <el-descriptions-item label="二次编码" v-if="showVideo">{{
+        args.video.twoPass ? "是" : "否"
+      }}</el-descriptions-item>
       <el-descriptions-item label="帧率" v-if="showVideo">{{
         args.video.fps ? args.video.fps : "未定义"
       }}</el-descriptions-item>

@@ -14,7 +14,7 @@ namespace SimpleFFmpegGUI.Manager
         {
             string tempPath = System.IO.Path.GetTempFileName() + ".jpg";
             FFmpegProcess process = new FFmpegProcess($"-ss {time.TotalSeconds:0.000}  -i \"{path}\" -vframes 1 {tempPath}");
-            await process.StartAsync(null);
+            await process.StartAsync(null,null);
             return tempPath;
         }
 

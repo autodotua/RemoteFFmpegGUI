@@ -78,6 +78,7 @@ export default Vue.extend({
   mounted: function () {
     this.$nextTick(function () {
       const inputOutput = loadArgs(this.$refs.args);
+      
       if (inputOutput.inputs) {
         this.files = inputOutput.inputs;
       }

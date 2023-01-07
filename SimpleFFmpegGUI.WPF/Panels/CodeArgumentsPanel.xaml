@@ -156,6 +156,8 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="8" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <!--  编码  -->
                         <Label Content="编码" />
@@ -211,13 +213,18 @@
                             VerticalAlignment="Center"
                             Content="{Binding Video.Crf}"
                             IsEnabled="{Binding Video.EnableCrf}" />
-                        <!--  平均码率  -->
+                        <!--  2Pass  -->
                         <CheckBox
                             Grid.Row="6"
+                            Content="二次编码"
+                            IsChecked="{Binding Video.TwoPass}" />
+                        <!--  平均码率  -->
+                        <CheckBox
+                            Grid.Row="8"
                             Content="平均码率"
                             IsChecked="{Binding Video.EnableAverageBitrate}" />
                         <ui:NumberBox
-                            Grid.Row="6"
+                            Grid.Row="8"
                             Grid.Column="2"
                             IsEnabled="{Binding Video.EnableAverageBitrate}"
                             Maximum="800"
@@ -225,23 +232,23 @@
                             Value="{Binding Video.AverageBitrate}" />
                         <!--  最大码率  -->
                         <CheckBox
-                            Grid.Row="8"
+                            Grid.Row="10"
                             Content="最大码率"
                             IsChecked="{Binding Video.EnableMaxBitrate}" />
                         <ui:NumberBox
-                            Grid.Row="8"
+                            Grid.Row="10"
                             Grid.Column="2"
                             IsEnabled="{Binding Video.EnableMaxBitrate}"
                             Maximum="800"
                             Minimum="0.1"
                             Value="{Binding Video.MaxBitrate}" />
                         <Label
-                            Grid.Row="10"
+                            Grid.Row="12"
                             VerticalAlignment="Center"
                             Content="倍率"
                             IsEnabled="{Binding Video.EnableMaxBitrate}" />
                         <ui:NumberBox
-                            Grid.Row="10"
+                            Grid.Row="12"
                             Grid.Column="2"
                             IsEnabled="{Binding Video.EnableMaxBitrate}"
                             Maximum="10"
@@ -249,11 +256,11 @@
                             Value="{Binding Video.MaxBitrateBuffer}" />
                         <!--  分辨率  -->
                         <CheckBox
-                            Grid.Row="12"
+                            Grid.Row="14"
                             Content="分辨率"
                             IsChecked="{Binding Video.EnableSize}" />
                         <ComboBox
-                            Grid.Row="12"
+                            Grid.Row="14"
                             Grid.Column="2"
                             ui:ControlHelper.PlaceholderText="示例：640:480 或 640:-1 或 iw/2:ih/2"
                             IsEditable="True"
@@ -262,11 +269,11 @@
                             Text="{Binding Video.Size}" />
                         <!--  比例  -->
                         <CheckBox
-                            Grid.Row="14"
+                            Grid.Row="16"
                             Content="画面比例"
                             IsChecked="{Binding Video.EnableAspectRatio}" />
                         <ComboBox
-                            Grid.Row="14"
+                            Grid.Row="16"
                             Grid.Column="2"
                             ui:ControlHelper.PlaceholderText="示例：4:3 或 1.3333"
                             IsEditable="True"
@@ -275,22 +282,22 @@
                             Text="{Binding Video.AspectRatio}" />
                         <!--  帧率  -->
                         <CheckBox
-                            Grid.Row="16"
+                            Grid.Row="18"
                             Content="帧率"
                             IsChecked="{Binding Video.EnableFps}" />
                         <ComboBox
-                            Grid.Row="16"
+                            Grid.Row="18"
                             Grid.Column="2"
                             IsEditable="True"
                             IsEnabled="{Binding Video.EnableFps}"
                             ItemsSource="{Binding Fpses}"
                             Text="{Binding Video.Fps}" />
                         <CheckBox
-                            Grid.Row="18"
+                            Grid.Row="20"
                             Content="像素格式"
                             IsChecked="{Binding Video.EnablePixelFormat}" />
                         <ComboBox
-                            Grid.Row="18"
+                            Grid.Row="20"
                             Grid.Column="2"
                             IsEditable="True"
                             IsEnabled="{Binding Video.EnablePixelFormat}"

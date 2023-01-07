@@ -151,7 +151,7 @@ namespace SimpleFFmpegGUI.Manager
         public static string TestOutputArguments(OutputArguments args)
         {
             FFMpegArguments f = Activator.CreateInstance(typeof(FFMpegArguments), true) as FFMpegArguments;
-            var p = f.OutputToFile("输出", true, a => ApplyOutputArguments(a, args));
+            var p = f.OutputToFile("输出", true, a => ApplyOutputArguments(a, args, args.Video == null || !args.Video.TwoPass ? 0 : 2));
             return p.Arguments;
         }
 
@@ -175,7 +175,7 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
-        private static void ApplyOutputArguments(FFMpegArgumentOptions fa, OutputArguments a)
+        private static void ApplyOutputArguments(FFMpegArgumentOptions fa, OutputArguments a, int twoPass)
         {
             if (a.DisableVideo && a.DisableAudio)
             {
@@ -206,9 +206,9 @@ namespace SimpleFFmpegGUI.Manager
                     fa.CopyChannel(Channel.Video);
                 }
             }
-            if (a.Audio == null)
+            if (a.Audio == null || twoPass == 1)
             {
-                if (a.DisableAudio)
+                if (a.DisableAudio || twoPass == 1)
                 {
                     fa.DisableChannel(Channel.Audio);
                 }
@@ -236,7 +236,7 @@ namespace SimpleFFmpegGUI.Manager
                     fa.WithVideoCodec(code);
                 }
                 fa.WithSpeedPreset((Speed)a.Video.Preset);
-                if (a.Video.Crf.HasValue)
+                if (a.Video.Crf.HasValue && twoPass == 0)
                 {
                     fa.WithConstantRateFactor(a.Video.Crf.Value);
                 }
@@ -259,6 +259,14 @@ namespace SimpleFFmpegGUI.Manager
                 if (a.Video.AspectRatio != null)
                 {
                     fa.WithVideoAspect(a.Video.AspectRatio);
+                }
+                if (a.Video.TwoPass && twoPass == 0 || !a.Video.TwoPass && twoPass > 0)
+                {
+                    throw new ArgumentException("2Pass参数不匹配", nameof(twoPass));
+                }
+                if (twoPass > 0)
+                {
+                    fa.WithTwoPass(code, twoPass);
                 }
                 if (a.Video.Size != null)
                 {
@@ -453,7 +461,7 @@ namespace SimpleFFmpegGUI.Manager
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private async Task RunAsync(FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken, bool useInstances = false)
+        private async Task RunAsync(FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken, bool useInstances = false,string workingDir=null)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -478,7 +486,7 @@ namespace SimpleFFmpegGUI.Manager
                 Process.Output += Output;
                 try
                 {
-                    await Process.StartAsync(cancellationToken);
+                    await Process.StartAsync(workingDir, cancellationToken);
                 }
                 finally
                 {
@@ -491,20 +499,33 @@ namespace SimpleFFmpegGUI.Manager
         {
             FFMpegArguments f = null;
             string message = null;
-            if (task.Inputs.Count() == 1)
-            {
-                f = FFMpegArguments.FromFileInput(task.Inputs[0].FilePath, true, a => ApplyInputArguments(a, task.Inputs[0]));
-
-                Progress = GetProgress(task);
-                message = $"正在转码：{Path.GetFileName(task.Inputs[0].FilePath)}";
-            }
-            else
+            if (task.Inputs.Count != 1)
             {
                 throw new ArgumentException("普通编码，输入文件必须为1个");
             }
+            f = FFMpegArguments.FromFileInput(task.Inputs[0].FilePath, true, a => ApplyInputArguments(a, task.Inputs[0]));
+
             GenerateOutputPath();
-            var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments));
-            await RunAsync(p, message, cancellationToken);
+            if (task.Arguments.Video == null || !task.Arguments.Video.TwoPass)
+            {
+                Progress = GetProgress(task);
+                message = $"正在转码：{Path.GetFileName(task.Inputs[0].FilePath)}";
+                var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments, 0));
+                await RunAsync(p, message, cancellationToken);
+            }
+            else
+            {
+                string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                Directory.CreateDirectory(tempDirectory);
+                Progress = GetProgress(task);
+                message = $"正在转码（Pass=1）：{Path.GetFileName(task.Inputs[0].FilePath)}";
+                var p = f.OutputToFile("NUL", true, a => ApplyOutputArguments(a, task.Arguments, 1));
+                await RunAsync(p, message, cancellationToken,workingDir: tempDirectory);
+                Progress = GetProgress(task);
+                message = $"正在转码（Pass=2）：{Path.GetFileName(task.Inputs[0].FilePath)}";
+                p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments, 2));
+                await RunAsync(p, message, cancellationToken, workingDir: tempDirectory);
+            }
         }
 
         private async Task RunCombineProcessAsync(CancellationToken cancellationToken)
@@ -625,7 +646,7 @@ namespace SimpleFFmpegGUI.Manager
                 Progress = GetProgress(task);
 
                 GenerateOutputPath();
-                var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments));
+                var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments, 0));
                 await RunAsync(p, message, cancellationToken);
             }
             else

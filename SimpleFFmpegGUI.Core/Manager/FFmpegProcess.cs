@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,25 +42,35 @@ namespace SimpleFFmpegGUI.Manager
 
         private bool started = false;
 
-        public Task StartAsync(CancellationToken? cancellationToken)
+        public Task StartAsync(string workingDir, CancellationToken? cancellationToken)
         {
             if (started)
             {
                 throw new Exception("已经开始运行，不可再次运行");
             }
             started = true;
+
+            if(!string.IsNullOrEmpty(workingDir))
+            {           
+                //2Pass时会生成文件名相同的临时文件，如果多个FFmpeg一起运行会冲突，因此需要设置单独的工作目录
+                process.StartInfo.WorkingDirectory = workingDir;
+            }
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
             bool exit = false;
             cancellationToken?.Register(() =>
             {
-                exit = true;
-                process.Kill();
+                if (!exit)
+                {
+                    exit = true;
+                    process.Kill();
+                }
             });
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             process.Exited += async (s, e) =>
              {
+                 exit = true;
                  try
                  {
                      await Task.Delay(1000);

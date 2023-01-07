@@ -5,31 +5,27 @@ namespace SimpleFFmpegGUI.Model
 {
     public class VideoCodeArguments : INotifyPropertyChanged
     {
+        private string aspect;
+        private double? averageBitrate;
         private string code;
-
-        public string Code
-        {
-            get => code;
-            set => this.SetValueAndNotify(ref code, value, nameof(Code));
-        }
-
-        private int preset;
-
-        public int Preset
-        {
-            get => preset;
-            set => this.SetValueAndNotify(ref preset, value, nameof(Preset));
-        }
 
         private int? crf;
 
-        public int? Crf
-        {
-            get => crf;
-            set => this.SetValueAndNotify(ref crf, value, nameof(Crf));
-        }
+        private double? fps;
 
-        private string aspect;
+        private double? maxBitrate;
+
+        private double? maxBitrateBuffer;
+
+        private string pixelFormat;
+
+        private int preset;
+
+        private string size;
+
+        private bool twoPass;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public string AspectRatio
         {
@@ -37,15 +33,22 @@ namespace SimpleFFmpegGUI.Model
             set => this.SetValueAndNotify(ref aspect, value, nameof(AspectRatio));
         }
 
-        private string size;
-
-        public string Size
+        public double? AverageBitrate
         {
-            get => size;
-            set => this.SetValueAndNotify(ref size, value, nameof(Size));
+            get => averageBitrate;
+            set => this.SetValueAndNotify(ref averageBitrate, value, nameof(AverageBitrate));
         }
 
-        private double? fps;
+        public string Code
+        {
+            get => code;
+            set => this.SetValueAndNotify(ref code, value, nameof(Code));
+        }
+        public int? Crf
+        {
+            get => crf;
+            set => this.SetValueAndNotify(ref crf, value, nameof(Crf));
+        }
 
         public double? Fps
         {
@@ -53,25 +56,11 @@ namespace SimpleFFmpegGUI.Model
             set => this.SetValueAndNotify(ref fps, value, nameof(Fps));
         }
 
-        private double? averageBitrate;
-
-        public double? AverageBitrate
-        {
-            get => averageBitrate;
-            set => this.SetValueAndNotify(ref averageBitrate, value, nameof(AverageBitrate));
-        }
-
-        private double? maxBitrate;
-
         public double? MaxBitrate
         {
             get => maxBitrate;
             set => this.SetValueAndNotify(ref maxBitrate, value, nameof(MaxBitrate));
         }
-
-        private double? maxBitrateBuffer;
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public double? MaxBitrateBuffer
         {
@@ -79,12 +68,27 @@ namespace SimpleFFmpegGUI.Model
             set => this.SetValueAndNotify(ref maxBitrateBuffer, value, nameof(MaxBitrateBuffer));
         }
 
-        private string pixelFormat;
-
         public string PixelFormat
         {
             get => pixelFormat;
             set => this.SetValueAndNotify(ref pixelFormat, value, nameof(PixelFormat));
         }
+
+        public int Preset
+        {
+            get => preset;
+            set => this.SetValueAndNotify(ref preset, value, nameof(Preset));
+        }
+        public string Size
+        {
+            get => size;
+            set => this.SetValueAndNotify(ref size, value, nameof(Size));
+        }
+        public bool TwoPass
+        {
+            get => twoPass;
+            set => this.SetValueAndNotify(ref twoPass, value, nameof(TwoPass));
+        }
+
     }
 }

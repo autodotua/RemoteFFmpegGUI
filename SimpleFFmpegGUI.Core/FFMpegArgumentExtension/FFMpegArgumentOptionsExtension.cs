@@ -31,6 +31,9 @@ namespace SimpleFFmpegGUI.FFMpegArgumentExtension
         public static FFMpegArgumentOptions WithVideoAspect(this FFMpegArgumentOptions opt, string aspect)
             => opt.WithArgument(new VideoAspectArgument(aspect));
 
+        public static FFMpegArgumentOptions WithTwoPass(this FFMpegArgumentOptions opt, string code, int pass)
+            => opt.WithArgument(new VideoTwoPassArgument(code, pass));
+
         public static VideoFilterOptions Scale(this VideoFilterOptions opt, string size)
         {
             opt.Arguments.Add(new ScaleArgument(size));
