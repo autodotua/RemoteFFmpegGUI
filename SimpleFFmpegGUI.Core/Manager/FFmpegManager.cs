@@ -336,7 +336,7 @@ namespace SimpleFFmpegGUI.Manager
 
         private void GenerateOutputPath()
         {
-            string output = task.Output;
+            string output = task.Output.Trim();
             var a = task.Arguments;
             if (string.IsNullOrEmpty(output))
             {
@@ -637,7 +637,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new ArgumentException("拼接视频，输入文件必须为2个或更多");
             }
-            message = $"正在合并：{Path.GetFileName(task.Inputs[0].FilePath)}等";
+            message = $"正在拼接：{task.Inputs.Count}个文件";
 
             if (task.Arguments.Concat == null || task.Arguments.Concat.Type == ConcatType.ViaTs)
             {
@@ -661,6 +661,7 @@ namespace SimpleFFmpegGUI.Manager
                     }
                 }
                 task.Arguments.Format = null;
+                Progress = GetProgress(task);
                 GenerateOutputPath();
                 var p = FFMpegArguments.FromFileInput(tempPath, false,
                     o => o.WithCustomArgument("-f concat -safe 0"))
@@ -683,10 +684,17 @@ namespace SimpleFFmpegGUI.Manager
             await RunAsync(p, null, cancellationToken);
         }
 
+        private static readonly Regex[] ErrorMessageRegexs = new[]
+        {
+            new Regex("Error.*",RegexOptions.Compiled),
+            new Regex(@"\[.*\] *Unable.*",RegexOptions.Compiled),
+        };
         public string GetErrorMessage()
         {
             var logs = LogManager.GetLogs('O', Task.Id, DateTime.Now.AddSeconds(-5));
-            var log = logs.List.Where(p => p.Message.StartsWith("Error")).OrderByDescending(p => p.Time).FirstOrDefault();
+            var log = logs.List
+                .Where(p =>ErrorMessageRegexs.Any(q=>q.IsMatch(p.Message)))
+                .OrderByDescending(p => p.Time).FirstOrDefault();
             return log?.Message;
         }
     }

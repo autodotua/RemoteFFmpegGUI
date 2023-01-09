@@ -18,9 +18,8 @@ try {
     Write-Output "已经安装npm（Node.JS）"
     Write-Output "已经安装.NET 6 SDK"
     Write-Output "已经将ffmpeg相关二进制文件、MediaInfo.dll、性能测试视频（test.mp4）放置到./bin中"
-    Write-Output "按任意键继续"
 
-    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+    pause
     Clear-Host
 
     
@@ -54,6 +53,8 @@ try {
         mkdir -Force Generation/Publish/WebPackage/api
         mkdir -Force Generation/Publish/WebPackage/host
 
+        Clear-Host
+        
         Write-Output "正在发布Web"
         Set-Location SimpleFFmpegGUI.Web
         npm install
@@ -107,7 +108,7 @@ try {
 
     Write-Output "操作完成"
     Write-Output "Web包位于Generation/Publish/WebPackage，WPF包位于Generation/Publish/WPF。"
-    [Console]::ReadKey()
+    pause
 }
 catch {
     Write-Error $_
