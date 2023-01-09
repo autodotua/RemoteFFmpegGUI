@@ -22,7 +22,8 @@ namespace SimpleFFmpegGUI
 
         public PipeService()
         {
-            Logger.Info("已建立与客户端的连接");
+            using Logger logger = new Logger();
+            logger.Info("已建立与客户端的连接");
         }
 
         public void StartQueue()

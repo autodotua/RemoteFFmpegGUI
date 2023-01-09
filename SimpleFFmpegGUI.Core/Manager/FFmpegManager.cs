@@ -21,18 +21,20 @@ namespace SimpleFFmpegGUI.Manager
 {
     public class FFmpegManager : INotifyPropertyChanged
     {
+        private static readonly Regex[] ErrorMessageRegexs = new[]
+        {
+            new Regex("Error.*",RegexOptions.Compiled),
+            new Regex(@"\[.*\] *Unable.*",RegexOptions.Compiled),
+            new Regex(@".*Invalid.*",RegexOptions.Compiled|RegexOptions.IgnoreCase),
+        };
+
         private static readonly Regex rPsnr = new Regex(@"PSNR (([yuvaverageminmax]+:[0-9\. ]+)+)", RegexOptions.Compiled);
-
         private static readonly Regex rSsim = new Regex(@"SSIM ([YUVAll]+:[0-9\.\(\) ]+)+", RegexOptions.Compiled);
-
         private readonly TaskInfo task;
-
         private CancellationTokenSource cancel;
-
         private bool hasRun = false;
-
         private string lastOutput;
-
+        private Logger logger = new Logger();
         private bool paused;
 
         private DateTime pauseStartTime;
@@ -46,6 +48,8 @@ namespace SimpleFFmpegGUI.Manager
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public event EventHandler StatusChanged;
+
         public bool Paused
         {
             get => paused;
@@ -55,14 +59,27 @@ namespace SimpleFFmpegGUI.Manager
         public ProgressDto Progress { get; private set; }
         public TaskInfo Task => task;
         private FFmpegProcess Process { get; set; }
-
-        public event EventHandler StatusChanged;
+        public static string TestOutputArguments(OutputArguments args)
+        {
+            FFMpegArguments f = Activator.CreateInstance(typeof(FFMpegArguments), true) as FFMpegArguments;
+            var p = f.OutputToFile("输出", true, a => ApplyOutputArguments(a, args, args.Video == null || !args.Video.TwoPass ? 0 : 2));
+            return p.Arguments;
+        }
 
         public void Cancel()
         {
-            Logger.Info(task, "取消当前任务");
+            logger.Info(task, "取消当前任务");
             task.Status = TaskStatus.Cancel;
             cancel.Cancel();
+        }
+
+        public string GetErrorMessage()
+        {
+            var logs = LogManager.GetLogs('O', Task.Id, DateTime.Now.AddSeconds(-5));
+            var log = logs.List
+                .Where(p => ErrorMessageRegexs.Any(q => q.IsMatch(p.Message)))
+                .OrderByDescending(p => p.Time).FirstOrDefault();
+            return log?.Message;
         }
 
         public StatusDto GetStatus()
@@ -86,7 +103,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             Paused = false;
             Progress.PauseTime += DateTime.Now - pauseStartTime;
-            Logger.Info(task, "恢复队列");
+            logger.Info(task, "恢复队列");
             ProcessExtension.ResumeProcess(Process.Id);
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -101,7 +118,7 @@ namespace SimpleFFmpegGUI.Manager
             cancel = new CancellationTokenSource();
             try
             {
-                Logger.Info(task, "开始任务");
+                logger.Info(task, "开始任务");
                 string tempDir = ConfigHelper.TempDir;
                 await (task.Type switch
                 {
@@ -123,11 +140,12 @@ namespace SimpleFFmpegGUI.Manager
                     {
                     }
                 }
-                Logger.Info(task, "完成任务");
+                logger.Info(task, "完成任务");
             }
             finally
             {
                 Progress = null;
+                logger.Dispose();
             }
         }
 
@@ -142,19 +160,11 @@ namespace SimpleFFmpegGUI.Manager
                 throw new Exception("进程还未启动或该任务不允许暂停");
             }
             Paused = true;
-            Logger.Info(task, "暂停队列");
+            logger.Info(task, "暂停队列");
             pauseStartTime = DateTime.Now;
             ProcessExtension.SuspendProcess(Process.Id);
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
-
-        public static string TestOutputArguments(OutputArguments args)
-        {
-            FFMpegArguments f = Activator.CreateInstance(typeof(FFMpegArguments), true) as FFMpegArguments;
-            var p = f.OutputToFile("输出", true, a => ApplyOutputArguments(a, args, args.Video == null || !args.Video.TwoPass ? 0 : 2));
-            return p.Arguments;
-        }
-
         private static void ApplyInputArguments(FFMpegArgumentOptions fa, InputArguments a)
         {
             if (a == null)
@@ -456,7 +466,7 @@ namespace SimpleFFmpegGUI.Manager
         private void Output(object sender, FFmpegOutputEventArgs e)
         {
             lastOutput = e.Data;
-            Logger.Output(task, e.Data);
+            logger.Output(task, e.Data);
             FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(e.Data));
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -465,10 +475,10 @@ namespace SimpleFFmpegGUI.Manager
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                Logger.Info(task, "进程启动前就被要求取消");
+                logger.Info(task, "进程启动前就被要求取消");
                 return;
             }
-            Logger.Info(task, "FFmpeg参数为：" + processor.Arguments);
+            logger.Info(task, "FFmpeg参数为：" + processor.Arguments);
             task.FFmpegArguments = string.IsNullOrEmpty(task.FFmpegArguments) ? processor.Arguments : task.FFmpegArguments + ";" + processor.Arguments;
             if (Progress != null)
             {
@@ -618,13 +628,13 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     var match = rSsim.Match(e.Data);
                     ssim = match.Value;
-                    Logger.Info(task, "对比结果（SSIM）：" + match.Value);
+                    logger.Info(task, "对比结果（SSIM）：" + match.Value);
                 }
                 if (rPsnr.IsMatch(e.Data))
                 {
                     var match = rPsnr.Match(e.Data);
                     psnr = match.Value;
-                    Logger.Info(task, "对比结果（PSNR）：" + match.Value);
+                    logger.Info(task, "对比结果（PSNR）：" + match.Value);
                 }
             }
         }
@@ -682,20 +692,6 @@ namespace SimpleFFmpegGUI.Manager
                  });
 
             await RunAsync(p, null, cancellationToken);
-        }
-
-        private static readonly Regex[] ErrorMessageRegexs = new[]
-        {
-            new Regex("Error.*",RegexOptions.Compiled),
-            new Regex(@"\[.*\] *Unable.*",RegexOptions.Compiled),
-        };
-        public string GetErrorMessage()
-        {
-            var logs = LogManager.GetLogs('O', Task.Id, DateTime.Now.AddSeconds(-5));
-            var log = logs.List
-                .Where(p =>ErrorMessageRegexs.Any(q=>q.IsMatch(p.Message)))
-                .OrderByDescending(p => p.Time).FirstOrDefault();
-            return log?.Message;
         }
     }
 }

@@ -34,6 +34,8 @@ namespace SimpleFFmpegGUI.Manager
                 RedirectStandardError = true,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
+                StandardErrorEncoding=System.Text.Encoding.UTF8,
+                StandardOutputEncoding=System.Text.Encoding.UTF8,
             };
             process.EnableRaisingEvents = true;
             process.OutputDataReceived += Process_OutputDataReceived;

@@ -31,7 +31,8 @@ namespace SimpleFFmpegGUI.Manager
             };
             db.Tasks.Add(task);
             db.SaveChanges();
-            Logger.Info(task, "新建任务");
+            using Logger logger = new Logger();
+            logger.Info(task, "新建任务");
             return task;
         }
 

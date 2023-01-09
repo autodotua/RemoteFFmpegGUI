@@ -30,7 +30,7 @@ namespace SimpleFFmpegGUI.WPF
     public partial class App : Application
     {
         public static DateTime AppStartTime { get; } = DateTime.Now;
-        public static ILog Log { get; private set; }
+        public static ILog AppLog { get; private set; }
         public static ServiceProvider ServiceProvider { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -47,7 +47,7 @@ namespace SimpleFFmpegGUI.WPF
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
             ServiceProvider = serviceCollection.BuildServiceProvider();
-    
+
             if (e.Args.Length > 1)
             {
                 if (e.Args[0] == "cut")
@@ -110,17 +110,17 @@ namespace SimpleFFmpegGUI.WPF
 
         private void InitializeLogs()
         {
-            Log = log4net.LogManager.GetLogger(GetType());
-            Log.Info("程序启动");
+            AppLog = log4net.LogManager.GetLogger(GetType());
+            AppLog.Info("程序启动");
 
             Logger.Log += Logger_Log;
             void Logger_Log(object sender, LogEventArgs e)
             {
                 switch (e.Log.Type)
                 {
-                    case 'E': Log.Error(e.Log.Message); break;
-                    case 'W': Log.Warn(e.Log.Message); break;
-                    case 'I': Log.Info(e.Log.Message); break;
+                    case 'E': AppLog.Error(e.Log.Message); break;
+                    case 'W': AppLog.Warn(e.Log.Message); break;
+                    case 'I': AppLog.Info(e.Log.Message); break;
                 }
             }
         }
@@ -129,7 +129,7 @@ namespace SimpleFFmpegGUI.WPF
         {
             try
             {
-                Log.Error(e.Exception);
+                AppLog.Error(e.Exception);
                 Dispatcher.Invoke(() =>
                 {
                     var result = MessageBox.Show("程序发生异常，可能出现数据丢失等问题。是否关闭？" + Environment.NewLine + Environment.NewLine + e.Exception.ToString(), FzLib.Program.App.ProgramName + " - 未捕获的异常", MessageBoxButton.YesNo, MessageBoxImage.Error);
@@ -142,6 +142,10 @@ namespace SimpleFFmpegGUI.WPF
             catch (Exception ex)
             {
             }
+        }
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
         }
     }
 }

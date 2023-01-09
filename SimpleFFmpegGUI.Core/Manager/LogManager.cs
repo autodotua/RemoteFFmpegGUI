@@ -8,13 +8,14 @@ namespace SimpleFFmpegGUI.Manager
 {
     public static class LogManager
     {
-        public static PagedListDto<Log> GetLogs(char? type = null, 
-            int taskId=0,
-            DateTime? from = null, 
+        public static PagedListDto<Log> GetLogs(char? type = null,
+            int taskId = 0,
+            DateTime? from = null,
             DateTime? to = null,
-            int skip = 0, 
+            int skip = 0,
             int take = 0)
         {
+            Logger.SaveAll();
             using var db = FFmpegDbContext.GetNew();
             IQueryable<Log> logs = db.Logs;
             if (type.HasValue)
@@ -29,7 +30,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 logs = logs.Where(p => p.Time < to.Value);
             }
-            if(taskId!=0)
+            if (taskId != 0)
             {
                 logs = logs.Where(p => p.TaskId == taskId);
             }

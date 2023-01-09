@@ -24,7 +24,8 @@ namespace SimpleFFmpegGUI.Manager
             set
             {
                 shutdownAfterQueueFinished = value;
-                Logger.Info("收到队列结束后自动关机命令：" + value.ToString());
+                using Logger logger = new Logger();
+                logger.Info("收到队列结束后自动关机命令：" + value.ToString());
             }
         }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:验证平台兼容性", Justification = "<挂起>")]
@@ -91,13 +92,15 @@ namespace SimpleFFmpegGUI.Manager
 
         public void AbortShutdown()
         {
-            Logger.Warn("收到终止关机命令");
+            using Logger logger = new Logger();
+            logger.Warn("收到终止关机命令");
             Shutdown(false);
         }
 
         public void Shutdown()
         {
-            Logger.Warn("收到关机命令");
+            using Logger logger = new Logger();
+            logger.Warn("收到关机命令");
             Shutdown(true);
         }
 

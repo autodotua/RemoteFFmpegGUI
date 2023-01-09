@@ -6,6 +6,11 @@ namespace SimpleFFmpegGUI
     {
         private static ConsoleLogger instance;
 
+        private ConsoleLogger()
+        {
+            Logger.Log += Logger_Log;
+        }
+
         public static void StartListen()
         {
             if (instance == null)
@@ -13,12 +18,6 @@ namespace SimpleFFmpegGUI
                 new ConsoleLogger();
             }
         }
-
-        private ConsoleLogger()
-        {
-            Logger.Log += Logger_Log;
-        }
-
         private void Logger_Log(object sender, LogEventArgs e)
         {
             ConsoleColor defaultColor = Console.ForegroundColor;

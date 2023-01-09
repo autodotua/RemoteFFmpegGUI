@@ -20,6 +20,7 @@ namespace SimpleFFmpegGUI.Manager
 {
     public class QueueManager
     {
+        private Logger logger = new Logger();
         private bool cancelQueue = false;
         /// <summary>
         /// 用于判断是否为有效计划的队列计划ID
@@ -117,12 +118,12 @@ namespace SimpleFFmpegGUI.Manager
         {
             if (running)
             {
-                Logger.Warn("队列正在运行，开始队列失败");
+                logger.Warn("队列正在运行，开始队列失败");
                 return;
             }
             running = true;
             scheduleTime = null;
-            Logger.Info("开始队列");
+            logger.Info("开始队列");
             using FFmpegDbContext db = FFmpegDbContext.GetNew();
             List<TaskInfo> tasks;
             while (!cancelQueue && GetQueueTasks(db).Any())
@@ -136,7 +137,7 @@ namespace SimpleFFmpegGUI.Manager
             running = false;
             bool cancelManually = cancelQueue;
             cancelQueue = false;
-            Logger.Info("队列完成");
+            logger.Info("队列完成");
             if (!cancelManually && PowerManager.ShutdownAfterQueueFinished)
             {
                 PowerManager.Shutdown();
@@ -164,9 +165,9 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new Exception("任务正在进行中，但状态不是正在处理中");
             }
-            Logger.Info(task, "开始独立任务");
+            logger.Info(task, "开始独立任务");
             await ProcessTaskAsync(db, task, false);
-            Logger.Info(task, "独立任务完成");
+            logger.Info(task, "独立任务完成");
         }
 
         /// <summary>
@@ -222,13 +223,13 @@ namespace SimpleFFmpegGUI.Manager
             {
                 if (task.Status != TaskStatus.Cancel)
                 {
-                    Logger.Error(task, "运行错误：" + ex.ToString());
+                    logger.Error(task, "运行错误：" + ex.ToString());
                     task.Status = TaskStatus.Error;
                     task.Message = ffmpegManager.GetErrorMessage() ?? "运行错误，请查看日志";
                 }
                 else
                 {
-                    Logger.Warn(task, "任务被取消");
+                    logger.Warn(task, "任务被取消");
                 }
             }
             finally

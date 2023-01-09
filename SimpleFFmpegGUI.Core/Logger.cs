@@ -4,55 +4,98 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI
 {
-    public static class Logger
+    public class LogEventArgs : EventArgs
     {
-        private static ConsoleColor DefaultColor = Console.ForegroundColor;
-
-        private static string GetMessage(TaskInfo task, string message)
+        public LogEventArgs(Log log)
         {
-            return $"{message} （{task.Type}  {(task.Inputs == null ? "？" : string.Join('+', task.Inputs))} ===> {task.Output ?? "？"}）";
+            Log = log;
         }
 
-        public static void Info(TaskInfo task, string message)
+        public Log Log { get; set; }
+    }
+
+    public class Logger : IDisposable
+    {
+        private static HashSet<Logger> allLoggers = new HashSet<Logger>();
+        private FFmpegDbContext db = FFmpegDbContext.GetNew();
+        private bool disposed = false;
+        private Timer timer;
+        public Logger()
         {
-            AddLog('I', message, task);
+            StartTimer();
+            allLoggers.Add(this);
         }
 
-        public static void Info(string message)
+        ~Logger()
         {
-            AddLog('I', message);
+            Dispose();
         }
 
-        public static void Output(TaskInfo task, string message)
+        public static event EventHandler<LogEventArgs> Log;
+
+        public static void SaveAll()
         {
-            AddLog('O', message, task);
-            Debug.WriteLine(message);
+            foreach (var logger in allLoggers)
+            {
+                logger.Save();
+            }
         }
 
-        public static void Error(string message)
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                disposed = true;
+                if (allLoggers.Contains(this))
+                {
+                    allLoggers.Remove(this);
+                }
+                timer.Dispose();
+                Save();
+                db.Dispose();
+            }
+        }
+
+        public void Error(string message)
         {
             AddLog('E', message);
         }
 
-        public static void Error(TaskInfo task, string message)
+        public void Error(TaskInfo task, string message)
         {
             AddLog('E', message, task);
         }
 
-        public static void Warn(string message)
+        public void Info(TaskInfo task, string message)
+        {
+            AddLog('I', message, task);
+        }
+
+        public void Info(string message)
+        {
+            AddLog('I', message);
+        }
+
+        public void Output(TaskInfo task, string message)
+        {
+            AddLog('O', message, task);
+        }
+
+        public void Warn(string message)
         {
             AddLog('W', message);
         }
 
-        public static void Warn(TaskInfo task, string message)
+        public void Warn(TaskInfo task, string message)
         {
             AddLog('W', message, task);
         }
 
-        private static void AddLog(char type, string message, TaskInfo task = null)
+        private void AddLog(char type, string message, TaskInfo task = null)
         {
             Log log = new Log()
             {
@@ -62,21 +105,22 @@ namespace SimpleFFmpegGUI
                 TaskId = task?.Id
             };
             Log?.Invoke(null, new LogEventArgs(log));
-            using var db = FFmpegDbContext.GetNew();
             db.Logs.Add(log);
-            db.SaveChanges();
         }
 
-        public static event EventHandler<LogEventArgs> Log;
-    }
-
-    public class LogEventArgs : EventArgs
-    {
-        public LogEventArgs(Log log)
+        private void Save()
         {
-            Log = log;
+            if (db.ChangeTracker.HasChanges())
+            {
+                db.SaveChanges();
+            }
         }
-
-        public Log Log { get; set; }
+        private void StartTimer()
+        {
+            timer = new Timer(new TimerCallback(o =>
+            {
+                Save();
+            }), null, 10000, 10000);
+        }
     }
 }

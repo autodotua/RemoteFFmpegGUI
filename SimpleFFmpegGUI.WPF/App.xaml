@@ -5,6 +5,7 @@
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:system="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
+    Exit="Application_Exit"
     ShutdownMode="OnMainWindowClose">
     <Application.Resources>
         <ResourceDictionary>
