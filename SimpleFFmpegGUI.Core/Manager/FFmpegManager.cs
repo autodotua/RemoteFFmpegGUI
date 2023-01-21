@@ -487,7 +487,7 @@ namespace SimpleFFmpegGUI.Manager
             if (useInstances)
             {
                 processor.CancellableThrough(cancellationToken);
-                processor.NotifyOnOutput((str, type) => Output(null, new FFmpegOutputEventArgs() { Data = str }));
+                processor.NotifyOnOutput(str => Output(null, new FFmpegOutputEventArgs() { Data = str }));
                 await processor.ProcessAsynchronously();
             }
             else
