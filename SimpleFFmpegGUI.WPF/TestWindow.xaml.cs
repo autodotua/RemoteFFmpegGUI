@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using static SimpleFFmpegGUI.WPF.Model.PerformanceTestLine;
@@ -125,25 +126,12 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        /// <summary>
-        /// 测试核心代码
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        private async Task TestAsync(string input)
+        private async Task CreateRefVideosAsync(string input, string[] sizes)
         {
-            double[] sums = new double[CodecsCount];
-            int[] counts = new int[CodecsCount];
-            string[] codecs = new string[CodecsCount] { "H264", "H265", "VP9" };
-            string[] extraArgs = new string[CodecsCount] { "", "", "-row-mt 1" };
-            string[] sizes = new string[SizesCount] { "1280x720", "1920x1080", "2560x1440", "3840x2160" };
-            //不同分辨率不同编码的权重矩阵，即一般情况下不同分辨率的编码帧速率与720P的帧速率之比
-            double[,] weights = new[,] {
-                { 1, 0.64, 0.4, 0.2 },
-                { 1, 0.6, 0.35, 0.16 },
-                { 1, 0.6, 0.4, 0.2 } };
-
+            if(Directory.Exists("test"))
+            {
+                Directory.Delete("test", true);
+            }
             var task = new TaskInfo()
             {
                 Inputs = new List<InputArguments>()
@@ -153,6 +141,87 @@ namespace SimpleFFmpegGUI.WPF
                         FilePath = input,
                     }
                 },
+                Arguments = new OutputArguments()
+                {
+                    Video = new VideoCodeArguments()
+                    {
+                        Preset = 7,
+                        Code = "H264",
+                        Crf = 13,
+                    },
+                    Audio = null,
+                    DisableAudio = true,
+                    Format = "mp4",
+
+                },
+                Type = TaskType.Code,
+            };
+
+            foreach (var size in sizes)
+            {
+                ViewModel.Message = $"正在准备{size.Split(':')[1]}P";
+                task.Arguments.Video.Size = size;
+                task.Output = Path.GetFullPath($"test/{size.Split(':')[1]}P");
+
+                runningFFmpeg = new FFmpegManager(task);
+                runningFFmpeg.StatusChanged += (s, e) =>
+                {
+                    var status = runningFFmpeg.GetStatus();
+                    if (status.HasDetail && status.Progress != null && status.Progress.Percent is >= 0 and <= 1)
+                    {
+                        ViewModel.DetailProgress = status.Progress.Percent;
+                    }
+                };
+                try
+                {
+                    await runningFFmpeg.RunAsync();
+                }
+                catch (TaskCanceledException ex)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("编码失败", ex);
+                }
+                finally
+                {
+                    runningFFmpeg = null;
+                }
+                ViewModel.Progress += 1;
+            }
+        }
+
+        /// <summary>
+        /// 测试核心代码
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private async Task TestAsync(string input)
+        {
+            double[] fpsSums = new double[CodecsCount];
+            int[] counts = new int[CodecsCount];
+            string[] codecs = new string[CodecsCount] { "H264", "H265", "VP9" };
+            string[] extraArgs = new string[CodecsCount] { "", "", "-row-mt 1" };
+            string[] sizes = new string[SizesCount] { "-1:720", "-1:1080", "-1:1440", "-1:2160" };
+            int[] bitrates = new int[SizesCount] { 2, 4, 8, 16 };
+            //不同分辨率不同编码的权重矩阵，即一般情况下不同分辨率的编码帧速率与720P的帧速率之比
+            double[,] weights = new[,] {
+                { 1, 0.64, 0.4, 0.2 },
+                { 1, 0.6, 0.35, 0.16 },
+                { 1, 0.6, 0.4, 0.2 } };
+
+            await CreateRefVideosAsync(input, sizes);
+            if (stopping)
+            {
+                return;
+            }
+
+
+            var task = new TaskInfo()
+            {
+                Inputs = new List<InputArguments>(),
                 Output = Path.GetFullPath("test/temp"),
                 Arguments = new OutputArguments()
                 {
@@ -168,11 +237,15 @@ namespace SimpleFFmpegGUI.WPF
                 for (int j = 0; j < sizes.Length; j++)
                 {
                     var item = ViewModel.Tests[j].Sizes[i];
+                    string sizeName = $"{sizes[j].Split(':')[1]}P";
 
-                    ViewModel.Message = $"正在测试{codecs[i]}，{sizes[j].Split('x')[1]}P";
-                    ViewModel.Progress += 0.5;
+                    //编码速度测试
+                    ViewModel.Message = $"正在编码测试{codecs[i]}，{sizeName}";
                     ViewModel.DetailProgress = 0;
+                    task.Inputs.Clear();
+                    task.Inputs.Add(new InputArguments() { FilePath = Path.GetFullPath($"test/{sizeName}.mp4") });
                     task.Arguments.Video.Code = codecs[i];
+                    task.Arguments.Video.AverageBitrate = bitrates[i];
                     task.Arguments.Video.Size = sizes[j];
                     task.Arguments.Extra = extraArgs[i];
 
@@ -211,28 +284,84 @@ namespace SimpleFFmpegGUI.WPF
                     {
                         throw new Exception("无法获取编码帧速度");
                     }
-                    sums[i] += fps / weights[i, j];
-                    counts[i]++;
-                    item.Score = fps;
+
                     if (stopping)
                     {
                         return;
                     }
+
+
+                    //编码质量测试
+                    var qualityTask = new TaskInfo()
+                    {
+                        Inputs = new List<InputArguments>()
+                        {
+                            task.Inputs[0],
+                            new InputArguments()
+                            {
+                                FilePath =task.RealOutput
+                            }
+                        },
+                        Arguments = new OutputArguments(),
+                        Type = TaskType.Compare,
+                    };
+                    ViewModel.Message = $"正在质量测试{codecs[i]}，{sizeName}";
+                    ViewModel.DetailProgress = 0;
+
+
+                    runningFFmpeg = new FFmpegManager(qualityTask);
+                    runningFFmpeg.StatusChanged += (s, e) =>
+                    {
+                        var status = runningFFmpeg.GetStatus();
+                        if (status.HasDetail && status.Progress != null && status.Progress.Percent is >= 0 and <= 1)
+                        {
+                            ViewModel.DetailProgress = status.Progress.Percent;
+                        }
+                    };
+                    try
+                    {
+                        await runningFFmpeg.RunAsync();
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        goto end;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("质量检测失败", ex);
+                    }
+                    finally
+                    {
+                        runningFFmpeg = null;
+                    }
+                    ViewModel.Progress += 0.5;
+                    if (stopping)
+                    {
+                        return;
+                    }
+
+                    //统计整理
+                    fpsSums[i] += fps / weights[i, j];
+                    counts[i]++;
+                    item.Score = fps;
+                    string message = qualityTask.Message;
+                    item.SSIM = double.Parse(Regex.Match(message, @"All:[0-9\.]+").Value[4..]) * 100;
+                    item.PSNR= double.Parse(Regex.Match(message, @"average:[0-9\.]+").Value[8..]);
                 }
             }
         end:
             for (int i = 0; i < CodecsCount; i++)
             {
-                ViewModel.Tests[^1].Sizes[i].Score = counts[i] == 0 ? 0 : Math.Round(sums[i] / counts[i], 2);
+                ViewModel.Tests[^1].Sizes[i].Score = counts[i] == 0 ? 0 : Math.Round(fpsSums[i] / counts[i], 2);
             }
             ViewModel.Message = "";
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if(ViewModel.IsTesting)
+            if (ViewModel.IsTesting)
             {
-                e.Cancel=true; 
+                e.Cancel = true;
             }
         }
     }

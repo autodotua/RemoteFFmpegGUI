@@ -7,96 +7,174 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Title="编码性能测试 - FFmpeg 工具箱"
-    Width="480"
+    Title="编码测试 - FFmpeg 工具箱"
+    Width="1400"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
+    Closing="Window_Closing"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
-    SizeToContent="Height" Closing="Window_Closing"
+    SizeToContent="Height"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
-    <ui:SimpleStackPanel
-        Margin="8"
-        Orientation="Vertical"
-        Spacing="8">
-
-        <DataGrid
-            AutoGenerateColumns="False"
-            CanUserAddRows="False"
-            CanUserDeleteRows="False"
-            CanUserReorderColumns="False"
-            CanUserResizeRows="False"
-            CanUserSortColumns="False"
-            HeadersVisibility="Column"
-            IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
-            ItemsSource="{Binding Tests}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Header}" />
-
-                <DataGridTextColumn
-                    Width="120"
-                    Binding="{Binding Sizes[0].Score}"
-                    Header="H264" />
-                <DataGridTextColumn
-                    Width="120"
-                    Binding="{Binding Sizes[1].Score}"
-                    Header="H265" />
-                <DataGridTextColumn
-                    Width="120"
-                    Binding="{Binding Sizes[2].Score}"
-                    Header="VP9" />
-            </DataGrid.Columns>
-        </DataGrid>
-        <TextBlock Text="{Binding Message}" />
-        <ProgressBar
-            Maximum="1"
-            Minimum="0"
-            Value="{Binding DetailProgress}" />
-        <ProgressBar
-            Maximum="12"
-            Minimum="0"
-            Value="{Binding Progress}" />
-
-        <DockPanel LastChildFill="True">
-            <TextBlock
-                VerticalAlignment="Center"
-                DockPanel.Dock="Left"
-                Text="速度预设：" />
-            <Slider
-                AutoToolTipPlacement="TopLeft"
+    <Grid Margin="8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <GroupBox Header="速度">
+            <DataGrid
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                CanUserReorderColumns="False"
+                CanUserResizeRows="False"
+                CanUserSortColumns="False"
+                HeadersVisibility="Column"
                 IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
-                IsSnapToTickEnabled="True"
-                Maximum="8"
-                Minimum="0"
-                TickFrequency="1"
-                TickPlacement="BottomRight"
-                Value="{Binding Preset}" />
-        </DockPanel>
-        <TextBlock Opacity="0.7">
-            <Run>本测试将模拟不同编码格式和分辨率下视频编码的速度，单位为帧每秒。</Run>
-            <LineBreak />
-            <Run>测试视频视频长度越长（左），测试耗时越长，测试结果越准确。</Run>
-            <LineBreak />
-            <Run>速度预设越慢（左），测试耗时越长，测试结果越准确。</Run>
-            <LineBreak />
-            <Run>不同速度预设、不同测试视频的测试分数没有参考性。</Run>
-        </TextBlock>
+                ItemsSource="{Binding Tests}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Header}" />
+
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Sizes[0].Score}"
+                        Header="H264" />
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Sizes[1].Score}"
+                        Header="H265" />
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Sizes[2].Score}"
+                        Header="VP9" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        <GroupBox
+            Grid.Column="2"
+            Header="画面相似性">
+            <DataGrid
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                CanUserReorderColumns="False"
+                CanUserResizeRows="False"
+                CanUserSortColumns="False"
+                HeadersVisibility="Column"
+                IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                ItemsSource="{Binding Tests}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Header}" />
+
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Sizes[0].SSIM, StringFormat=0.00}"
+                        Header="H264" />
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Sizes[1].SSIM, StringFormat=0.00}"
+                        Header="H265" />
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Sizes[2].SSIM, StringFormat=0.00}"
+                        Header="VP9" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        <GroupBox
+            Grid.Column="4"
+            Header="画面信噪比">
+            <DataGrid
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                CanUserReorderColumns="False"
+                CanUserResizeRows="False"
+                CanUserSortColumns="False"
+                HeadersVisibility="Column"
+                IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                ItemsSource="{Binding Tests}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Header}" />
+
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Sizes[0].PSNR, StringFormat=0.00}"
+                        Header="H264" />
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Sizes[1].PSNR, StringFormat=0.00}"
+                        Header="H265" />
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Sizes[2].PSNR, StringFormat=0.00}"
+                        Header="VP9" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
         <ui:SimpleStackPanel
-            HorizontalAlignment="Right"
-            Orientation="Horizontal"
+            Grid.Row="2"
+            Grid.ColumnSpan="99"
             Spacing="8">
-            <Button
+            <TextBlock Text="{Binding Message}" />
+            <ProgressBar
+                Maximum="1"
+                Minimum="0"
+                Value="{Binding DetailProgress}" />
+            <ProgressBar
+                Maximum="16"
+                Minimum="0"
+                Value="{Binding Progress}" />
+
+            <DockPanel LastChildFill="True">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Left"
+                    Text="速度预设：" />
+                <Slider
+                    AutoToolTipPlacement="TopLeft"
+                    IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                    IsSnapToTickEnabled="True"
+                    Maximum="8"
+                    Minimum="0"
+                    TickFrequency="1"
+                    TickPlacement="BottomRight"
+                    Value="{Binding Preset}" />
+            </DockPanel>
+            <TextBlock Opacity="0.7">
+                <Run>本测试将模拟不同编码格式和分辨率下视频编码的速度，单位为帧每秒。</Run>
+                <LineBreak />
+                <Run>测试视频视频长度越长，速度预设越慢（左），测试耗时越长，测试结果越准确。</Run>
+                <LineBreak />
+                <Run>不同版本的本软件和FFmpeg、不同速度预设、不同测试视频的测试分数没有参考性。</Run>
+                <LineBreak />
+                <Run>不同分辨率之间的分数无关。</Run>
+            </TextBlock>
+            <ui:SimpleStackPanel
                 HorizontalAlignment="Right"
-                Click="StopButton_Click"
-                Content="停止测试"
-                Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}}" />
-            <Button
-                HorizontalAlignment="Right"
-                Click="StartButton_Click"
-                Content="开始测试"
-                Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                Orientation="Horizontal"
+                Spacing="8">
+                <Button
+                    HorizontalAlignment="Right"
+                    Click="StopButton_Click"
+                    Content="停止测试"
+                    Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}}" />
+                <Button
+                    HorizontalAlignment="Right"
+                    Click="StartButton_Click"
+                    Content="开始测试"
+                    Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+            </ui:SimpleStackPanel>
         </ui:SimpleStackPanel>
-    </ui:SimpleStackPanel>
+    </Grid>
 </Window>

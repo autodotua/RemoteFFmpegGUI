@@ -28,13 +28,24 @@ namespace SimpleFFmpegGUI.WPF.Model
     {
         public bool IsChecked { get; set; }
         private double score;
+        private double ssim;
+        private double psnr;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         public double Score
         {
             get => score;
             set => this.SetValueAndNotify(ref score, value, nameof(Score));
+        }
+        public double SSIM
+        {
+            get => ssim;
+            set => this.SetValueAndNotify(ref ssim, value, nameof(SSIM));
+        } 
+        public double PSNR
+        {
+            get => psnr;
+            set => this.SetValueAndNotify(ref psnr, value, nameof(PSNR));
         }
 
     }
