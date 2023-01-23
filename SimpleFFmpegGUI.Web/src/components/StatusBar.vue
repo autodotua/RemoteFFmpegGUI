@@ -55,7 +55,10 @@
               :stroke-width="20"
               :color="progressColor"
               style="margin-right: 24px; margin-top: 4px"
-              :percentage="Math.round(status.progress.percent * 10000) / 100"
+              :percentage="status.progress.percent * 100"
+              :format="(p) => p.toFixed(2) + '%'"
+              text-color="white"
+              define-back-color="#CCCA"
             ></el-progress
           ></el-col>
         </el-row>
@@ -96,9 +99,12 @@
             <el-progress
               :text-inside="true"
               :stroke-width="20"
-              style="margin-top: 10px"
               :color="progressColor"
-              :percentage="Math.round(status.progress.percent * 10000) / 100"
+              style="margin-top: 10px"
+              :percentage="status.progress.percent * 100"
+              :format="(p) => p.toFixed(2) + '%'"
+              text-color="white"
+              define-back-color="#CCCA"
             ></el-progress></el-col
           ><el-col :span="4">
             <el-popconfirm title="真的要取消任务吗？" @confirm="cancel">
@@ -202,4 +208,15 @@ export default Vue.component("status-bar", {
   margin-right: -30px;
   margin-top: -12px;
 }
+</style>
+
+<style>
+/* .el-progress__text {
+  font-size: 14px !important;
+}
+
+.el-progress-bar {
+  margin-right: -60px !important;
+  padding-right: 72px !important;
+} */
 </style>

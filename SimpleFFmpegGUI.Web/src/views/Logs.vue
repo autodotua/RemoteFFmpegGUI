@@ -106,7 +106,7 @@ export default Vue.extend({
   created() {
     if (this.$route.query.id) {
       net.getTask(Number.parseInt(this.$route.query.id as string)).then((r) => {
-        this.taskName = TaskType.GetByID(r.data.type).Description="（";
+        this.taskName = TaskType.GetByID(r.data.type).Description+"（";
 
         if (r.data.inputs && r.data.inputs.length > 0) {
           this.taskName += r.data.inputs[0].filePath;

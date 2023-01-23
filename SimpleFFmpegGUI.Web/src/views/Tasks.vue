@@ -5,7 +5,8 @@
         <a class="right12" v-if="isProcessing == false && hasSchedule"
           >已计划开始时间</a
         >
-        <el-date-picker
+        <el-date-picker 
+         v-if="isProcessing == false"
           class="right12"
           v-model="scheduleTime"
           value-format="yyyy-MM-dd[T]HH:mm:ss[Z]"
