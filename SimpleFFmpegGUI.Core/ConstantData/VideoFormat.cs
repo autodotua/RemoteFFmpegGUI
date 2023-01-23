@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimpleFFmpegGUI.Model
+namespace SimpleFFmpegGUI.ConstantData
 {
     public class VideoFormat
     {

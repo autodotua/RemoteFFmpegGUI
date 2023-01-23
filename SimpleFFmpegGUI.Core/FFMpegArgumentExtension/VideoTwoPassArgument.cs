@@ -1,24 +1,36 @@
 ﻿using FFMpegCore.Arguments;
+using FFMpegCore.Enums;
+using SimpleFFmpegGUI.ConstantData;
 using System;
+using VideoCodec = SimpleFFmpegGUI.ConstantData.VideoCodec;
 
 namespace SimpleFFmpegGUI.FFMpegArgumentExtension
 {
     public class VideoTwoPassArgument : IArgument
     {
-        public readonly string Code;
+        public readonly string Codec;
         public readonly int Pass;
 
-        public VideoTwoPassArgument(string code,int pass)
+        public VideoTwoPassArgument(string codec,int pass)
         {
-            Code= code;
+            Codec= codec;
             Pass= pass;
         }
 
-        public string Text => Code switch
+        public string Text
         {
-            "libx265" => $"-x265-params pass={Pass}",
-            "libx264" => $"-pass {Pass}",
-            _ => throw new ArgumentException("不支持2Pass的编码", nameof(Code)),
-        };
+            get
+            {
+                if (Codec == VideoCodec.H265.Lib)
+                {
+                    return $"-x265-params pass={Pass}";
+                }
+                else
+                {
+                    return $"-pass {Pass}";
+                }
+            }
+        }
+     
     }
 }

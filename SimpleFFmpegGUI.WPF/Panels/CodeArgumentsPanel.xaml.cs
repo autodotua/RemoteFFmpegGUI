@@ -3,6 +3,7 @@ using FzLib.Collection;
 using Mapster;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleFFmpegGUI.ConstantData;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
@@ -227,7 +228,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public IEnumerable Fpses => new double[] { 10, 20, 23.976, 24, 25, 29.97, 30, 48, 59.94, 60, 120 };
 
-        public IEnumerable VideoCodes { get; } = new[] { "自动", "H265", "H264", "VP9" };
+        public IEnumerable VideoCodes { get; } = new[] { "自动", "H265", "H264", "VP9","AV1" };
         public IEnumerable AudioCodes { get; } = new[] { "自动", "AAC", "OPUS" };
         public IEnumerable Formats => VideoFormat.Formats;
         public IEnumerable Sizes { get; } = new[] { "-1:2160", "-1:1440", "-1:1080", "-1:720", "-1:576", "-1:480" };

@@ -16,6 +16,8 @@ using System.Text.RegularExpressions;
 using FFMpegCore.Exceptions;
 using System.ComponentModel;
 using FzLib;
+using SimpleFFmpegGUI.ConstantData;
+using VideoCodec = SimpleFFmpegGUI.ConstantData.VideoCodec;
 
 namespace SimpleFFmpegGUI.Manager
 {
@@ -230,22 +232,21 @@ namespace SimpleFFmpegGUI.Manager
 
             if (a.Video != null)
             {
-                string code = a.Video.Code?.ToLower()?.Replace(".", "") switch
+                string code = a.Video.Code?.ToUpper()?.Replace(".", "");
+                string codecLib = null;
+                if (VideoCodec.VideoCodecs.Any(p => p.Name == code))
                 {
-                    "h265" => "libx265",
-                    "h264" => "libx264",
-                    "vp9" => "libvpx-vp9",
-                    "自动" => null,
-                    "auto" => null,
-                    null => null,
-                    "" => null,
-                    _ => a.Video.Code
-                };
-                if (code != null)
-                {
-                    fa.WithVideoCodec(code);
+                    codecLib = VideoCodec.VideoCodecs.First(p => p.Name == code).Lib;
                 }
-                fa.WithSpeedPreset((Speed)a.Video.Preset);
+                else if (code is not ("自动" or "AUTO"))
+                {
+                    codecLib = code.ToLower();
+                }
+                if (codecLib != null)
+                {
+                    fa.WithVideoCodec(codecLib);
+                    fa.WithCpuSpeed(codecLib, a.Video.Preset);
+                }
                 if (a.Video.Crf.HasValue && twoPass == 0)
                 {
                     fa.WithConstantRateFactor(a.Video.Crf.Value);
@@ -471,7 +472,7 @@ namespace SimpleFFmpegGUI.Manager
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private async Task RunAsync(FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken, bool useInstances = false,string workingDir=null)
+        private async Task RunAsync(FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken, bool useInstances = false, string workingDir = null)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -530,7 +531,7 @@ namespace SimpleFFmpegGUI.Manager
                 Progress = GetProgress(task);
                 message = $"正在转码（Pass=1）：{Path.GetFileName(task.Inputs[0].FilePath)}";
                 var p = f.OutputToFile("NUL", true, a => ApplyOutputArguments(a, task.Arguments, 1));
-                await RunAsync(p, message, cancellationToken,workingDir: tempDirectory);
+                await RunAsync(p, message, cancellationToken, workingDir: tempDirectory);
                 Progress = GetProgress(task);
                 message = $"正在转码（Pass=2）：{Path.GetFileName(task.Inputs[0].FilePath)}";
                 p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments, 2));

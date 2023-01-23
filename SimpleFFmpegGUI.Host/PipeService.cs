@@ -3,6 +3,7 @@ using FzLib.Collection;
 using Mapster;
 using MediaInfo;
 using Newtonsoft.Json;
+using SimpleFFmpegGUI.ConstantData;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;

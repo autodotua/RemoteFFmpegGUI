@@ -1,6 +1,7 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
 using FzLib;
 using FzLib.Collection;
+using FzLib.WPF;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.FzExtension.CommonDialog;
@@ -289,6 +290,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         private async void FFmpegArgsButton_Click(object sender, RoutedEventArgs e)
         {
+            this.GetWindow().Activate();
             try
             {
                 OutputArguments args = argumentsPanel.GetOutputArguments();
