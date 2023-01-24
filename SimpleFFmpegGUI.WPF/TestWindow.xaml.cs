@@ -1,4 +1,5 @@
 ﻿using FzLib;
+using FzLib.WPF.Converters;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
@@ -6,10 +7,14 @@ using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using static SimpleFFmpegGUI.WPF.Model.PerformanceTestLine;
 
 namespace SimpleFFmpegGUI.WPF
@@ -26,7 +31,6 @@ namespace SimpleFFmpegGUI.WPF
             new PerformanceTestLine(){Header="1080P"},
             new PerformanceTestLine(){Header="1440P"},
             new PerformanceTestLine(){Header="2160P"},
-            new PerformanceTestLine(){Header="总得分"},
         };
         private string message = "";
         public string Message
@@ -46,6 +50,12 @@ namespace SimpleFFmpegGUI.WPF
         {
             get => progress;
             set => this.SetValueAndNotify(ref progress, value, nameof(Progress));
+        }
+        private double maxProgress = 0;
+        public double MaxProgress
+        {
+            get => maxProgress;
+            set => this.SetValueAndNotify(ref maxProgress, value, nameof(MaxProgress));
         }
         private double detailProgress = 0;
         public double DetailProgress
@@ -70,6 +80,13 @@ namespace SimpleFFmpegGUI.WPF
         private bool stopping = false;
         private FFmpegManager runningFFmpeg = null;
 
+        private static readonly string[] codecs = new string[CodecsCount] { "H264", "H265", "VP9", "AV1" };
+        private static readonly string[] extraArgs = new string[CodecsCount] { "", "", "-row-mt 1", "-row-mt 1 -tiles 4x4" };
+        private static readonly string[] sizes = new string[SizesCount] { "-1:720", "-1:1080", "-1:1440", "-1:2160" };
+        private static readonly int[] bitrates = new int[SizesCount] { 2, 4, 8, 16 };
+
+
+
         public TestWindowViewModel ViewModel { get; set; }
 
         public TestWindow(TestWindowViewModel viewModel)
@@ -77,6 +94,76 @@ namespace SimpleFFmpegGUI.WPF
             ViewModel = viewModel;
             DataContext = ViewModel;
             InitializeComponent();
+            CreateDaraGrids();
+            CreateSwitchItems();
+            SizeToContent = SizeToContent.WidthAndHeight;
+        }
+        private void CreateSwitchItems()
+        {
+            for (int i = 0; i < CodecsCount; i++)
+            {
+                stkCodecs.Children.Add(new CheckBox()
+                {
+                    Content = codecs[i],
+                    IsChecked = true,
+                });
+            }
+            for (int i = 0; i < SizesCount; i++)
+            {
+                stkSizes.Children.Add(new CheckBox()
+                {
+                    Content = $"{sizes[i].Split(':')[1]}P",
+                    IsChecked = true,
+                });
+            }
+        }
+        private void CreateDaraGrids()
+        {
+            grpSpeed.Content = GetDataGrid(nameof(PerformanceTestItem.Score));
+            grpSSIM.Content = GetDataGrid(nameof(PerformanceTestItem.SSIM), "0.00");
+            grpPSNR.Content = GetDataGrid(nameof(PerformanceTestItem.PSNR), "0.00");
+
+            DataGrid GetDataGrid(string type, string format = null)
+            {
+                DataGrid dataGrid = new DataGrid()
+                {
+                    AutoGenerateColumns = false,
+                    CanUserAddRows = false,
+                    CanUserDeleteRows = false,
+                    CanUserReorderColumns = false,
+                    CanUserResizeColumns = false,
+                    CanUserResizeRows = false,
+                    CanUserSortColumns = false,
+                    HeadersVisibility = DataGridHeadersVisibility.Column
+                };
+                dataGrid.SetBinding(DataGrid.IsEnabledProperty,
+                    new Binding(nameof(TestWindowViewModel.IsTesting)) { Converter = new InverseBoolConverter() });
+                dataGrid.SetBinding(DataGrid.ItemsSourceProperty,
+                   new Binding(nameof(TestWindowViewModel.Tests)));
+                DataGridTextColumn c = new DataGridTextColumn()
+                {
+                    Binding = new Binding(nameof(PerformanceTestLine.Header))
+                };
+                dataGrid.Columns.Add(c);
+                for (int i = 0; i < codecs.Length; i++)
+                {
+                    c = new DataGridTextColumn()
+                    {
+                        Width = 120,
+                        Header = codecs[i],
+                        Binding = new Binding($"{nameof(PerformanceTestLine.Sizes)}[{i}].{type}")
+                        {
+                            Converter = new EmptyIfZeroConverter()
+                        }
+                    };
+                    if (!string.IsNullOrEmpty(format))
+                    {
+                        c.Binding.StringFormat = format;
+                    }
+                    dataGrid.Columns.Add(c);
+                }
+                return dataGrid;
+            }
         }
 
         private void StopButton_Click(object sender, RoutedEventArgs e)
@@ -128,7 +215,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private async Task CreateRefVideosAsync(string input, string[] sizes)
         {
-            if(Directory.Exists("test"))
+            if (Directory.Exists("test"))
             {
                 Directory.Delete("test", true);
             }
@@ -157,9 +244,14 @@ namespace SimpleFFmpegGUI.WPF
                 Type = TaskType.Code,
             };
 
-            foreach (var size in sizes)
+            for (int i = 0; i < sizes.Length; i++)
             {
-                ViewModel.Message = $"正在准备{size.Split(':')[1]}P";
+                var size = sizes[i];
+                if (stkSizes.Children.Cast<CheckBox>().ElementAt(i).IsChecked == false)
+                {
+                    continue;
+                }
+                ViewModel.Message = $"正在准备{size.Split(':')[1]}P素材";
                 task.Arguments.Video.Size = size;
                 task.Output = Path.GetFullPath($"test/{size.Split(':')[1]}P");
 
@@ -200,18 +292,8 @@ namespace SimpleFFmpegGUI.WPF
         /// <exception cref="Exception"></exception>
         private async Task TestAsync(string input)
         {
-            double[] fpsSums = new double[CodecsCount];
-            int[] counts = new int[CodecsCount];
-            string[] codecs = new string[CodecsCount] { "H264", "H265", "VP9" };
-            string[] extraArgs = new string[CodecsCount] { "", "", "-row-mt 1" };
-            string[] sizes = new string[SizesCount] { "-1:720", "-1:1080", "-1:1440", "-1:2160" };
-            int[] bitrates = new int[SizesCount] { 2, 4, 8, 16 };
-            //不同分辨率不同编码的权重矩阵，即一般情况下不同分辨率的编码帧速率与720P的帧速率之比
-            double[,] weights = new[,] {
-                { 1, 0.64, 0.4, 0.2 },
-                { 1, 0.6, 0.35, 0.16 },
-                { 1, 0.6, 0.4, 0.2 } };
-
+            ViewModel.MaxProgress = stkSizes.Children.Cast<CheckBox>().Count(p => p.IsChecked == true)
+                * (stkCodecs.Children.Cast<CheckBox>().Count(p => p.IsChecked == true) + 1);
             await CreateRefVideosAsync(input, sizes);
             if (stopping)
             {
@@ -234,8 +316,16 @@ namespace SimpleFFmpegGUI.WPF
             };
             for (int i = 0; i < codecs.Length; i++)
             {
+                if (stkCodecs.Children.Cast<CheckBox>().ElementAt(i).IsChecked == false)
+                {
+                    continue;
+                }
                 for (int j = 0; j < sizes.Length; j++)
                 {
+                    if (stkSizes.Children.Cast<CheckBox>().ElementAt(j).IsChecked == false)
+                    {
+                        continue;
+                    }
                     var item = ViewModel.Tests[j].Sizes[i];
                     string sizeName = $"{sizes[j].Split(':')[1]}P";
 
@@ -341,19 +431,13 @@ namespace SimpleFFmpegGUI.WPF
                     }
 
                     //统计整理
-                    fpsSums[i] += fps / weights[i, j];
-                    counts[i]++;
                     item.Score = fps;
                     string message = qualityTask.Message;
                     item.SSIM = double.Parse(Regex.Match(message, @"All:[0-9\.]+").Value[4..]) * 100;
-                    item.PSNR= double.Parse(Regex.Match(message, @"average:[0-9\.]+").Value[8..]);
+                    item.PSNR = double.Parse(Regex.Match(message, @"average:[0-9\.]+").Value[8..]);
                 }
             }
         end:
-            for (int i = 0; i < CodecsCount; i++)
-            {
-                ViewModel.Tests[^1].Sizes[i].Score = counts[i] == 0 ? 0 : Math.Round(fpsSums[i] / counts[i], 2);
-            }
             ViewModel.Message = "";
         }
 
@@ -363,6 +447,23 @@ namespace SimpleFFmpegGUI.WPF
             {
                 e.Cancel = true;
             }
+        }
+    }
+
+    public class EmptyIfZeroConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is 0 or 0d)
+            {
+                return "";
+            }
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

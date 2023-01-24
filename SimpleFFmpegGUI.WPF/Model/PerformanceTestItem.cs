@@ -10,12 +10,13 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class PerformanceTestLine
     {
-        public const int CodecsCount = 3;
+        public const int CodecsCount = 4;
         public const int SizesCount = 4;
         public PerformanceTestLine()
         {
             Sizes = new PerformanceTestItem[CodecsCount]
             {
+                new PerformanceTestItem(){IsChecked=true },
                 new PerformanceTestItem(){IsChecked=true },
                 new PerformanceTestItem(){IsChecked=true },
                 new PerformanceTestItem(){IsChecked=true },

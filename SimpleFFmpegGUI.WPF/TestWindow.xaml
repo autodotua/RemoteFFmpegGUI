@@ -15,166 +15,112 @@
     Closing="Window_Closing"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
-    SizeToContent="Height"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="16" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="16" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="16" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <GroupBox Header="速度">
-            <DataGrid
-                AutoGenerateColumns="False"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False"
-                CanUserReorderColumns="False"
-                CanUserResizeRows="False"
-                CanUserSortColumns="False"
-                HeadersVisibility="Column"
-                IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
-                ItemsSource="{Binding Tests}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Header}" />
-
-                    <DataGridTextColumn
-                        Width="120"
-                        Binding="{Binding Sizes[0].Score}"
-                        Header="H264" />
-                    <DataGridTextColumn
-                        Width="120"
-                        Binding="{Binding Sizes[1].Score}"
-                        Header="H265" />
-                    <DataGridTextColumn
-                        Width="120"
-                        Binding="{Binding Sizes[2].Score}"
-                        Header="VP9" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
         <GroupBox
-            Grid.Column="2"
-            Header="画面相似性">
-            <DataGrid
-                AutoGenerateColumns="False"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False"
-                CanUserReorderColumns="False"
-                CanUserResizeRows="False"
-                CanUserSortColumns="False"
-                HeadersVisibility="Column"
-                IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
-                ItemsSource="{Binding Tests}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Header}" />
-
-                    <DataGridTextColumn
-                        Width="120"
-                        Binding="{Binding Sizes[0].SSIM, StringFormat=0.00}"
-                        Header="H264" />
-                    <DataGridTextColumn
-                        Width="120"
-                        Binding="{Binding Sizes[1].SSIM, StringFormat=0.00}"
-                        Header="H265" />
-                    <DataGridTextColumn
-                        Width="120"
-                        Binding="{Binding Sizes[2].SSIM, StringFormat=0.00}"
-                        Header="VP9" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
+            x:Name="grpSpeed"
+            Header="速度" />
         <GroupBox
-            Grid.Column="4"
-            Header="画面信噪比">
-            <DataGrid
-                AutoGenerateColumns="False"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False"
-                CanUserReorderColumns="False"
-                CanUserResizeRows="False"
-                CanUserSortColumns="False"
-                HeadersVisibility="Column"
-                IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
-                ItemsSource="{Binding Tests}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Header}" />
-
-                    <DataGridTextColumn
-                        Width="120"
-                        Binding="{Binding Sizes[0].PSNR, StringFormat=0.00}"
-                        Header="H264" />
-                    <DataGridTextColumn
-                        Width="120"
-                        Binding="{Binding Sizes[1].PSNR, StringFormat=0.00}"
-                        Header="H265" />
-                    <DataGridTextColumn
-                        Width="120"
-                        Binding="{Binding Sizes[2].PSNR, StringFormat=0.00}"
-                        Header="VP9" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
-        <ui:SimpleStackPanel
+            x:Name="grpSSIM"
             Grid.Row="2"
-            Grid.ColumnSpan="99"
-            Spacing="8">
-            <TextBlock Text="{Binding Message}" />
-            <ProgressBar
-                Maximum="1"
-                Minimum="0"
-                Value="{Binding DetailProgress}" />
-            <ProgressBar
-                Maximum="16"
-                Minimum="0"
-                Value="{Binding Progress}" />
-
-            <DockPanel LastChildFill="True">
-                <TextBlock
-                    VerticalAlignment="Center"
-                    DockPanel.Dock="Left"
-                    Text="速度预设：" />
-                <Slider
-                    AutoToolTipPlacement="TopLeft"
-                    IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
-                    IsSnapToTickEnabled="True"
-                    Maximum="8"
-                    Minimum="0"
-                    TickFrequency="1"
-                    TickPlacement="BottomRight"
-                    Value="{Binding Preset}" />
-            </DockPanel>
-            <TextBlock Opacity="0.7">
-                <Run>本测试将模拟不同编码格式和分辨率下视频编码的速度，单位为帧每秒。</Run>
-                <LineBreak />
-                <Run>测试视频视频长度越长，速度预设越慢（左），测试耗时越长，测试结果越准确。</Run>
-                <LineBreak />
-                <Run>不同版本的本软件和FFmpeg、不同速度预设、不同测试视频的测试分数没有参考性。</Run>
-                <LineBreak />
-                <Run>不同分辨率之间的分数无关。</Run>
-            </TextBlock>
+            Header="画面相似性" />
+        <GroupBox
+            x:Name="grpPSNR"
+            Grid.Row="4"
+            Header="画面信噪比" />
+        <DockPanel
+            Grid.RowSpan="99"
+            Grid.Column="2">
             <ui:SimpleStackPanel
-                HorizontalAlignment="Right"
-                Orientation="Horizontal"
+                DockPanel.Dock="Top"
                 Spacing="8">
-                <Button
-                    HorizontalAlignment="Right"
-                    Click="StopButton_Click"
-                    Content="停止测试"
-                    Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}}" />
-                <Button
-                    HorizontalAlignment="Right"
-                    Click="StartButton_Click"
-                    Content="开始测试"
-                    Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                <DockPanel LastChildFill="True">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="速度预设：" />
+                    <Slider
+                        AutoToolTipPlacement="TopLeft"
+                        IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                        IsSnapToTickEnabled="True"
+                        Maximum="5"
+                        Minimum="0"
+                        TickFrequency="1"
+                        TickPlacement="BottomRight"
+                        Value="{Binding Preset}" />
+                </DockPanel>
+                <DockPanel LastChildFill="True">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="测试编码器：" />
+                    <ui:SimpleStackPanel
+                        x:Name="stkCodecs"
+                        Orientation="Horizontal" />
+
+                </DockPanel>
+                <DockPanel LastChildFill="True">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="测试分辨率：" />
+                    <ui:SimpleStackPanel
+                        x:Name="stkSizes"
+                        Orientation="Horizontal" />
+
+                </DockPanel>
             </ui:SimpleStackPanel>
-        </ui:SimpleStackPanel>
+            <ui:SimpleStackPanel
+                VerticalAlignment="Bottom"
+                DockPanel.Dock="Bottom"
+                Spacing="8">
+                <TextBlock Opacity="0.7">
+                    <Run>本测试将模拟不同编码格式和分辨率下视频编码的速度，单位为帧每秒。</Run>
+                    <LineBreak />
+                    <Run>测试视频视频长度越长，速度预设越慢（左），测试耗时越长，测试结果越准确。</Run>
+                    <LineBreak />
+                    <Run>不同版本的本软件和FFmpeg、不同速度预设、不同测试视频的测试分数没有参考性。</Run>
+                    <LineBreak />
+                    <Run>不同分辨率之间的分数无关。</Run>
+                </TextBlock>
+                <TextBlock Text="{Binding Message}" />
+                <ProgressBar
+                    Maximum="1"
+                    Minimum="0"
+                    Value="{Binding DetailProgress}" />
+                <ProgressBar
+                    Maximum="{Binding MaxProgress}"
+                    Minimum="0"
+                    Value="{Binding Progress}" />
+                <ui:SimpleStackPanel
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <Button
+                        HorizontalAlignment="Right"
+                        Click="StopButton_Click"
+                        Content="停止测试"
+                        Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}}" />
+                    <Button
+                        HorizontalAlignment="Right"
+                        Click="StartButton_Click"
+                        Content="开始测试"
+                        Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                </ui:SimpleStackPanel>
+            </ui:SimpleStackPanel>
+        </DockPanel>
     </Grid>
 </Window>
