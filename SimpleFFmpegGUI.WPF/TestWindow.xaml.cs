@@ -1,13 +1,13 @@
 ﻿using FzLib;
 using FzLib.WPF.Converters;
 using ModernWpf.FzExtension.CommonDialog;
+using SimpleFFmpegGUI.ConstantData;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -16,108 +16,25 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using static SimpleFFmpegGUI.WPF.Model.PerformanceTestLine;
+using static SimpleFFmpegGUI.WPF.TestWindowViewModel;
 
 namespace SimpleFFmpegGUI.WPF
 {
-    public class TestWindowViewModel : INotifyPropertyChanged
-    {
-        public TestWindowViewModel()
-        {
-        }
-
-        public PerformanceTestLine[] Tests { get; } = new PerformanceTestLine[]
-        {
-            new PerformanceTestLine(){Header="720P"},
-            new PerformanceTestLine(){Header="1080P"},
-            new PerformanceTestLine(){Header="1440P"},
-            new PerformanceTestLine(){Header="2160P"},
-        };
-        private string message = "";
-        public string Message
-        {
-            get => message;
-            set => this.SetValueAndNotify(ref message, value, nameof(Message));
-        }
-        private bool isTesting = false;
-        public bool IsTesting
-        {
-            get => isTesting;
-            set => this.SetValueAndNotify(ref isTesting, value, nameof(IsTesting));
-        }
-
-        private double progress = 0;
-        public double Progress
-        {
-            get => progress;
-            set => this.SetValueAndNotify(ref progress, value, nameof(Progress));
-        }
-        private double maxProgress = 0;
-        public double MaxProgress
-        {
-            get => maxProgress;
-            set => this.SetValueAndNotify(ref maxProgress, value, nameof(MaxProgress));
-        }
-        private double detailProgress = 0;
-        public double DetailProgress
-        {
-            get => detailProgress;
-            set => this.SetValueAndNotify(ref detailProgress, value, nameof(DetailProgress));
-        }
-        private int preset = 3;
-        public int Preset
-        {
-            get => preset;
-            set => this.SetValueAndNotify(ref preset, value, nameof(Preset));
-        }
-
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
-    }
-
     public partial class TestWindow : Window
     {
-        private bool stopping = false;
+        private const string TestDir = "test";
         private FFmpegManager runningFFmpeg = null;
-
-        private static readonly string[] codecs = new string[CodecsCount] { "H264", "H265", "VP9", "AV1" };
-        private static readonly string[] extraArgs = new string[CodecsCount] { "", "", "-row-mt 1", "-row-mt 1 -tiles 4x4" };
-        private static readonly string[] sizes = new string[SizesCount] { "-1:720", "-1:1080", "-1:1440", "-1:2160" };
-        private static readonly int[] bitrates = new int[SizesCount] { 2, 4, 8, 16 };
-
-
-
-        public TestWindowViewModel ViewModel { get; set; }
-
+        private bool stopping = false;
         public TestWindow(TestWindowViewModel viewModel)
         {
             ViewModel = viewModel;
             DataContext = ViewModel;
             InitializeComponent();
-            CreateDaraGrids();
-            CreateSwitchItems();
-            SizeToContent = SizeToContent.WidthAndHeight;
+            CreateDataGrids();
         }
-        private void CreateSwitchItems()
-        {
-            for (int i = 0; i < CodecsCount; i++)
-            {
-                stkCodecs.Children.Add(new CheckBox()
-                {
-                    Content = codecs[i],
-                    IsChecked = true,
-                });
-            }
-            for (int i = 0; i < SizesCount; i++)
-            {
-                stkSizes.Children.Add(new CheckBox()
-                {
-                    Content = $"{sizes[i].Split(':')[1]}P",
-                    IsChecked = true,
-                });
-            }
-        }
-        private void CreateDaraGrids()
+
+        public TestWindowViewModel ViewModel { get; set; }
+        private void CreateDataGrids()
         {
             grpSpeed.Content = GetDataGrid(nameof(PerformanceTestItem.Score));
             grpSSIM.Content = GetDataGrid(nameof(PerformanceTestItem.SSIM), "0.00");
@@ -134,7 +51,9 @@ namespace SimpleFFmpegGUI.WPF
                     CanUserResizeColumns = false,
                     CanUserResizeRows = false,
                     CanUserSortColumns = false,
-                    HeadersVisibility = DataGridHeadersVisibility.Column
+                    HeadersVisibility = DataGridHeadersVisibility.Column,
+                    SelectionUnit = DataGridSelectionUnit.Cell,
+                    IsReadOnly = true,
                 };
                 dataGrid.SetBinding(DataGrid.IsEnabledProperty,
                     new Binding(nameof(TestWindowViewModel.IsTesting)) { Converter = new InverseBoolConverter() });
@@ -142,16 +61,17 @@ namespace SimpleFFmpegGUI.WPF
                    new Binding(nameof(TestWindowViewModel.Tests)));
                 DataGridTextColumn c = new DataGridTextColumn()
                 {
-                    Binding = new Binding(nameof(PerformanceTestLine.Header))
+                    Binding = new Binding(nameof(PerformanceTestLine.Header)),
+                    IsReadOnly = true,
                 };
                 dataGrid.Columns.Add(c);
-                for (int i = 0; i < codecs.Length; i++)
+                for (int i = 0; i < CodecsCount; i++)
                 {
                     c = new DataGridTextColumn()
                     {
                         Width = 120,
-                        Header = codecs[i],
-                        Binding = new Binding($"{nameof(PerformanceTestLine.Sizes)}[{i}].{type}")
+                        Header = ViewModel.Codecs[i].Name,
+                        Binding = new Binding($"{nameof(PerformanceTestLine.Items)}[{i}].{type}")
                         {
                             Converter = new EmptyIfZeroConverter()
                         }
@@ -166,59 +86,8 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        private void StopButton_Click(object sender, RoutedEventArgs e)
+        private async Task<int> CreateRefVideosAsync(string input, string[] sizes)
         {
-            IsEnabled = false;
-            stopping = true;
-            runningFFmpeg?.Cancel();
-        }
-
-        private async void StartButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                stopping = false;
-                ViewModel.Progress = 0;
-                ViewModel.IsTesting = true;
-                ViewModel.Tests[^1].Sizes.ForEach(p => p.Score = 0);
-                if (!Directory.Exists("test"))
-                {
-                    Directory.CreateDirectory("test");
-                }
-                string input = Path.GetFullPath(Config.Instance.PerformanceTestFileName);
-                if (!File.Exists(input))
-                {
-                    throw new FileNotFoundException("不存在测试文件");
-                }
-                await TestAsync(input);
-            }
-            catch (Exception ex)
-            {
-                if (stopping)
-                {
-                    ViewModel.Message = "测试终止";
-                }
-                else
-                {
-                    await CommonDialog.ShowErrorDialogAsync(ex);
-                    ViewModel.Message = ex.Message;
-                }
-            }
-            finally
-            {
-                Directory.Delete("test", true);
-                ViewModel.IsTesting = false;
-                ViewModel.DetailProgress = 1;
-                IsEnabled = true;
-            }
-        }
-
-        private async Task CreateRefVideosAsync(string input, string[] sizes)
-        {
-            if (Directory.Exists("test"))
-            {
-                Directory.Delete("test", true);
-            }
             var task = new TaskInfo()
             {
                 Inputs = new List<InputArguments>()
@@ -243,14 +112,16 @@ namespace SimpleFFmpegGUI.WPF
                 },
                 Type = TaskType.Code,
             };
-
+            int count = 0;
             for (int i = 0; i < sizes.Length; i++)
             {
                 var size = sizes[i];
-                if (stkSizes.Children.Cast<CheckBox>().ElementAt(i).IsChecked == false)
+
+                if (!ViewModel.Tests[i].Items.Any(p => p.IsChecked))
                 {
                     continue;
                 }
+                count++;
                 ViewModel.Message = $"正在准备{size.Split(':')[1]}P素材";
                 task.Arguments.Video.Size = size;
                 task.Output = Path.GetFullPath($"test/{size.Split(':')[1]}P");
@@ -282,8 +153,64 @@ namespace SimpleFFmpegGUI.WPF
                 }
                 ViewModel.Progress += 1;
             }
+            return count;
         }
 
+        private void SelectAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Tests.ForEach(p => p.Items.ForEach(q => q.IsChecked = true));
+        }
+
+        private async void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ViewModel.Tests.Any(p => p.Items.Any(q => q.IsChecked)))
+            {
+                await CommonDialog.ShowErrorDialogAsync("没有选择任何测试项目");
+                return;
+            }
+            try
+            {
+                stopping = false;
+                ViewModel.Progress = 0;
+                ViewModel.IsTesting = true;
+                ViewModel.Tests.ForEach(q => q.Items.ForEach(p => p.Score = 0));
+                if (!Directory.Exists(TestDir))
+                {
+                    Directory.CreateDirectory(TestDir);
+                }
+                string input = Path.GetFullPath(Config.Instance.PerformanceTestFileName);
+                if (!File.Exists(input))
+                {
+                    throw new FileNotFoundException("不存在测试文件");
+                }
+                await TestAsync(input);
+            }
+            catch (Exception ex)
+            {
+                if (stopping)
+                {
+                    ViewModel.Message = "测试终止";
+                }
+                else
+                {
+                    await CommonDialog.ShowErrorDialogAsync(ex);
+                    ViewModel.Message = ex.Message;
+                }
+            }
+            finally
+            {
+                ViewModel.IsTesting = false;
+                ViewModel.DetailProgress = 1;
+                IsEnabled = true;
+            }
+        }
+
+        private void StopButton_Click(object sender, RoutedEventArgs e)
+        {
+            IsEnabled = false;
+            stopping = true;
+            runningFFmpeg?.Cancel();
+        }
         /// <summary>
         /// 测试核心代码
         /// </summary>
@@ -292,9 +219,12 @@ namespace SimpleFFmpegGUI.WPF
         /// <exception cref="Exception"></exception>
         private async Task TestAsync(string input)
         {
-            ViewModel.MaxProgress = stkSizes.Children.Cast<CheckBox>().Count(p => p.IsChecked == true)
-                * (stkCodecs.Children.Cast<CheckBox>().Count(p => p.IsChecked == true) + 1);
-            await CreateRefVideosAsync(input, sizes);
+            if (Directory.Exists(TestDir))
+            {
+                Directory.Delete(TestDir, true);
+            }
+            int count = await CreateRefVideosAsync(input, sizes);
+            ViewModel.MaxProgress = ViewModel.Tests.Sum(p => p.Items.Count(q => q.IsChecked)) + count;
             if (stopping)
             {
                 return;
@@ -304,40 +234,37 @@ namespace SimpleFFmpegGUI.WPF
             var task = new TaskInfo()
             {
                 Inputs = new List<InputArguments>(),
-                Output = Path.GetFullPath("test/temp"),
                 Arguments = new OutputArguments()
                 {
-                    Video = new VideoCodeArguments() { Preset = ViewModel.Preset },
+                    Video = new VideoCodeArguments(),
                     Audio = null,
                     DisableAudio = true,
                     Format = "mp4"
                 },
                 Type = TaskType.Code,
             };
-            for (int i = 0; i < codecs.Length; i++)
+            for (int i = 0; i < CodecsCount; i++)
             {
-                if (stkCodecs.Children.Cast<CheckBox>().ElementAt(i).IsChecked == false)
-                {
-                    continue;
-                }
                 for (int j = 0; j < sizes.Length; j++)
                 {
-                    if (stkSizes.Children.Cast<CheckBox>().ElementAt(j).IsChecked == false)
+                    var item = ViewModel.Tests[j].Items[i];
+                    if (!item.IsChecked)
                     {
                         continue;
                     }
-                    var item = ViewModel.Tests[j].Sizes[i];
-                    string sizeName = $"{sizes[j].Split(':')[1]}P";
+
 
                     //编码速度测试
-                    ViewModel.Message = $"正在编码测试{codecs[i]}，{sizeName}";
+                    ViewModel.Message = $"正在编码测试{ViewModel.Codecs[i].Name}，{sizeTexts[j]}";
                     ViewModel.DetailProgress = 0;
                     task.Inputs.Clear();
-                    task.Inputs.Add(new InputArguments() { FilePath = Path.GetFullPath($"test/{sizeName}.mp4") });
-                    task.Arguments.Video.Code = codecs[i];
-                    task.Arguments.Video.AverageBitrate = bitrates[i];
+                    task.Inputs.Add(new InputArguments() { FilePath = Path.GetFullPath($"test/{sizeTexts[j]}.mp4") });
+                    task.Arguments.Video.Code = ViewModel.Codecs[i].Name;
+                    task.Arguments.Video.Preset = ViewModel.Codecs[i].CpuSpeed;
+                    task.Arguments.Video.AverageBitrate = ViewModel.Tests[j].MBitrate;
                     task.Arguments.Video.Size = sizes[j];
-                    task.Arguments.Extra = extraArgs[i];
+                    task.Arguments.Extra = ViewModel.Codecs[i].ExtraArguments;
+                    task.Output = Path.GetFullPath($"test/{ViewModel.Codecs[i].Name}-{sizeTexts[j]}.mp4");
 
                     runningFFmpeg = new FFmpegManager(task);
                     double fps = 0;
@@ -395,7 +322,7 @@ namespace SimpleFFmpegGUI.WPF
                         Arguments = new OutputArguments(),
                         Type = TaskType.Compare,
                     };
-                    ViewModel.Message = $"正在质量测试{codecs[i]}，{sizeName}";
+                    ViewModel.Message = $"正在质量测试{ViewModel.Codecs[i].Name}，{sizeTexts[j]}";
                     ViewModel.DetailProgress = 0;
 
 
@@ -450,20 +377,77 @@ namespace SimpleFFmpegGUI.WPF
         }
     }
 
-    public class EmptyIfZeroConverter : IValueConverter
+    public class TestWindowViewModel : INotifyPropertyChanged
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        private static readonly int[] bitrates = new int[SizesCount] { 2, 4, 8, 16 };
+        private static readonly string[] extraArgs = new string[CodecsCount] { "", "", "-row-mt 1", "-row-mt 1" };
+        public static readonly string[] sizes = new string[SizesCount] { "-1:720", "-1:1080", "-1:1440", "-1:2160" };
+        public static readonly string[] sizeTexts = new string[SizesCount] { "720P", "1080P", "1440P", "2160P" };
+        private double detailProgress = 0;
+
+        private bool isTesting = false;
+
+        private double maxProgress = 0;
+
+        private string message = "";
+
+        private int preset = 3;
+
+        private double progress = 0;
+
+        public TestWindowViewModel()
         {
-            if (value is 0 or 0d)
+            for (int i = 0; i < SizesCount; i++)
             {
-                return "";
+                Tests[i] = new PerformanceTestLine() { Header = sizeTexts[i], MBitrate = bitrates[i] };
             }
-            return value;
+
+            for (int i = 0; i < CodecsCount; i++)
+            {
+                Codecs[i] = new PerformanceTestCodecParameter()
+                {
+                    Name = VideoCodec.VideoCodecs[i].Name,
+                    CpuSpeed = 4,
+                    MaxCpuSpeed = VideoCodec.VideoCodecs[i].MaxSpeedLevel,
+                    ExtraArguments = extraArgs[i]
+                };
+            }
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public double DetailProgress
         {
-            throw new NotImplementedException();
+            get => detailProgress;
+            set => this.SetValueAndNotify(ref detailProgress, value, nameof(DetailProgress));
         }
+
+        public bool IsTesting
+        {
+            get => isTesting;
+            set => this.SetValueAndNotify(ref isTesting, value, nameof(IsTesting));
+        }
+
+        public double MaxProgress
+        {
+            get => maxProgress;
+            set => this.SetValueAndNotify(ref maxProgress, value, nameof(MaxProgress));
+        }
+
+        public string Message
+        {
+            get => message;
+            set => this.SetValueAndNotify(ref message, value, nameof(Message));
+        }
+
+        public double Progress
+        {
+            get => progress;
+            set => this.SetValueAndNotify(ref progress, value, nameof(Progress));
+        }
+
+        public PerformanceTestLine[] Tests { get; } = new PerformanceTestLine[SizesCount];
+
+        public PerformanceTestCodecParameter[] Codecs { get; } = new PerformanceTestCodecParameter[CodecsCount];
     }
 }

@@ -14,7 +14,7 @@ namespace SimpleFFmpegGUI.ConstantData
         public static readonly VideoCodec AV1 = new VideoCodec("AV1", "libaom-av1",8);
         public static readonly VideoCodec[] VideoCodecs = new VideoCodec[]
         {
-            H265,
+            H264,
             H265,
             VP9,
             AV1,

@@ -8,31 +8,28 @@ using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
-    public class PerformanceTestLine
+    public class PerformanceTestItem : INotifyPropertyChanged
     {
-        public const int CodecsCount = 4;
-        public const int SizesCount = 4;
-        public PerformanceTestLine()
-        {
-            Sizes = new PerformanceTestItem[CodecsCount]
-            {
-                new PerformanceTestItem(){IsChecked=true },
-                new PerformanceTestItem(){IsChecked=true },
-                new PerformanceTestItem(){IsChecked=true },
-                new PerformanceTestItem(){IsChecked=true },
-            };
-        }
-        public string Header { get; set; }
-        public PerformanceTestItem[] Sizes { get; }
-    }
-    public class PerformanceTestItem:INotifyPropertyChanged
-    {
-        public bool IsChecked { get; set; }
-        private double score;
-        private double ssim;
+        private bool isChecked;
         private double psnr;
 
+        private double score;
+
+        private double ssim;
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool IsChecked
+        {
+            get => isChecked;
+            set => this.SetValueAndNotify(ref isChecked, value, nameof(IsChecked));
+        }
+        public double PSNR
+        {
+            get => psnr;
+            set => this.SetValueAndNotify(ref psnr, value, nameof(PSNR));
+        }
+
         public double Score
         {
             get => score;
@@ -42,12 +39,32 @@ namespace SimpleFFmpegGUI.WPF.Model
         {
             get => ssim;
             set => this.SetValueAndNotify(ref ssim, value, nameof(SSIM));
-        } 
-        public double PSNR
-        {
-            get => psnr;
-            set => this.SetValueAndNotify(ref psnr, value, nameof(PSNR));
         }
+    }
 
+    public class PerformanceTestLine
+    {
+        public const int CodecsCount = 4;
+        public const int SizesCount = 4;
+        public PerformanceTestLine()
+        {
+            Items = new PerformanceTestItem[CodecsCount];
+
+            for (int i = 0; i < CodecsCount; i++)
+            {
+                Items[i] = new PerformanceTestItem();
+            }
+        }
+        public string Header { get; set; }
+        public PerformanceTestItem[] Items { get; }
+        public double MBitrate { get; set; }
+    }
+
+    public class PerformanceTestCodecParameter
+    {
+        public string Name { get; set; }
+        public string ExtraArguments { get; set; }
+        public int CpuSpeed { get; set; }
+        public int MaxCpuSpeed { get; set; }
     }
 }

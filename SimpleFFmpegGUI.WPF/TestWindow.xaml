@@ -5,10 +5,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:SimpleFFmpegGUI.WPF.Model"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="编码测试 - FFmpeg 工具箱"
-    Width="1400"
+    Width="1200"
+    Height="800"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
@@ -21,7 +23,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="16" />
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -32,56 +34,160 @@
         </Grid.RowDefinitions>
         <GroupBox
             x:Name="grpSpeed"
-            Header="速度" />
+            Header="速度（帧每秒，越低越好）" />
         <GroupBox
             x:Name="grpSSIM"
             Grid.Row="2"
-            Header="画面相似性" />
+            Header="画面相似性（百分比，越高越好）" />
         <GroupBox
             x:Name="grpPSNR"
             Grid.Row="4"
-            Header="画面信噪比" />
+            Header="画面信噪比（比值，越高越好）" />
         <DockPanel
             Grid.RowSpan="99"
             Grid.Column="2">
             <ui:SimpleStackPanel
                 DockPanel.Dock="Top"
+                IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
                 Spacing="8">
-                <DockPanel LastChildFill="True">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        DockPanel.Dock="Left"
-                        Text="速度预设：" />
-                    <Slider
-                        AutoToolTipPlacement="TopLeft"
+                <GroupBox>
+                    <GroupBox.HeaderTemplate>
+                        <DataTemplate>
+                            <ui:SimpleStackPanel
+                                Orientation="Horizontal"
+                                Spacing="16">
+                                <TextBlock Text="测试项目" />
+                                <Button
+                                    Background="Transparent"
+                                    Click="SelectAllButton_Click"
+                                    Content="全选"
+                                    Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                            </ui:SimpleStackPanel>
+                        </DataTemplate>
+                    </GroupBox.HeaderTemplate>
+                    <DataGrid
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        CanUserReorderColumns="False"
+                        CanUserResizeRows="False"
+                        CanUserSortColumns="False"
+                        HeadersVisibility="Column"
                         IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
-                        IsSnapToTickEnabled="True"
-                        Maximum="5"
-                        Minimum="0"
-                        TickFrequency="1"
-                        TickPlacement="BottomRight"
-                        Value="{Binding Preset}" />
-                </DockPanel>
-                <DockPanel LastChildFill="True">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        DockPanel.Dock="Left"
-                        Text="测试编码器：" />
-                    <ui:SimpleStackPanel
-                        x:Name="stkCodecs"
-                        Orientation="Horizontal" />
+                        ItemsSource="{Binding Tests}"
+                        SelectionUnit="Cell">
 
-                </DockPanel>
-                <DockPanel LastChildFill="True">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        DockPanel.Dock="Left"
-                        Text="测试分辨率：" />
-                    <ui:SimpleStackPanel
-                        x:Name="stkSizes"
-                        Orientation="Horizontal" />
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Binding="{Binding Header}"
+                                IsReadOnly="True" />
+                            <DataGridTemplateColumn
+                                Width="96"
+                                Header="H264">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            Margin="16,0"
+                                            IsChecked="{Binding Items[0].IsChecked, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Width="96"
+                                Header="H265">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            Margin="16,0"
+                                            IsChecked="{Binding Items[1].IsChecked, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Width="96"
+                                Header="VP9">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            Margin="16,0"
+                                            IsChecked="{Binding Items[2].IsChecked, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Width="96"
+                                Header="AV1">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            Margin="16,0"
+                                            IsChecked="{Binding Items[3].IsChecked, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn
+                                Width="120"
+                                Binding="{Binding MBitrate, UpdateSourceTrigger=PropertyChanged}"
+                                Header="码率 (Mbps)" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
 
-                </DockPanel>
+                <GroupBox Header="编码设置">
+                    <DataGrid
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        CanUserReorderColumns="False"
+                        CanUserResizeRows="False"
+                        CanUserSortColumns="False"
+                        HeadersVisibility="Column"
+                        IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                        ItemsSource="{Binding Codecs}"
+                        SelectionUnit="Cell">
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Binding="{Binding Name}"
+                                IsReadOnly="True" />
+                            <DataGridTemplateColumn
+                                Width="200"
+                                Header="速度预设">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Margin="8,0"
+                                            VerticalAlignment="Center">
+                                            <Run Text="{Binding CpuSpeed, Mode=OneWay}" />
+                                            <Run Text=" / " />
+                                            <Run Text="{Binding MaxCpuSpeed, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <Slider
+                                            Margin="16,0"
+                                            AutoToolTipPlacement="TopLeft"
+                                            IsSnapToTickEnabled="True"
+                                            Maximum="{Binding MaxCpuSpeed}"
+                                            Minimum="0"
+                                            TickFrequency="1"
+                                            TickPlacement="BottomRight"
+                                            Value="{Binding CpuSpeed}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTextColumn
+                                Width="240"
+                                Binding="{Binding ExtraArguments, UpdateSourceTrigger=PropertyChanged}"
+                                Header="额外参数" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                </GroupBox>
+
             </ui:SimpleStackPanel>
             <ui:SimpleStackPanel
                 VerticalAlignment="Bottom"

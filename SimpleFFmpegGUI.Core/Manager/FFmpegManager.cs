@@ -238,7 +238,7 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     codecLib = VideoCodec.VideoCodecs.First(p => p.Name == code).Lib;
                 }
-                else if (code is not ("自动" or "AUTO"))
+                else if (code is not ("自动" or "AUTO" or null))
                 {
                     codecLib = code.ToLower();
                 }
