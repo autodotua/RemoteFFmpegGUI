@@ -446,7 +446,7 @@ namespace SimpleFFmpegGUI.Manager
             string psnr = null;
             try
             {
-                await RunAsync(p, $"正在对比{Path.GetFileName(task.Inputs[0].FilePath)}和{Path.GetFileName(task.Inputs[1].FilePath)}", cancellationToken);
+                await RunAsync(p, $"正在对比 {Path.GetFileName(task.Inputs[0].FilePath)} 和 {Path.GetFileName(task.Inputs[1].FilePath)}", cancellationToken);
                 if (ssim == null || psnr == null)
                 {
                     throw new Exception("对比视频失败，未识别到对比结果");

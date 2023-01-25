@@ -64,6 +64,7 @@ namespace SimpleFFmpegGUI.WPF
             }
             else
             {
+                ServiceProvider.GetService<FFmpegOutputPageViewModel>();
                 MainWindow = ServiceProvider.GetService<MainWindow>();
                 MainWindow.Show();
             }
@@ -100,6 +101,9 @@ namespace SimpleFFmpegGUI.WPF
 
             services.AddTransient<PresetsPage>();
             services.AddTransient<PresetsPageViewModel>();
+
+            services.AddTransient<FFmpegOutputPage>();
+            services.AddSingleton<FFmpegOutputPageViewModel>();
 
             services.AddTransient<TaskListViewModel>();
             services.AddTransient<CodeArgumentsPanelViewModel>();

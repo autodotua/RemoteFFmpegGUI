@@ -1,0 +1,85 @@
+﻿<UserControl
+    x:Class="SimpleFFmpegGUI.WPF.Pages.FFmpegOutputPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
+    xmlns:converters="clr-namespace:FzLib.WPF.Converters;assembly=FzCoreLib.Windows"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Pages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mext="clr-namespace:ModernWpf.FzExtension;assembly=ModernWpf.FzExtension"
+    xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
+    xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
+    xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Loaded="UserControl_Loaded"
+    mc:Ignorable="d">
+    <DockPanel>
+
+        <ui:CommandBar
+            Grid.Row="99"
+            DockPanel.Dock="Bottom">
+            <ui:AppBarButton
+                Click="ClearAllButton_Click"
+                Icon="Clear"
+                Label="清空" />
+            <ui:AppBarButton
+                Click="CopyAllButton_Click"
+                Icon="Copy"
+                Label="复制全部内容" />
+
+
+        </ui:CommandBar>
+        <ScrollViewer
+            Name="scr"
+            Margin="4">
+            <ItemsControl
+                Margin="0,0,20,0"
+                ItemsSource="{Binding Outputs, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock PreviewMouseDown="TextBlock_PreviewMouseDown"
+                            FontFamily="Consolas"
+                            Text="{Binding Message}">
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <SolidColorBrush
+                                                        Opacity="0.5"
+                                                        Color="{DynamicResource SystemAccentColor}" />
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Setter Property="Cursor" Value="Hand" />
+                                        </Trigger>
+                                        <DataTrigger
+                                            Binding="{Binding Type}"
+                                            Value="I">
+                                            <Setter Property="Foreground" Value="Gray" />
+                                            <Setter Property="Cursor" Value="Hand" />
+                                        </DataTrigger>
+                                        <DataTrigger
+                                            Binding="{Binding Type}"
+                                            Value="E">
+                                            <Setter Property="Foreground" Value="Red" />
+                                            <Setter Property="Cursor" Value="Hand" />
+                                        </DataTrigger> 
+                                        <DataTrigger
+                                            Binding="{Binding Type}"
+                                            Value="W">
+                                            <Setter Property="Foreground" Value="Orange" />
+                                            <Setter Property="Cursor" Value="Hand" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

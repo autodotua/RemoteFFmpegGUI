@@ -18,6 +18,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
                 nameof(TasksPage) => "所有任务",
                 nameof(LogsPage) => "日志",
                 nameof(SettingPage) => "设置",
+                nameof(FFmpegOutputPage) => "FFmpeg输出命令行",
                 _ => throw new NotImplementedException(),
             };
         }

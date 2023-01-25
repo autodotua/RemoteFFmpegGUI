@@ -307,5 +307,10 @@ namespace SimpleFFmpegGUI.WPF
         {
             Config.Instance.Save();
         }
+
+        private void FFmpegOutputButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddNewTab<FFmpegOutputPage>();
+        }
     }
 }

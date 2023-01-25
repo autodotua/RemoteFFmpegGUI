@@ -108,6 +108,13 @@
                         <ui:AppBarButton.Icon>
                             <ui:FontIcon Glyph="&#xE916;" />
                         </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>      
+                    <ui:AppBarButton
+                        Click="FFmpegOutputButton_Click"
+                        Label="FFmpeg输出命令行">
+                        <ui:AppBarButton.Icon>
+                            <ui:FontIcon Glyph="&#xE1A2;" />
+                        </ui:AppBarButton.Icon>
                     </ui:AppBarButton>
                 </ui:CommandBar.SecondaryCommands>
             </ui:CommandBar>
