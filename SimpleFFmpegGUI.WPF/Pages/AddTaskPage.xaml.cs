@@ -1,4 +1,5 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
+using FFMpegCore.Exceptions;
 using FzLib;
 using FzLib.Collection;
 using FzLib.WPF;
@@ -105,6 +106,19 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         private async void AddToQueueButton_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                if (ViewModel.Type is TaskType.Code)
+                {
+                    FFmpegManager.TestOutputArguments(argumentsPanel.GetOutputArguments());
+                }
+            }
+            catch (FFMpegArgumentException ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync(ex.Message, null, title: "参数错误");
+                return;
+            }
+
             IsEnabled = false;
             try
             {
@@ -166,7 +180,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
             //ViewModel.AllowChangeType = false;
             ViewModel.Type = task.Type;
             fileIOPanel.Update(task.Type, task.Inputs, task.Output);
-            argumentsPanel.Update(task.Type,task.Arguments);
+            argumentsPanel.Update(task.Type, task.Arguments);
         }
 
         public void SetFiles(IEnumerable<string> files, TaskType type)
@@ -198,6 +212,19 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         private async void AddToRemoteHostButton_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                if (ViewModel.Type is TaskType.Code)
+                {
+                    FFmpegManager.TestOutputArguments(argumentsPanel.GetOutputArguments());
+                }
+            }
+            catch (FFMpegArgumentException ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync(ex.Message, null, title: "参数错误");
+                return;
+            }
+
             var items = Config.Instance.RemoteHosts.Select(p =>
             new SelectDialogItem(p.Name, p.Address));
             var index = await CommonDialog.ShowSelectItemDialogAsync("请确保在远程主机的输入文件夹中有同名文件", items);

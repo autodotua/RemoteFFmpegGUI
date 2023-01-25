@@ -31,9 +31,11 @@ namespace SimpleFFmpegGUI.WPF
             DataContext = ViewModel;
             InitializeComponent();
             CreateDataGrids();
+            CreateTestItemsDataGrid();
         }
 
         public TestWindowViewModel ViewModel { get; set; }
+
         private void CreateDataGrids()
         {
             grpSpeed.Content = GetDataGrid(nameof(PerformanceTestItem.Score));
@@ -69,7 +71,7 @@ namespace SimpleFFmpegGUI.WPF
                 {
                     c = new DataGridTextColumn()
                     {
-                        Width = 120,
+                        Width = 108,
                         Header = ViewModel.Codecs[i].Name,
                         Binding = new Binding($"{nameof(PerformanceTestLine.Items)}[{i}].{type}")
                         {
@@ -156,6 +158,58 @@ namespace SimpleFFmpegGUI.WPF
             return count;
         }
 
+        private void CreateTestItemsDataGrid()
+        {
+            DataGrid dataGrid = new DataGrid()
+            {
+                AutoGenerateColumns = false,
+                CanUserAddRows = false,
+                CanUserDeleteRows = false,
+                CanUserReorderColumns = false,
+                CanUserResizeColumns = false,
+                CanUserResizeRows = false,
+                CanUserSortColumns = false,
+                HeadersVisibility = DataGridHeadersVisibility.Column,
+                SelectionUnit = DataGridSelectionUnit.Cell,
+                IsReadOnly = true,
+            };
+            dataGrid.SetBinding(DataGrid.IsEnabledProperty,
+                new Binding(nameof(TestWindowViewModel.IsTesting)) { Converter = new InverseBoolConverter() });
+            dataGrid.SetBinding(DataGrid.ItemsSourceProperty,
+               new Binding(nameof(TestWindowViewModel.Tests)));
+            var c = new DataGridTextColumn()
+            {
+                Binding = new Binding(nameof(PerformanceTestLine.Header)),
+                IsReadOnly = true,
+            };
+            dataGrid.Columns.Add(c);
+            for (int i = 0; i < CodecsCount; i++)
+            {
+                var codec = VideoCodec.VideoCodecs[i];
+                var tc = new DataGridTemplateColumn()
+                {
+                    Width = 108,
+                    Header = codec.Name
+                };
+                tc.CellTemplate = new DataTemplate();
+                FrameworkElementFactory factory = new FrameworkElementFactory(typeof(CheckBox));
+                factory.SetValue(MarginProperty, new Thickness(16, 0, 0, 0));
+                factory.SetBinding(CheckBox.IsCheckedProperty, new Binding($"{nameof(PerformanceTestLine.Items)}[{i}].{nameof(PerformanceTestItem.IsChecked)}")
+                {
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                });
+                tc.CellTemplate.VisualTree = factory;
+                dataGrid.Columns.Add(tc);
+            }
+            c = new DataGridTextColumn()
+            {
+                Width = 108,
+                Binding = new Binding(nameof(PerformanceTestLine.MBitrate)),
+                Header = "码率 (Mbps)"
+            };
+            dataGrid.Columns.Add(c);
+            grpTestItems.Content = dataGrid;
+        }
         private void SelectAllButton_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.Tests.ForEach(p => p.Items.ForEach(q => q.IsChecked = true));
@@ -173,7 +227,7 @@ namespace SimpleFFmpegGUI.WPF
                 stopping = false;
                 ViewModel.Progress = 0;
                 ViewModel.IsTesting = true;
-                ViewModel.Tests.ForEach(q => q.Items.ForEach(p => p.Score = 0));
+                ViewModel.Tests.ForEach(q => q.Items.ForEach(p => p.Clear()));
                 if (!Directory.Exists(TestDir))
                 {
                     Directory.CreateDirectory(TestDir);
@@ -262,7 +316,6 @@ namespace SimpleFFmpegGUI.WPF
                     task.Arguments.Video.Code = ViewModel.Codecs[i].Name;
                     task.Arguments.Video.Preset = ViewModel.Codecs[i].CpuSpeed;
                     task.Arguments.Video.AverageBitrate = ViewModel.Tests[j].MBitrate;
-                    task.Arguments.Video.Size = sizes[j];
                     task.Arguments.Extra = ViewModel.Codecs[i].ExtraArguments;
                     task.Output = Path.GetFullPath($"test/{ViewModel.Codecs[i].Name}-{sizeTexts[j]}.mp4");
 
@@ -379,10 +432,11 @@ namespace SimpleFFmpegGUI.WPF
 
     public class TestWindowViewModel : INotifyPropertyChanged
     {
-        private static readonly int[] bitrates = new int[SizesCount] { 2, 4, 8, 16 };
-        private static readonly string[] extraArgs = new string[CodecsCount] { "", "", "-row-mt 1", "-row-mt 1" };
+        public const int SizesCount = 4;
         public static readonly string[] sizes = new string[SizesCount] { "-1:720", "-1:1080", "-1:1440", "-1:2160" };
         public static readonly string[] sizeTexts = new string[SizesCount] { "720P", "1080P", "1440P", "2160P" };
+        private static readonly int[] bitrates = new int[SizesCount] { 2, 4, 8, 16 };
+        private static readonly string[] extraArgs = new string[CodecsCount] { "", "", "-row-mt 1", "-row-mt 1", "" };
         private double detailProgress = 0;
 
         private bool isTesting = false;
@@ -390,8 +444,6 @@ namespace SimpleFFmpegGUI.WPF
         private double maxProgress = 0;
 
         private string message = "";
-
-        private int preset = 3;
 
         private double progress = 0;
 
@@ -407,7 +459,7 @@ namespace SimpleFFmpegGUI.WPF
                 Codecs[i] = new PerformanceTestCodecParameter()
                 {
                     Name = VideoCodec.VideoCodecs[i].Name,
-                    CpuSpeed = 4,
+                    CpuSpeed = VideoCodec.VideoCodecs[i].DefaultSpeedLevel,
                     MaxCpuSpeed = VideoCodec.VideoCodecs[i].MaxSpeedLevel,
                     ExtraArguments = extraArgs[i]
                 };
@@ -415,6 +467,8 @@ namespace SimpleFFmpegGUI.WPF
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public PerformanceTestCodecParameter[] Codecs { get; } = new PerformanceTestCodecParameter[CodecsCount];
 
         public double DetailProgress
         {
@@ -447,7 +501,5 @@ namespace SimpleFFmpegGUI.WPF
         }
 
         public PerformanceTestLine[] Tests { get; } = new PerformanceTestLine[SizesCount];
-
-        public PerformanceTestCodecParameter[] Codecs { get; } = new PerformanceTestCodecParameter[CodecsCount];
     }
 }

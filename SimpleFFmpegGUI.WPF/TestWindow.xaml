@@ -9,7 +9,7 @@
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="编码测试 - FFmpeg 工具箱"
-    Width="1200"
+    Width="1400"
     Height="800"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
@@ -50,7 +50,7 @@
                 DockPanel.Dock="Top"
                 IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
                 Spacing="8">
-                <GroupBox>
+                <GroupBox x:Name="grpTestItems">
                     <GroupBox.HeaderTemplate>
                         <DataTemplate>
                             <ui:SimpleStackPanel
@@ -65,72 +65,6 @@
                             </ui:SimpleStackPanel>
                         </DataTemplate>
                     </GroupBox.HeaderTemplate>
-                    <DataGrid
-                        AutoGenerateColumns="False"
-                        CanUserAddRows="False"
-                        CanUserDeleteRows="False"
-                        CanUserReorderColumns="False"
-                        CanUserResizeRows="False"
-                        CanUserSortColumns="False"
-                        HeadersVisibility="Column"
-                        IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
-                        ItemsSource="{Binding Tests}"
-                        SelectionUnit="Cell">
-
-                        <DataGrid.Columns>
-                            <DataGridTextColumn
-                                Binding="{Binding Header}"
-                                IsReadOnly="True" />
-                            <DataGridTemplateColumn
-                                Width="96"
-                                Header="H264">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox
-                                            Margin="16,0"
-                                            IsChecked="{Binding Items[0].IsChecked, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn
-                                Width="96"
-                                Header="H265">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox
-                                            Margin="16,0"
-                                            IsChecked="{Binding Items[1].IsChecked, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn
-                                Width="96"
-                                Header="VP9">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox
-                                            Margin="16,0"
-                                            IsChecked="{Binding Items[2].IsChecked, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn
-                                Width="96"
-                                Header="AV1">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox
-                                            Margin="16,0"
-                                            IsChecked="{Binding Items[3].IsChecked, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn
-                                Width="120"
-                                Binding="{Binding MBitrate, UpdateSourceTrigger=PropertyChanged}"
-                                Header="码率 (Mbps)" />
-                        </DataGrid.Columns>
-                    </DataGrid>
                 </GroupBox>
 
                 <GroupBox Header="编码设置">

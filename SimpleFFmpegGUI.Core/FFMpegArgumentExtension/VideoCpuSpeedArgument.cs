@@ -29,6 +29,10 @@ namespace SimpleFFmpegGUI.FFMpegArgumentExtension
                 {
                     return $"-cpu-used {Level}";
                 }
+                if (Codec == VideoCodec.AV1SVT.Lib)
+                {
+                    return $"-preset {Level}";
+                }
                 return new SpeedPresetArgument((Speed)Level).Text;
             }
         }

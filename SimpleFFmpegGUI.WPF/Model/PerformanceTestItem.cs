@@ -1,4 +1,5 @@
 ﻿using FzLib;
+using SimpleFFmpegGUI.ConstantData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,12 +41,18 @@ namespace SimpleFFmpegGUI.WPF.Model
             get => ssim;
             set => this.SetValueAndNotify(ref ssim, value, nameof(SSIM));
         }
+
+        public void Clear()
+        {
+            Score = 0;
+            SSIM = 0;
+            PSNR = 0;
+        }
     }
 
     public class PerformanceTestLine
     {
-        public const int CodecsCount = 4;
-        public const int SizesCount = 4;
+        public const int CodecsCount = 5;
         public PerformanceTestLine()
         {
             Items = new PerformanceTestItem[CodecsCount];

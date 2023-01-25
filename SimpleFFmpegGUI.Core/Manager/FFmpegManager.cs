@@ -18,6 +18,7 @@ using System.ComponentModel;
 using FzLib;
 using SimpleFFmpegGUI.ConstantData;
 using VideoCodec = SimpleFFmpegGUI.ConstantData.VideoCodec;
+using static SimpleFFmpegGUI.Manager.FFmpegOutputArgumentManager;
 
 namespace SimpleFFmpegGUI.Manager
 {
@@ -187,140 +188,6 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
-        private static void ApplyOutputArguments(FFMpegArgumentOptions fa, OutputArguments a, int twoPass)
-        {
-            if (a.DisableVideo && a.DisableAudio)
-            {
-                throw new Exception("不能同时禁用视频和音频");
-            }
-            if (a.Video == null && a.Audio == null && !a.DisableAudio && !a.DisableVideo)
-            {
-                fa.CopyChannel(Channel.Both);
-                return;
-            }
-            if (a.DisableVideo)
-            {
-                a.Video = null;
-            }
-            if (a.DisableAudio)
-            {
-                a.Audio = null;
-            }
-
-            if (a.Video == null)
-            {
-                if (a.DisableVideo)
-                {
-                    fa.DisableChannel(Channel.Video);
-                }
-                else
-                {
-                    fa.CopyChannel(Channel.Video);
-                }
-            }
-            if (a.Audio == null || twoPass == 1)
-            {
-                if (a.DisableAudio || twoPass == 1)
-                {
-                    fa.DisableChannel(Channel.Audio);
-                }
-                else
-                {
-                    fa.CopyChannel(Channel.Audio);
-                }
-            }
-
-            if (a.Video != null)
-            {
-                string code = a.Video.Code?.ToUpper()?.Replace(".", "");
-                string codecLib = null;
-                if (VideoCodec.VideoCodecs.Any(p => p.Name == code))
-                {
-                    codecLib = VideoCodec.VideoCodecs.First(p => p.Name == code).Lib;
-                }
-                else if (code is not ("自动" or "AUTO" or null))
-                {
-                    codecLib = code.ToLower();
-                }
-                if (codecLib != null)
-                {
-                    fa.WithVideoCodec(codecLib);
-                    fa.WithCpuSpeed(codecLib, a.Video.Preset);
-                }
-                if (a.Video.Crf.HasValue && twoPass == 0)
-                {
-                    fa.WithConstantRateFactor(a.Video.Crf.Value);
-                }
-                if (a.Video.Fps.HasValue)
-                {
-                    fa.WithFramerate(a.Video.Fps.Value);
-                }
-                if (a.Video.AverageBitrate.HasValue)
-                {
-                    fa.WithVideoMBitrate(a.Video.AverageBitrate.Value);
-                }
-                if (a.Video.MaxBitrate.HasValue && a.Video.MaxBitrateBuffer.HasValue)
-                {
-                    fa.WithVideoMMaxBitrate(a.Video.MaxBitrate.Value, a.Video.MaxBitrateBuffer.Value);
-                }
-                if (a.Video.PixelFormat != null)
-                {
-                    fa.WithVideoPixelFormat(a.Video.PixelFormat);
-                }
-                if (a.Video.AspectRatio != null)
-                {
-                    fa.WithVideoAspect(a.Video.AspectRatio);
-                }
-                if (a.Video.TwoPass && twoPass == 0 || !a.Video.TwoPass && twoPass > 0)
-                {
-                    throw new ArgumentException("2Pass参数不匹配", nameof(twoPass));
-                }
-                if (twoPass > 0)
-                {
-                    fa.WithTwoPass(code, twoPass);
-                }
-                if (a.Video.Size != null)
-                {
-                    fa.WithVideoFilters(o =>
-                    {
-                        o.Scale(a.Video.Size);
-                    });
-                }
-            }
-            if (a.Audio != null)
-            {
-                string code = a.Audio.Code?.ToLower()?.Replace(".", "") switch
-                {
-                    "opus" => "libopus",
-                    "自动" => null,
-                    "auto" => null,
-                    "" => null,
-                    null => null,
-                    _ => a.Audio.Code
-                };
-                if (code != null)
-                {
-                    fa.WithAudioCodec(code);
-                }
-                if (a.Audio.Bitrate.HasValue)
-                {
-                    fa.WithAudioBitrate(a.Audio.Bitrate.Value);
-                }
-                if (a.Audio.SamplingRate.HasValue)
-                {
-                    fa.WithAudioSamplingRate(a.Audio.SamplingRate.Value);
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(a.Extra))
-            {
-                fa.WithArguments(a.Extra);
-            }
-            if (!string.IsNullOrWhiteSpace(a.Format))
-            {
-                fa.ForceFormat(a.Format);
-            }
-        }
 
         private async Tasks.Task<List<string>> ConvertToTsAsync(TaskInfo task, string tempFolder, CancellationToken cancellationToken)
         {
@@ -345,35 +212,6 @@ namespace SimpleFFmpegGUI.Manager
             return tsFiles;
         }
 
-        private void GenerateOutputPath()
-        {
-            string output = task.Output.Trim();
-            var a = task.Arguments;
-            if (string.IsNullOrEmpty(output))
-            {
-                if (task.Inputs.Count == 0)
-                {
-                    throw new Exception("没有指定输出路径，且输入文件为空");
-                }
-                output = task.Inputs[0].FilePath;
-            }
-            if (!string.IsNullOrEmpty(a?.Format))
-            {
-                VideoFormat format = VideoFormat.Formats.Where(p => p.Name == a.Format || p.Extension == a.Format).FirstOrDefault();
-                if (format != null)
-                {
-                    string dir = Path.GetDirectoryName(output);
-                    string name = Path.GetFileNameWithoutExtension(output);
-                    string extension = format.Extension;
-                    output = Path.Combine(dir, name + "." + extension);
-                }
-            }
-            task.RealOutput = FileSystem.GetNoDuplicateFile(output);
-            if (!new FileInfo(task.RealOutput).Directory.Exists)
-            {
-                new FileInfo(task.RealOutput).Directory.Create();
-            }
-        }
 
         private ProgressDto GetConvertToTsProgress(string file)
         {
@@ -516,7 +354,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             f = FFMpegArguments.FromFileInput(task.Inputs[0].FilePath, true, a => ApplyInputArguments(a, task.Inputs[0]));
 
-            GenerateOutputPath();
+            GenerateOutputPath(task);
             if (task.Arguments.Video == null || !task.Arguments.Video.TwoPass)
             {
                 Progress = GetProgress(task);
@@ -561,7 +399,7 @@ namespace SimpleFFmpegGUI.Manager
 
             Progress = GetProgress(task);
 
-            GenerateOutputPath();
+            GenerateOutputPath(task);
             var p = f.OutputToFile(task.RealOutput, true, a =>
             {
                 a.CopyChannel(Channel.Both);
@@ -583,18 +421,19 @@ namespace SimpleFFmpegGUI.Manager
         {
             if (task.Inputs.Count() != 2)
             {
-                throw new ArgumentException("视频比较，输入文件必须为2个");
+                throw new FFMpegArgumentException("视频比较，输入文件必须为2个");
             }
             var v1 = FFProbe.Analyse(task.Inputs[0].FilePath);
             var v2 = FFProbe.Analyse(task.Inputs[1].FilePath);
             if (v1.VideoStreams.Count == 0)
             {
-                throw new ArgumentException("输入1不含视频");
+                throw new FFMpegArgumentException("输入1不含视频");
             }
             if (v2.VideoStreams.Count == 0)
             {
-                throw new ArgumentException("输入2不含视频");
+                throw new FFMpegArgumentException("输入2不含视频");
             }
+            Progress = GetProgress(task);
             var p = FFMpegArguments
                  .FromFileInput(task.Inputs[0].FilePath)
                  .AddFileInput(task.Inputs[1].FilePath)
@@ -607,7 +446,7 @@ namespace SimpleFFmpegGUI.Manager
             string psnr = null;
             try
             {
-                await RunAsync(p, null, cancellationToken);
+                await RunAsync(p, $"正在对比{Path.GetFileName(task.Inputs[0].FilePath)}和{Path.GetFileName(task.Inputs[1].FilePath)}", cancellationToken);
                 if (ssim == null || psnr == null)
                 {
                     throw new Exception("对比视频失败，未识别到对比结果");
@@ -656,7 +495,7 @@ namespace SimpleFFmpegGUI.Manager
                 f = FFMpegArguments.FromConcatInput(tsFiles, a => ApplyInputArguments(a, task.Inputs[0]));
                 Progress = GetProgress(task);
 
-                GenerateOutputPath();
+                GenerateOutputPath(task);
                 var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments, 0));
                 await RunAsync(p, message, cancellationToken);
             }
@@ -673,7 +512,7 @@ namespace SimpleFFmpegGUI.Manager
                 }
                 task.Arguments.Format = null;
                 Progress = GetProgress(task);
-                GenerateOutputPath();
+                GenerateOutputPath(task);
                 var p = FFMpegArguments.FromFileInput(tempPath, false,
                     o => o.WithCustomArgument("-f concat -safe 0"))
                      .OutputToFile(task.RealOutput, true, o => o.CopyChannel(Channel.Both));

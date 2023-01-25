@@ -11,7 +11,7 @@ namespace SimpleFFmpegGUI.Dto
     public class StatusDto : INotifyPropertyChanged
     {
         private static readonly Regex rFFmpegOutput = new Regex(
-            @"frame= *(?<f>[0-9]+) *fps= *(?<fps>[0-9\.]+) *(q= *(?<q>[0-9\.\-]+) *)+size= *(?<size>[0-9\.a-zA-Z]+) *time= *(?<time>[0-9\.\-:]+) *bitrate= *(?<b>([0-9\.a-z/]+)|(N/A)).*speed= *(?<speed>([0-9\.]+)|(N/A))x?", RegexOptions.Compiled);
+            @"frame= *(?<f>[0-9]+) *fps= *(?<fps>[0-9\.]+) *(L?q= *(?<q>[0-9\.\-]+) *)+size= *(?<size>([0-9\.a-zA-Z]+)|(N/A)) *time= *(?<time>[0-9\.\-:]+) *bitrate= *(?<b>([0-9\.a-z/]+)|(N/A)).*speed= *(?<speed>([0-9\.]+)|(N/A))x?", RegexOptions.Compiled);
 
         private string bitrate;
 

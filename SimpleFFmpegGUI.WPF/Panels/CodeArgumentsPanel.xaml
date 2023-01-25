@@ -164,7 +164,7 @@
                         <ComboBox
                             Grid.Column="2"
                             IsEditable="True"
-                            ItemsSource="{Binding VideoCodes}"
+                            ItemsSource="{Binding VideoCodecs}"
                             SelectedIndex="1"
                             Text="{Binding Video.Code}" />
                         <!--  预设  -->
@@ -329,7 +329,7 @@
                         <ComboBox
                             Grid.Column="2"
                             IsEditable="True"
-                            ItemsSource="{Binding AudioCodes}"
+                            ItemsSource="{Binding AudioCodecs}"
                             SelectedIndex="1"
                             Text="{Binding Audio.Code}" />
 

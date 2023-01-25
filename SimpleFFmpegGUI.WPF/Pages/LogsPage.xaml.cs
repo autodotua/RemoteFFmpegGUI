@@ -51,7 +51,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
             set => this.SetValueAndNotify(ref from, value, nameof(From));
         }
 
-        private DateTime to = DateTime.Now;
+        private DateTime to = DateTime.Today.AddDays(1);
 
         public DateTime To
         {

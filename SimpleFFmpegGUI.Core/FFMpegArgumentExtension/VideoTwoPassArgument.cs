@@ -11,10 +11,10 @@ namespace SimpleFFmpegGUI.FFMpegArgumentExtension
         public readonly string Codec;
         public readonly int Pass;
 
-        public VideoTwoPassArgument(string codec,int pass)
+        public VideoTwoPassArgument(string codec, int pass)
         {
-            Codec= codec;
-            Pass= pass;
+            Codec = codec;
+            Pass = pass;
         }
 
         public string Text
@@ -31,6 +31,6 @@ namespace SimpleFFmpegGUI.FFMpegArgumentExtension
                 }
             }
         }
-     
+
     }
 }
