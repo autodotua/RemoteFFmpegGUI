@@ -5,15 +5,17 @@ namespace SimpleFFmpegGUI.Model
 {
     public class OutputArguments : INotifyPropertyChanged
     {
+        private AudioCodeArguments audio;
+        private CombineArguments combine;
+        private ConcatArguments concat;
+        private bool disableAudio;
+        private bool disableVideo;
+        private string extra;
+        private string format;
+        private StreamArguments stream;
         private VideoCodeArguments video;
 
-        public VideoCodeArguments Video
-        {
-            get => video;
-            set => this.SetValueAndNotify(ref video, value, nameof(Video));
-        }
-
-        private AudioCodeArguments audio;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public AudioCodeArguments Audio
         {
@@ -21,47 +23,11 @@ namespace SimpleFFmpegGUI.Model
             set => this.SetValueAndNotify(ref audio, value, nameof(Audio));
         }
 
-        private string extra;
-
-        public string Extra
-        {
-            get => extra;
-            set => this.SetValueAndNotify(ref extra, value, nameof(Extra));
-        }
-
-        private bool disableVideo;
-
-        public bool DisableVideo
-        {
-            get => disableVideo;
-            set => this.SetValueAndNotify(ref disableVideo, value, nameof(DisableVideo));
-        }
-
-        private bool disableAudio;
-
-        public bool DisableAudio
-        {
-            get => disableAudio;
-            set => this.SetValueAndNotify(ref disableAudio, value, nameof(DisableAudio));
-        }
-
-        private string format;
-
-        public string Format
-        {
-            get => format;
-            set => this.SetValueAndNotify(ref format, value, nameof(Format));
-        }
-
-        private CombineArguments combine;
-
         public CombineArguments Combine
         {
             get => combine;
             set => this.SetValueAndNotify(ref combine, value, nameof(Combine));
         }
-
-        private ConcatArguments concat;
 
         public ConcatArguments Concat
         {
@@ -69,6 +35,40 @@ namespace SimpleFFmpegGUI.Model
             set => this.SetValueAndNotify(ref concat, value, nameof(Concat));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public bool DisableAudio
+        {
+            get => disableAudio;
+            set => this.SetValueAndNotify(ref disableAudio, value, nameof(DisableAudio));
+        }
+
+        public bool DisableVideo
+        {
+            get => disableVideo;
+            set => this.SetValueAndNotify(ref disableVideo, value, nameof(DisableVideo));
+        }
+
+        public string Extra
+        {
+            get => extra;
+            set => this.SetValueAndNotify(ref extra, value, nameof(Extra));
+        }
+
+        public string Format
+        {
+            get => format;
+            set => this.SetValueAndNotify(ref format, value, nameof(Format));
+        }
+
+        public StreamArguments Stream
+        {
+            get => stream;
+            set => this.SetValueAndNotify(ref stream, value, nameof(Stream));
+        }
+
+        public VideoCodeArguments Video
+        {
+            get => video;
+            set => this.SetValueAndNotify(ref video, value, nameof(Video));
+        }
     }
 }

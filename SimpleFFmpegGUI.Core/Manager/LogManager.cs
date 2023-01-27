@@ -1,7 +1,6 @@
 ﻿using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Model;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SimpleFFmpegGUI.Manager

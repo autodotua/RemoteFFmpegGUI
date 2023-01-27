@@ -1,5 +1,5 @@
 ﻿using FzLib;
-using SimpleFFmpegGUI.ConstantData;
+using SimpleFFmpegGUI.FFmpegLib;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

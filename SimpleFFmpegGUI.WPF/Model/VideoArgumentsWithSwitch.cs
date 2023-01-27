@@ -96,7 +96,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             MaxBitrate = EnableMaxBitrate ? MaxBitrate : null;
             Size = EnableSize ? Size : null;
             PixelFormat = EnablePixelFormat ? PixelFormat : null;
-            AspectRatio = EnablePixelFormat ? AspectRatio : null;
+            AspectRatio = EnableAspectRatio ? AspectRatio : null;
         }
 
         public void Update()

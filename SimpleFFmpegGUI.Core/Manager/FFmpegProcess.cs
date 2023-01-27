@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,8 +32,8 @@ namespace SimpleFFmpegGUI.Manager
                 RedirectStandardError = true,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
-                StandardErrorEncoding=System.Text.Encoding.UTF8,
-                StandardOutputEncoding=System.Text.Encoding.UTF8,
+                StandardErrorEncoding = System.Text.Encoding.UTF8,
+                StandardOutputEncoding = System.Text.Encoding.UTF8,
             };
             process.EnableRaisingEvents = true;
             process.OutputDataReceived += Process_OutputDataReceived;
@@ -52,8 +50,8 @@ namespace SimpleFFmpegGUI.Manager
             }
             started = true;
 
-            if(!string.IsNullOrEmpty(workingDir))
-            {           
+            if (!string.IsNullOrEmpty(workingDir))
+            {
                 //2Pass时会生成文件名相同的临时文件，如果多个FFmpeg一起运行会冲突，因此需要设置单独的工作目录
                 process.StartInfo.WorkingDirectory = workingDir;
             }

@@ -3,7 +3,7 @@ using FzLib.Collection;
 using Mapster;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleFFmpegGUI.ConstantData;
+using SimpleFFmpegGUI.FFmpegLib;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;

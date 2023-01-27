@@ -77,18 +77,17 @@ namespace SimpleFFmpegGUI.WPF.Model
             get
             {
                 string output = Output;
-
-                if (output == null)
+                if (!string.IsNullOrEmpty(RealOutput))
+                {
+                    output = Path.GetFileName(RealOutput);
+                }
+                else if (output == null)
                 {
                     output = "未指定输出";
                 }
                 else
                 {
                     output = Path.GetFileName(Output);
-                }
-                if (!string.IsNullOrEmpty(RealOutput))
-                {
-                    output += $"（实际输出：{Path.GetFileName(RealOutput)}）";
                 }
                 return output;
             }

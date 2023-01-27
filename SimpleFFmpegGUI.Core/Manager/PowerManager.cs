@@ -4,9 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.Manager
 {
@@ -18,6 +16,7 @@ namespace SimpleFFmpegGUI.Manager
         private static readonly string abortShutdownCommand = "-a";
         private static readonly string shutdownCommand = $"-s -t 180 -c \"{FzLib.Program.App.ProgramName}\"";
         private bool shutdownAfterQueueFinished = false;
+
         public bool ShutdownAfterQueueFinished
         {
             get { return shutdownAfterQueueFinished; }
@@ -28,6 +27,7 @@ namespace SimpleFFmpegGUI.Manager
                 logger.Info("收到队列结束后自动关机命令：" + value.ToString());
             }
         }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:验证平台兼容性", Justification = "<挂起>")]
         public static CpuCoreUsageDto[] GetCpuUsage(TimeSpan sampleSpan)
         {
@@ -131,6 +131,7 @@ namespace SimpleFFmpegGUI.Manager
             process.WaitForExit();
             process.Close();
         }
+
         [DebuggerDisplay("{CpuIndex} - {CoreIndex} : {Usage}")]
         public class CpuCoreUsage
         {

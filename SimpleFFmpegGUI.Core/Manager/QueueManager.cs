@@ -1,18 +1,8 @@
-﻿using FFMpegCore;
-using FFMpegCore.Enums;
-using FzLib.IO;
-using Instances;
-using SimpleFFmpegGUI.Dto;
-using SimpleFFmpegGUI.FFMpegArgumentExtension;
-using SimpleFFmpegGUI.Manager;
-using SimpleFFmpegGUI.Model;
+﻿using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using Task = System.Threading.Tasks.Task;
 using Tasks = System.Threading.Tasks;
 
@@ -22,10 +12,12 @@ namespace SimpleFFmpegGUI.Manager
     {
         private Logger logger = new Logger();
         private bool cancelQueue = false;
+
         /// <summary>
         /// 用于判断是否为有效计划的队列计划ID
         /// </summary>
         private int currentScheduleID = 0;
+
         private bool running = false;
         private DateTime? scheduleTime = null;
         private List<FFmpegManager> taskProcessManagers = new List<FFmpegManager>();
@@ -33,34 +25,42 @@ namespace SimpleFFmpegGUI.Manager
         public QueueManager()
         {
         }
+
         /// <summary>
         /// 任务发生改变
         /// </summary>
         public event NotifyCollectionChangedEventHandler TaskManagersChanged;
+
         /// <summary>
         /// 主队列任务
         /// </summary>
         public FFmpegManager MainQueueManager => Managers.FirstOrDefault(p => p.Task == MainQueueTask);
+
         /// <summary>
         /// 主队列的Task
         /// </summary>
         public TaskInfo MainQueueTask { get; private set; }
+
         /// <summary>
         /// 所有任务
         /// </summary>
         public IReadOnlyList<FFmpegManager> Managers => taskProcessManagers.AsReadOnly();
+
         /// <summary>
         /// 电源性能管理
         /// </summary>
         public PowerManager PowerManager { get; } = new PowerManager();
+
         /// <summary>
         /// 独立任务
         /// </summary>
         public IEnumerable<TaskInfo> StandaloneTasks => Managers.Where(p => p.Task != MainQueueTask).Select(p => p.Task);
+
         /// <summary>
         /// 所有任务
         /// </summary>
         public IEnumerable<TaskInfo> Tasks => Managers.Select(p => p.Task);
+
         /// <summary>
         /// 取消主队列
         /// </summary>
@@ -91,6 +91,7 @@ namespace SimpleFFmpegGUI.Manager
             CheckMainQueueProcessingTaskManager();
             MainQueueManager.Resume();
         }
+
         /// <summary>
         /// 计划一个未来某个时刻开始队列的任务
         /// </summary>
@@ -111,6 +112,7 @@ namespace SimpleFFmpegGUI.Manager
                 StartQueue();
             }
         }
+
         /// <summary>
         /// 开始队列
         /// </summary>
@@ -203,6 +205,7 @@ namespace SimpleFFmpegGUI.Manager
                 .Where(p => p.Status == TaskStatus.Queue)
                 .Where(p => !p.IsDeleted);
         }
+
         private async Task ProcessTaskAsync(FFmpegDbContext db, TaskInfo task, bool main)
         {
             FFmpegManager ffmpegManager = new FFmpegManager(task);
@@ -240,6 +243,7 @@ namespace SimpleFFmpegGUI.Manager
             db.SaveChanges();
             RemoveManager(task, ffmpegManager, main);
         }
+
         private void RemoveManager(TaskInfo task, FFmpegManager ffmpegManager, bool main)
         {
             if (!taskProcessManagers.Remove(ffmpegManager))

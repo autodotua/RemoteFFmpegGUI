@@ -33,6 +33,7 @@ namespace SimpleFFmpegGUI.Model
             get => duration;
             set => this.SetValueAndNotify(ref duration, value, nameof(Duration));
         }
-
+        public string Format { get; set; }
+        public string Extra { get; set; }
     }
 }

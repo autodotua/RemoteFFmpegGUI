@@ -2,8 +2,6 @@
 using Mapster;
 using SimpleFFmpegGUI.Dto;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.Manager
@@ -14,11 +12,11 @@ namespace SimpleFFmpegGUI.Manager
         {
             string tempPath = System.IO.Path.GetTempFileName() + ".jpg";
             FFmpegProcess process = new FFmpegProcess($"-ss {time.TotalSeconds:0.000}  -i \"{path}\" -vframes 1 {tempPath}");
-            await process.StartAsync(null,null);
+            await process.StartAsync(null, null);
             return tempPath;
         }
 
-        public async static Task<MediaInfoDto> GetMediaInfoAsync(string path, bool includeDetail = true)
+        public static async Task<MediaInfoDto> GetMediaInfoAsync(string path, bool includeDetail = true)
         {
             IMediaAnalysis result = null;
             try

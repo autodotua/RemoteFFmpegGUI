@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using Instances;
+﻿using FFMpegCore;
+using FzLib;
+using FzLib.IO;
 using SimpleFFmpegGUI.Dto;
+using SimpleFFmpegGUI.FFmpegArgument;
+using SimpleFFmpegGUI.FFmpegLib;
 using SimpleFFmpegGUI.Model;
+using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using Task = System.Threading.Tasks.Task;
-using Tasks = System.Threading.Tasks;
-using FFMpegCore;
-using FFMpegCore.Enums;
-using FzLib.IO;
-using SimpleFFmpegGUI.FFMpegArgumentExtension;
-using System.Threading;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using FFMpegCore.Exceptions;
-using System.ComponentModel;
-using FzLib;
-using SimpleFFmpegGUI.ConstantData;
-using VideoCodec = SimpleFFmpegGUI.ConstantData.VideoCodec;
-using static SimpleFFmpegGUI.Manager.FFmpegOutputArgumentManager;
+using System.Threading;
+using Task = System.Threading.Tasks.Task;
 
 namespace SimpleFFmpegGUI.Manager
 {
@@ -62,11 +56,10 @@ namespace SimpleFFmpegGUI.Manager
         public ProgressDto Progress { get; private set; }
         public TaskInfo Task => task;
         private FFmpegProcess Process { get; set; }
-        public static string TestOutputArguments(OutputArguments args)
+
+        public static string TestOutputArguments(OutputArguments arguments)
         {
-            FFMpegArguments f = Activator.CreateInstance(typeof(FFMpegArguments), true) as FFMpegArguments;
-            var p = f.OutputToFile("输出", true, a => ApplyOutputArguments(a, args, args.Video == null || !args.Video.TwoPass ? 0 : 2));
-            return p.Arguments;
+            return ArgumentsGenerator.GetOutputArguments(arguments, arguments.Video?.TwoPass == true ? 2 : 0);
         }
 
         public void Cancel()
@@ -168,65 +161,44 @@ namespace SimpleFFmpegGUI.Manager
             ProcessExtension.SuspendProcess(Process.Id);
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
-        private static void ApplyInputArguments(FFMpegArgumentOptions fa, InputArguments a)
-        {
-            if (a == null)
-            {
-                return;
-            }
-            if (a.From.HasValue && a.To.HasValue)
-            {
-                fa.Seek(a.From.Value);
-            }
-            if (a.To.HasValue)
-            {
-                fa.To(a.To.Value);
-            }
-            if (a.Duration.HasValue)
-            {
-                fa.WithDuration(a.Duration.Value);
-            }
-        }
 
+        //private async Tasks.Task<List<string>> ConvertToTsAsync(TaskInfo task, string tempFolder, CancellationToken cancellationToken)
+        //{
+        //    List<string> tsFiles = new List<string>();
+        //    if (!Directory.Exists(tempFolder))
+        //    {
+        //        Directory.CreateDirectory(tempFolder);
+        //    }
+        //    int i = 0;
+        //    foreach (var file in task.Inputs)
+        //    {
+        //        Progress = GetConvertToTsProgress(file.FilePath);
+        //        string path = FileSystem.GetNoDuplicateFile(Path.Combine(tempFolder, "join.ts"));
+        //        tsFiles.Add(path);
+        //        var p = FFMpegArguments.FromFileInput(file.FilePath)
+        //                  .OutputToFile(path, true, p =>
+        //                      p.CopyChannel()
+        //                      .WithBitStreamFilter(Channel.Video, Filter.H264_Mp4ToAnnexB)
+        //                      .ForceFormat(VideoType.Ts));
+        //        await RunAsync(p, $"打包第{++i}个临时文件", cancellationToken);
+        //    }
+        //    return tsFiles;
+        //}
 
-        private async Tasks.Task<List<string>> ConvertToTsAsync(TaskInfo task, string tempFolder, CancellationToken cancellationToken)
-        {
-            List<string> tsFiles = new List<string>();
-            if (!Directory.Exists(tempFolder))
-            {
-                Directory.CreateDirectory(tempFolder);
-            }
-            int i = 0;
-            foreach (var file in task.Inputs)
-            {
-                Progress = GetConvertToTsProgress(file.FilePath);
-                string path = FileSystem.GetNoDuplicateFile(Path.Combine(tempFolder, "join.ts"));
-                tsFiles.Add(path);
-                var p = FFMpegArguments.FromFileInput(file.FilePath)
-                          .OutputToFile(path, true, p =>
-                              p.CopyChannel()
-                              .WithBitStreamFilter(Channel.Video, Filter.H264_Mp4ToAnnexB)
-                              .ForceFormat(VideoType.Ts));
-                await RunAsync(p, $"打包第{++i}个临时文件", cancellationToken);
-            }
-            return tsFiles;
-        }
-
-
-        private ProgressDto GetConvertToTsProgress(string file)
-        {
-            var p = new ProgressDto();
-            try
-            {
-                p.VideoLength = FFProbe.Analyse(file).Duration;
-                p.StartTime = DateTime.Now;
-                return p;
-            }
-            catch
-            {
-                return null;
-            }
-        }
+        //private ProgressDto GetConvertToTsProgress(string file)
+        //{
+        //    var p = new ProgressDto();
+        //    try
+        //    {
+        //        p.VideoLength = FFProbe.Analyse(file).Duration;
+        //        p.StartTime = DateTime.Now;
+        //        return p;
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
 
         private ProgressDto GetProgress(TaskInfo task)
         {
@@ -310,57 +282,77 @@ namespace SimpleFFmpegGUI.Manager
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private async Task RunAsync(FFMpegArgumentProcessor processor, string desc, CancellationToken cancellationToken, bool useInstances = false, string workingDir = null)
+        private async Task RunAsync(string arguments, string desc, CancellationToken cancellationToken, string workingDir = null)
         {
             if (cancellationToken.IsCancellationRequested)
             {
                 logger.Info(task, "进程启动前就被要求取消");
                 return;
             }
-            logger.Info(task, "FFmpeg参数为：" + processor.Arguments);
-            task.FFmpegArguments = string.IsNullOrEmpty(task.FFmpegArguments) ? processor.Arguments : task.FFmpegArguments + ";" + processor.Arguments;
+            logger.Info(task, "FFmpeg参数为：" + arguments);
+            task.FFmpegArguments = string.IsNullOrEmpty(task.FFmpegArguments) ? arguments : task.FFmpegArguments + ";" + arguments;
             if (Progress != null)
             {
                 Progress.Name = desc;
             }
-            if (useInstances)
+
+            Process = new FFmpegProcess(arguments);
+            Process.Output += Output;
+            try
             {
-                processor.CancellableThrough(cancellationToken);
-                processor.NotifyOnOutput(str => Output(null, new FFmpegOutputEventArgs() { Data = str }));
-                await processor.ProcessAsynchronously();
+                await Process.StartAsync(workingDir, cancellationToken);
             }
-            else
+            finally
             {
-                Process = new FFmpegProcess(processor.Arguments);
-                Process.Output += Output;
-                try
+                Process = null;
+            }
+        }
+
+        private static string GenerateOutputPath(TaskInfo task)
+        {
+            string output = task.Output.Trim();
+            var a = task.Arguments;
+            if (string.IsNullOrEmpty(output))
+            {
+                if (task.Inputs.Count == 0)
                 {
-                    await Process.StartAsync(workingDir, cancellationToken);
+                    throw new Exception("没有指定输出路径，且输入文件为空");
                 }
-                finally
+                output = task.Inputs[0].FilePath;
+            }
+            if (!string.IsNullOrEmpty(a?.Format))
+            {
+                VideoFormat format = VideoFormat.Formats.Where(p => p.Name == a.Format || p.Extension == a.Format).FirstOrDefault();
+                if (format != null)
                 {
-                    Process = null;
+                    string dir = Path.GetDirectoryName(output);
+                    string name = Path.GetFileNameWithoutExtension(output);
+                    string extension = format.Extension;
+                    output = Path.Combine(dir, name + "." + extension);
                 }
             }
+            task.RealOutput = FileSystem.GetNoDuplicateFile(output);
+            if (!new FileInfo(task.RealOutput).Directory.Exists)
+            {
+                new FileInfo(task.RealOutput).Directory.Create();
+            }
+            return task.RealOutput;
         }
 
         private async Task RunCodeProcessAsync(string tempDir, CancellationToken cancellationToken)
         {
-            FFMpegArguments f = null;
             string message = null;
             if (task.Inputs.Count != 1)
             {
                 throw new ArgumentException("普通编码，输入文件必须为1个");
             }
-            f = FFMpegArguments.FromFileInput(task.Inputs[0].FilePath, true, a => ApplyInputArguments(a, task.Inputs[0]));
-
             GenerateOutputPath(task);
             if (task.Arguments.Video == null || !task.Arguments.Video.TwoPass)
             {
                 Progress = GetProgress(task);
                 message = $"正在转码：{Path.GetFileName(task.Inputs[0].FilePath)}";
-                var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments, 0));
-                await RunAsync(p, message, cancellationToken);
+                string arg = ArgumentsGenerator.GetArguments(task, 0);
+                await RunAsync(arg, message, cancellationToken);
             }
             else
             {
@@ -368,12 +360,14 @@ namespace SimpleFFmpegGUI.Manager
                 Directory.CreateDirectory(tempDirectory);
                 Progress = GetProgress(task);
                 message = $"正在转码（Pass=1）：{Path.GetFileName(task.Inputs[0].FilePath)}";
-                var p = f.OutputToFile("NUL", true, a => ApplyOutputArguments(a, task.Arguments, 1));
-                await RunAsync(p, message, cancellationToken, workingDir: tempDirectory);
+
+                string arg = ArgumentsGenerator.GetArguments(task, 1, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "NUL" : "/dev/null");
+                await RunAsync(arg, message, cancellationToken, tempDirectory);
                 Progress = GetProgress(task);
+
                 message = $"正在转码（Pass=2）：{Path.GetFileName(task.Inputs[0].FilePath)}";
-                p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments, 2));
-                await RunAsync(p, message, cancellationToken, workingDir: tempDirectory);
+                arg = ArgumentsGenerator.GetArguments(task, 2);
+                await RunAsync(arg, message, cancellationToken, tempDirectory);
             }
         }
 
@@ -393,60 +387,42 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new ArgumentException("输入2不含音频");
             }
-            FFMpegArguments f = FFMpegArguments
-                .FromFileInput(task.Inputs[0].FilePath)
-                .AddFileInput(task.Inputs[1].FilePath);
 
             Progress = GetProgress(task);
-
             GenerateOutputPath(task);
-            var p = f.OutputToFile(task.RealOutput, true, a =>
-            {
-                a.CopyChannel(Channel.Both);
-                if (video.AudioStreams.Count != 0 || audio.VideoStreams.Count != 0)
-                {
-                    a.WithMapping(0, Channel.Video, 0)
-                     .WithMapping(1, Channel.Audio, 0);
-                }
 
-                if (task.Arguments?.Combine?.Shortest ?? false)
-                {
-                    a.UsingShortest(true);
-                }
-            });
-            await RunAsync(p, "正在合并音视频", cancellationToken);
+            var outputArgs = ArgumentsGenerator.GetOutputArguments(v => v.Copy(), a => a.Copy(),
+                s => (video.AudioStreams.Count != 0 || audio.VideoStreams.Count != 0) ? s.Map(0, StreamChannel.Video, 0).Map(0, StreamChannel.Audio, 0) : s);
+            string arg = ArgumentsGenerator.GetArguments(task.Inputs, outputArgs,task.RealOutput);
+
+            await RunAsync(arg, "正在合并音视频", cancellationToken);
         }
 
         private async Task RunCompareProcessAsync(CancellationToken cancellationToken)
         {
-            if (task.Inputs.Count() != 2)
+            if (task.Inputs.Count != 2)
             {
-                throw new FFMpegArgumentException("视频比较，输入文件必须为2个");
+                throw new FFmpegArgumentException("视频比较，输入文件必须为2个");
             }
             var v1 = FFProbe.Analyse(task.Inputs[0].FilePath);
             var v2 = FFProbe.Analyse(task.Inputs[1].FilePath);
             if (v1.VideoStreams.Count == 0)
             {
-                throw new FFMpegArgumentException("输入1不含视频");
+                throw new FFmpegArgumentException("输入1不含视频");
             }
             if (v2.VideoStreams.Count == 0)
             {
-                throw new FFMpegArgumentException("输入2不含视频");
+                throw new FFmpegArgumentException("输入2不含视频");
             }
             Progress = GetProgress(task);
-            var p = FFMpegArguments
-                 .FromFileInput(task.Inputs[0].FilePath)
-                 .AddFileInput(task.Inputs[1].FilePath)
-                 .OutputToUrl("", o =>
-                 {
-                     o.WithCustomArgument("-lavfi \"ssim;[0:v][1:v]psnr\" -f null -");
-                 });
+
+            var arg = ArgumentsGenerator.GetArguments(task.Inputs, "-lavfi \"ssim;[0:v][1:v]psnr\" -f null -");
             FFmpegOutput += CheckOutput;
             string ssim = null;
             string psnr = null;
             try
             {
-                await RunAsync(p, $"正在对比 {Path.GetFileName(task.Inputs[0].FilePath)} 和 {Path.GetFileName(task.Inputs[1].FilePath)}", cancellationToken);
+                await RunAsync(arg, $"正在对比 {Path.GetFileName(task.Inputs[0].FilePath)} 和 {Path.GetFileName(task.Inputs[1].FilePath)}", cancellationToken);
                 if (ssim == null || psnr == null)
                 {
                     throw new Exception("对比视频失败，未识别到对比结果");
@@ -481,7 +457,6 @@ namespace SimpleFFmpegGUI.Manager
 
         private async Task RunConcatProcessAsync(string tempDir, CancellationToken cancellationToken)
         {
-            FFMpegArguments f = null;
             string message = null;
             if (task.Inputs.Count < 2)
             {
@@ -491,13 +466,15 @@ namespace SimpleFFmpegGUI.Manager
 
             if (task.Arguments.Concat == null || task.Arguments.Concat.Type == ConcatType.ViaTs)
             {
-                var tsFiles = await ConvertToTsAsync(task, tempDir, cancellationToken);
-                f = FFMpegArguments.FromConcatInput(tsFiles, a => ApplyInputArguments(a, task.Inputs[0]));
-                Progress = GetProgress(task);
+                //var tsFiles = await ConvertToTsAsync(task, tempDir, cancellationToken);
+                //f = FFMpegArguments.FromConcatInput(tsFiles, a => ApplyInputArguments(a, task.Inputs[0]));
+                //Progress = GetProgress(task);
 
-                GenerateOutputPath(task);
-                var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments, 0));
-                await RunAsync(p, message, cancellationToken);
+                //GenerateOutputPath(task);
+                //var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments, 0));
+                //await RunAsync(p, message, cancellationToken);
+
+                throw new NotSupportedException("取消支持该方法的拼接");
             }
             else
             {
@@ -513,25 +490,22 @@ namespace SimpleFFmpegGUI.Manager
                 task.Arguments.Format = null;
                 Progress = GetProgress(task);
                 GenerateOutputPath(task);
-                var p = FFMpegArguments.FromFileInput(tempPath, false,
-                    o => o.WithCustomArgument("-f concat -safe 0"))
-                     .OutputToFile(task.RealOutput, true, o => o.CopyChannel(Channel.Both));
-                await RunAsync(p, message, cancellationToken);
+                var input = new InputArguments()
+                {
+                    FilePath = tempPath,
+                    Format = "concat",
+                    Extra = "-safe 0"
+                };
+
+                string arg = ArgumentsGenerator.GetArguments(new InputArguments[] { input }, "-c copy", task.RealOutput);
+
+                await RunAsync(arg, message, cancellationToken);
             }
         }
 
         private async Task RunCustomProcessAsync(CancellationToken cancellationToken)
         {
-            Type type = typeof(FFMpegArguments);
-            FFMpegArguments fa = Activator.CreateInstance(typeof(FFMpegArguments), true) as FFMpegArguments;
-
-            var p = fa
-                 .OutputToUrl("", o =>
-                 {
-                     o.WithCustomArgument(task.Arguments.Extra);
-                 });
-
-            await RunAsync(p, null, cancellationToken);
+            await RunAsync(task.Arguments.Extra, null, cancellationToken);
         }
     }
 }

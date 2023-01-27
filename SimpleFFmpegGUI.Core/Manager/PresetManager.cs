@@ -147,14 +147,13 @@ namespace SimpleFFmpegGUI.Manager
 
         public static void Import(string json)
         {
-
             var presets = JsonConvert.DeserializeObject<List<CodePreset>>(json);
 
             using var db = FFmpegDbContext.GetNew();
             foreach (var preset in presets)
             {
-                string name=preset.Name;
-                var type=preset.Type;
+                string name = preset.Name;
+                var type = preset.Type;
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     throw new ArgumentException("名称为空");
