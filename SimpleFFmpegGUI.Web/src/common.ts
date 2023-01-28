@@ -17,7 +17,7 @@ export function formatDoubleTimeSpan(seconds: number, includeMs = false): string
     const s = seconds - m * 60 - h * 3600;
 
     if (includeMs) {
-        return h > 0 ? (String(h) + ":") : ""
+        return (h > 0 ? (String(h) + ":") : "")
             + String(m).padStart(2, '0') + ":"
             + String(Math.floor(s)).padStart(2, '0') + "."
             + String(s - Math.floor(s)).substr(2, 2)

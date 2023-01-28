@@ -110,7 +110,6 @@ namespace SimpleFFmpegGUI.WPF
                     Audio = null,
                     DisableAudio = true,
                     Format = "mp4",
-
                 },
                 Type = TaskType.Code,
             };
@@ -171,7 +170,6 @@ namespace SimpleFFmpegGUI.WPF
                 CanUserSortColumns = false,
                 HeadersVisibility = DataGridHeadersVisibility.Column,
                 SelectionUnit = DataGridSelectionUnit.Cell,
-                IsReadOnly = true,
             };
             dataGrid.SetBinding(DataGrid.IsEnabledProperty,
                 new Binding(nameof(TestWindowViewModel.IsTesting)) { Converter = new InverseBoolConverter() });
@@ -186,12 +184,12 @@ namespace SimpleFFmpegGUI.WPF
             for (int i = 0; i < CodecsCount; i++)
             {
                 var codec = VideoCodec.VideoCodecs[i];
-                var tc = new DataGridTemplateColumn()
+                var tc = new DataGridTemplateColumn
                 {
                     Width = 108,
-                    Header = codec.Name
+                    Header = codec.Name,
+                    CellTemplate = new DataTemplate()
                 };
-                tc.CellTemplate = new DataTemplate();
                 FrameworkElementFactory factory = new FrameworkElementFactory(typeof(CheckBox));
                 factory.SetValue(MarginProperty, new Thickness(16, 0, 0, 0));
                 factory.SetBinding(CheckBox.IsCheckedProperty, new Binding($"{nameof(PerformanceTestLine.Items)}[{i}].{nameof(PerformanceTestItem.IsChecked)}")
