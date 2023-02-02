@@ -15,8 +15,19 @@ namespace SimpleFFmpegGUI.FFmpegArgument
 
         public virtual string GetArguments()
         {
+            var args = arguments.Concat(ExtraArguments()).Where(p=>p!=null).ToList();
+            while(args.Any(p=>p.Other!=null))
+            {
+                var hasOthers=args.Where(p=>p.Other!=null).ToList();
+                foreach (var item in hasOthers)
+                {
+                    args.Add(item.Other);
+                    item.Other = null;
+                }
+            }
+
             List<string> list = new List<string>();
-            var groups = arguments.Concat(ExtraArguments()).GroupBy(p => p.Parent).ToList();
+            var groups = args.GroupBy(p => p.Parent).ToList();
             foreach (var group in groups)
             {
                 if (group.Key == null)

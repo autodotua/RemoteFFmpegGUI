@@ -23,6 +23,10 @@
         public string Value { get; set; }
         public string Parent { get; set; }
         public char Seprator { get; }
+        /// <summary>
+        /// 用于串联多个参数
+        /// </summary>
+        public FFmpegArgumentItem Other { get; set; }
     }
 
 }

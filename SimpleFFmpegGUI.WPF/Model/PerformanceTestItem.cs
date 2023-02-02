@@ -18,7 +18,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         public string Name { get; set; }
     }
 
-    [DebuggerDisplay("{Codec.Name}")]
+    [DebuggerDisplay("{Codec}")]
     public class PerformanceTestItem : INotifyPropertyChanged
     {
         private bool isChecked;
@@ -27,7 +27,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         private double ssim;
         private double vmaf;
 
-        public PerformanceTestItem(VideoCodec codec)
+        public PerformanceTestItem(string codec)
         {
             Codec = codec;
         }
@@ -37,7 +37,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public VideoCodec Codec { get; set; }
+        public string Codec { get; set; }
         public bool IsChecked
         {
             get => isChecked;
@@ -49,10 +49,10 @@ namespace SimpleFFmpegGUI.WPF.Model
             set => this.SetValueAndNotify(ref psnr, value, nameof(PSNR));
         }
 
-        public double Score
+        public double FPS
         {
             get => score;
-            set => this.SetValueAndNotify(ref score, value, nameof(Score));
+            set => this.SetValueAndNotify(ref score, value, nameof(FPS));
         }
 
         public double SSIM
@@ -68,7 +68,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         }
         public void Clear()
         {
-            Score = 0;
+            FPS = 0;
             SSIM = 0;
             PSNR = 0;
             VMAF = 0;
@@ -92,7 +92,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
             for (int i = 0; i < CodecsCount; i++)
             {
-                Items[i] = new PerformanceTestItem(VideoCodec.VideoCodecs[i]);
+                Items[i] = new PerformanceTestItem(VideoCodec.VideoCodecs[i].Name);
             }
         }
         public string Header { get; set; }
