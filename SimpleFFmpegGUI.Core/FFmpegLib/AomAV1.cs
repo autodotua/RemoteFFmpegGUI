@@ -9,7 +9,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
         public override string Name => "AV1 (aom)";
         public override string Lib => "libaom-av1";
         public override int MaxSpeedLevel => 8;
-        public override int DefaultSpeedLevel => 3;
+        public override int DefaultSpeedLevel => 5;
         public override int DefaultCRF => 28;
 
         public override FFmpegArgumentItem Speed(int speed)

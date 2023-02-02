@@ -8,7 +8,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
         public override string Name => "AV1 (SVT)";
         public override string Lib => "libsvtav1";
         public override int MaxSpeedLevel => 12;
-        public override int DefaultSpeedLevel => 6;
+        public override int DefaultSpeedLevel => 5;
         public override int DefaultCRF => 28;
 
         public override FFmpegArgumentItem Speed(int speed)
@@ -31,7 +31,11 @@ namespace SimpleFFmpegGUI.FFmpegLib
 
         public override FFmpegArgumentItem MaxBitrate(double mb)
         {
-            throw new FFmpegArgumentException("SVTAV1编译器不支持参数：" + nameof(MaxBitrate));
+            if (mb < 0)
+            {
+                throw new FFmpegArgumentException("最大码率超出范围");
+            }
+            return new FFmpegArgumentItem("mbr", Convert.ToInt32(mb * 1000).ToString(), "svtav1-params", ':');
         }
         public override FFmpegArgumentItem BufferSize(double mb)
         {

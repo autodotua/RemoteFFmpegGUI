@@ -25,27 +25,26 @@
             <ColumnDefinition Width="16" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="16" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="16" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <GroupBox
-            x:Name="grpSpeed"
-            Header="速度（帧每秒，越低越好）" />
-        <GroupBox
-            x:Name="grpSSIM"
-            Grid.Row="2"
-            Header="画面相似性（百分比，越高越好）" />
-        <GroupBox
-            x:Name="grpPSNR"
-            Grid.Row="4"
-            Header="画面信噪比（比值，越高越好）" />
-        <DockPanel
-            Grid.RowSpan="99"
-            Grid.Column="2">
+        <ScrollViewer>
+            <ui:SimpleStackPanel
+                IsHitTestVisible="False"
+                Orientation="Vertical"
+                Spacing="2">
+                <GroupBox
+                    x:Name="grpSpeed"
+                    Header="速度（帧每秒，越低越好）" />
+                <GroupBox
+                    x:Name="grpSSIM"
+                    Header="画面相似性（百分比，越高越好）" />
+                <GroupBox
+                    x:Name="grpVMAF"
+                    Header="VMAF评分（越高越好）" />
+                <GroupBox
+                    x:Name="grpPSNR"
+                    Header="画面信噪比（比值，越高越好）" />
+            </ui:SimpleStackPanel>
+        </ScrollViewer>
+        <DockPanel Grid.Column="2">
             <ui:SimpleStackPanel
                 DockPanel.Dock="Top"
                 IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
@@ -121,6 +120,20 @@
                     </DataGrid>
 
                 </GroupBox>
+                <DockPanel>
+                    <Button
+                        Margin="12,0"
+                        VerticalAlignment="Bottom"
+                        Click="BrowseTestVideoButton_Click"
+                        DockPanel.Dock="Right">
+                        <Button.Content>
+                            <ui:SymbolIcon Symbol="BrowsePhotos" />
+                        </Button.Content>
+                    </Button>
+                    <TextBox
+                        ui:ControlHelper.Header="测试视频"
+                        Text="{Binding TestVideo}" />
+                </DockPanel>
 
             </ui:SimpleStackPanel>
             <ui:SimpleStackPanel

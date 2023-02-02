@@ -1,5 +1,7 @@
 ﻿using FzLib;
 using FzLib.WPF.Converters;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.WindowsAPICodePack.FzExtension;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.FFmpegLib;
 using SimpleFFmpegGUI.Manager;
@@ -17,6 +19,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using static SimpleFFmpegGUI.WPF.Model.PerformanceTestLine;
 using static SimpleFFmpegGUI.WPF.TestWindowViewModel;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SimpleFFmpegGUI.WPF
 {
@@ -36,11 +39,21 @@ namespace SimpleFFmpegGUI.WPF
 
         public TestWindowViewModel ViewModel { get; set; }
 
+        private void BrowseTestVideoButton_Click(object sender, RoutedEventArgs e)
+        {
+            string path = new FileFilterCollection().Add("视频", "mp4", "mov", "mkv", "avi").CreateOpenFileDialog().GetFilePath();
+            if (path != null)
+            {
+                ViewModel.TestVideo = path;
+            }
+        }
+
         private void CreateDataGrids()
         {
             grpSpeed.Content = GetDataGrid(nameof(PerformanceTestItem.Score));
             grpSSIM.Content = GetDataGrid(nameof(PerformanceTestItem.SSIM), "0.00");
             grpPSNR.Content = GetDataGrid(nameof(PerformanceTestItem.PSNR), "0.00");
+            grpVMAF.Content = GetDataGrid(nameof(PerformanceTestItem.VMAF), "0.00");
 
             DataGrid GetDataGrid(string type, string format = null)
             {
@@ -215,6 +228,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
+            SaveConfigs();
             if (!ViewModel.Tests.Any(p => p.Items.Any(q => q.IsChecked)))
             {
                 await CommonDialog.ShowErrorDialogAsync("没有选择任何测试项目");
@@ -230,7 +244,7 @@ namespace SimpleFFmpegGUI.WPF
                 {
                     Directory.CreateDirectory(TestDir);
                 }
-                string input = Path.GetFullPath(Config.Instance.PerformanceTestFileName);
+                string input = Path.GetFullPath(ViewModel.TestVideo);
                 if (!File.Exists(input))
                 {
                     throw new FileNotFoundException("不存在测试文件");
@@ -413,6 +427,7 @@ namespace SimpleFFmpegGUI.WPF
                     string message = qualityTask.Message;
                     item.SSIM = double.Parse(Regex.Match(message, @"All:[0-9\.]+").Value[4..]) * 100;
                     item.PSNR = double.Parse(Regex.Match(message, @"average:[0-9\.]+").Value[8..]);
+                    item.VMAF = double.Parse(Regex.Match(message, @"VMAF score: [0-9\.]+").Value[12..]);
                 }
             }
         end:
@@ -421,10 +436,20 @@ namespace SimpleFFmpegGUI.WPF
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            SaveConfigs();
+
             if (ViewModel.IsTesting)
             {
                 e.Cancel = true;
             }
+        }
+
+        private void SaveConfigs()
+        {
+            Config.Instance.TestVideo = ViewModel.TestVideo;
+            Config.Instance.TestCodecs = ViewModel.Codecs;
+            Config.Instance.TestItems = ViewModel.Tests;
+            Config.Instance.Save();
         }
     }
 
@@ -444,22 +469,42 @@ namespace SimpleFFmpegGUI.WPF
 
         private double progress = 0;
 
+        private string testVideo = "test.mp4";
+
         public TestWindowViewModel()
         {
-            for (int i = 0; i < SizesCount; i++)
+            if (Config.Instance.TestItems == null || Config.Instance.TestItems.Any(p => p == null) || Config.Instance.TestItems.Length != Tests.Length)
             {
-                Tests[i] = new PerformanceTestLine() { Header = sizeTexts[i], MBitrate = bitrates[i] };
-            }
-
-            for (int i = 0; i < CodecsCount; i++)
-            {
-                Codecs[i] = new PerformanceTestCodecParameter()
+                for (int i = 0; i < SizesCount; i++)
                 {
-                    Name = VideoCodec.VideoCodecs[i].Name,
-                    CpuSpeed = VideoCodec.VideoCodecs[i].DefaultSpeedLevel,
-                    MaxCpuSpeed = VideoCodec.VideoCodecs[i].MaxSpeedLevel,
-                    ExtraArguments = ""
-                };
+                    Tests[i] = new PerformanceTestLine() { Header = sizeTexts[i], MBitrate = bitrates[i] };
+                    Tests[i].FillItems();
+                }
+            }
+            else
+            {
+                Tests = Config.Instance.TestItems;
+            }
+            if (Config.Instance.TestCodecs == null || Config.Instance.TestCodecs.Any(p => p == null) || Config.Instance.TestCodecs.Length != Codecs.Length)
+            {
+                for (int i = 0; i < CodecsCount; i++)
+                {
+                    Codecs[i] = new PerformanceTestCodecParameter()
+                    {
+                        Name = VideoCodec.VideoCodecs[i].Name,
+                        CpuSpeed = VideoCodec.VideoCodecs[i].DefaultSpeedLevel,
+                        MaxCpuSpeed = VideoCodec.VideoCodecs[i].MaxSpeedLevel,
+                        ExtraArguments = ""
+                    };
+                }
+            }
+            else
+            {
+                Codecs = Config.Instance.TestCodecs;
+            }
+            if (Config.Instance.TestVideo != null)
+            {
+                TestVideo = Config.Instance.TestVideo;
             }
         }
 
@@ -496,7 +541,12 @@ namespace SimpleFFmpegGUI.WPF
             get => progress;
             set => this.SetValueAndNotify(ref progress, value, nameof(Progress));
         }
-
         public PerformanceTestLine[] Tests { get; } = new PerformanceTestLine[SizesCount];
+
+        public string TestVideo
+        {
+            get => testVideo;
+            set => this.SetValueAndNotify(ref testVideo, value, nameof(TestVideo));
+        }
     }
 }

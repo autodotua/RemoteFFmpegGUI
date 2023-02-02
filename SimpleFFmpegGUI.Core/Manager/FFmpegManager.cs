@@ -1,6 +1,7 @@
 ﻿using FFMpegCore;
 using FzLib;
 using FzLib.IO;
+using FzLib.Program;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.FFmpegArgument;
 using SimpleFFmpegGUI.FFmpegLib;
@@ -25,8 +26,9 @@ namespace SimpleFFmpegGUI.Manager
             new Regex(@".*Invalid.*",RegexOptions.Compiled|RegexOptions.IgnoreCase),
         };
 
-        private static readonly Regex rPsnr = new Regex(@"PSNR (([yuvaverageminmax]+:[0-9\. ]+)+)", RegexOptions.Compiled);
-        private static readonly Regex rSsim = new Regex(@"SSIM ([YUVAll]+:[0-9\.\(\) ]+)+", RegexOptions.Compiled);
+        private static readonly Regex rPSNR = new Regex(@"PSNR (([yuvaverageminmax]+:[0-9\. ]+)+)", RegexOptions.Compiled);
+        private static readonly Regex rSSIM = new Regex(@"SSIM ([YUVAll]+:[0-9\.\(\) ]+)+", RegexOptions.Compiled);
+        private static readonly Regex rVMAF = new Regex(@"VMAF score: [0-9\.]+", RegexOptions.Compiled);
         private readonly TaskInfo task;
         private CancellationTokenSource cancel;
         private bool hasRun = false;
@@ -147,7 +149,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public void Suspend()
         {
-            if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 throw new PlatformNotSupportedException("暂停和恢复功能仅支持Windows");
             }
@@ -162,43 +164,36 @@ namespace SimpleFFmpegGUI.Manager
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        //private async Tasks.Task<List<string>> ConvertToTsAsync(TaskInfo task, string tempFolder, CancellationToken cancellationToken)
-        //{
-        //    List<string> tsFiles = new List<string>();
-        //    if (!Directory.Exists(tempFolder))
-        //    {
-        //        Directory.CreateDirectory(tempFolder);
-        //    }
-        //    int i = 0;
-        //    foreach (var file in task.Inputs)
-        //    {
-        //        Progress = GetConvertToTsProgress(file.FilePath);
-        //        string path = FileSystem.GetNoDuplicateFile(Path.Combine(tempFolder, "join.ts"));
-        //        tsFiles.Add(path);
-        //        var p = FFMpegArguments.FromFileInput(file.FilePath)
-        //                  .OutputToFile(path, true, p =>
-        //                      p.CopyChannel()
-        //                      .WithBitStreamFilter(Channel.Video, Filter.H264_Mp4ToAnnexB)
-        //                      .ForceFormat(VideoType.Ts));
-        //        await RunAsync(p, $"打包第{++i}个临时文件", cancellationToken);
-        //    }
-        //    return tsFiles;
-        //}
-
-        //private ProgressDto GetConvertToTsProgress(string file)
-        //{
-        //    var p = new ProgressDto();
-        //    try
-        //    {
-        //        p.VideoLength = FFProbe.Analyse(file).Duration;
-        //        p.StartTime = DateTime.Now;
-        //        return p;
-        //    }
-        //    catch
-        //    {
-        //        return null;
-        //    }
-        //}
+        private static string GenerateOutputPath(TaskInfo task)
+        {
+            string output = task.Output.Trim();
+            var a = task.Arguments;
+            if (string.IsNullOrEmpty(output))
+            {
+                if (task.Inputs.Count == 0)
+                {
+                    throw new Exception("没有指定输出路径，且输入文件为空");
+                }
+                output = task.Inputs[0].FilePath;
+            }
+            if (!string.IsNullOrEmpty(a?.Format))
+            {
+                VideoFormat format = VideoFormat.Formats.Where(p => p.Name == a.Format || p.Extension == a.Format).FirstOrDefault();
+                if (format != null)
+                {
+                    string dir = Path.GetDirectoryName(output);
+                    string name = Path.GetFileNameWithoutExtension(output);
+                    string extension = format.Extension;
+                    output = Path.Combine(dir, name + "." + extension);
+                }
+            }
+            task.RealOutput = FileSystem.GetNoDuplicateFile(output);
+            if (!new FileInfo(task.RealOutput).Directory.Exists)
+            {
+                new FileInfo(task.RealOutput).Directory.Create();
+            }
+            return task.RealOutput;
+        }
 
         private ProgressDto GetProgress(TaskInfo task)
         {
@@ -307,38 +302,6 @@ namespace SimpleFFmpegGUI.Manager
                 Process = null;
             }
         }
-
-        private static string GenerateOutputPath(TaskInfo task)
-        {
-            string output = task.Output.Trim();
-            var a = task.Arguments;
-            if (string.IsNullOrEmpty(output))
-            {
-                if (task.Inputs.Count == 0)
-                {
-                    throw new Exception("没有指定输出路径，且输入文件为空");
-                }
-                output = task.Inputs[0].FilePath;
-            }
-            if (!string.IsNullOrEmpty(a?.Format))
-            {
-                VideoFormat format = VideoFormat.Formats.Where(p => p.Name == a.Format || p.Extension == a.Format).FirstOrDefault();
-                if (format != null)
-                {
-                    string dir = Path.GetDirectoryName(output);
-                    string name = Path.GetFileNameWithoutExtension(output);
-                    string extension = format.Extension;
-                    output = Path.Combine(dir, name + "." + extension);
-                }
-            }
-            task.RealOutput = FileSystem.GetNoDuplicateFile(output);
-            if (!new FileInfo(task.RealOutput).Directory.Exists)
-            {
-                new FileInfo(task.RealOutput).Directory.Create();
-            }
-            return task.RealOutput;
-        }
-
         private async Task RunCodeProcessAsync(string tempDir, CancellationToken cancellationToken)
         {
             string message = null;
@@ -415,11 +378,18 @@ namespace SimpleFFmpegGUI.Manager
                 throw new FFmpegArgumentException("输入2不含视频");
             }
             Progress = GetProgress(task);
-
-            var arg = ArgumentsGenerator.GetArguments(task.Inputs, "-lavfi \"ssim;[0:v][1:v]psnr\" -f null -");
+            string argument = "-lavfi \"ssim;[0:v][1:v]psnr\" -f null -";
+            string vmafModel = Directory.EnumerateFiles(App.ProgramDirectoryPath, "vmaf*.json").FirstOrDefault();
+            if (vmafModel != null)
+            {
+                vmafModel = Path.GetFileName(vmafModel);
+                 argument = @$"-lavfi ""ssim;[0:v][1:v]psnr;[0:v]setpts=PTS-STARTPTS[reference]; [1:v]setpts=PTS-STARTPTS[distorted]; [distorted][reference]libvmaf=model_path={vmafModel.Replace('\\','/')}:n_threads={Environment.ProcessorCount}""  -f null -";
+            }
+            var arg = ArgumentsGenerator.GetArguments(task.Inputs, argument);
             FFmpegOutput += CheckOutput;
             string ssim = null;
             string psnr = null;
+            string vmaf = null;
             try
             {
                 await RunAsync(arg, $"正在对比 {Path.GetFileName(task.Inputs[0].FilePath)} 和 {Path.GetFileName(task.Inputs[1].FilePath)}", cancellationToken);
@@ -427,7 +397,7 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     throw new Exception("对比视频失败，未识别到对比结果");
                 }
-                task.Message = ssim + Environment.NewLine + psnr;
+                task.Message = ssim + Environment.NewLine + psnr+(vmaf==null?"":(Environment.NewLine+vmaf));
             }
             finally
             {
@@ -440,39 +410,37 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     return;
                 }
-                if (rSsim.IsMatch(e.Data))
+                if (rSSIM.IsMatch(e.Data))
                 {
-                    var match = rSsim.Match(e.Data);
+                    var match = rSSIM.Match(e.Data);
                     ssim = match.Value;
                     logger.Info(task, "对比结果（SSIM）：" + match.Value);
                 }
-                if (rPsnr.IsMatch(e.Data))
+                if (rPSNR.IsMatch(e.Data))
                 {
-                    var match = rPsnr.Match(e.Data);
+                    var match = rPSNR.Match(e.Data);
                     psnr = match.Value;
                     logger.Info(task, "对比结果（PSNR）：" + match.Value);
+                }
+                if (rVMAF.IsMatch(e.Data))
+                {
+                    var match = rVMAF.Match(e.Data);
+                    vmaf = match.Value;
+                    logger.Info(task, "对比结果（VMAF）：" + match.Value);
                 }
             }
         }
 
         private async Task RunConcatProcessAsync(string tempDir, CancellationToken cancellationToken)
         {
-            string message = null;
             if (task.Inputs.Count < 2)
             {
                 throw new ArgumentException("拼接视频，输入文件必须为2个或更多");
             }
-            message = $"正在拼接：{task.Inputs.Count}个文件";
+            string message = $"正在拼接：{task.Inputs.Count}个文件";
 
             if (task.Arguments.Concat == null || task.Arguments.Concat.Type == ConcatType.ViaTs)
             {
-                //var tsFiles = await ConvertToTsAsync(task, tempDir, cancellationToken);
-                //f = FFMpegArguments.FromConcatInput(tsFiles, a => ApplyInputArguments(a, task.Inputs[0]));
-                //Progress = GetProgress(task);
-
-                //GenerateOutputPath(task);
-                //var p = f.OutputToFile(task.RealOutput, true, a => ApplyOutputArguments(a, task.Arguments, 0));
-                //await RunAsync(p, message, cancellationToken);
 
                 throw new NotSupportedException("取消支持该方法的拼接");
             }

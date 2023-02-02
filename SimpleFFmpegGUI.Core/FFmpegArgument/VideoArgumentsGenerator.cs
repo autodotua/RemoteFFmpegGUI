@@ -2,6 +2,7 @@
 using MediaInfo.Model;
 using SimpleFFmpegGUI.FFmpegLib;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Channels;
 using VideoCodec = SimpleFFmpegGUI.FFmpegLib.VideoCodec;
 
@@ -43,13 +44,13 @@ namespace SimpleFFmpegGUI.FFmpegArgument
 
         public VideoArgumentsGenerator BufferRatio(double? ratio)
         {
-            if (ratio.HasValue)
+            if (ratio.HasValue && videoCodec.Name != VideoCodec.SVTAV1.Name)
             {
                 if (maxBitrate == null)
                 {
                     throw new FFmpegArgumentException("应先设置最大码率，然后设置缓冲比例");
                 }
-                arguments.Add(videoCodec.MaxBitrate(ratio.Value * maxBitrate.Value));
+                arguments.Add(videoCodec.BufferSize(ratio.Value * maxBitrate.Value));
             }
             return this;
         }
@@ -158,7 +159,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
 
         public override IEnumerable<FFmpegArgumentItem> ExtraArguments()
         {
-            return videoCodec.ExtraArguments();
+            return videoCodec == null ? Enumerable.Empty<FFmpegArgumentItem>() : videoCodec.ExtraArguments();
         }
     }
 }

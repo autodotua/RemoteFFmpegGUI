@@ -11,13 +11,18 @@ namespace SimpleFFmpegGUI.FFmpegLib
 {
     public abstract class VideoCodec : CodecBase
     {
+        public static readonly X264 X264 = new X264();
+        public static readonly X265 X265 = new X265();
+        public static readonly XVP9 XVP9 = new XVP9();
+        public static readonly AomAV1 AomAV1 = new AomAV1();
+        public static readonly SVTAV1 SVTAV1 = new SVTAV1();
         public static readonly VideoCodec[] VideoCodecs = new VideoCodec[]
         {
-            new X264(),
-            new X265(),
-            new XVP9(),
-            new AomAV1(),
-            new SVTAV1()
+           X264,
+           X265,
+           XVP9,
+           AomAV1,
+           SVTAV1
         };
 
 

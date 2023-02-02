@@ -16,7 +16,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
 
         public override string Name => "H264";
         public override string Lib => "libx264";
-        public override int MaxSpeedLevel => FFmpegEnums.Presets.Length;
+        public override int MaxSpeedLevel => FFmpegEnums.Presets.Length-1;
         public override int DefaultSpeedLevel => 3;
         public override int DefaultCRF => 23;
 
