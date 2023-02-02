@@ -434,7 +434,6 @@ namespace SimpleFFmpegGUI.WPF
         public static readonly string[] sizes = new string[SizesCount] { "-1:720", "-1:1080", "-1:1440", "-1:2160" };
         public static readonly string[] sizeTexts = new string[SizesCount] { "720P", "1080P", "1440P", "2160P" };
         private static readonly int[] bitrates = new int[SizesCount] { 2, 4, 8, 16 };
-        private static readonly string[] extraArgs = new string[CodecsCount] { "", "", "-row-mt 1", "-row-mt 1", "" };
         private double detailProgress = 0;
 
         private bool isTesting = false;
@@ -459,7 +458,7 @@ namespace SimpleFFmpegGUI.WPF
                     Name = VideoCodec.VideoCodecs[i].Name,
                     CpuSpeed = VideoCodec.VideoCodecs[i].DefaultSpeedLevel,
                     MaxCpuSpeed = VideoCodec.VideoCodecs[i].MaxSpeedLevel,
-                    ExtraArguments = extraArgs[i]
+                    ExtraArguments = ""
                 };
             }
         }

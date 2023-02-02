@@ -8,10 +8,15 @@ namespace SimpleFFmpegGUI.FFmpegArgument
     {
         protected List<FFmpegArgumentItem> arguments = new List<FFmpegArgumentItem>();
 
+        public virtual IEnumerable<FFmpegArgumentItem> ExtraArguments()
+        {
+            return Enumerable.Empty<FFmpegArgumentItem>();
+        }
+
         public virtual string GetArguments()
         {
             List<string> list = new List<string>();
-            var groups = arguments.GroupBy(p => p.Parent).ToList();
+            var groups = arguments.Concat(ExtraArguments()).GroupBy(p => p.Parent).ToList();
             foreach (var group in groups)
             {
                 if (group.Key == null)

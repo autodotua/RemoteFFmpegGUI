@@ -39,9 +39,11 @@
                 ItemsSource="{Binding Outputs, Mode=OneWay}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock PreviewMouseDown="TextBlock_PreviewMouseDown"
+                        <TextBlock
                             FontFamily="Consolas"
-                            Text="{Binding Message}">
+                            PreviewMouseDown="TextBlock_PreviewMouseDown"
+                            Text="{Binding Message}"
+                            TextWrapping="Wrap">
                             <TextBlock.Style>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Style.Triggers>
@@ -66,7 +68,7 @@
                                             Value="E">
                                             <Setter Property="Foreground" Value="Red" />
                                             <Setter Property="Cursor" Value="Hand" />
-                                        </DataTrigger> 
+                                        </DataTrigger>
                                         <DataTrigger
                                             Binding="{Binding Type}"
                                             Value="W">

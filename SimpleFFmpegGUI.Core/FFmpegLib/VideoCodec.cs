@@ -1,6 +1,7 @@
 ﻿using FFMpegCore.Enums;
 using FzLib.DataAnalysis;
 using SimpleFFmpegGUI.FFmpegArgument;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,10 @@ namespace SimpleFFmpegGUI.FFmpegLib
         public abstract int DefaultSpeedLevel { get; }
         public virtual int MaxCRF { get; } = 63;
         public abstract int MaxSpeedLevel { get; }
+        public virtual IEnumerable<FFmpegArgumentItem> ExtraArguments()
+        {
+            return Enumerable.Empty<FFmpegArgumentItem>();
+        }
         public virtual FFmpegArgumentItem AverageBitrate(double mb)
         {
             if (mb < 0)

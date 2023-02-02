@@ -1,4 +1,6 @@
 ﻿using SimpleFFmpegGUI.FFmpegArgument;
+using System;
+using System.Collections.Generic;
 
 namespace SimpleFFmpegGUI.FFmpegLib
 {
@@ -17,6 +19,26 @@ namespace SimpleFFmpegGUI.FFmpegLib
                 throw new FFmpegArgumentException("速度值超出范围");
             }
             return new FFmpegArgumentItem("cpu-used", speed.ToString());
+        }
+
+        public override IEnumerable<FFmpegArgumentItem> ExtraArguments()
+        {
+            yield return new FFmpegArgumentItem("row-mt", "1");
+
+            //寻找将线程数切成两个最接近的数
+            int threadCount = Environment.ProcessorCount;
+            int best = 1;
+            double sqrt = Math.Sqrt(threadCount);
+            for (int i = Convert.ToInt32(sqrt); i > 0; i--)
+            {
+                if (threadCount / i * i == threadCount)
+                {
+                    best = i;
+                    break;
+                }
+            }
+
+            yield return new FFmpegArgumentItem("tiles", $"{best}x{threadCount/best}");
         }
     }
 

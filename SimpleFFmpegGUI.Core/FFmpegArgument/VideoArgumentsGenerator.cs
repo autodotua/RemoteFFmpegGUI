@@ -1,6 +1,7 @@
 ﻿using FFMpegCore.Enums;
 using MediaInfo.Model;
 using SimpleFFmpegGUI.FFmpegLib;
+using System.Collections.Generic;
 using System.Threading.Channels;
 using VideoCodec = SimpleFFmpegGUI.FFmpegLib.VideoCodec;
 
@@ -145,6 +146,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             }
             return this;
         }
+
         public VideoArgumentsGenerator FrameRate(double? fps)
         {
             if (fps.HasValue)
@@ -152,6 +154,11 @@ namespace SimpleFFmpegGUI.FFmpegArgument
                 arguments.Add(videoCodec.FrameRate(fps.Value));
             }
             return this;
+        }
+
+        public override IEnumerable<FFmpegArgumentItem> ExtraArguments()
+        {
+            return videoCodec.ExtraArguments();
         }
     }
 }

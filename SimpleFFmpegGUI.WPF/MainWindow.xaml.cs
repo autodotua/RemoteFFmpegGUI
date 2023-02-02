@@ -295,7 +295,8 @@ namespace SimpleFFmpegGUI.WPF
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
             var window = App.ServiceProvider.GetService<TestWindow>();
-            window.ShowDialog(this);
+            window.Owner = this;
+            window.Show();
         }
 
         private void Window_StateChanged(object sender, EventArgs e)

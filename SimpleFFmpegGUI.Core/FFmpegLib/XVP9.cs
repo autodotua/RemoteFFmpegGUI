@@ -1,4 +1,5 @@
 ﻿using SimpleFFmpegGUI.FFmpegArgument;
+using System.Collections.Generic;
 
 namespace SimpleFFmpegGUI.FFmpegLib
 {
@@ -17,6 +18,10 @@ namespace SimpleFFmpegGUI.FFmpegLib
                 throw new FFmpegArgumentException("速度值超出范围");
             }
             return new FFmpegArgumentItem("cpu-used", speed.ToString());
+        }
+        public override IEnumerable<FFmpegArgumentItem> ExtraArguments()
+        {
+            yield return new FFmpegArgumentItem("row-mt","1");
         }
     }
 
