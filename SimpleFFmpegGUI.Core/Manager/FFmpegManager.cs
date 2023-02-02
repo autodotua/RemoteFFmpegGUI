@@ -195,10 +195,10 @@ namespace SimpleFFmpegGUI.Manager
             return task.RealOutput;
         }
 
-        private ProgressDto GetProgress(TaskInfo task)
+        private ProgressDto GetProgress(TaskInfo task, bool onlyCalcFirstVideoDuration = false)
         {
             var p = new ProgressDto();
-            if (task.Inputs.Count == 1)
+            if (task.Inputs.Count == 1 || onlyCalcFirstVideoDuration)
             {
                 p.VideoLength = GetVideoDuration(task.Inputs[0]);
             }
@@ -351,12 +351,12 @@ namespace SimpleFFmpegGUI.Manager
                 throw new ArgumentException("输入2不含音频");
             }
 
-            Progress = GetProgress(task);
+            Progress = GetProgress(task, true);
             GenerateOutputPath(task);
 
             var outputArgs = ArgumentsGenerator.GetOutputArguments(v => v.Copy(), a => a.Copy(),
                 s => (video.AudioStreams.Count != 0 || audio.VideoStreams.Count != 0) ? s.Map(0, StreamChannel.Video, 0).Map(0, StreamChannel.Audio, 0) : s);
-            string arg = ArgumentsGenerator.GetArguments(task.Inputs, outputArgs,task.RealOutput);
+            string arg = ArgumentsGenerator.GetArguments(task.Inputs, outputArgs, task.RealOutput);
 
             await RunAsync(arg, "正在合并音视频", cancellationToken);
         }
@@ -377,13 +377,13 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new FFmpegArgumentException("输入2不含视频");
             }
-            Progress = GetProgress(task);
+            Progress = GetProgress(task, true);
             string argument = "-lavfi \"ssim;[0:v][1:v]psnr\" -f null -";
             string vmafModel = Directory.EnumerateFiles(App.ProgramDirectoryPath, "vmaf*.json").FirstOrDefault();
             if (vmafModel != null)
             {
                 vmafModel = Path.GetFileName(vmafModel);
-                 argument = @$"-lavfi ""ssim;[0:v][1:v]psnr;[0:v]setpts=PTS-STARTPTS[reference]; [1:v]setpts=PTS-STARTPTS[distorted]; [distorted][reference]libvmaf=model_path={vmafModel.Replace('\\','/')}:n_threads={Environment.ProcessorCount}""  -f null -";
+                argument = @$"-lavfi ""ssim;[0:v][1:v]psnr;[0:v]setpts=PTS-STARTPTS[reference]; [1:v]setpts=PTS-STARTPTS[distorted]; [distorted][reference]libvmaf=model_path={vmafModel.Replace('\\', '/')}:n_threads={Environment.ProcessorCount}""  -f null -";
             }
             var arg = ArgumentsGenerator.GetArguments(task.Inputs, argument);
             FFmpegOutput += CheckOutput;
@@ -397,7 +397,7 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     throw new Exception("对比视频失败，未识别到对比结果");
                 }
-                task.Message = ssim + Environment.NewLine + psnr+(vmaf==null?"":(Environment.NewLine+vmaf));
+                task.Message = ssim + Environment.NewLine + psnr + (vmaf == null ? "" : (Environment.NewLine + vmaf));
             }
             finally
             {
