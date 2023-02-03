@@ -27,21 +27,25 @@
         </Grid.ColumnDefinitions>
         <ScrollViewer>
             <ui:SimpleStackPanel
-                IsHitTestVisible="False"
                 Orientation="Vertical"
-                Spacing="2">
-                <GroupBox
+                Spacing="12">
+                <Expander
                     x:Name="grpSpeed"
-                    Header="速度（帧每秒，越低越好）" />
-                <GroupBox
+                    Header="速度（帧每秒，越低越好）"
+                    IsExpanded="True" />
+                <Expander
+                    x:Name="grpVMAF"
+                    Header="VMAF评分（越高越好）"
+                    IsExpanded="True" />
+                <Expander
                     x:Name="grpSSIM"
                     Header="画面相似性（百分比，越高越好）" />
-                <GroupBox
-                    x:Name="grpVMAF"
-                    Header="VMAF评分（越高越好）" />
-                <GroupBox
+                <Expander
                     x:Name="grpPSNR"
                     Header="画面信噪比（比值，越高越好）" />
+                <Expander
+                    x:Name="grpCpuUsage"
+                    Header="CPU占用率（百分比）" />
             </ui:SimpleStackPanel>
         </ScrollViewer>
         <DockPanel Grid.Column="2">

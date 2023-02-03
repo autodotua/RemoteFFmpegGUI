@@ -26,6 +26,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         private double score;
         private double ssim;
         private double vmaf;
+        private double cpu;
 
         public PerformanceTestItem(string codec)
         {
@@ -47,6 +48,11 @@ namespace SimpleFFmpegGUI.WPF.Model
         {
             get => psnr;
             set => this.SetValueAndNotify(ref psnr, value, nameof(PSNR));
+        }
+        public double CpuUsage
+        {
+            get => cpu;
+            set => this.SetValueAndNotify(ref cpu, value, nameof(CpuUsage));
         }
 
         public double FPS
@@ -72,6 +78,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             SSIM = 0;
             PSNR = 0;
             VMAF = 0;
+            CpuUsage = 0;
         }
     }
 

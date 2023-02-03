@@ -7,7 +7,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
     {
         public override string Name => "VP9";
         public override string Lib => "libvpx-vp9";
-        public override int MaxSpeedLevel => 8;
+        public override int MaxSpeedLevel => 5;
         public override int DefaultSpeedLevel => 3;
         public override int DefaultCRF => 23;
 

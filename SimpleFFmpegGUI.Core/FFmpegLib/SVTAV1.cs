@@ -7,7 +7,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
     {
         public override string Name => "AV1 (SVT)";
         public override string Lib => "libsvtav1";
-        public override int MaxSpeedLevel => 12;
+        public override int MaxSpeedLevel => 8;
         public override int DefaultSpeedLevel => 6;
         public override int DefaultCRF => 28;
 

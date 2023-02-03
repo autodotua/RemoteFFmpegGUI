@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.Manager
 {
@@ -29,8 +30,13 @@ namespace SimpleFFmpegGUI.Manager
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:验证平台兼容性", Justification = "<挂起>")]
-        public static CpuCoreUsageDto[] GetCpuUsage(TimeSpan sampleSpan)
+        public static async Task<CpuCoreUsageDto[]> GetCpuUsageAsync(TimeSpan sampleSpan=default,Task task=default)
         {
+            if(sampleSpan ==default && task==default)
+            {
+                throw new ArgumentException("至少提供一个参数");
+            }
+
             PerformanceCounter cpuCounter;
 
             cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
@@ -66,7 +72,14 @@ namespace SimpleFFmpegGUI.Manager
                 };
                 usages.Add(cpuCoreUsage.CpuIndex * 1000 + cpuCoreUsage.CoreIndex, cpuCoreUsage);
             }
-            Thread.Sleep(sampleSpan);
+            if (sampleSpan != default)
+            {
+                await Task.Delay(sampleSpan);
+            }
+            else
+            {
+                await task;
+            }
 
             foreach (var s in instances)
             {

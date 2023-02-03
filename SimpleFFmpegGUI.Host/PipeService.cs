@@ -221,7 +221,7 @@ namespace SimpleFFmpegGUI
 
         public CpuCoreUsageDto[] GetCpuUsage(TimeSpan sampleSpan)
         {
-            return PowerManager.GetCpuUsage(sampleSpan);
+            return PowerManager.GetCpuUsageAsync(sampleSpan).Result;
         }
 
         public void ScheduleQueue(DateTime time)
