@@ -9,6 +9,9 @@ namespace SimpleFFmpegGUI.Manager
     {
         private readonly Process process = new Process();
 
+        public TimeSpan RunningTime => process.HasExited ? process.ExitTime - process.StartTime : throw new Exception("进程还未结束");
+        public double CpuUsage => process.HasExited ? process.TotalProcessorTime.TotalSeconds / Environment.ProcessorCount / RunningTime.TotalSeconds : throw new Exception("进程还未结束");
+
         public int Id
         {
             get

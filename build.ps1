@@ -108,6 +108,8 @@ try {
 
     Write-Output "操作完成"
     Write-Output "Web包位于Generation/Publish/WebPackage，WPF包位于Generation/Publish/WPF。"
+
+    ii Generation/Publish
     pause
 }
 catch {

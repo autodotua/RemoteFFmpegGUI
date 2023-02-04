@@ -53,7 +53,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void CreateDataGrids()
         {
-            grpSpeed.Content = GetDataGrid(nameof(PerformanceTestItem.FPS));
+            grpSpeed.Content = GetDataGrid(nameof(PerformanceTestItem.FPS),"0.00");
             grpSSIM.Content = GetDataGrid(nameof(PerformanceTestItem.SSIM), "0.00%");
             grpPSNR.Content = GetDataGrid(nameof(PerformanceTestItem.PSNR), "0.00");
             grpVMAF.Content = GetDataGrid(nameof(PerformanceTestItem.VMAF), "0.00");
@@ -73,7 +73,7 @@ namespace SimpleFFmpegGUI.WPF
                     HeadersVisibility = DataGridHeadersVisibility.Column,
                     SelectionUnit = DataGridSelectionUnit.Cell,
                     IsReadOnly = true,
-                    IsHitTestVisible= false,
+                    IsHitTestVisible = false,
                 };
                 dataGrid.SetBinding(DataGrid.IsEnabledProperty,
                     new Binding(nameof(TestWindowViewModel.IsTesting)) { Converter = new InverseBoolConverter() });
@@ -226,9 +226,106 @@ namespace SimpleFFmpegGUI.WPF
             dataGrid.Columns.Add(c);
             grpTestItems.Content = dataGrid;
         }
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            string path = new FileFilterCollection().Add("CSV表格", "csv").CreateSaveFileDialog().SetDefault("编码测试结果").GetFilePath();
+            if (path == null)
+            {
+                return;
+            }
+            try
+            {
+                Dictionary<string, Func<PerformanceTestItem, double>> key2Func = new Dictionary<string, Func<PerformanceTestItem, double>>()
+                {
+                    ["FPS"] = p => p.FPS,
+                    ["SSIM"] = p => p.SSIM,
+                    ["VMAF"] = p => p.VMAF,
+                    ["PSNR"] = p => p.PSNR,
+                    ["CPU"] = p => p.CpuUsage,
+
+                };
+                StringBuilder str = new StringBuilder();
+                str.AppendLine("Size," + string.Join(',', VideoCodec.VideoCodecs.Select(p => p.Name)));
+
+                foreach (var key in key2Func.Keys)
+                {
+                    str.AppendLine(key);
+                    foreach (var test in ViewModel.Tests)
+                    {
+                        str.Append(test.Header);
+                        foreach (var item in test.Items)
+                        {
+                            str.Append(',');
+                            str.Append(key2Func[key](item));
+                        }
+                        str.AppendLine();
+                    }
+                }
+
+                File.WriteAllText($"{Path.GetDirectoryName(path)}\\{Path.GetFileNameWithoutExtension(path)}_分指标.csv", str.ToString(), new UTF8Encoding(true));
+
+
+                str.Clear();
+                str.AppendLine("Codec,Size,Mbitrate,Speed,Extra,FPS,VMAF,SSIM,PSNR,CPU,Duration,Video");
+
+                foreach (var test in ViewModel.Tests)
+                {
+                    foreach (var item in test.Items.Where(p => p.FPS > 0))
+                    {
+                        str.Append(item.Codec ?? "")
+                            .Append(',')
+                            .Append(test.Header)
+                            .Append(',')
+                            .Append(test.MBitrate)
+                            .Append(',')
+                            .Append(ViewModel.Codecs.First(p => p.Name == item.Codec).CpuSpeed)
+                            .Append(',')
+                            .Append(ViewModel.Codecs.First(p => p.Name == item.Codec).ExtraArguments ?? "")
+                            .Append(',')
+                            .Append(item.FPS)
+                            .Append(',')
+                            .Append(item.VMAF)
+                            .Append(',')
+                            .Append(item.SSIM)
+                            .Append(',')
+                            .Append(item.PSNR)
+                            .Append(',')
+                            .Append(item.CpuUsage)
+                            .Append(',')
+                            .Append(item.ProcessDuration.TotalSeconds)
+                            .Append(',')
+                            .Append('"')
+                            .Append(ViewModel.TestVideo)
+                            .Append('"')
+                            .AppendLine();
+                    }
+                }
+
+
+                File.WriteAllText($"{Path.GetDirectoryName(path)}\\{Path.GetFileNameWithoutExtension(path)}_详细信息.csv", str.ToString(), new UTF8Encoding(true));
+            }
+            catch (Exception ex)
+            {
+                CommonDialog.ShowErrorDialogAsync(ex, "导出失败");
+            }
+        }
+
+        private void SaveConfigs()
+        {
+            Config.Instance.TestVideo = ViewModel.TestVideo;
+            Config.Instance.TestCodecs = ViewModel.Codecs;
+            Config.Instance.TestItems = ViewModel.Tests;
+            Config.Instance.Save();
+        }
+
         private void SelectAllButton_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.Tests.ForEach(p => p.Items.ForEach(q => q.IsChecked = true));
+        }
+
+        private void SelectNoneButton_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Tests.ForEach(p => p.Items.ForEach(q => q.IsChecked = false));
         }
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
@@ -295,6 +392,8 @@ namespace SimpleFFmpegGUI.WPF
             {
                 Directory.Delete(TestDir, true);
             }
+            var media = await MediaInfoManager.GetMediaInfoAsync(input, false);
+            var frameCount = media.VideoStreams[0].AvgFrameRate * media.VideoStreams[0].Duration.TotalSeconds;
             int count = await CreateRefVideosAsync(input, sizes);
             ViewModel.MaxProgress = ViewModel.Tests.Sum(p => p.Items.Count(q => q.IsChecked)) + count;
             if (stopping)
@@ -338,14 +437,9 @@ namespace SimpleFFmpegGUI.WPF
                     task.Output = Path.GetFullPath($"test/{ViewModel.Codecs[i].Name}-{sizeTexts[j]}.mp4");
 
                     runningFFmpeg = new FFmpegManager(task);
-                    double fps = 0;
                     runningFFmpeg.StatusChanged += (s, e) =>
                     {
                         var status = runningFFmpeg.GetStatus();
-                        if (status.HasDetail && status.Fps > 0)
-                        {
-                            fps = status.Fps;
-                        }
                         if (status.HasDetail && status.Progress != null && status.Progress.Percent is >= 0 and <= 1)
                         {
                             ViewModel.DetailProgress = status.Progress.Percent;
@@ -353,8 +447,10 @@ namespace SimpleFFmpegGUI.WPF
                     };
                     try
                     {
-                        var cpu = await PowerManager.GetCpuUsageAsync(task: runningFFmpeg.RunAsync());
-                        item.CpuUsage = cpu[0].Usage;
+                        await runningFFmpeg.RunAsync();
+                        item.CpuUsage = runningFFmpeg.LastProcess.CpuUsage;
+                        item.ProcessDuration = runningFFmpeg.LastProcess.RunningTime;
+                        item.FPS = frameCount / item.ProcessDuration.TotalSeconds;
                     }
                     catch (TaskCanceledException)
                     {
@@ -368,17 +464,13 @@ namespace SimpleFFmpegGUI.WPF
                     {
                         runningFFmpeg = null;
                     }
-                    ViewModel.Progress += 0.5;
-                    if (fps <= 0)
-                    {
-                        throw new Exception("无法获取编码帧速度");
-                    }
-                    item.FPS = fps;
+
 
                     if (stopping)
                     {
                         return;
                     }
+                    ViewModel.Progress += 0.5;
 
 
                     //编码质量测试
@@ -431,7 +523,7 @@ namespace SimpleFFmpegGUI.WPF
                     }
 
                     string message = qualityTask.Message;
-                    item.SSIM = double.Parse(Regex.Match(message, @"All:[0-9\.]+").Value[4..]) ;
+                    item.SSIM = double.Parse(Regex.Match(message, @"All:[0-9\.]+").Value[4..]);
                     item.PSNR = double.Parse(Regex.Match(message, @"average:[0-9\.]+").Value[8..]);
                     item.VMAF = double.Parse(Regex.Match(message, @"VMAF score: [0-9\.]+").Value[12..]);
                 }
@@ -447,92 +539,6 @@ namespace SimpleFFmpegGUI.WPF
             if (ViewModel.IsTesting)
             {
                 e.Cancel = true;
-            }
-        }
-
-        private void SaveConfigs()
-        {
-            Config.Instance.TestVideo = ViewModel.TestVideo;
-            Config.Instance.TestCodecs = ViewModel.Codecs;
-            Config.Instance.TestItems = ViewModel.Tests;
-            Config.Instance.Save();
-        }
-
-        private void ExportButton_Click(object sender, RoutedEventArgs e)
-        {
-            string path = new FileFilterCollection().Add("CSV表格", "csv").CreateSaveFileDialog().SetDefault("编码测试结果").GetFilePath();
-            if (path == null)
-            {
-                return;
-            }
-            try
-            {
-                Dictionary<string, Func<PerformanceTestItem, double>> key2Func = new Dictionary<string, Func<PerformanceTestItem, double>>()
-                {
-                    ["FPS"] = p => p.FPS,
-                    ["SSIM"] = p => p.SSIM,
-                    ["VMAF"] = p => p.VMAF,
-                    ["PSNR"] = p => p.PSNR,
-                    ["CPU"] = p => p.CpuUsage,
-
-                };
-                StringBuilder str = new StringBuilder();
-                str.AppendLine("Size," + string.Join(',', VideoCodec.VideoCodecs.Select(p => p.Name)));
-
-                foreach (var key in key2Func.Keys)
-                {
-                    str.AppendLine(key);
-                    foreach (var test in ViewModel.Tests)
-                    {
-                        str.Append(test.Header);
-                        foreach (var item in test.Items)
-                        {
-                            str.Append(',');
-                            str.Append(key2Func[key](item));
-                        }
-                        str.AppendLine();
-                    }
-                }
-
-                File.WriteAllText($"{Path.GetDirectoryName(path)}\\{Path.GetFileNameWithoutExtension(path)}_分指标.csv", str.ToString());
-
-
-                str.Clear();
-                str.AppendLine("Codec,Size,Mbitrate,Speed,Extra,FPS,VMAF,SSIM,VMAF,PSNR,CPU");
-
-                foreach (var test in ViewModel.Tests)
-                {
-                    foreach (var item in test.Items.Where(p => p.FPS > 0))
-                    {
-                        str.Append(item.Codec ?? "")
-                            .Append(',')
-                            .Append(test.Header)
-                            .Append(',')
-                            .Append(test.MBitrate)
-                            .Append(',')
-                            .Append(ViewModel.Codecs.First(p => p.Name == item.Codec).CpuSpeed)
-                            .Append(',')
-                            .Append(ViewModel.Codecs.First(p => p.Name == item.Codec).ExtraArguments ?? "")
-                            .Append(',')
-                            .Append(item.FPS)
-                            .Append(',')
-                            .Append(item.VMAF)
-                            .Append(',')
-                            .Append(item.SSIM)
-                            .Append(',')
-                            .Append(item.PSNR)
-                            .Append(',')
-                            .Append(item.CpuUsage)
-                            .AppendLine();
-                    }
-                }
-
-
-                File.WriteAllText($"{Path.GetDirectoryName(path)}\\{Path.GetFileNameWithoutExtension(path)}_详细信息.csv", str.ToString());
-            }
-            catch (Exception ex)
-            {
-                CommonDialog.ShowErrorDialogAsync(ex, "导出失败");
             }
         }
     }

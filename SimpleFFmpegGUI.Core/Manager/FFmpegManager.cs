@@ -58,6 +58,7 @@ namespace SimpleFFmpegGUI.Manager
         public ProgressDto Progress { get; private set; }
         public TaskInfo Task => task;
         private FFmpegProcess Process { get; set; }
+        public FFmpegProcess LastProcess { get; private set; }
 
         public static string TestOutputArguments(OutputArguments arguments)
         {
@@ -299,6 +300,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             finally
             {
+                LastProcess = Process;
                 Process = null;
             }
         }

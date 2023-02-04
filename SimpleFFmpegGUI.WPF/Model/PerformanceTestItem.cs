@@ -21,13 +21,13 @@ namespace SimpleFFmpegGUI.WPF.Model
     [DebuggerDisplay("{Codec}")]
     public class PerformanceTestItem : INotifyPropertyChanged
     {
+        private double cpu;
         private bool isChecked;
+        private TimeSpan processDuration;
         private double psnr;
         private double score;
         private double ssim;
         private double vmaf;
-        private double cpu;
-
         public PerformanceTestItem(string codec)
         {
             Codec = codec;
@@ -39,16 +39,6 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public event PropertyChangedEventHandler PropertyChanged;
         public string Codec { get; set; }
-        public bool IsChecked
-        {
-            get => isChecked;
-            set => this.SetValueAndNotify(ref isChecked, value, nameof(IsChecked));
-        }
-        public double PSNR
-        {
-            get => psnr;
-            set => this.SetValueAndNotify(ref psnr, value, nameof(PSNR));
-        }
         public double CpuUsage
         {
             get => cpu;
@@ -61,6 +51,22 @@ namespace SimpleFFmpegGUI.WPF.Model
             set => this.SetValueAndNotify(ref score, value, nameof(FPS));
         }
 
+        public bool IsChecked
+        {
+            get => isChecked;
+            set => this.SetValueAndNotify(ref isChecked, value, nameof(IsChecked));
+        }
+        public TimeSpan ProcessDuration
+        {
+            get => processDuration;
+            set => this.SetValueAndNotify(ref processDuration, value, nameof(ProcessDuration));
+        }
+
+        public double PSNR
+        {
+            get => psnr;
+            set => this.SetValueAndNotify(ref psnr, value, nameof(PSNR));
+        }
         public double SSIM
         {
             get => ssim;
@@ -93,6 +99,12 @@ namespace SimpleFFmpegGUI.WPF.Model
                 throw new Exception("编码数量不对应");
             }
         }
+        public string Header { get; set; }
+
+        public PerformanceTestItem[] Items { get; set; }
+
+        public double MBitrate { get; set; }
+
         public void FillItems()
         {
             Items = new PerformanceTestItem[CodecsCount];
@@ -102,8 +114,5 @@ namespace SimpleFFmpegGUI.WPF.Model
                 Items[i] = new PerformanceTestItem(VideoCodec.VideoCodecs[i].Name);
             }
         }
-        public string Header { get; set; }
-        public PerformanceTestItem[] Items { get; set; }
-        public double MBitrate { get; set; }
     }
 }

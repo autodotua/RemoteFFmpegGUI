@@ -31,7 +31,7 @@
                 Spacing="12">
                 <Expander
                     x:Name="grpSpeed"
-                    Header="速度（帧每秒，越低越好）"
+                    Header="编码速度（帧每秒，越高越好）"
                     IsExpanded="True" />
                 <Expander
                     x:Name="grpVMAF"
@@ -45,7 +45,8 @@
                     Header="画面信噪比（比值，越高越好）" />
                 <Expander
                     x:Name="grpCpuUsage"
-                    Header="CPU占用率（百分比）" />
+                    Header="CPU占用率（百分比）"
+                    IsExpanded="True" />
             </ui:SimpleStackPanel>
         </ScrollViewer>
         <DockPanel Grid.Column="2">
@@ -64,6 +65,10 @@
                                     Background="Transparent"
                                     Click="SelectAllButton_Click"
                                     Content="全选"
+                                    Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />    <Button
+                                    Background="Transparent"
+                                    Click="SelectNoneButton_Click"
+                                    Content="全不选"
                                     Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                             </ui:SimpleStackPanel>
                         </DataTemplate>
