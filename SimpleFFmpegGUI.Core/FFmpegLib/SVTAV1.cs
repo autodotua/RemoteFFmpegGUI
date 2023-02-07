@@ -52,6 +52,11 @@ namespace SimpleFFmpegGUI.FFmpegLib
             }
             return new FFmpegArgumentItem("fps", fps.ToString(), "svtav1-params", ':');
         }
+
+        public override FFmpegArgumentItem Pass(int pass)
+        {
+            throw new FFmpegArgumentException("SVTAV1暂不支持2Pass");
+        }
     }
 
 }

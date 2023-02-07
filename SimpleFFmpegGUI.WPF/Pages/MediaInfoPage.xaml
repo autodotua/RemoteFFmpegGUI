@@ -60,7 +60,7 @@
         <ScrollViewer
             xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
             xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
-            Grid.Row="2"
+            Grid.Row="2" HorizontalScrollBarVisibility="Auto"
             c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
             Visibility="{Binding MediaInfo, Converter={StaticResource NotNullConverter}}">
             <ui:SimpleStackPanel Spacing="8">

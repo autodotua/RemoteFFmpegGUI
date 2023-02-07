@@ -18,12 +18,13 @@ namespace SimpleFFmpegGUI.Dto
 
         public TimeSpan LastTime { get; set; }
         public double Percent { get; set; }
+        public double BasePercent { get; set; } = 0;
 
         public void Update(TimeSpan VideoDuration)
         {
             if (VideoLength.HasValue)
             {
-                Percent = VideoDuration.Ticks * 1.0 / VideoLength.Value.Ticks;
+                Percent = VideoDuration.Ticks * 1.0 / VideoLength.Value.Ticks+ BasePercent;
                 if (Percent >= 1)
                 {
                     Percent = 1;

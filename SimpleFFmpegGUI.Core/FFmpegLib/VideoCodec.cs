@@ -1,4 +1,5 @@
-﻿using FFMpegCore.Enums;
+﻿using FFMpegCore.Arguments;
+using FFMpegCore.Enums;
 using FzLib.DataAnalysis;
 using SimpleFFmpegGUI.FFmpegArgument;
 using System.Collections;
@@ -87,6 +88,15 @@ namespace SimpleFFmpegGUI.FFmpegLib
                 throw new FFmpegArgumentException("提供的像素格式为空");
             }
             return new FFmpegArgumentItem("pix_fmt", format);
+        }
+
+        public virtual FFmpegArgumentItem Pass(int pass)
+        {
+            if (pass is not (1 or 2 or 3))
+            {
+                throw new FFmpegArgumentException("参数pass超出范围");
+            }
+            return new FFmpegArgumentItem("pass", pass.ToString());
         }
 
         public abstract FFmpegArgumentItem Speed(int speed);

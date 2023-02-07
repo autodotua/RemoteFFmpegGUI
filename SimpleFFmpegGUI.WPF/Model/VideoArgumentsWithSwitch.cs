@@ -37,7 +37,14 @@ namespace SimpleFFmpegGUI.WPF.Model
         public bool EnableCrf
         {
             get => enableCrf;
-            set => this.SetValueAndNotify(ref enableCrf, value, nameof(EnableCrf));
+            set
+            {
+                this.SetValueAndNotify(ref enableCrf, value, nameof(EnableCrf));
+                if (value && Crf == null)
+                {
+                    Crf = 25;
+                }
+            }
         }
 
         private bool enableSize;
@@ -45,7 +52,14 @@ namespace SimpleFFmpegGUI.WPF.Model
         public bool EnableSize
         {
             get => enableSize;
-            set => this.SetValueAndNotify(ref enableSize, value, nameof(EnableSize));
+            set
+            {
+                this.SetValueAndNotify(ref enableSize, value, nameof(EnableSize));
+                if (value && string.IsNullOrWhiteSpace(Size))
+                {
+                    Size = "-1:1080";
+                }
+            }
         }
 
         private bool enableAspectRatio;
@@ -53,7 +67,14 @@ namespace SimpleFFmpegGUI.WPF.Model
         public bool EnableAspectRatio
         {
             get => enableAspectRatio;
-            set => this.SetValueAndNotify(ref enableAspectRatio, value, nameof(EnableAspectRatio));
+            set
+            {
+                this.SetValueAndNotify(ref enableAspectRatio, value, nameof(EnableAspectRatio));
+                if (value && string.IsNullOrWhiteSpace(AspectRatio))
+                {
+                    AspectRatio = "16:9";
+                }
+            }
         }
 
         private bool enableFps;
@@ -61,7 +82,14 @@ namespace SimpleFFmpegGUI.WPF.Model
         public bool EnableFps
         {
             get => enableFps;
-            set => this.SetValueAndNotify(ref enableFps, value, nameof(EnableFps));
+            set
+            {
+                this.SetValueAndNotify(ref enableFps, value, nameof(EnableFps));
+                if (value && Fps == null)
+                {
+                    Fps = 30;
+                }
+            }
         }
 
         private bool enableAverageBitrate;
@@ -69,7 +97,14 @@ namespace SimpleFFmpegGUI.WPF.Model
         public bool EnableAverageBitrate
         {
             get => enableAverageBitrate;
-            set => this.SetValueAndNotify(ref enableAverageBitrate, value, nameof(EnableAverageBitrate));
+            set
+            {
+                this.SetValueAndNotify(ref enableAverageBitrate, value, nameof(EnableAverageBitrate));
+                if (value && AverageBitrate == null)
+                {
+                    AverageBitrate = 10;
+                }
+            }
         }
 
         private bool enableMaxBitrate;
@@ -77,7 +112,14 @@ namespace SimpleFFmpegGUI.WPF.Model
         public bool EnableMaxBitrate
         {
             get => enableMaxBitrate;
-            set => this.SetValueAndNotify(ref enableMaxBitrate, value, nameof(EnableMaxBitrate));
+            set
+            {
+                this.SetValueAndNotify(ref enableMaxBitrate, value, nameof(EnableMaxBitrate));
+                if (value && MaxBitrate == null)
+                {
+                    MaxBitrate = 20;
+                }
+            }
         }
 
         private bool enablePixelFormat;
@@ -85,7 +127,14 @@ namespace SimpleFFmpegGUI.WPF.Model
         public bool EnablePixelFormat
         {
             get => enablePixelFormat;
-            set => this.SetValueAndNotify(ref enablePixelFormat, value, nameof(EnablePixelFormat));
+            set
+            {
+                this.SetValueAndNotify(ref enablePixelFormat, value, nameof(EnablePixelFormat));
+                if (value && string.IsNullOrWhiteSpace(PixelFormat))
+                {
+                    PixelFormat = "yuv420p";
+                }
+            }
         }
 
         public void Apply()
@@ -109,9 +158,9 @@ namespace SimpleFFmpegGUI.WPF.Model
             EnablePixelFormat = !string.IsNullOrEmpty(PixelFormat);
             EnableAspectRatio = !string.IsNullOrEmpty(AspectRatio);
             //从数据库提取的Argument，若某些开关没有启动，则其值为null，这不符合UI，因此需要对null值进行赋初始值。
-            Crf ??= 25; 
+            Crf ??= 25;
             MaxBitrate ??= 20;
-            AverageBitrate = AverageBitrate?? 10;
+            AverageBitrate = AverageBitrate ?? 10;
             MaxBitrateBuffer ??= 2;
         }
     }

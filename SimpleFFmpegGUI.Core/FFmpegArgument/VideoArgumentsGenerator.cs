@@ -112,11 +112,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             {
                 return this;
             }
-            if (pass is not (1 or 2 or 3))
-            {
-                throw new FFmpegArgumentException("参数pass超出范围");
-            }
-            arguments.Add(new FFmpegArgumentItem("pass", pass.Value.ToString()));
+            arguments.Add(videoCodec.Pass(pass.Value));
             return this;
         }
 

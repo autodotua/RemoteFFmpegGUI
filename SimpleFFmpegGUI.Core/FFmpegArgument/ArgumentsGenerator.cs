@@ -16,6 +16,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         public static string GetArguments(TaskInfo task, int pass, string output = null)
         {
             StringBuilder str = new StringBuilder();
+            str.Append("-hide_banner ");
             foreach (var input in task.Inputs)
             {
                 str.Append(GetInputArguments(input));

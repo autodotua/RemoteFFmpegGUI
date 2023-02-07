@@ -206,14 +206,7 @@ namespace SimpleFFmpegGUI.Manager
             else
             {
                 var durations = task.Inputs.Select(p => GetVideoDuration(p));
-                if (durations.All(p => p.HasValue))
-                {
-                    p.VideoLength = TimeSpan.FromTicks(durations.Select(p => p.Value.Ticks).Sum());
-                }
-                else
-                {
-                    p.VideoLength = null;
-                }
+                p.VideoLength = durations.All(p => p.HasValue) ? TimeSpan.FromTicks(durations.Select(p => p.Value.Ticks).Sum()) : null;
             }
             p.StartTime = DateTime.Now;
             return p;
@@ -324,11 +317,12 @@ namespace SimpleFFmpegGUI.Manager
                 string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 Directory.CreateDirectory(tempDirectory);
                 Progress = GetProgress(task);
+                Progress.VideoLength *= 2;
                 message = $"正在转码（Pass=1）：{Path.GetFileName(task.Inputs[0].FilePath)}";
 
                 string arg = ArgumentsGenerator.GetArguments(task, 1, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "NUL" : "/dev/null");
                 await RunAsync(arg, message, cancellationToken, tempDirectory);
-                Progress = GetProgress(task);
+                Progress.BasePercent = 0.5;
 
                 message = $"正在转码（Pass=2）：{Path.GetFileName(task.Inputs[0].FilePath)}";
                 arg = ArgumentsGenerator.GetArguments(task, 2);

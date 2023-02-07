@@ -21,13 +21,17 @@ namespace SimpleFFmpegGUI
     public class Logger : IDisposable
     {
         private static HashSet<Logger> allLoggers = new HashSet<Logger>();
+        private static object lockObj=new object();
         private FFmpegDbContext db = FFmpegDbContext.GetNew();
         private bool disposed = false;
         private Timer timer;
         public Logger()
         {
-            StartTimer();
-            allLoggers.Add(this);
+            lock (lockObj)
+            {
+                StartTimer();
+                allLoggers.Add(this);
+            }
         }
 
         ~Logger()
@@ -39,9 +43,12 @@ namespace SimpleFFmpegGUI
 
         public static void SaveAll()
         {
-            foreach (var logger in allLoggers)
+            lock (lockObj)
             {
-                logger.Save();
+                foreach (var logger in allLoggers)
+                {
+                    logger.Save();
+                }
             }
         }
 
@@ -49,13 +56,16 @@ namespace SimpleFFmpegGUI
         {
             if (!disposed)
             {
-                disposed = true;
-                if (allLoggers.Contains(this))
+                lock (lockObj)
                 {
-                    allLoggers.Remove(this);
+                    disposed = true;
+                    if (allLoggers.Contains(this))
+                    {
+                        allLoggers.Remove(this);
+                    }
+                    timer.Dispose();
+                    Save();
                 }
-                timer.Dispose();
-                Save();
                 db.Dispose();
             }
         }
