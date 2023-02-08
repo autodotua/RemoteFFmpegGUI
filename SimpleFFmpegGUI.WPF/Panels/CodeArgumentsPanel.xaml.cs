@@ -154,7 +154,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             set
             {
                 this.SetValueAndNotify(ref videoOutputStrategy, value, nameof(VideoOutputStrategy));
-                if(value == ChannelOutputStrategy.Code&&Audio==null)
+                if (value == ChannelOutputStrategy.Code && Audio == null)
                 {
                     Video = new VideoArgumentsWithSwitch();
                 }
@@ -224,11 +224,13 @@ namespace SimpleFFmpegGUI.WPF.Panels
             set => this.SetValueAndNotify(ref extra, value, nameof(Extra));
         }
 
+
+
         public IEnumerable ConcatTypes => Enum.GetValues<ConcatType>();
 
         public IEnumerable Fpses => new double[] { 10, 20, 23.976, 24, 25, 29.97, 30, 48, 59.94, 60, 120 };
 
-        public IEnumerable VideoCodecs { get; } = new[] { "自动" }.Concat(VideoCodec.VideoCodecs.Select(p=>p.Name));
+        public IEnumerable VideoCodecs { get; } = new[] { "自动" }.Concat(VideoCodec.VideoCodecs.Select(p => p.Name));
         public IEnumerable AudioCodecs { get; } = new[] { "自动", "AAC", "OPUS" };
         public IEnumerable Formats => VideoFormat.Formats;
         public IEnumerable Sizes { get; } = new[] { "-1:2160", "-1:1440", "-1:1080", "-1:720", "-1:576", "-1:480" };
@@ -286,7 +288,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
         }
 
-        public void Update(TaskType type,OutputArguments arguments)
+        public void Update(TaskType type, OutputArguments arguments)
         {
             ViewModel.Update(type, arguments);
         }

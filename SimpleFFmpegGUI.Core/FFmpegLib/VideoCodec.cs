@@ -17,6 +17,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
         public static readonly XVP9 XVP9 = new XVP9();
         public static readonly AomAV1 AomAV1 = new AomAV1();
         public static readonly SVTAV1 SVTAV1 = new SVTAV1();
+        public static readonly GeneralVideoCodec General = new GeneralVideoCodec();
         public static readonly VideoCodec[] VideoCodecs = new VideoCodec[]
         {
            X264,
@@ -30,7 +31,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
 
         public abstract int DefaultCRF { get; }
         public abstract int DefaultSpeedLevel { get; }
-        public virtual int MaxCRF { get; } = 63;
+        public abstract int MaxCRF { get; }
         public abstract int MaxSpeedLevel { get; }
         public virtual IEnumerable<FFmpegArgumentItem> ExtraArguments()
         {

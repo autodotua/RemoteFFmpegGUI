@@ -18,6 +18,9 @@ namespace SimpleFFmpegGUI.Dto
 
         public TimeSpan LastTime { get; set; }
         public double Percent { get; set; }
+        /// <summary>
+        /// 基础百分比，用于二压时，第二遍在在百分比的基础上加上0.5
+        /// </summary>
         public double BasePercent { get; set; } = 0;
 
         public void Update(TimeSpan VideoDuration)

@@ -10,6 +10,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
         public override int MaxSpeedLevel => 5;
         public override int DefaultSpeedLevel => 3;
         public override int DefaultCRF => 23;
+        public override int MaxCRF => 63;
 
         public override FFmpegArgumentItem Speed(int speed)
         {
@@ -21,7 +22,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
         }
         public override IEnumerable<FFmpegArgumentItem> ExtraArguments()
         {
-            yield return new FFmpegArgumentItem("row-mt","1");
+            yield return new FFmpegArgumentItem("row-mt", "1");
         }
     }
 

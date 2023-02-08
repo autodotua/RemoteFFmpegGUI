@@ -47,6 +47,7 @@
                         Grid.Row="2"
                         Height="40"
                         ItemsSource="{Binding ChannelOutputStrategies}"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                         SelectedItem="{Binding VideoOutputStrategy}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -66,6 +67,7 @@
                         Grid.Row="2"
                         Grid.Column="2"
                         ItemsSource="{Binding ChannelOutputStrategies}"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                         SelectedItem="{Binding AudioOutputStrategy}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -133,7 +135,7 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />
-                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="8" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
@@ -175,10 +177,10 @@
                             x:Name="sldPreset"
                             Grid.Row="2"
                             Grid.Column="2"
-                            Margin="0,0,36,0"
+                            Margin="36,0,36,0"
                             AutoToolTipPlacement="TopLeft"
                             IsSnapToTickEnabled="True"
-                            Maximum="8"
+                            Maximum="{Binding Video.MaxPreset}"
                             Minimum="0"
                             TickFrequency="1"
                             TickPlacement="BottomRight"
@@ -186,9 +188,15 @@
                         <Label
                             Grid.Row="2"
                             Grid.Column="2"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Content="慢" />
+                        <Label
+                            Grid.Row="2"
+                            Grid.Column="2"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Content="{Binding Video.Preset, Converter={StaticResource Int2StringConverter}, ConverterParameter=0:很慢;1:慢;2:较慢;3:平衡;4:较快;5:快;6:很快;7:超快;8:极快}" />
+                            Content="快" />
                         <!--  CRF  -->
                         <CheckBox
                             Grid.Row="4"
@@ -197,21 +205,27 @@
                         <Slider
                             Grid.Row="4"
                             Grid.Column="2"
-                            Margin="0,0,36,0"
+                            Margin="36,0,36,0"
                             AutoToolTipPlacement="TopLeft"
                             IsEnabled="{Binding Video.EnableCrf}"
-                            IsSnapToTickEnabled="True"
-                            Maximum="40"
-                            Minimum="10"
-                            TickFrequency="1"
+                            Maximum="{Binding Video.MaxCRF}"
+                            Minimum="0"
+                            TickFrequency="5"
                             TickPlacement="BottomRight"
                             Value="{Binding Video.Crf}" />
                         <Label
                             Grid.Row="4"
                             Grid.Column="2"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Content="清晰"
+                            IsEnabled="{Binding Video.EnableCrf}" />
+                        <Label
+                            Grid.Row="4"
+                            Grid.Column="2"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Content="{Binding Video.Crf}"
+                            Content="模糊"
                             IsEnabled="{Binding Video.EnableCrf}" />
                         <!--  2Pass  -->
                         <CheckBox

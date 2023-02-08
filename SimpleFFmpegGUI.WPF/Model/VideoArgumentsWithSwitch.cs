@@ -1,6 +1,8 @@
 ﻿using FzLib;
+using SimpleFFmpegGUI.FFmpegLib;
 using SimpleFFmpegGUI.Model;
 using System.ComponentModel;
+using System.Linq;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
@@ -28,6 +30,13 @@ namespace SimpleFFmpegGUI.WPF.Model
                 case nameof(EnableCrf) when EnableCrf:
                     TwoPass = false;
                     EnableAverageBitrate = false;
+                    break;
+                case nameof(Code):
+                    var codec = VideoCodec.VideoCodecs.FirstOrDefault(p => p.Name == Code) ?? VideoCodec.General;
+                    MaxPreset = codec.MaxSpeedLevel;
+                    Preset = codec.DefaultSpeedLevel;
+                    MaxCRF = codec.MaxCRF;
+                    Crf = codec.DefaultCRF;
                     break;
             }
         }
@@ -137,6 +146,18 @@ namespace SimpleFFmpegGUI.WPF.Model
             }
         }
 
+        private int maxPreset;
+        public int MaxPreset
+        {
+            get => maxPreset;
+            set => this.SetValueAndNotify(ref maxPreset, value, nameof(MaxPreset));
+        }
+        private int maxCRF;
+        public int MaxCRF
+        {
+            get => maxCRF;
+            set => this.SetValueAndNotify(ref maxCRF, value, nameof(MaxCRF));
+        }
         public void Apply()
         {
             Crf = EnableCrf ? Crf : null;

@@ -9,6 +9,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
         public override string Lib => null;
         public override int MaxSpeedLevel => 10;
         public override string Name => null;
+        public override int MaxCRF => 63;
 
         public override FFmpegArgumentItem Speed(int speed)
         {

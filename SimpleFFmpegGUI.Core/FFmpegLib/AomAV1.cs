@@ -11,6 +11,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
         public override int MaxSpeedLevel => 8;
         public override int DefaultSpeedLevel => 5;
         public override int DefaultCRF => 28;
+        public override int MaxCRF => 63;
 
         public override FFmpegArgumentItem Speed(int speed)
         {
@@ -38,7 +39,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
                 }
             }
 
-            yield return new FFmpegArgumentItem("tiles", $"{best}x{threadCount/best}");
+            yield return new FFmpegArgumentItem("tiles", $"{best}x{threadCount / best}");
         }
     }
 
