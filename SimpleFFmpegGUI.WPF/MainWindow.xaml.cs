@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -214,7 +215,8 @@ namespace SimpleFFmpegGUI.WPF
                     .GetValues(typeof(TaskType))
                     .Cast<TaskType>()
                     .ToList()
-                    .Select(p => new SelectDialogItem(FzLib.WPF.Converters.DescriptionConverter.GetDescription(p)))
+                    .Select(p => new SelectDialogItem(GetAttributeValue<NameDescriptionAttribute,string>(p,p=>p.Name), 
+                        GetAttributeValue<NameDescriptionAttribute, string>(p, p => p.Description)))
                     .ToList();
                 items.Add(new SelectDialogItem("查询信息", "查看媒体的元数据信息"));
                 int typeCount = Enum.GetValues(typeof(TaskType)).Length;
@@ -234,6 +236,21 @@ namespace SimpleFFmpegGUI.WPF
                     AddNewTab<MediaInfoPage>().SetFile(files.First());
                 }
             }
+        }
+
+        public static TResult GetAttributeValue<T,TResult>(object obj,Func<T,TResult> valueConverter) where T:Attribute
+        {
+            MemberInfo[] member = obj.GetType().GetMember(obj.ToString());
+            if (member != null && member.Length != 0)
+            {
+                object[] customAttributes = member[0].GetCustomAttributes(typeof(T), inherit: false);
+                if (customAttributes != null && customAttributes.Length != 0)
+                {
+                    return valueConverter(customAttributes[0] as T);
+                }
+            }
+
+            throw new Exception();
         }
 
         protected override async void OnContentRendered(EventArgs e)

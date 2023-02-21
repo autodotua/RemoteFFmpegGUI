@@ -8,6 +8,7 @@
     xmlns:model="clr-namespace:SimpleFFmpegGUI.WPF.Model"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
+    x:Name="root"
     Title="编码测试 - FFmpeg 工具箱"
     Width="1400"
     Height="800"
@@ -45,7 +46,10 @@
                     Header="画面信噪比（比值，越高越好）" />
                 <Expander
                     x:Name="grpCpuUsage"
-                    Header="CPU占用率（百分比）"
+                    Header="CPU占用率（百分比）" />
+                <Expander
+                    x:Name="grpOutputSize"
+                    Header="输出大小（MB）"
                     IsExpanded="True" />
             </ui:SimpleStackPanel>
         </ScrollViewer>
@@ -65,7 +69,8 @@
                                     Background="Transparent"
                                     Click="SelectAllButton_Click"
                                     Content="全选"
-                                    Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />    <Button
+                                    Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                                <Button
                                     Background="Transparent"
                                     Click="SelectNoneButton_Click"
                                     Content="全不选"
@@ -121,17 +126,65 @@
                                 </DataGridTemplateColumn.CellEditingTemplate>
                             </DataGridTemplateColumn>
 
+
+                            <DataGridTemplateColumn
+                                Width="160"
+                                Header="CRF">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Margin="8,0"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding CRF}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <Slider
+                                            Margin="16,0"
+                                            AutoToolTipPlacement="TopLeft"
+                                            Maximum="{Binding MaxCRF}"
+                                            Minimum="0"
+                                            TickFrequency="5"
+                                            TickPlacement="BottomRight"
+                                            Value="{Binding CRF}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn
-                                Width="240"
+                                Binding="{Binding BitrateFactor}"
+                                Header="码率补偿因子" />
+                            <DataGridTextColumn
+                                Width="160"
                                 Binding="{Binding ExtraArguments, UpdateSourceTrigger=PropertyChanged}"
                                 Header="额外参数" />
                         </DataGrid.Columns>
                     </DataGrid>
-
                 </GroupBox>
-                <DockPanel>
+
+
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox
+                        Width="160"
+                        ui:ControlHelper.Header="质量控制模式"
+                        SelectedIndex="{Binding QCMode}">
+                        <ComboBoxItem>平均码率</ComboBoxItem>
+                        <ComboBoxItem>CRF恒定质量</ComboBoxItem>
+                    </ComboBox>
+                    <TextBox
+                        Grid.Column="2"
+                        ui:ControlHelper.Header="测试视频"
+                        Text="{Binding TestVideo}" />
                     <Button
-                        Margin="12,0"
+                        Grid.Column="4"
                         VerticalAlignment="Bottom"
                         Click="BrowseTestVideoButton_Click"
                         DockPanel.Dock="Right">
@@ -139,10 +192,7 @@
                             <ui:SymbolIcon Symbol="BrowsePhotos" />
                         </Button.Content>
                     </Button>
-                    <TextBox
-                        ui:ControlHelper.Header="测试视频"
-                        Text="{Binding TestVideo}" />
-                </DockPanel>
+                </Grid>
 
             </ui:SimpleStackPanel>
             <ui:SimpleStackPanel
@@ -159,31 +209,53 @@
                     <Run>不同分辨率之间的分数无关。</Run>
                 </TextBlock>
                 <TextBlock Text="{Binding Message}" />
-                <ProgressBar
-                    Maximum="1"
-                    Minimum="0"
-                    Value="{Binding DetailProgress}" />
-                <ProgressBar
-                    Maximum="{Binding MaxProgress}"
-                    Minimum="0"
-                    Value="{Binding Progress}" />
-                <ui:SimpleStackPanel
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal"
-                    Spacing="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <ProgressBar
+                            Maximum="1"
+                            Minimum="0"
+                            Value="{Binding DetailProgress}" />
+                        <ProgressBar
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Maximum="{Binding MaxProgress}"
+                            Minimum="0"
+                            Value="{Binding Progress}" />
+                    </Grid>
                     <Button
+                        Grid.Column="2"
+                        Width="84"
+                        HorizontalAlignment="Stretch"
                         Click="ExportButton_Click"
                         Content="导出"
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
+                        Grid.Column="4"
+                        Width="84"
+                        HorizontalAlignment="Stretch"
                         Click="StopButton_Click"
                         Content="停止测试"
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}}" />
                     <Button
+                        Grid.Column="4"
+                        Width="84"
+                        HorizontalAlignment="Stretch"
                         Click="StartButton_Click"
                         Content="开始测试"
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
-                </ui:SimpleStackPanel>
+
+                </Grid>
             </ui:SimpleStackPanel>
         </DockPanel>
     </Grid>

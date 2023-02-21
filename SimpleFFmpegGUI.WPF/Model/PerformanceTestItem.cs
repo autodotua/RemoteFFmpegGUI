@@ -10,11 +10,27 @@ using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
-    public class PerformanceTestCodecParameter
+    public class PerformanceTestCodecParameter:INotifyPropertyChanged
     {
+        private double bitrateFacor = 1;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public double BitrateFactor
+        {
+            get => bitrateFacor;
+            set
+            {
+                if (value < 0.5) value = 0.5;
+                if (value > 2) value = 2;
+                this.SetValueAndNotify(ref bitrateFacor, value, nameof(BitrateFactor));
+            }
+        }
+
         public int CpuSpeed { get; set; }
+        public int CRF { get; set; }
         public string ExtraArguments { get; set; }
         public int MaxCpuSpeed { get; set; }
+        public int MaxCRF { get; set; }
         public string Name { get; set; }
     }
 
@@ -23,6 +39,7 @@ namespace SimpleFFmpegGUI.WPF.Model
     {
         private double cpu;
         private bool isChecked;
+        private double outputSize;
         private TimeSpan processDuration;
         private double psnr;
         private double score;
@@ -56,6 +73,12 @@ namespace SimpleFFmpegGUI.WPF.Model
             get => isChecked;
             set => this.SetValueAndNotify(ref isChecked, value, nameof(IsChecked));
         }
+        public double OutputSize
+        {
+            get => outputSize;
+            set => this.SetValueAndNotify(ref outputSize, value, nameof(OutputSize));
+        }
+
         public TimeSpan ProcessDuration
         {
             get => processDuration;
@@ -85,6 +108,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             PSNR = 0;
             VMAF = 0;
             CpuUsage = 0;
+            OutputSize= 0;
         }
     }
 

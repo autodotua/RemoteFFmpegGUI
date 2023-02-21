@@ -116,6 +116,7 @@ namespace SimpleFFmpegGUI.WPF
         public bool WindowMaximum { get; set; } = false;
 
         public string TestVideo { get; set; }
+        public int TestQCMode { get; set; } = 0;
         public PerformanceTestLine[] TestItems { get; set; }
         public PerformanceTestCodecParameter[] TestCodecs { get; set; }
 
