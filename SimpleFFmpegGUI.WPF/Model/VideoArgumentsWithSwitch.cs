@@ -16,6 +16,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             AverageBitrate = 10;
             MaxBitrate = 20;
             MaxBitrateBuffer = 2;
+            VideoArgumentsWithSwitch_PropertyChanged(this, new PropertyChangedEventArgs(nameof(Code)));
             PropertyChanged += VideoArgumentsWithSwitch_PropertyChanged;
         }
 
