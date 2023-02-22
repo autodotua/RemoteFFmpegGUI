@@ -2,11 +2,13 @@
     x:Class="SimpleFFmpegGUI.WPF.TestWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:SimpleFFmpegGUI.WPF.Model"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
+    xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     x:Name="root"
     Title="编码测试 - FFmpeg 工具箱"
@@ -16,7 +18,6 @@
     ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
     Closing="Window_Closing"
-    ResizeMode="NoResize"
     ShowInTaskbar="False"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
@@ -26,7 +27,7 @@
             <ColumnDefinition Width="16" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <ScrollViewer>
+        <ScrollViewer c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}">
             <ui:SimpleStackPanel
                 Orientation="Vertical"
                 Spacing="12">
@@ -53,151 +54,156 @@
                     IsExpanded="True" />
             </ui:SimpleStackPanel>
         </ScrollViewer>
-        <DockPanel Grid.Column="2">
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="16" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ScrollViewer c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}">
+                <ui:SimpleStackPanel
+                    IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                    Spacing="8">
+                    <GroupBox x:Name="grpTestItems">
+                        <GroupBox.HeaderTemplate>
+                            <DataTemplate>
+                                <ui:SimpleStackPanel
+                                    Orientation="Horizontal"
+                                    Spacing="16">
+                                    <TextBlock Text="测试项目" />
+                                    <Button
+                                        Background="Transparent"
+                                        Click="SelectAllButton_Click"
+                                        Content="全选"
+                                        Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                                    <Button
+                                        Background="Transparent"
+                                        Click="SelectNoneButton_Click"
+                                        Content="全不选"
+                                        Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                                </ui:SimpleStackPanel>
+                            </DataTemplate>
+                        </GroupBox.HeaderTemplate>
+                    </GroupBox>
+
+                    <GroupBox Header="编码设置">
+                        <DataGrid
+                            AutoGenerateColumns="False"
+                            CanUserAddRows="False"
+                            CanUserDeleteRows="False"
+                            CanUserReorderColumns="False"
+                            CanUserResizeRows="False"
+                            CanUserSortColumns="False"
+                            HeadersVisibility="Column"
+                            IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                            ItemsSource="{Binding Codecs}"
+                            SelectionUnit="Cell">
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn
+                                    Binding="{Binding Name}"
+                                    IsReadOnly="True" />
+                                <DataGridTemplateColumn
+                                    Width="200"
+                                    Header="速度预设">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                Margin="8,0"
+                                                VerticalAlignment="Center">
+                                                <Run Text="{Binding CpuSpeed, Mode=OneWay}" />
+                                                <Run Text=" / " />
+                                                <Run Text="{Binding MaxCpuSpeed, Mode=OneWay}" />
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate>
+                                            <Slider
+                                                Margin="16,0"
+                                                AutoToolTipPlacement="TopLeft"
+                                                IsSnapToTickEnabled="True"
+                                                Maximum="{Binding MaxCpuSpeed}"
+                                                Minimum="0"
+                                                TickFrequency="1"
+                                                TickPlacement="BottomRight"
+                                                Value="{Binding CpuSpeed}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                </DataGridTemplateColumn>
+
+
+                                <DataGridTemplateColumn
+                                    Width="160"
+                                    Header="CRF">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                Margin="8,0"
+                                                VerticalAlignment="Center"
+                                                Text="{Binding CRF}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate>
+                                            <Slider
+                                                Margin="16,0"
+                                                AutoToolTipPlacement="TopLeft"
+                                                Maximum="{Binding MaxCRF}"
+                                                Minimum="0"
+                                                TickFrequency="5"
+                                                TickPlacement="BottomRight"
+                                                Value="{Binding CRF}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn
+                                    Binding="{Binding BitrateFactor}"
+                                    Header="码率补偿因子" />
+                                <DataGridTextColumn
+                                    Width="160"
+                                    Binding="{Binding ExtraArguments, UpdateSourceTrigger=PropertyChanged}"
+                                    Header="额外参数" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox
+                            Width="160"
+                            ui:ControlHelper.Header="质量控制模式"
+                            SelectedIndex="{Binding QCMode}">
+                            <ComboBoxItem>平均码率</ComboBoxItem>
+                            <ComboBoxItem>CRF恒定质量</ComboBoxItem>
+                        </ComboBox>
+                        <TextBox
+                            Grid.Column="2"
+                            ui:ControlHelper.Header="测试视频"
+                            Text="{Binding TestVideo}" />
+                        <Button
+                            Grid.Column="4"
+                            VerticalAlignment="Bottom"
+                            Click="BrowseTestVideoButton_Click"
+                            DockPanel.Dock="Right">
+                            <Button.Content>
+                                <ui:SymbolIcon Symbol="BrowsePhotos" />
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+
+                </ui:SimpleStackPanel>
+            </ScrollViewer>
             <ui:SimpleStackPanel
-                DockPanel.Dock="Top"
-                IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
-                Spacing="8">
-                <GroupBox x:Name="grpTestItems">
-                    <GroupBox.HeaderTemplate>
-                        <DataTemplate>
-                            <ui:SimpleStackPanel
-                                Orientation="Horizontal"
-                                Spacing="16">
-                                <TextBlock Text="测试项目" />
-                                <Button
-                                    Background="Transparent"
-                                    Click="SelectAllButton_Click"
-                                    Content="全选"
-                                    Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
-                                <Button
-                                    Background="Transparent"
-                                    Click="SelectNoneButton_Click"
-                                    Content="全不选"
-                                    Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
-                            </ui:SimpleStackPanel>
-                        </DataTemplate>
-                    </GroupBox.HeaderTemplate>
-                </GroupBox>
-
-                <GroupBox Header="编码设置">
-                    <DataGrid
-                        AutoGenerateColumns="False"
-                        CanUserAddRows="False"
-                        CanUserDeleteRows="False"
-                        CanUserReorderColumns="False"
-                        CanUserResizeRows="False"
-                        CanUserSortColumns="False"
-                        HeadersVisibility="Column"
-                        IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
-                        ItemsSource="{Binding Codecs}"
-                        SelectionUnit="Cell">
-
-                        <DataGrid.Columns>
-                            <DataGridTextColumn
-                                Binding="{Binding Name}"
-                                IsReadOnly="True" />
-                            <DataGridTemplateColumn
-                                Width="200"
-                                Header="速度预设">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock
-                                            Margin="8,0"
-                                            VerticalAlignment="Center">
-                                            <Run Text="{Binding CpuSpeed, Mode=OneWay}" />
-                                            <Run Text=" / " />
-                                            <Run Text="{Binding MaxCpuSpeed, Mode=OneWay}" />
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                                <DataGridTemplateColumn.CellEditingTemplate>
-                                    <DataTemplate>
-                                        <Slider
-                                            Margin="16,0"
-                                            AutoToolTipPlacement="TopLeft"
-                                            IsSnapToTickEnabled="True"
-                                            Maximum="{Binding MaxCpuSpeed}"
-                                            Minimum="0"
-                                            TickFrequency="1"
-                                            TickPlacement="BottomRight"
-                                            Value="{Binding CpuSpeed}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellEditingTemplate>
-                            </DataGridTemplateColumn>
-
-
-                            <DataGridTemplateColumn
-                                Width="160"
-                                Header="CRF">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock
-                                            Margin="8,0"
-                                            VerticalAlignment="Center"
-                                            Text="{Binding CRF}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                                <DataGridTemplateColumn.CellEditingTemplate>
-                                    <DataTemplate>
-                                        <Slider
-                                            Margin="16,0"
-                                            AutoToolTipPlacement="TopLeft"
-                                            Maximum="{Binding MaxCRF}"
-                                            Minimum="0"
-                                            TickFrequency="5"
-                                            TickPlacement="BottomRight"
-                                            Value="{Binding CRF}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellEditingTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn
-                                Binding="{Binding BitrateFactor}"
-                                Header="码率补偿因子" />
-                            <DataGridTextColumn
-                                Width="160"
-                                Binding="{Binding ExtraArguments, UpdateSourceTrigger=PropertyChanged}"
-                                Header="额外参数" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </GroupBox>
-
-
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="16" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="8" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <ComboBox
-                        Width="160"
-                        ui:ControlHelper.Header="质量控制模式"
-                        SelectedIndex="{Binding QCMode}">
-                        <ComboBoxItem>平均码率</ComboBoxItem>
-                        <ComboBoxItem>CRF恒定质量</ComboBoxItem>
-                    </ComboBox>
-                    <TextBox
-                        Grid.Column="2"
-                        ui:ControlHelper.Header="测试视频"
-                        Text="{Binding TestVideo}" />
-                    <Button
-                        Grid.Column="4"
-                        VerticalAlignment="Bottom"
-                        Click="BrowseTestVideoButton_Click"
-                        DockPanel.Dock="Right">
-                        <Button.Content>
-                            <ui:SymbolIcon Symbol="BrowsePhotos" />
-                        </Button.Content>
-                    </Button>
-                </Grid>
-
-            </ui:SimpleStackPanel>
-            <ui:SimpleStackPanel
+                Grid.Row="2"
                 VerticalAlignment="Bottom"
-                DockPanel.Dock="Bottom"
                 Spacing="8">
                 <TextBlock Opacity="0.7">
                     <Run>本测试将模拟不同编码格式和分辨率下视频编码的速度，单位为帧每秒。</Run>
@@ -213,6 +219,10 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="8" />
                         <ColumnDefinition Width="Auto" />
@@ -237,18 +247,32 @@
                         Grid.Column="2"
                         Width="84"
                         HorizontalAlignment="Stretch"
+                        Click="ClearButton_Click"
+                        Content="重置"
+                        Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                    <Button
+                        Grid.Column="4"
+                        Width="84"
+                        HorizontalAlignment="Stretch"
+                        Click="OpenDirButton_Click"
+                        Content="打开目录"
+                        Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                    <Button
+                        Grid.Column="6"
+                        Width="84"
+                        HorizontalAlignment="Stretch"
                         Click="ExportButton_Click"
                         Content="导出"
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
-                        Grid.Column="4"
+                        Grid.Column="8"
                         Width="84"
                         HorizontalAlignment="Stretch"
                         Click="StopButton_Click"
                         Content="停止测试"
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}}" />
                     <Button
-                        Grid.Column="4"
+                        Grid.Column="8"
                         Width="84"
                         HorizontalAlignment="Stretch"
                         Click="StartButton_Click"
@@ -257,6 +281,6 @@
 
                 </Grid>
             </ui:SimpleStackPanel>
-        </DockPanel>
+        </Grid>
     </Grid>
 </Window>

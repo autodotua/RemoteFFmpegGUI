@@ -52,6 +52,9 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
+        /// <summary>
+        /// 动态创建表格
+        /// </summary>
         private void CreateDataGrids()
         {
             grpSpeed.Content = GetDataGrid(nameof(PerformanceTestItem.FPS), "0.00");
@@ -108,7 +111,14 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        private async Task<int> CreateRefVideosAsync(string input, string[] sizes)
+        /// <summary>
+        /// 创建各分辨率的
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="sizes"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private async Task CreateRefVideosAsync(string input, string[] sizes)
         {
             var task = new TaskInfo()
             {
@@ -133,7 +143,6 @@ namespace SimpleFFmpegGUI.WPF
                 },
                 Type = TaskType.Code,
             };
-            int count = 0;
             for (int i = 0; i < sizes.Length; i++)
             {
                 var size = sizes[i];
@@ -142,11 +151,14 @@ namespace SimpleFFmpegGUI.WPF
                 {
                     continue;
                 }
-                count++;
                 ViewModel.Message = $"正在准备{size.Split(':')[1]}P素材";
                 task.Arguments.Video.Size = size;
-                task.Output = Path.GetFullPath($"test/{size.Split(':')[1]}P");
+                task.Output = Path.GetFullPath($"{TestDir}/{size.Split(':')[1]}P.mp4");
 
+                if (File.Exists(task.Output))
+                {
+                    continue;
+                }
                 runningFFmpeg = new FFmpegManager(task);
                 runningFFmpeg.StatusChanged += (s, e) =>
                 {
@@ -172,9 +184,7 @@ namespace SimpleFFmpegGUI.WPF
                 {
                     runningFFmpeg = null;
                 }
-                ViewModel.Progress += 1;
             }
-            return count;
         }
 
         private void CreateTestItemsDataGrid()
@@ -238,51 +248,30 @@ namespace SimpleFFmpegGUI.WPF
             }
             try
             {
-                Dictionary<string, Func<PerformanceTestItem, double>> key2Func = new Dictionary<string, Func<PerformanceTestItem, double>>()
-                {
-                    ["FPS"] = p => p.FPS,
-                    ["SSIM"] = p => p.SSIM,
-                    ["VMAF"] = p => p.VMAF,
-                    ["PSNR"] = p => p.PSNR,
-                    ["CPU"] = p => p.CpuUsage,
 
-                };
                 StringBuilder str = new StringBuilder();
-                str.AppendLine("Size," + string.Join(',', VideoCodec.VideoCodecs.Select(p => p.Name)));
-
-                foreach (var key in key2Func.Keys)
+                if (!File.Exists(path))
                 {
-                    str.AppendLine(key);
-                    foreach (var test in ViewModel.Tests)
-                    {
-                        str.Append(test.Header);
-                        foreach (var item in test.Items)
-                        {
-                            str.Append(',');
-                            str.Append(key2Func[key](item));
-                        }
-                        str.AppendLine();
-                    }
+                    str.AppendLine("Codec,Size,Mbitrate,BitrateFactor,CRF,Speed,Extra,FPS,VMAF,SSIM,PSNR,CPU,Duration,Video");
                 }
-                File.WriteAllText($"{Path.GetDirectoryName(path)}\\{Path.GetFileNameWithoutExtension(path)}_分指标.csv", str.ToString(), new UTF8Encoding(true));
-
-
-                str.Clear();
-                str.AppendLine("Codec,Size,Mbitrate,Speed,Extra,FPS,VMAF,SSIM,PSNR,CPU,Duration,Video");
-
                 foreach (var test in ViewModel.Tests)
                 {
                     foreach (var item in test.Items.Where(p => p.FPS > 0))
                     {
+                        var codec = ViewModel.Codecs.First(p => p.Name == item.Codec);
                         str.Append(item.Codec ?? "")
                             .Append(',')
                             .Append(test.Header)
                             .Append(',')
-                            .Append(test.MBitrate)
+                            .Append(ViewModel.QCMode == 0 ? test.MBitrate : "")
                             .Append(',')
-                            .Append(ViewModel.Codecs.First(p => p.Name == item.Codec).CpuSpeed)
+                            .Append(ViewModel.QCMode == 0 ? codec.BitrateFactor : "")
                             .Append(',')
-                            .Append(ViewModel.Codecs.First(p => p.Name == item.Codec).ExtraArguments ?? "")
+                            .Append(ViewModel.QCMode == 1 ? codec.CRF : "")
+                            .Append(',')
+                            .Append(codec.CpuSpeed)
+                            .Append(',')
+                            .Append(codec.ExtraArguments ?? "")
                             .Append(',')
                             .Append(item.FPS)
                             .Append(',')
@@ -303,8 +292,14 @@ namespace SimpleFFmpegGUI.WPF
                     }
                 }
 
-
-                File.WriteAllText($"{Path.GetDirectoryName(path)}\\{Path.GetFileNameWithoutExtension(path)}_详细信息.csv", str.ToString(), new UTF8Encoding(true));
+                if (!File.Exists(path))
+                {
+                    File.WriteAllText(path, str.ToString(), new UTF8Encoding(true));
+                }
+                else
+                {
+                    File.AppendAllText(path, str.ToString(), new UTF8Encoding(true));
+                }
             }
             catch (Exception ex)
             {
@@ -392,14 +387,10 @@ namespace SimpleFFmpegGUI.WPF
         /// <exception cref="Exception"></exception>
         private async Task TestAsync(string input)
         {
-            if (Directory.Exists(TestDir))
-            {
-                Directory.Delete(TestDir, true);
-            }
             var media = await MediaInfoManager.GetMediaInfoAsync(input, false);
             var frameCount = media.VideoStreams[0].AvgFrameRate * media.VideoStreams[0].Duration.TotalSeconds;
-            int count = await CreateRefVideosAsync(input, sizes);
-            ViewModel.MaxProgress = ViewModel.Tests.Sum(p => p.Items.Count(q => q.IsChecked)) + count;
+            await CreateRefVideosAsync(input, sizes);
+            ViewModel.MaxProgress = ViewModel.Tests.Sum(p => p.Items.Count(q => q.IsChecked));
             if (stopping)
             {
                 return;
@@ -442,14 +433,15 @@ namespace SimpleFFmpegGUI.WPF
                     switch (ViewModel.QCMode)//平均码率
                     {
                         case 0:
-                            task.Arguments.Video.AverageBitrate = test.MBitrate*codec.BitrateFactor;
+                            task.Arguments.Video.AverageBitrate = test.MBitrate * codec.BitrateFactor;
                             break;
                         default:
                             task.Arguments.Video.Crf = codec.CRF;
                             break;
                     }
                     task.Arguments.Extra = codec.ExtraArguments;
-                    task.Output = Path.GetFullPath($"test/{codec.Name}-{sizeTexts[j]}.mp4");
+                    string qctext = ViewModel.QCMode == 0 ? $"bitrate={test.MBitrate}M&factor={codec.BitrateFactor}" : $"crf={codec.CRF}";
+                    task.Output = Path.GetFullPath($"{TestDir}/codec={codec.Name}&size={sizeTexts[j]}&speed={codec.CpuSpeed}&{qctext}.mp4");
 
                     runningFFmpeg = new FFmpegManager(task);
                     runningFFmpeg.StatusChanged += (s, e) =>
@@ -541,7 +533,14 @@ namespace SimpleFFmpegGUI.WPF
                     string message = qualityTask.Message;
                     item.SSIM = double.Parse(Regex.Match(message, @"All:[0-9\.]+").Value[4..]);
                     item.PSNR = double.Parse(Regex.Match(message, @"average:[0-9\.]+").Value[8..]);
-                    item.VMAF = double.Parse(Regex.Match(message, @"VMAF score: [0-9\.]+").Value[12..]);
+                    try
+                    {
+                        item.VMAF = double.Parse(Regex.Match(message, @"VMAF score: [0-9\.]+").Value[12..]);
+                    }
+                    catch
+                    {
+                        throw new Exception("未放置VMAF模型文件");
+                    }
                 }
             }
         end:
@@ -555,6 +554,31 @@ namespace SimpleFFmpegGUI.WPF
             if (ViewModel.IsTesting)
             {
                 e.Cancel = true;
+            }
+        }
+
+        private void OpenDirButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Directory.Exists(TestDir))
+            {
+                Process.Start("explorer.exe", Path.GetFullPath(TestDir));
+            }
+            else
+            {
+                this.CreateMessage().QueueError("测试目录不存在");
+            }
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Directory.Exists(TestDir))
+            {
+                FzLib.IO.WindowsFileSystem.DeleteFileOrFolder(TestDir, false, true);
+                this.CreateMessage().QueueSuccess("已删除测试目录");
+            }
+            else
+            {
+                this.CreateMessage().QueueSuccess("测试目录不存在，无需重置");
             }
         }
     }
