@@ -97,10 +97,12 @@
                             IsChecked="{Binding Format.EnableFormat}" />
                         <ComboBox
                             Grid.Column="2"
+                            IsEditable="True"
                             IsEnabled="{Binding Format.EnableFormat}"
                             ItemsSource="{Binding Formats}"
                             SelectedValue="{Binding Format.Format}"
-                            SelectedValuePath="Name">
+                            SelectedValuePath="Name"
+                            TextSearch.TextPath="Extension">
 
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>

@@ -24,6 +24,8 @@ namespace SimpleFFmpegGUI.Manager
             new Regex("Error.*",RegexOptions.Compiled),
             new Regex(@"\[.*\] *Unable.*",RegexOptions.Compiled),
             new Regex(@".*Invalid.*",RegexOptions.Compiled|RegexOptions.IgnoreCase),
+            new Regex(@"Could find no file.*",RegexOptions.Compiled|RegexOptions.IgnoreCase),
+            new Regex(@".* error",RegexOptions.Compiled|RegexOptions.IgnoreCase),
         };
 
         private static readonly Regex rPSNR = new Regex(@"PSNR (([yuvaverageminmax]+:[0-9\. ]+)+)", RegexOptions.Compiled);

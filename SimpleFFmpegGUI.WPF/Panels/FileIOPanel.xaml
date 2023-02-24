@@ -44,7 +44,7 @@
                     <DataTemplate>
                         <Border
                             Margin="4"
-                            Padding="10,6,10,4"
+                            Padding="10,6,10,10"
                             BorderBrush="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
                             BorderThickness="0,0,0,2">
                             <Grid>
@@ -54,6 +54,9 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="8" />
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="8" />
+                                    <RowDefinition Height="*" />
+                                    <!--  如果是Auto会抖动  -->
                                 </Grid.RowDefinitions>
                                 <TextBlock Text="{Binding Index, StringFormat=输入文件 {0}}" />
                                 <Grid Grid.Row="2">
@@ -98,39 +101,129 @@
                                         <ColumnDefinition Width="60" />
                                         <ColumnDefinition Width="8" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />
-                                        <!--<RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />-->
-                                    </Grid.RowDefinitions>
-
+                                    <Grid.Resources>
+                                        <sys:String x:Key="placehoder">时:分:秒</sys:String>
+                                        <sys:String x:Key="tooltip">
+                                            格式：时:分:秒.毫秒，例如12:34:56.789表示12小时34分56.789秒
+                                        </sys:String>
+                                    </Grid.Resources>
                                     <CheckBox
                                         Content="开始"
                                         IsChecked="{Binding EnableFrom}" />
                                     <TextBox
                                         Grid.Column="2"
-                                        ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
-                                        Text="{Binding From, Converter={StaticResource TimeSpanMMConverter}}" />
+                                        ui:ControlHelper.PlaceholderText="{StaticResource placehoder}"
+                                        Text="{Binding From, Converter={StaticResource TimeSpanMMConverter}}"
+                                        ToolTip="{StaticResource tooltip}" />
                                     <CheckBox
                                         Grid.Column="4"
                                         Content="结束"
                                         IsChecked="{Binding EnableTo}" />
                                     <TextBox
                                         Grid.Column="6"
-                                        ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
-                                        Text="{Binding To, Converter={StaticResource TimeSpanMMConverter}}" />
-                                    <!--<CheckBox
-                                        Grid.Row="4"
-                                        Content="经过"
-                                        IsChecked="{Binding EnableDuration}" />
-                                    <TextBox
-                                        Grid.Row="4" Grid.ColumnSpan="99"
+                                        ui:ControlHelper.PlaceholderText="{StaticResource placehoder}"
+                                        Text="{Binding To, Converter={StaticResource TimeSpanMMConverter}}"
+                                        ToolTip="{StaticResource tooltip}" />
+
+                                    <ToggleButton
+                                        Grid.Column="8"
+                                        Content="…">
+                                        <ToggleButton.Triggers>
+                                            <EventTrigger RoutedEvent="ToggleButton.Unchecked">
+                                                <BeginStoryboard>
+                                                    <Storyboard x:Name="HideStackPanel">
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetName="grdMore"
+                                                            Storyboard.TargetProperty="LayoutTransform.ScaleY"
+                                                            To="0"
+                                                            Duration="0:0:0.3">
+                                                            <DoubleAnimation.EasingFunction>
+                                                                <CubicEase EasingMode="EaseInOut" />
+                                                            </DoubleAnimation.EasingFunction>
+                                                        </DoubleAnimation>
+                                                        <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Content">
+                                                            <DiscreteObjectKeyFrame
+                                                                KeyTime="0:0:0"
+                                                                Value="More" />
+                                                        </ObjectAnimationUsingKeyFrames>-->
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                            <EventTrigger RoutedEvent="ToggleButton.Checked">
+                                                <BeginStoryboard>
+                                                    <Storyboard x:Name="ShowStackPanel">
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetName="grdMore"
+                                                            Storyboard.TargetProperty="LayoutTransform.ScaleY"
+                                                            To="1"
+                                                            Duration="0:0:0.3">
+                                                            <DoubleAnimation.EasingFunction>
+                                                                <CubicEase EasingMode="EaseInOut" />
+                                                            </DoubleAnimation.EasingFunction>
+                                                        </DoubleAnimation>
+                                                        <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Content">
+                                                            <DiscreteObjectKeyFrame
+                                                                KeyTime="0:0:0" Value=""/>
+                                                        </ObjectAnimationUsingKeyFrames>-->
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </ToggleButton.Triggers>
+                                    </ToggleButton>
+                                </Grid>
+                                <Grid
+                                    x:Name="grdMore"
+                                    Grid.Row="99">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="8" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="8" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.LayoutTransform>
+                                        <ScaleTransform ScaleY="0" />
+                                    </Grid.LayoutTransform>
+                                    <CheckBox
+                                        Grid.ColumnSpan="99"
+                                        Content="输入为图像帧序列"
+                                        IsChecked="{Binding Image2}">
+                                        <CheckBox.ToolTip>
+                                            <TextBlock>
+                                                <Run>图像序列文件名示例：</Run>
+                                                <LineBreak />
+                                                <Run>abc1.jpg, abc2.jpg, ..., abc379.jpg:</Run>
+                                                <Run FontWeight="Bold">abc%d.jpg</Run>
+                                                <LineBreak />
+                                                <Run>abc001.png, ..., abc379.png:</Run>
+                                                <Run FontWeight="Bold">abc%03d.jpg</Run>
+                                            </TextBlock>
+                                        </CheckBox.ToolTip>
+                                    </CheckBox>
+                                    <TextBlock
+                                        Grid.Row="2"
+                                        VerticalAlignment="Center"
+                                        Text="输入帧率" />
+                                    <ui:NumberBox
+                                        Grid.Row="2"
                                         Grid.Column="2"
-                                        ui:ControlHelper.PlaceholderText="时:分:秒.毫秒"
-                                        Text="{Binding Duration, Converter={StaticResource TimeSpanMMConverter}}" />-->
+                                        Value="{Binding Framerate}" />
+                                    <TextBlock
+                                        Grid.Row="4"
+                                        VerticalAlignment="Center"
+                                        Text="其他参数" />
+                                    <TextBox
+                                        Grid.Row="4"
+                                        Grid.Column="2"
+                                        Text="{Binding Extra}" />
                                 </Grid>
                             </Grid>
                         </Border>

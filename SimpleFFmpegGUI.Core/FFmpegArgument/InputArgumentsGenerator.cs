@@ -22,6 +22,15 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             }
             arguments.Add(new FFmpegArgumentItem("f", format));
         }
+
+        public void Framerate(double? fps)
+        {
+            if (!fps.HasValue)
+            {
+                return;
+            }
+            arguments.Add(new FFmpegArgumentItem("framerate", fps.ToString()));
+        }
      
         public void Input(string file)
         {

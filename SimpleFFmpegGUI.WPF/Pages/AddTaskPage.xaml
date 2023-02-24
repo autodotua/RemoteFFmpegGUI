@@ -8,7 +8,7 @@
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:converters="clr-namespace:SimpleFFmpegGUI.WPF.Converters"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
     <Grid Margin="8,8,0,8">
@@ -36,9 +36,12 @@
                 IsEnabled="{Binding AllowChangeType}"
                 ItemsSource="{Binding TaskTypes}"
                 SelectedItem="{Binding Type}">
+                <ComboBox.Resources>
+                    <converters:NameDescriptionAttributeValueConverter x:Key="NameDescriptionAttributeValueConverter"/>
+                </ComboBox.Resources>
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
+                        <TextBlock Text="{Binding ., Converter={StaticResource NameDescriptionAttributeValueConverter}}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>

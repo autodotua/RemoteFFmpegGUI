@@ -50,6 +50,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             ig.To(ia.To);
             ig.Duration(ia.Duration);
             ig.Format(ia.Format);
+            ig.Framerate(ia.Framerate);
             ig.Input(ia.FilePath);
             return ia.Extra == null ? ig.GetArguments() : $"{ia.Extra}  {ig.GetArguments()}";
         }

@@ -7,6 +7,7 @@ using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.FFmpegLib;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
+using SimpleFFmpegGUI.WPF.Converters;
 using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections.Generic;
