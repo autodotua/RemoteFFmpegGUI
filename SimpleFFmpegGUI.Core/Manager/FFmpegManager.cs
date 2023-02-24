@@ -7,6 +7,7 @@ using SimpleFFmpegGUI.FFmpegArgument;
 using SimpleFFmpegGUI.FFmpegLib;
 using SimpleFFmpegGUI.Model;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -167,6 +168,8 @@ namespace SimpleFFmpegGUI.Manager
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
+       private static HashSet<char> invalidFileNameChars=Path.GetInvalidFileNameChars().ToHashSet();
+
         private static string GenerateOutputPath(TaskInfo task)
         {
             string output = task.Output.Trim();
@@ -179,17 +182,33 @@ namespace SimpleFFmpegGUI.Manager
                 }
                 output = task.Inputs[0].FilePath;
             }
+
+            //删除非法字符
+            string dir = Path.GetDirectoryName(output);
+            string filename = Path.GetFileName(output);
+            if (filename.Any(p => invalidFileNameChars.Contains(p)))
+            {
+                foreach (var c in invalidFileNameChars)
+                {
+                    filename = filename.Replace(c.ToString(), "");
+                }
+                output = Path.Combine(dir, filename);
+            }
+
+
+            //修改扩展名
             if (!string.IsNullOrEmpty(a?.Format))
             {
                 VideoFormat format = VideoFormat.Formats.Where(p => p.Name == a.Format || p.Extension == a.Format).FirstOrDefault();
                 if (format != null)
                 {
-                    string dir = Path.GetDirectoryName(output);
                     string name = Path.GetFileNameWithoutExtension(output);
                     string extension = format.Extension;
                     output = Path.Combine(dir, name + "." + extension);
                 }
             }
+            
+            //获取非重复文件名
             task.RealOutput = FileSystem.GetNoDuplicateFile(output);
             if (!new FileInfo(task.RealOutput).Directory.Exists)
             {
