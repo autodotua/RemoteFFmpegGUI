@@ -377,7 +377,7 @@ export default Vue.component("code-arguments", {
           name: "使用concat格式，不需要重新解码和编码，需要相同格式文件",
         },
       ],
-      videoCodes: ["自动", "H264", "H265", "VP9"],
+      videoCodes: ["自动", "H264", "H265", "VP9", "AV1 (aom)", "AV1 (SVT)"],
       audioCodes: ["自动", "AAC", "OPUS"],
       audioSamples: [8000, 16000, 32000, 44100, 48000, 96000],
       formats: [],

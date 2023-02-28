@@ -253,7 +253,7 @@ namespace SimpleFFmpegGUI.WPF
                 StringBuilder str = new StringBuilder();
                 if (!File.Exists(path))
                 {
-                    str.AppendLine("Codec,Size,Mbitrate,BitrateFactor,CRF,Speed,Extra,FPS,VMAF,SSIM,PSNR,CPU,Duration,Video");
+                    str.AppendLine("Codec,Resolution,Mbitrate,BitrateFactor,CRF,Speed,Extra,FPS,VMAF,SSIM,PSNR,CPU,Duration,OutputSize,Video");
                 }
                 foreach (var test in ViewModel.Tests)
                 {
@@ -285,6 +285,8 @@ namespace SimpleFFmpegGUI.WPF
                             .Append(item.CpuUsage)
                             .Append(',')
                             .Append(item.ProcessDuration.TotalSeconds)
+                            .Append(',')
+                            .Append(item.OutputSize)
                             .Append(',')
                             .Append('"')
                             .Append(ViewModel.TestVideo)
