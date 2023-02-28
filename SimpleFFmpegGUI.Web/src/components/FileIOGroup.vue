@@ -38,14 +38,33 @@
               label="结束"
               :time.sync="value.to"
             ></time-input>
-            <time-input
+            <!-- <time-input
               :enabled.sync="value.enableDuration"
               label="经过"
               :time.sync="value.duration"
             ></time-input>
             <a class="gray" v-if="value.enableTo && value.enableDuration"
               >同时设置“结束”和“经过”时间后，优先取经过时间</a
-            >
+            > -->
+          </div>
+          <div class="top12" v-if="showMore">
+            <el-checkbox v-model="value.image2">输入为图片序列</el-checkbox>
+            <a class="left24" v-show="value.image2">输入帧率：</a>
+            <el-input-number
+              v-show="value.image2"
+              v-model="value.framerate"
+              size="small"
+              :precision="3"
+              :min="1"
+              :max="120"
+            ></el-input-number>
+          </div>
+          <div class="top12" v-if="showMore">
+            <a >其他参数：</a>
+            <el-input
+              v-model="value.extra" class="width240"
+              size="small"
+            ></el-input>
           </div>
         </el-collapse-item>
       </el-collapse>
@@ -100,6 +119,9 @@ export default Vue.component("file-io-group", {
           from: 0,
           to: 0,
           duration: 0,
+          image2: false,
+          framerate: 30,
+          extra:""
         },
       ],
     };
@@ -116,6 +138,9 @@ export default Vue.component("file-io-group", {
     },
     showClip: {
       default: true,
+    },
+    showMore: {
+      default: false,
     },
     singleOutput: {
       default: false,
@@ -151,6 +176,9 @@ export default Vue.component("file-io-group", {
         from: 0,
         to: 0,
         duration: 0,
+        image2: false,
+        framerate: 30,
+        extra:""
       };
     },
     updateFile(file: string, index: number) {
@@ -175,6 +203,9 @@ export default Vue.component("file-io-group", {
             from: file.enableFrom ? file.from : null,
             to: file.enableTo ? file.to : null,
             duration: file.enableDuration ? file.duration : null,
+            image2:file.image2,
+            framerate:file.image2?file.framerate:null,
+            extra:file.extra
           });
         });
       return inputs;
@@ -193,6 +224,9 @@ export default Vue.component("file-io-group", {
 
           enableDuration: file.duration != null,
           duration: file.duration != null ? file.duration : null,
+          image2: file.image2,
+          framerate: file.framerate,
+          extra: file.extra
         });
       });
     },

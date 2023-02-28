@@ -5,8 +5,8 @@
         <a class="right12" v-if="isProcessing == false && hasSchedule"
           >已计划开始时间</a
         >
-        <el-date-picker 
-         v-if="isProcessing == false"
+        <el-date-picker
+          v-if="isProcessing == false"
           class="right12"
           v-model="scheduleTime"
           value-format="yyyy-MM-dd[T]HH:mm:ss[Z]"
@@ -100,6 +100,10 @@
               <div v-for="file in props.row.inputs" :key="file.filePath">
                 <a class="right24">
                   {{ file.filePath }}
+                  <br v-if="file.image2" />
+                  {{ file.image2 ? "图像序列，帧率为" + file.framerate : "" }}
+                  <br v-if="file.extra" />
+                  {{ file.extra ? "额外参数：" + file.extra : "" }}
                 </a>
                 <a v-if="file.from" class="right12"> 开始：{{ file.from }}s</a>
                 <a v-if="file.to" class="right12"> 结束：{{ file.to }}s</a>

@@ -5,6 +5,7 @@
       <FileIOGroup
         :inputs="files"
         :output="output"
+        :showMore="true"
         ref="io"
       ></FileIOGroup>
       <h2>参数</h2>

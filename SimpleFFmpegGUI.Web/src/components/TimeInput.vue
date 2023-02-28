@@ -15,7 +15,7 @@
       <el-col :span="1">
         <el-checkbox style="margin-top: 15px" v-model="isEnabled"></el-checkbox>
       </el-col>
-      <el-col :sm="22" :md="10" class="top12">
+      <el-col :xs="22" :sm="22" :md="10" class="top12 left12">
         <el-input-number
           :disabled="!isEnabled"
           v-model="h"
@@ -128,7 +128,7 @@ export default Vue.component("time-input", {
       this.h = h;
       this.m = m;
       this.s = s;
-      this.isEnabled=true;
+      this.isEnabled = true;
     },
   },
   components: {},

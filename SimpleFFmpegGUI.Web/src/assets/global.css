@@ -4,6 +4,12 @@
 .right12 {
     margin-right: 12px;
 }
+.left24 {
+    margin-left: 24px;
+}
+.left12 {
+    margin-left: 12px;
+}
 
 .bottom12 {
     margin-bottom: 12px;
@@ -25,6 +31,10 @@
     margin-top: 12px;
 }
 
+
+.width240 {
+    width: 240px;
+}
 
 .width160 {
     width: 160px;
