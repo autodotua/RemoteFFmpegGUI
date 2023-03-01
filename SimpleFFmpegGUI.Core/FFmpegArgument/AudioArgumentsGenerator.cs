@@ -5,7 +5,16 @@ namespace SimpleFFmpegGUI.FFmpegArgument
 {
     public class AudioArgumentsGenerator : ArgumentsGeneratorBase
     {
-        AudioCodec audioCodec;
+        /// <summary>
+        /// 编码
+        /// </summary>
+        private AudioCodec audioCodec;
+
+        /// <summary>
+        /// 码率
+        /// </summary>
+        /// <param name="kb"></param>
+        /// <returns></returns>
         public AudioArgumentsGenerator Bitrate(double? kb)
         {
             if (kb.HasValue)
@@ -15,6 +24,11 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 编码
+        /// </summary>
+        /// <param name="codec"></param>
+        /// <returns></returns>
         public AudioArgumentsGenerator Codec(string codec)
         {
             codec = codec.ToLower();
@@ -35,17 +49,26 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 复制音频流
+        /// </summary>
+        /// <returns></returns>
         public AudioArgumentsGenerator Copy()
         {
             arguments.Add(new FFmpegArgumentItem("c:a", "copy"));
             return this;
         }
 
+        /// <summary>
+        /// 禁用音频流
+        /// </summary>
+        /// <returns></returns>
         public AudioArgumentsGenerator Disable()
         {
             arguments.Add(new FFmpegArgumentItem("an"));
             return this;
         }
+
         public AudioArgumentsGenerator SamplingRate(int? hz)
         {
             if (hz.HasValue)

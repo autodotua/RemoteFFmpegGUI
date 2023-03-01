@@ -1,17 +1,28 @@
-﻿using FFMpegCore.Enums;
-using MediaInfo.Model;
-using SimpleFFmpegGUI.FFmpegLib;
+﻿using SimpleFFmpegGUI.FFmpegLib;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Channels;
 using VideoCodec = SimpleFFmpegGUI.FFmpegLib.VideoCodec;
 
 namespace SimpleFFmpegGUI.FFmpegArgument
 {
     public class VideoArgumentsGenerator : ArgumentsGeneratorBase
     {
-        double? maxBitrate;
-        VideoCodec videoCodec;
+        /// <summary>
+        /// 最大码率
+        /// </summary>
+        private double? maxBitrate;
+        
+        /// <summary>
+        /// 视频编码
+        /// </summary>
+        private VideoCodec videoCodec;
+
+        /// <summary>
+        /// 画面比例
+        /// </summary>
+        /// <param name="aspect"></param>
+        /// <returns></returns>
+        /// <exception cref="FFmpegArgumentException"></exception>
         public VideoArgumentsGenerator Aspect(string aspect)
         {
             if (string.IsNullOrEmpty(aspect))
@@ -30,9 +41,13 @@ namespace SimpleFFmpegGUI.FFmpegArgument
                 return this;
             }
             throw new FFmpegArgumentException("无法解析的画面比例格式");
-
         }
 
+        /// <summary>
+        /// 平均码率
+        /// </summary>
+        /// <param name="mb"></param>
+        /// <returns></returns>
         public VideoArgumentsGenerator AverageBitrate(double? mb)
         {
             if (mb.HasValue)
@@ -42,6 +57,12 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 设置最大码率时，缓冲区与最大码率的比值
+        /// </summary>
+        /// <param name="ratio"></param>
+        /// <returns></returns>
+        /// <exception cref="FFmpegArgumentException"></exception>
         public VideoArgumentsGenerator BufferRatio(double? ratio)
         {
             if (ratio.HasValue && videoCodec.Name != VideoCodec.SVTAV1.Name)
@@ -55,6 +76,11 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 视频编码
+        /// </summary>
+        /// <param name="codec"></param>
+        /// <returns></returns>
         public VideoArgumentsGenerator Codec(string codec)
         {
             codec = codec.ToLower();
@@ -75,12 +101,21 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 复制视频流
+        /// </summary>
+        /// <returns></returns>
         public VideoArgumentsGenerator Copy()
         {
             arguments.Add(new FFmpegArgumentItem("c:v", "copy"));
             return this;
         }
 
+        /// <summary>
+        /// CRF（恒定画面质量）系数
+        /// </summary>
+        /// <param name="crf"></param>
+        /// <returns></returns>
         public VideoArgumentsGenerator CRF(int? crf)
         {
             if (crf.HasValue)
@@ -90,12 +125,21 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 禁用视频流
+        /// </summary>
+        /// <returns></returns>
         public VideoArgumentsGenerator Disable()
         {
             arguments.Add(new FFmpegArgumentItem("vn"));
             return this;
         }
 
+        /// <summary>
+        /// 最大码率
+        /// </summary>
+        /// <param name="mb"></param>
+        /// <returns></returns>
         public VideoArgumentsGenerator MaxBitrate(double? mb)
         {
             if (mb.HasValue)
@@ -106,6 +150,11 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 编码次数（二次编码）
+        /// </summary>
+        /// <param name="pass"></param>
+        /// <returns></returns>
         public VideoArgumentsGenerator Pass(int? pass)
         {
             if (!pass.HasValue || pass.Equals(0))
@@ -116,6 +165,11 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 像素格式
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
         public VideoArgumentsGenerator PixelFormat(string format)
         {
             if (!string.IsNullOrEmpty(format))
@@ -126,6 +180,11 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 画面尺寸，分辨率
+        /// </summary>
+        /// <param name="scale"></param>
+        /// <returns></returns>
         public VideoArgumentsGenerator Scale(string scale)
         {
             if (!string.IsNullOrEmpty(scale))
@@ -135,6 +194,11 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 编码速度/质量比参数
+        /// </summary>
+        /// <param name="speed"></param>
+        /// <returns></returns>
         public VideoArgumentsGenerator Speed(int? speed)
         {
             if (speed.HasValue)
@@ -144,6 +208,11 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 帧率
+        /// </summary>
+        /// <param name="fps"></param>
+        /// <returns></returns>
         public VideoArgumentsGenerator FrameRate(double? fps)
         {
             if (fps.HasValue)
@@ -153,6 +222,10 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             return this;
         }
 
+        /// <summary>
+        /// 针对部分视频编码格式的额外参数
+        /// </summary>
+        /// <returns></returns>
         public override IEnumerable<FFmpegArgumentItem> ExtraArguments()
         {
             return videoCodec == null ? Enumerable.Empty<FFmpegArgumentItem>() : videoCodec.ExtraArguments();

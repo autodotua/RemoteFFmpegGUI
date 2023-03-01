@@ -3,7 +3,7 @@
 namespace SimpleFFmpegGUI.Model
 {
     [AttributeUsage(AttributeTargets.All)]
-    public class NameDescriptionAttribute:Attribute
+    public class NameDescriptionAttribute : Attribute
     {
         public NameDescriptionAttribute()
         {

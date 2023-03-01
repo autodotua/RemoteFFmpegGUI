@@ -101,7 +101,7 @@
                             IsEnabled="{Binding Format.EnableFormat}"
                             ItemsSource="{Binding Formats}"
                             SelectedValue="{Binding Format.Format}"
-                            SelectedValuePath="Name"
+                            SelectedValuePath="Extension"
                             TextSearch.TextPath="Extension">
 
                             <ComboBox.ItemTemplate>

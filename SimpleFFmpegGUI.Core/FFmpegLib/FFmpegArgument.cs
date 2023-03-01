@@ -19,10 +19,26 @@
             Seprator = seprator;
         }
 
+        /// <summary>
+        /// 参数的名称，即“-”后面的内容
+        /// </summary>
         public string Key { get; set; }
+
+        /// <summary>
+        /// 参数的值
+        /// </summary>
         public string Value { get; set; }
+
+        /// <summary>
+        /// 如果该参数为某一参数的子参数，则该属性为父参数的Key
+        /// </summary>
         public string Parent { get; set; }
+
+        /// <summary>
+        /// 如果该参数为某一参数的子参数，则该属性为划分该父参数下子参数的分隔符
+        /// </summary>
         public char Seprator { get; }
+
         /// <summary>
         /// 用于串联多个参数
         /// </summary>

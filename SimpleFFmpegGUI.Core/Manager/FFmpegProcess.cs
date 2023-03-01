@@ -5,24 +5,14 @@ using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.Manager
 {
+    /// <summary>
+    /// FFmpeg进程
+    /// </summary>
     public class FFmpegProcess
     {
         private readonly Process process = new Process();
 
-        public TimeSpan RunningTime => process.HasExited ? process.ExitTime - process.StartTime : throw new Exception("进程还未结束");
-        public double CpuUsage => process.HasExited ? process.TotalProcessorTime.TotalSeconds / Environment.ProcessorCount / RunningTime.TotalSeconds : throw new Exception("进程还未结束");
-
-        public int Id
-        {
-            get
-            {
-                if (!started)
-                {
-                    throw new Exception("进程还未开始运行");
-                }
-                return process.Id;
-            }
-        }
+        private bool started = false;
 
         public FFmpegProcess(string argument)
         {
@@ -43,8 +33,30 @@ namespace SimpleFFmpegGUI.Manager
             process.ErrorDataReceived += Process_OutputDataReceived;
         }
 
-        private bool started = false;
+        public event EventHandler<FFmpegOutputEventArgs> Output;
 
+        /// <summary>
+        /// CPU使用率
+        /// </summary>
+        public double CpuUsage => process.HasExited ? process.TotalProcessorTime.TotalSeconds / Environment.ProcessorCount / RunningTime.TotalSeconds : throw new Exception("进程还未结束");
+
+        /// <summary>
+        /// 进程ID
+        /// </summary>
+        public int Id => !started ? throw new Exception("进程还未开始运行") : process.Id;
+
+        /// <summary>
+        /// 运行时间
+        /// </summary>
+        public TimeSpan RunningTime => process.HasExited ? process.ExitTime - process.StartTime : throw new Exception("进程还未结束");
+        
+        /// <summary>
+        /// 启动进程
+        /// </summary>
+        /// <param name="workingDir"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public Task StartAsync(string workingDir, CancellationToken? cancellationToken)
         {
             if (started)
@@ -100,6 +112,11 @@ namespace SimpleFFmpegGUI.Manager
             return tcs.Task;
         }
 
+        /// <summary>
+        /// 进程输出事件接收
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (e.Data == null)
@@ -108,7 +125,5 @@ namespace SimpleFFmpegGUI.Manager
             }
             Output?.Invoke(this, new FFmpegOutputEventArgs(e.Data));
         }
-
-        public event EventHandler<FFmpegOutputEventArgs> Output;
     }
 }

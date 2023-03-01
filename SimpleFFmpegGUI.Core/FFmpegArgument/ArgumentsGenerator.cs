@@ -1,18 +1,22 @@
-﻿using FFMpegCore.Exceptions;
-using SimpleFFmpegGUI.FFmpegLib;
-using SimpleFFmpegGUI.Model;
-using System.IO;
+﻿using SimpleFFmpegGUI.Model;
 using System;
-using System.Linq;
-using FzLib.IO;
-using System.Text;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SimpleFFmpegGUI.FFmpegArgument
 {
+    /// <summary>
+    /// FFmpeg命令参数生成器
+    /// </summary>
     public static class ArgumentsGenerator
     {
+        /// <summary>
+        /// 生成FFmpeg字符串参数
+        /// </summary>
+        /// <param name="task">任务</param>
+        /// <param name="pass">二次编码时，指定是第几次编码</param>
+        /// <param name="output">输出路径</param>
+        /// <returns></returns>
         public static string GetArguments(TaskInfo task, int pass, string output = null)
         {
             StringBuilder str = new StringBuilder();
@@ -28,6 +32,14 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             str.Append("\" -y");
             return str.ToString();
         }
+
+        /// <summary>
+        /// 生成FFmpeg字符串参数
+        /// </summary>
+        /// <param name="inputs">输入文件</param>
+        /// <param name="outputArguments">输出参数</param>
+        /// <param name="output">输出路径</param>
+        /// <returns></returns>
         public static string GetArguments(IEnumerable<InputArguments> inputs, string outputArguments, string output = null)
         {
             StringBuilder str = new StringBuilder();
@@ -38,11 +50,16 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             }
             str.Append(outputArguments);
             str.Append(' ');
-            str.Append(output ==null? "":$"\"{output}\"");
+            str.Append(output == null ? "" : $"\"{output}\"");
             str.Append(" -y");
             return str.ToString();
         }
 
+        /// <summary>
+        /// 生成输入的字符串参数
+        /// </summary>
+        /// <param name="ia">输入文件</param>
+        /// <returns></returns>
         public static string GetInputArguments(InputArguments ia)
         {
             InputArgumentsGenerator ig = new InputArgumentsGenerator();
@@ -54,6 +71,14 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             ig.Input(ia.FilePath);
             return ia.Extra == null ? ig.GetArguments() : $"{ia.Extra}  {ig.GetArguments()}";
         }
+
+        /// <summary>
+        /// 生成输出部分的字符串参数
+        /// </summary>
+        /// <param name="video">视频参数</param>
+        /// <param name="audio">音频参数</param>
+        /// <param name="stream">流参数</param>
+        /// <returns></returns>
         public static string GetOutputArguments(
             Func<VideoArgumentsGenerator, VideoArgumentsGenerator> video,
             Func<AudioArgumentsGenerator, AudioArgumentsGenerator> audio,
@@ -67,8 +92,15 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             sg = stream(sg);
 
             return string.Join(' ', vg.GetArguments(), ag.GetArguments(), sg.GetArguments());
-
         }
+
+        /// <summary>
+        /// 生成输出部分的字符串参数
+        /// </summary>
+        /// <param name="oa">输出参数</param>
+        /// <param name="pass">二次编码时，指定是第几次编码</param>
+        /// <returns></returns>
+        /// <exception cref="FFmpegArgumentException"></exception>
         public static string GetOutputArguments(OutputArguments oa, int pass)
         {
             VideoArgumentsGenerator vg = new VideoArgumentsGenerator();
@@ -128,10 +160,11 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             }
 
             string extra = "";
-            if (oa.Format != null)
-            {
-                extra = $"-f {oa.Format}";
-            }
+            //取消指定format，因为一些不同的格式可能Format相同，指定后缀名也可以达到相同的效果
+            //if (oa.Format != null)
+            //{
+            //    extra = $"-f {oa.Format}";
+            //}
             if (oa.Extra != null)
             {
                 extra = $"{extra} {oa.Extra}";

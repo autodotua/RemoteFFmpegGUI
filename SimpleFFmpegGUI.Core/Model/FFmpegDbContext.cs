@@ -1,24 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SimpleFFmpegGUI.Model
 {
     public class FFmpegDbContext : DbContext
     {
-        private static FFmpegDbContext db;
         private bool hasDb = false;
-
-        //internal static FFmpegDbContext Get()
-        //{
-        //    if (db == null)
-        //    {
-        //        db = new FFmpegDbContext();
-        //    }
-        //    return db;
-        //}
 
         internal static FFmpegDbContext GetNew()
         {
@@ -41,6 +29,7 @@ namespace SimpleFFmpegGUI.Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //对于非结构化数据，采用Json的方式进行存储
             var listConverter = new EFJsonConverter<List<InputArguments>>();
             var argConverter = new EFJsonConverter<OutputArguments>();
             base.OnModelCreating(modelBuilder);

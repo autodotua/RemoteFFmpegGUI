@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:SimpleFFmpegGUI.Model;assembly=SimpleFFmpegGUI.Core"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    xmlns:uimodel="clr-namespace:SimpleFFmpegGUI.WPF.Model"
+    xmlns:uimodel="clr-namespace:SimpleFFmpegGUI.WPF.Model" xmlns:converters="clr-namespace:SimpleFFmpegGUI.WPF.Converters"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
@@ -84,7 +84,10 @@
                             <RowDefinition Height="4" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBlock Text="{Binding Type, Converter={StaticResource DescriptionConverter}}" />
+                        <Grid.Resources>
+                            <converters:NameDescriptionAttributeValueConverter x:Key="NameDescriptionAttributeValueConverter"/>
+                        </Grid.Resources>
+                        <TextBlock Text="{Binding Type, Converter={StaticResource NameDescriptionAttributeValueConverter}}" />
                         <TextBlock
                             Grid.Column="2"
                             Text="{Binding IOText}"

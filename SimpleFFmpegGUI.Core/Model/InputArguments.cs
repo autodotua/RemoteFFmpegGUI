@@ -42,7 +42,6 @@ namespace SimpleFFmpegGUI.Model
             set => this.SetValueAndNotify(ref extra, value, nameof(Extra));
         }
 
-
         /// <summary>
         /// 输入文件的路径
         /// </summary>
@@ -51,6 +50,7 @@ namespace SimpleFFmpegGUI.Model
             get => filePath;
             set => this.SetValueAndNotify(ref filePath, value, nameof(FilePath));
         }
+
         /// <summary>
         /// 输入格式
         /// </summary>
@@ -75,6 +75,7 @@ namespace SimpleFFmpegGUI.Model
             get => framerate;
             set => this.SetValueAndNotify(ref framerate, value, nameof(Framerate));
         }
+
         /// <summary>
         /// 开始时间
         /// </summary>

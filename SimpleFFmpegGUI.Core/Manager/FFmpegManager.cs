@@ -18,8 +18,14 @@ using Task = System.Threading.Tasks.Task;
 
 namespace SimpleFFmpegGUI.Manager
 {
+    /// <summary>
+    /// 单个FFmpeg任务管理器
+    /// </summary>
     public class FFmpegManager : INotifyPropertyChanged
     {
+        /// <summary>
+        /// 错误信息的识别正则
+        /// </summary>
         private static readonly Regex[] ErrorMessageRegexs = new[]
         {
             new Regex("Error.*",RegexOptions.Compiled),
@@ -29,16 +35,59 @@ namespace SimpleFFmpegGUI.Manager
             new Regex(@".* error",RegexOptions.Compiled|RegexOptions.IgnoreCase),
         };
 
+        /// <summary>
+        /// 用于识别PSNR的正则
+        /// </summary>
         private static readonly Regex rPSNR = new Regex(@"PSNR (([yuvaverageminmax]+:[0-9\. ]+)+)", RegexOptions.Compiled);
+
+        /// <summary>
+        /// 用于识别SSIM的正则
+        /// </summary>
         private static readonly Regex rSSIM = new Regex(@"SSIM ([YUVAll]+:[0-9\.\(\) ]+)+", RegexOptions.Compiled);
+
+        /// <summary>
+        /// 用于识别VMAF的正则
+        /// </summary>
         private static readonly Regex rVMAF = new Regex(@"VMAF score: [0-9\.]+", RegexOptions.Compiled);
+
+        /// <summary>
+        /// 不合法的文件名字符集合
+        /// </summary>
+        private static HashSet<char> invalidFileNameChars = Path.GetInvalidFileNameChars().ToHashSet();
+
+        /// <summary>
+        /// 当前任务
+        /// </summary>
         private readonly TaskInfo task;
+
+        /// <summary>
+        /// 用于取消任务的token源
+        /// </summary>
         private CancellationTokenSource cancel;
+
+        /// <summary>
+        /// 任务是否已经开始运行或已经完成
+        /// </summary>
         private bool hasRun = false;
+
+        /// <summary>
+        /// 最后一个输出
+        /// </summary>
         private string lastOutput;
+
+        /// <summary>
+        /// 日志
+        /// </summary>
         private Logger logger = new Logger();
+
+        /// <summary>
+        /// 任务是否被暂停
+        /// </summary>
         private bool paused;
 
+        /// <summary>
+        /// 暂停时，暂停开始的时间
+        /// </summary>
         private DateTime pauseStartTime;
 
         public FFmpegManager(TaskInfo task)
@@ -46,28 +95,59 @@ namespace SimpleFFmpegGUI.Manager
             this.task = task;
         }
 
+        /// <summary>
+        /// 进程输出事件
+        /// </summary>
         public event EventHandler<FFmpegOutputEventArgs> FFmpegOutput;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// 任务状态改变事件
+        /// </summary>
         public event EventHandler StatusChanged;
 
+        /// <summary>
+        /// 用于在任务结束后，保留该实例对应的FFmpeg进程
+        /// </summary>
+        public FFmpegProcess LastProcess { get; private set; }
+
+        /// <summary>
+        /// 任务是否暂停中
+        /// </summary>
         public bool Paused
         {
             get => paused;
             set => this.SetValueAndNotify(ref paused, value, nameof(Paused));
         }
 
+        /// <summary>
+        /// 进度相关属性
+        /// </summary>
         public ProgressDto Progress { get; private set; }
-        public TaskInfo Task => task;
-        private FFmpegProcess Process { get; set; }
-        public FFmpegProcess LastProcess { get; private set; }
 
+        /// <summary>
+        /// FFmpeg任务
+        /// </summary>
+        public TaskInfo Task => task;
+
+        /// <summary>
+        /// FFmpeg进程
+        /// </summary>
+        private FFmpegProcess Process { get; set; }
+        /// <summary>
+        /// 测试输出参数是否合法
+        /// </summary>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
         public static string TestOutputArguments(OutputArguments arguments)
         {
             return ArgumentsGenerator.GetOutputArguments(arguments, arguments.Video?.TwoPass == true ? 2 : 0);
         }
 
+        /// <summary>
+        /// 取消任务
+        /// </summary>
         public void Cancel()
         {
             logger.Info(task, "取消当前任务");
@@ -75,6 +155,10 @@ namespace SimpleFFmpegGUI.Manager
             cancel.Cancel();
         }
 
+        /// <summary>
+        /// 获取错误信息
+        /// </summary>
+        /// <returns></returns>
         public string GetErrorMessage()
         {
             var logs = LogManager.GetLogs('O', Task.Id, DateTime.Now.AddSeconds(-5));
@@ -84,6 +168,10 @@ namespace SimpleFFmpegGUI.Manager
             return log?.Message;
         }
 
+        /// <summary>
+        /// 获取当前状态
+        /// </summary>
+        /// <returns></returns>
         public StatusDto GetStatus()
         {
             if (Process == null)
@@ -93,9 +181,14 @@ namespace SimpleFFmpegGUI.Manager
             return new StatusDto(task, Progress, lastOutput, paused);
         }
 
+        /// <summary>
+        /// 暂停后恢复
+        /// </summary>
+        /// <exception cref="PlatformNotSupportedException"></exception>
+        /// <exception cref="Exception"></exception>
         public void Resume()
         {
-            if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 throw new PlatformNotSupportedException("暂停和恢复功能仅支持Windows");
             }
@@ -110,6 +203,12 @@ namespace SimpleFFmpegGUI.Manager
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// 执行任务
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        /// <exception cref="NotSupportedException"></exception>
         public async Task RunAsync()
         {
             if (hasRun)
@@ -151,6 +250,11 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
+        /// <summary>
+        /// 暂停任务
+        /// </summary>
+        /// <exception cref="PlatformNotSupportedException"></exception>
+        /// <exception cref="Exception"></exception>
         public void Suspend()
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -167,9 +271,12 @@ namespace SimpleFFmpegGUI.Manager
             ProcessExtension.SuspendProcess(Process.Id);
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
-
-       private static HashSet<char> invalidFileNameChars=Path.GetInvalidFileNameChars().ToHashSet();
-
+        /// <summary>
+        /// 生成输出路径
+        /// </summary>
+        /// <param name="task"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private static string GenerateOutputPath(TaskInfo task)
         {
             string output = task.Output.Trim();
@@ -207,7 +314,7 @@ namespace SimpleFFmpegGUI.Manager
                     output = Path.Combine(dir, name + "." + extension);
                 }
             }
-            
+
             //获取非重复文件名
             task.RealOutput = FileSystem.GetNoDuplicateFile(output);
             if (!new FileInfo(task.RealOutput).Directory.Exists)
@@ -217,31 +324,21 @@ namespace SimpleFFmpegGUI.Manager
             return task.RealOutput;
         }
 
-        private ProgressDto GetProgress(TaskInfo task, bool onlyCalcFirstVideoDuration = false)
-        {
-            var p = new ProgressDto();
-            if (task.Inputs.Count == 1 || onlyCalcFirstVideoDuration)
-            {
-                p.VideoLength = GetVideoDuration(task.Inputs[0]);
-            }
-            else
-            {
-                var durations = task.Inputs.Select(p => GetVideoDuration(p));
-                p.VideoLength = durations.All(p => p.HasValue) ? TimeSpan.FromTicks(durations.Select(p => p.Value.Ticks).Sum()) : null;
-            }
-            p.StartTime = DateTime.Now;
-            return p;
-        }
-
-        private TimeSpan? GetVideoDuration(InputArguments arg)
+        /// <summary>
+        /// 获取视频的长度
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private static TimeSpan? GetVideoDuration(InputArguments arg)
         {
             var path = arg.FilePath;
-            TimeSpan realLength = default;
+            TimeSpan realLength;
             try
             {
                 realLength = FFProbe.Analyse(path).Duration;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -284,6 +381,31 @@ namespace SimpleFFmpegGUI.Manager
             throw new Exception("未知情况");
         }
 
+        /// <summary>
+        /// 获取进度信息
+        /// </summary>
+        /// <param name="onlyCalcFirstVideoDuration"></param>
+        /// <returns></returns>
+        private ProgressDto GetProgress(bool onlyCalcFirstVideoDuration = false)
+        {
+            var p = new ProgressDto();
+            if (task.Inputs.Count == 1 || onlyCalcFirstVideoDuration)
+            {
+                p.VideoLength = GetVideoDuration(task.Inputs[0]);
+            }
+            else
+            {
+                var durations = task.Inputs.Select(p => GetVideoDuration(p));
+                p.VideoLength = durations.All(p => p.HasValue) ? TimeSpan.FromTicks(durations.Select(p => p.Value.Ticks).Sum()) : null;
+            }
+            p.StartTime = DateTime.Now;
+            return p;
+        }
+        /// <summary>
+        /// FFmpeg进程输出
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Output(object sender, FFmpegOutputEventArgs e)
         {
             lastOutput = e.Data;
@@ -292,6 +414,14 @@ namespace SimpleFFmpegGUI.Manager
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// 执行任务
+        /// </summary>
+        /// <param name="arguments"></param>
+        /// <param name="desc"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="workingDir"></param>
+        /// <returns></returns>
         private async Task RunAsync(string arguments, string desc, CancellationToken cancellationToken, string workingDir = null)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -318,6 +448,14 @@ namespace SimpleFFmpegGUI.Manager
                 Process = null;
             }
         }
+
+        /// <summary>
+        /// 执行编码任务
+        /// </summary>
+        /// <param name="tempDir"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         private async Task RunCodeProcessAsync(string tempDir, CancellationToken cancellationToken)
         {
             string message = null;
@@ -328,7 +466,7 @@ namespace SimpleFFmpegGUI.Manager
             GenerateOutputPath(task);
             if (task.Arguments.Video == null || !task.Arguments.Video.TwoPass)
             {
-                Progress = GetProgress(task);
+                Progress = GetProgress();
                 message = $"正在转码：{Path.GetFileName(task.Inputs[0].FilePath)}";
                 string arg = ArgumentsGenerator.GetArguments(task, 0);
                 await RunAsync(arg, message, cancellationToken);
@@ -337,7 +475,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 Directory.CreateDirectory(tempDirectory);
-                Progress = GetProgress(task);
+                Progress = GetProgress();
                 Progress.VideoLength *= 2;
                 message = $"正在转码（Pass=1）：{Path.GetFileName(task.Inputs[0].FilePath)}";
 
@@ -351,9 +489,15 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
+        /// <summary>
+        /// 执行音视频合并任务
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         private async Task RunCombineProcessAsync(CancellationToken cancellationToken)
         {
-            if (task.Inputs.Count() != 2)
+            if (task.Inputs.Count != 2)
             {
                 throw new ArgumentException("合并音视频操作，输入文件必须为2个");
             }
@@ -368,7 +512,7 @@ namespace SimpleFFmpegGUI.Manager
                 throw new ArgumentException("输入2不含音频");
             }
 
-            Progress = GetProgress(task, true);
+            Progress = GetProgress(true);
             GenerateOutputPath(task);
 
             var outputArgs = ArgumentsGenerator.GetOutputArguments(v => v.Copy(), a => a.Copy(),
@@ -378,6 +522,13 @@ namespace SimpleFFmpegGUI.Manager
             await RunAsync(arg, "正在合并音视频", cancellationToken);
         }
 
+        /// <summary>
+        /// 执行视频对比任务
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="FFmpegArgumentException"></exception>
+        /// <exception cref="Exception"></exception>
         private async Task RunCompareProcessAsync(CancellationToken cancellationToken)
         {
             if (task.Inputs.Count != 2)
@@ -394,7 +545,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new FFmpegArgumentException("输入2不含视频");
             }
-            Progress = GetProgress(task, true);
+            Progress = GetProgress(true);
             string argument = "-lavfi \"ssim;[0:v][1:v]psnr\" -f null -";
             string vmafModel = Directory.EnumerateFiles(App.ProgramDirectoryPath, "vmaf*.json").FirstOrDefault();
             if (vmafModel != null)
@@ -448,6 +599,14 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
+        /// <summary>
+        /// 执行视频拼接任务
+        /// </summary>
+        /// <param name="tempDir"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="NotSupportedException"></exception>
         private async Task RunConcatProcessAsync(string tempDir, CancellationToken cancellationToken)
         {
             if (task.Inputs.Count < 2)
@@ -473,7 +632,7 @@ namespace SimpleFFmpegGUI.Manager
                     }
                 }
                 task.Arguments.Format = null;
-                Progress = GetProgress(task);
+                Progress = GetProgress();
                 GenerateOutputPath(task);
                 var input = new InputArguments()
                 {
@@ -488,6 +647,11 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
+        /// <summary>
+        /// 执行自定义任务
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         private async Task RunCustomProcessAsync(CancellationToken cancellationToken)
         {
             await RunAsync(task.Arguments.Extra, null, cancellationToken);

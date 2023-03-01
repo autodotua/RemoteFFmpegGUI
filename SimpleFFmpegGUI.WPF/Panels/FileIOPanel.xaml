@@ -95,11 +95,11 @@
                                     Visibility="{Binding ElementName=root, Path=DataContext.ShowTimeClip, Converter={StaticResource Bool2VisibilityConverter}}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="60" />
-                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="4" />
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="16" />
-                                        <ColumnDefinition Width="60" />
                                         <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="60" />
+                                        <ColumnDefinition Width="4" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="16" />
                                         <ColumnDefinition Width="Auto" />
