@@ -220,7 +220,7 @@ namespace SimpleFFmpegGUI.Manager
             try
             {
                 logger.Info(task, "开始任务");
-                string tempDir = ConfigHelper.TempDir;
+                string tempDir = FileSystemUtility.GetTempDir();
                 await (task.Type switch
                 {
                     TaskType.Code => RunCodeProcessAsync(tempDir, cancel.Token),

@@ -213,12 +213,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 newInput.Update();
                 Inputs.Add(newInput);
             }
-            while(Inputs.Count< MinInputsCount)
+            while (Inputs.Count < MinInputsCount)
             {
                 Inputs.Add(new InputArgumentsDetail());
             }
-            OutputDir=Path.GetDirectoryName(output);
-            OutputFileName=Path.GetFileName(output);
+            OutputDir = Path.GetDirectoryName(output);
+            OutputFileName = Path.GetFileName(output);
             return inputs.Count <= MaxInputsCount;
         }
 
@@ -372,7 +372,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
         }
 
-        private void BrowseFileButton_Click(object sender, RoutedEventArgs e)
+        private async void BrowseFileButton_Click(object sender, RoutedEventArgs e)
         {
             var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
             string path = new FileFilterCollection()
@@ -382,6 +382,20 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 .GetFilePath();
             if (path != null)
             {
+                if (input.Image2)
+                {
+                    string seqFilename = FileSystemUtility.GetSequence(path);
+                    if (seqFilename != null)
+                    {
+                        bool rename =await CommonDialog.ShowYesNoDialogAsync("图像序列", $"指定的文件可能是图像序列中的一个，是否将输入路径修改为{seqFilename}？");
+                        if (rename)
+                        {
+                            path = seqFilename;
+                        }
+                    }
+                }
+
+
                 input.FilePath = path;
             }
         }
