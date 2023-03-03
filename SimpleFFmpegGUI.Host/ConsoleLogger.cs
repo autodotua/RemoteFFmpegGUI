@@ -15,9 +15,11 @@ namespace SimpleFFmpegGUI
         {
             if (instance == null)
             {
-                new ConsoleLogger();
+                instance = new ConsoleLogger();
             }
         }
+
+        private string lastLogContent = null;
         private void Logger_Log(object sender, LogEventArgs e)
         {
             ConsoleColor defaultColor = Console.ForegroundColor;
@@ -40,6 +42,12 @@ namespace SimpleFFmpegGUI
                 _ => e.Log.Type.ToString().PadLeft(2)
             };
             string time = e.Log.Time.ToString("yyyy-MM-dd HH:mm:ss");
+
+            if (lastLogContent != null && lastLogContent.StartsWith("frame=") && e.Log.Message.StartsWith("frame="))
+            {
+                ClearLine();
+            }
+
             Console.Write(time);
             Console.Write("    \t");
             Console.ForegroundColor = color;
@@ -48,6 +56,15 @@ namespace SimpleFFmpegGUI
             Console.Write("    \t");
             Console.Write(e.Log.Message);
             Console.WriteLine();
+
+
+            lastLogContent = e.Log.Message;
+        }
+        static void ClearLine()
+        {
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, Console.CursorTop - 1);
         }
     }
 }

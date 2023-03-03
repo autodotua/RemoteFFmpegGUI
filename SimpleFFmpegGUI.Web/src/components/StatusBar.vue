@@ -52,6 +52,20 @@
           <el-col :span="16">
             <el-progress
               :text-inside="true"
+              class="unknown-progress"
+              :stroke-width="20"
+              color="transparent"
+              :percentage="100"
+              v-show="status.progress.isIndeterminate"
+              style="margin-right: 24px; margin-top: 4px"
+              :show-text="true"
+              text-color="black"
+              :format="(p) => '进度未知'"
+              define-back-color="#CCCA"
+            ></el-progress>
+            <el-progress
+              :text-inside="true"
+              v-show="status.progress.isIndeterminate == false"
               :stroke-width="20"
               :color="progressColor"
               style="margin-right: 24px; margin-top: 4px"
@@ -98,9 +112,23 @@
           <el-col :span="20">
             <el-progress
               :text-inside="true"
+              class="unknown-progress"
+              :stroke-width="20"
+              color="transparent"
+              :percentage="100"
+              style="margin-right: 24px; margin-top: 4px"
+              :show-text="true"
+              v-show="status.progress.isIndeterminate"
+              text-color="black"
+              :format="(p) => '进度未知'"
+              define-back-color="#CCCA"
+            ></el-progress>
+            <el-progress
+              :text-inside="true"
               :stroke-width="20"
               :color="progressColor"
               style="margin-top: 10px"
+              v-show="status.progress.isIndeterminate == false"
               :percentage="status.progress.percent * 100"
               :format="(p) => p.toFixed(2) + '%'"
               text-color="white"
@@ -163,7 +191,9 @@ import {
 } from "../common";
 export default Vue.component("status-bar", {
   data() {
-    return {};
+    return {
+      walkingProgress: 0,
+    };
   },
   props: ["status", "windowWidth", "isPaused"],
   computed: {
@@ -193,6 +223,26 @@ export default Vue.component("status-bar", {
   components: {},
   mounted: function () {
     this.$nextTick(function () {
+      let delay = 0;
+      // setInterval(() => {
+      //   if (this.status.isPaused) {
+      //     //this.walkingProgress=0;
+      //     //return;
+      //   }
+      //   console.log(this.walkingProgress);
+      //   if (delay > 0) {
+      //     delay--;
+      //     if (delay == 0) {
+      //       this.walkingProgress = 0;
+      //     }
+      //     return;
+      //   }
+      //   if (this.walkingProgress >= 100) {
+      //     delay = 10;
+      //   } else {
+      //     this.walkingProgress++;
+      //   }
+      // }, 50);
       return;
     });
   },
@@ -211,6 +261,10 @@ export default Vue.component("status-bar", {
 </style>
 
 <style>
+.unknown-progress > div > div > div {
+  text-align: center;
+}
+
 /* .el-progress__text {
   font-size: 14px !important;
 }

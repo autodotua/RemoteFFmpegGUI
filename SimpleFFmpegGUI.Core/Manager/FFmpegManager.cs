@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
+using static SimpleFFmpegGUI.FileSystemUtility;
 
 namespace SimpleFFmpegGUI.Manager
 {
@@ -50,10 +51,6 @@ namespace SimpleFFmpegGUI.Manager
         /// </summary>
         private static readonly Regex rVMAF = new Regex(@"VMAF score: [0-9\.]+", RegexOptions.Compiled);
 
-        /// <summary>
-        /// 不合法的文件名字符集合
-        /// </summary>
-        private static HashSet<char> invalidFileNameChars = Path.GetInvalidFileNameChars().ToHashSet();
 
         /// <summary>
         /// 当前任务
@@ -135,6 +132,7 @@ namespace SimpleFFmpegGUI.Manager
         /// FFmpeg进程
         /// </summary>
         private FFmpegProcess Process { get; set; }
+
         /// <summary>
         /// 测试输出参数是否合法
         /// </summary>
@@ -223,7 +221,7 @@ namespace SimpleFFmpegGUI.Manager
                 string tempDir = FileSystemUtility.GetTempDir();
                 await (task.Type switch
                 {
-                    TaskType.Code => RunCodeProcessAsync(tempDir, cancel.Token),
+                    TaskType.Code => RunCodeProcessAsync(cancel.Token),
                     TaskType.Combine => RunCombineProcessAsync(cancel.Token),
                     TaskType.Compare => RunCompareProcessAsync(cancel.Token),
                     TaskType.Custom => RunCustomProcessAsync(cancel.Token),
@@ -270,58 +268,6 @@ namespace SimpleFFmpegGUI.Manager
             pauseStartTime = DateTime.Now;
             ProcessExtension.SuspendProcess(Process.Id);
             StatusChanged?.Invoke(this, EventArgs.Empty);
-        }
-        /// <summary>
-        /// 生成输出路径
-        /// </summary>
-        /// <param name="task"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        private static string GenerateOutputPath(TaskInfo task)
-        {
-            string output = task.Output.Trim();
-            var a = task.Arguments;
-            if (string.IsNullOrEmpty(output))
-            {
-                if (task.Inputs.Count == 0)
-                {
-                    throw new Exception("没有指定输出路径，且输入文件为空");
-                }
-                output = task.Inputs[0].FilePath;
-            }
-
-            //删除非法字符
-            string dir = Path.GetDirectoryName(output);
-            string filename = Path.GetFileName(output);
-            if (filename.Any(p => invalidFileNameChars.Contains(p)))
-            {
-                foreach (var c in invalidFileNameChars)
-                {
-                    filename = filename.Replace(c.ToString(), "");
-                }
-                output = Path.Combine(dir, filename);
-            }
-
-
-            //修改扩展名
-            if (!string.IsNullOrEmpty(a?.Format))
-            {
-                VideoFormat format = VideoFormat.Formats.Where(p => p.Name == a.Format || p.Extension == a.Format).FirstOrDefault();
-                if (format != null)
-                {
-                    string name = Path.GetFileNameWithoutExtension(output);
-                    string extension = format.Extension;
-                    output = Path.Combine(dir, name + "." + extension);
-                }
-            }
-
-            //获取非重复文件名
-            task.RealOutput = FileSystem.GetNoDuplicateFile(output);
-            if (!new FileInfo(task.RealOutput).Directory.Exists)
-            {
-                new FileInfo(task.RealOutput).Directory.Create();
-            }
-            return task.RealOutput;
         }
 
         /// <summary>
@@ -456,14 +402,23 @@ namespace SimpleFFmpegGUI.Manager
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        private async Task RunCodeProcessAsync(string tempDir, CancellationToken cancellationToken)
+        private async Task RunCodeProcessAsync(CancellationToken cancellationToken)
         {
-            string message = null;
             if (task.Inputs.Count != 1)
             {
                 throw new ArgumentException("普通编码，输入文件必须为1个");
             }
+            //处理图像序列名
+            if (task.Inputs.Count == 1 && task.Inputs[0].Image2)
+            {
+                string seq = GetSequence(task.Inputs[0].FilePath);
+                if (seq != null)
+                {
+                    task.Inputs[0].FilePath = seq;
+                }
+            }
             GenerateOutputPath(task);
+            string message;
             if (task.Arguments.Video == null || !task.Arguments.Video.TwoPass)
             {
                 Progress = GetProgress();
