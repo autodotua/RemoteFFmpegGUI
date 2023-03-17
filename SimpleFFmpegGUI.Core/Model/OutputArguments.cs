@@ -7,7 +7,6 @@ namespace SimpleFFmpegGUI.Model
     {
         private AudioCodeArguments audio;
         private CombineArguments combine;
-        private ConcatArguments concat;
         private bool disableAudio;
         private bool disableVideo;
         private string extra;
@@ -33,15 +32,6 @@ namespace SimpleFFmpegGUI.Model
         {
             get => combine;
             set => this.SetValueAndNotify(ref combine, value, nameof(Combine));
-        }
-
-        /// <summary>
-        /// 拼接参数
-        /// </summary>
-        public ConcatArguments Concat
-        {
-            get => concat;
-            set => this.SetValueAndNotify(ref concat, value, nameof(Concat));
         }
 
         /// <summary>

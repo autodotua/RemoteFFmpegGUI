@@ -32,7 +32,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
     {
         public CodeArgumentsPanelViewModel()
         {
-            Concat.PropertyChanged += (s, e) => UpdateWhenConcatArgumentsChanged();
         }
 
         public OutputArguments Arguments { get; set; }
@@ -41,12 +40,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public void Update(TaskType type, OutputArguments argument = null)
         {
             this.type = type;
-            if (type is TaskType.Concat)
-            {
-                UpdateWhenConcatArgumentsChanged();
-            }
-            CanSpecifyFormat = type is TaskType.Code or TaskType.Combine;
-            CanSetVideoAndAudio = type is TaskType.Code or TaskType.Concat;
+            CanSpecifyFormat = type is TaskType.Code or TaskType.Combine or TaskType.Concat;
+            CanSetVideoAndAudio = type is TaskType.Code;
             CanSetCombine = type is TaskType.Combine;
             CanSetConcat = type is TaskType.Concat;
             if (argument != null)
@@ -64,7 +59,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 Format = new FormatArgumentWithSwitch() { Format = argument.Format };
                 Format.Update();
                 Combine = argument.Combine;
-                Concat = argument.Concat;
                 Extra = argument.Extra;
             }
         }
@@ -86,17 +80,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 Audio = AudioOutputStrategy == ChannelOutputStrategy.Code ? Audio.Adapt<AudioCodeArguments>() : null,
                 Format = Format.Format,
                 Combine = Combine,
-                Concat = Concat,
                 Extra = Extra,
                 DisableVideo = VideoOutputStrategy == ChannelOutputStrategy.Disable,
                 DisableAudio = audioOutputStrategy == ChannelOutputStrategy.Disable,
             };
-        }
-
-        private void UpdateWhenConcatArgumentsChanged()
-        {
-            CanSetVideoAndAudio = Concat.Type == ConcatType.ViaTs;
-            CanSpecifyFormat = Concat.Type == ConcatType.ViaTs;
         }
 
         private bool canSetVideoAndAudio;
@@ -208,14 +195,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
             set => this.SetValueAndNotify(ref combine, value, nameof(Combine));
         }
 
-        private ConcatArguments concat = new ConcatArguments();
-
-        public ConcatArguments Concat
-        {
-            get => concat;
-            set => this.SetValueAndNotify(ref concat, value, nameof(Concat));
-        }
-
         private string extra;
 
         public string Extra
@@ -224,9 +203,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
             set => this.SetValueAndNotify(ref extra, value, nameof(Extra));
         }
 
-
-
-        public IEnumerable ConcatTypes => Enum.GetValues<ConcatType>();
 
         public IEnumerable Fpses => new double[] { 10, 20, 23.976, 24, 25, 29.97, 30, 48, 59.94, 60, 120 };
 

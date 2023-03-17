@@ -46,23 +46,7 @@
         ></el-switch>
       </el-form-item>
     </div>
-    <div v-if="type == 4">
-      <h3>拼接参数</h3>
-      <el-form-item label="拼接方法">
-        <el-select
-          v-model="code.concat.type"
-          value-key="id"
-          style="width: 320px"
-        >
-          <el-option
-            v-for="value in concatTypes"
-            :key="value.id"
-            :label="value.name"
-            :value="value.id"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-    </div>
+
     <div v-if="showFormats">
       <h3>容器</h3>
       <el-form-item label="指定输出容器">
@@ -370,13 +354,6 @@ export default Vue.component("code-arguments", {
         256: "256",
         320: "320",
       },
-      concatTypes: [
-        { id: 0, name: "通过ts中转，支持不同格式" },
-        {
-          id: 1,
-          name: "使用concat格式，不需要重新解码和编码，需要相同格式文件",
-        },
-      ],
       videoCodes: ["自动", "H264", "H265", "VP9", "AV1 (aom)", "AV1 (SVT)"],
       audioCodes: ["自动", "AAC", "OPUS"],
       audioSamples: [8000, 16000, 32000, 44100, 48000, 96000],
@@ -434,9 +411,6 @@ export default Vue.component("code-arguments", {
         combine: {
           shortest: false,
         },
-        concat: {
-          type: 0,
-        },
         disableVideo: false,
         disableAudio: false,
         extra: "",
@@ -457,14 +431,12 @@ export default Vue.component("code-arguments", {
   computed: {
     showFormats(): boolean {
       return (
-        [0, 1, 2, 4].includes(this.type) &&
-        (this.type != 4 || this.code.concat.type != 1)
+        [0, 1, 2, 4].includes(this.type) 
       );
     },
     showVideosAndAudios(): boolean {
       return (
-        [0, 4].includes(this.type) &&
-        (this.type != 4 || this.code.concat.type != 1)
+        [0].includes(this.type)
       );
     },
   },
@@ -559,13 +531,11 @@ export default Vue.component("code-arguments", {
           }
         : null;
       let combine = { shortest: this.code.combine.shortest };
-      let concat = { type: this.code.concat.type };
       let arg = {
         video: videoArg,
         audio: audioArg,
         input: null,
         combine: this.type == 1 ? combine : null,
-        concat: this.type == 4 ? concat : null,
         extra: this.code.extra,
         disableVideo: videoArg == null && this.code.disableVideo,
         disableAudio: audioArg == null && this.code.disableAudio,
@@ -581,7 +551,6 @@ export default Vue.component("code-arguments", {
       const video = args.video;
       const audio = args.audio;
       const combine = args.combine;
-      const concat = args.concat;
 
       if (video != null && !args.disableVideo) {
         this.code.enableVideo = true;
@@ -664,11 +633,6 @@ export default Vue.component("code-arguments", {
       if (this.type == 1 && combine != null) {
         this.code.combine = {
           shortest: combine.shortest,
-        };
-      }
-      if (this.type == 4 && concat != null) {
-        this.code.concat = {
-          type: concat.type,
         };
       }
       this.code.disableVideo = args.disableVideo;

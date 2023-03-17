@@ -10,7 +10,7 @@ namespace SimpleFFmpegGUI.Dto
         public string CodecLongName { get; set; }
         public int BitRate { get; set; }
         public TimeSpan Duration { get; set; }
-        public string? Language { get; set; }
+        public string Language { get; set; }
         public Dictionary<string, string> Tags { get; set; }
     }
 

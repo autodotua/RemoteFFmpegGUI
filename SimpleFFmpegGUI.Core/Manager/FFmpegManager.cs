@@ -347,6 +347,7 @@ namespace SimpleFFmpegGUI.Manager
             p.StartTime = DateTime.Now;
             return p;
         }
+
         /// <summary>
         /// FFmpeg进程输出
         /// </summary>
@@ -570,36 +571,27 @@ namespace SimpleFFmpegGUI.Manager
             }
             string message = $"正在拼接：{task.Inputs.Count}个文件";
 
-            if (task.Arguments.Concat == null || task.Arguments.Concat.Type == ConcatType.ViaTs)
+            string tempName = Guid.NewGuid().ToString() + ".txt";
+            string tempPath = Path.Combine(tempDir, tempName);
+            using (var stream = File.CreateText(tempPath))
             {
-
-                throw new NotSupportedException("取消支持该方法的拼接");
-            }
-            else
-            {
-                string tempName = Guid.NewGuid().ToString() + ".txt";
-                string tempPath = Path.Combine(tempDir, tempName);
-                using (var stream = File.CreateText(tempPath))
+                foreach (var file in task.Inputs)
                 {
-                    foreach (var file in task.Inputs)
-                    {
-                        stream.WriteLine($"file '{file.FilePath}'");
-                    }
+                    stream.WriteLine($"file '{file.FilePath}'");
                 }
-                task.Arguments.Format = null;
-                Progress = GetProgress();
-                GenerateOutputPath(task);
-                var input = new InputArguments()
-                {
-                    FilePath = tempPath,
-                    Format = "concat",
-                    Extra = "-safe 0"
-                };
-
-                string arg = ArgumentsGenerator.GetArguments(new InputArguments[] { input }, "-c copy", task.RealOutput);
-
-                await RunAsync(arg, message, cancellationToken);
             }
+            Progress = GetProgress();
+            GenerateOutputPath(task);
+            var input = new InputArguments()
+            {
+                FilePath = tempPath,
+                Format = "concat",
+                Extra = "-safe 0"
+            };
+
+            string arg = ArgumentsGenerator.GetArguments(new InputArguments[] { input }, "-c copy", task.RealOutput);
+
+            await RunAsync(arg, message, cancellationToken);
         }
 
         /// <summary>

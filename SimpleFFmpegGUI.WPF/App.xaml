@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:system="clr-namespace:System;assembly=System.Runtime"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:converters="clr-namespace:SimpleFFmpegGUI.WPF.Converters"
     Exit="Application_Exit"
     ShutdownMode="OnMainWindowClose">
     <Application.Resources>
@@ -14,6 +14,7 @@
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
             </ResourceDictionary.MergedDictionaries>
+            <converters:NameDescriptionAttributeValueConverter x:Key="NameDescriptionAttributeValueConverter"/>
             <system:String x:Key="DateTimeFormat">yyyy-MM-dd HH:mm:ss</system:String>
             <system:String x:Key="TimeSpanFormat">hh\:mm\:ss\.fff</system:String>
         </ResourceDictionary>

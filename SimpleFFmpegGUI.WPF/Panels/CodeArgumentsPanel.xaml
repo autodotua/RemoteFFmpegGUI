@@ -173,8 +173,9 @@
                             Text="{Binding Video.Code}" />
                         <!--  预设  -->
                         <Label
-                            Grid.Row="2"
-                            Content="速度预设" />
+                            Grid.Row="2">
+                            <TextBlock Text="{Binding Video.Preset,Mode=OneWay,StringFormat=速度预设（{0}）}" />
+                        </Label>
                         <Slider
                             x:Name="sldPreset"
                             Grid.Row="2"
@@ -202,8 +203,9 @@
                         <!--  CRF  -->
                         <CheckBox
                             Grid.Row="4"
-                            Content="CRF"
-                            IsChecked="{Binding Video.EnableCrf}" />
+                            IsChecked="{Binding Video.EnableCrf}" >
+                            <TextBlock Text="{Binding Video.Crf,Mode=OneWay,StringFormat=CRF（{0}）}" />
+                        </CheckBox>
                         <Slider
                             Grid.Row="4"
                             Grid.Column="2"
@@ -380,22 +382,6 @@
                     <CheckBox
                         Content="裁剪到视频长度"
                         IsChecked="{Binding Combine.Shortest}" />
-                </GroupBox>
-                <!--  拼接参数  -->
-                <GroupBox
-                    Header="拼接参数"
-                    Visibility="{Binding CanSetConcat, Converter={StaticResource Bool2VisibilityConverter}}">
-                    <ComboBox
-                        ui:ControlHelper.Header="拼接方式"
-                        ItemsSource="{Binding ConcatTypes}"
-                        SelectedIndex="0"
-                        SelectedItem="{Binding Concat.Type}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
                 </GroupBox>
                 <!--  额外参数  -->
                 <GroupBox Header="额外参数">

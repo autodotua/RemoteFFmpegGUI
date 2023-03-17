@@ -36,9 +36,6 @@
                 IsEnabled="{Binding AllowChangeType}"
                 ItemsSource="{Binding TaskTypes}"
                 SelectedItem="{Binding Type}">
-                <ComboBox.Resources>
-                    <converters:NameDescriptionAttributeValueConverter x:Key="NameDescriptionAttributeValueConverter"/>
-                </ComboBox.Resources>
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding ., Converter={StaticResource NameDescriptionAttributeValueConverter}}" />

@@ -194,7 +194,7 @@
                             Grid.Column="2"
                             Orientation="Horizontal"
                             Spacing="16">
-                            <TextBlock Text="{Binding Type, Converter={StaticResource DescriptionConverter}}" />
+                            <TextBlock Text="{Binding Type, Converter={StaticResource NameDescriptionAttributeValueConverter}}" />
                             <Button
                                 Margin="-8,-4"
                                 Padding="8,4"

@@ -52,7 +52,7 @@
 
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
+                            <TextBlock Text="{Binding ., Converter={StaticResource NameDescriptionAttributeValueConverter}}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

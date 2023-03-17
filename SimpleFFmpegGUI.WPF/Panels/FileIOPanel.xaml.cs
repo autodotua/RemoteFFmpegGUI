@@ -101,10 +101,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 {
                     Inputs.Add(new InputArgumentsDetail());
                 }
-                while (value < Inputs.Count)
-                {
-                    Inputs.RemoveAt(Inputs.Count - 1);
-                }
             }
         }
 
@@ -159,12 +155,25 @@ namespace SimpleFFmpegGUI.WPF.Panels
         /// <summary>
         /// 重置
         /// </summary>
-        public void Reset()
+        public void Reset(bool keepFiles)
         {
+            var files = keepFiles ?
+                Inputs.Select(p => p.FilePath).ToList() :
+                null;
             Inputs.Clear();
-            while (Inputs.Count < MinInputsCount)
+            int count = keepFiles ?
+                Math.Max(MinInputsCount, Math.Min(files.Count, MaxInputsCount))
+                : MinInputsCount;
+            while (Inputs.Count < count)
             {
                 Inputs.Add(new InputArgumentsDetail());
+            }
+            if (keepFiles)
+            {
+                for (int i = 0; i < Math.Min(files.Count, Inputs.Count); i++)
+                {
+                    Inputs[i].FilePath = files[i];
+                }
             }
         }
 
@@ -320,7 +329,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public void Reset()
         {
-            ViewModel.Reset();
+            ViewModel.Reset(false);
         }
 
         public void Update(TaskType type, List<InputArguments> inputs, string output)
@@ -334,7 +343,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public void Update(TaskType type)
         {
             ViewModel.Update(type);
-            Reset();
+            ViewModel.Reset(true);
         }
 
         protected override void OnDragOver(DragEventArgs e)
@@ -387,7 +396,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                     string seqFilename = FileSystemUtility.GetSequence(path);
                     if (seqFilename != null)
                     {
-                        bool rename =await CommonDialog.ShowYesNoDialogAsync("图像序列", $"指定的文件可能是图像序列中的一个，是否将输入路径修改为{seqFilename}？");
+                        bool rename = await CommonDialog.ShowYesNoDialogAsync("图像序列", $"指定的文件可能是图像序列中的一个，是否将输入路径修改为{seqFilename}？");
                         if (rename)
                         {
                             path = seqFilename;
