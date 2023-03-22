@@ -106,10 +106,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             VideoArgumentsGenerator vg = new VideoArgumentsGenerator();
             AudioArgumentsGenerator ag = new AudioArgumentsGenerator();
             StreamArgumentsGenerator sg = new StreamArgumentsGenerator();
-            if (oa.DisableVideo && oa.DisableAudio)
-            {
-                throw new FFmpegArgumentException("不能同时禁用视频和音频");
-            }
+            CheckOutputArguments(oa);
             if (oa.DisableVideo)
             {
                 vg.Disable();
@@ -161,16 +158,32 @@ namespace SimpleFFmpegGUI.FFmpegArgument
 
             string extra = "";
             //取消指定format，因为一些不同的格式可能Format相同，指定后缀名也可以达到相同的效果
-            //if (oa.Format != null)
+            //if (oa.Format != null && pass!=1)
             //{
             //    extra = $"-f {oa.Format}";
             //}
+            if (pass == 1)
+            {
+                extra = $"-f {oa.Format}";
+            }
             if (oa.Extra != null)
             {
                 extra = $"{extra} {oa.Extra}";
             }
 
             return string.Join(' ', vg.GetArguments(), ag.GetArguments(), sg.GetArguments(), extra);
+        }
+
+        private static void CheckOutputArguments(OutputArguments oa)
+        {
+            if (oa.DisableVideo && oa.DisableAudio)
+            {
+                throw new FFmpegArgumentException("不能同时禁用视频和音频");
+            }
+            if(oa.Video.TwoPass&&string.IsNullOrWhiteSpace(oa.Format))
+            {
+                throw new FFmpegArgumentException("需要二次编码时，必须指定格式（Format）");
+            }
         }
     }
 }

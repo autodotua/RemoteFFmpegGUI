@@ -52,7 +52,7 @@
 - -s：生成WPF（主执行文件为单文件，需要Runtime）
 - -f：生成WPF（包含框架，运行前无需单独安装.NET6 Desktop Runtime）
 
-若提示“无法加载文件 ******.ps1，因为在此系统中禁止执行脚本”，需要首先在管理员模式下运行PowerShell并执行 `set-executionpolicy remotesigned`，然后按Y确认。
+若提示`无法加载文件 ******.ps1，因为在此系统中禁止执行脚本`，需要首先在管理员模式下运行PowerShell并执行 `set-executionpolicy remotesigned`，然后按Y确认。
 生成文件位于 `Generation/Publish`下，其中 `WebPackage`为Web部署包，`WPF`为桌面程序。
 
 ### 部署基于Windows +IIS的Web版本

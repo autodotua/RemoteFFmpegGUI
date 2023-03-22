@@ -7,6 +7,7 @@ using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.FzExtension.CommonDialog;
 using Newtonsoft.Json;
+using SimpleFFmpegGUI.FFmpegArgument;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
@@ -113,7 +114,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
                     FFmpegManager.TestOutputArguments(argumentsPanel.GetOutputArguments());
                 }
             }
-            catch (FFMpegArgumentException ex)
+            catch (FFmpegArgumentException ex)
             {
                 await CommonDialog.ShowErrorDialogAsync(ex.Message, null, title: "参数错误");
                 return;
@@ -219,7 +220,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
                     FFmpegManager.TestOutputArguments(argumentsPanel.GetOutputArguments());
                 }
             }
-            catch (FFMpegArgumentException ex)
+            catch (FFmpegArgumentException ex)
             {
                 await CommonDialog.ShowErrorDialogAsync(ex.Message, null, title: "参数错误");
                 return;

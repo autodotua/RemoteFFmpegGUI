@@ -11,9 +11,7 @@
     mc:Ignorable="d">
     <UserControl.Resources>
         <local:Int2StringConverter x:Key="Int2StringConverter" />
-        <Style
-            BasedOn="{StaticResource DefaultComboBoxStyle}"
-            TargetType="{x:Type ComboBox}">
+        <Style BasedOn="{StaticResource DefaultComboBoxStyle}" TargetType="{x:Type ComboBox}">
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
     </UserControl.Resources>
@@ -25,13 +23,9 @@
             c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
             HorizontalScrollBarVisibility="Disabled"
             VerticalScrollBarVisibility="Auto">
-            <ui:SimpleStackPanel
-                Margin="8"
-                Spacing="8">
+            <ui:SimpleStackPanel Margin="8" Spacing="8">
                 <!--  输出  -->
-                <Grid
-                    HorizontalAlignment="Center"
-                    Visibility="{Binding CanSetVideoAndAudio, Converter={StaticResource Bool2VisibilityConverter}}">
+                <Grid HorizontalAlignment="Center" Visibility="{Binding CanSetVideoAndAudio, Converter={StaticResource Bool2VisibilityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="16" />
@@ -60,9 +54,7 @@
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                     </ListBox>
-                    <TextBlock
-                        Grid.Column="2"
-                        Text="音频输出" />
+                    <TextBlock Grid.Column="2" Text="音频输出" />
                     <ListBox
                         Grid.Row="2"
                         Grid.Column="2"
@@ -82,9 +74,7 @@
                     </ListBox>
                 </Grid>
                 <!--  容器  -->
-                <GroupBox
-                    Header="容器"
-                    Visibility="{Binding CanSpecifyFormat, Converter={StaticResource Bool2VisibilityConverter}}">
+                <GroupBox Header="容器" Visibility="{Binding CanSpecifyFormat, Converter={StaticResource Bool2VisibilityConverter}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />
@@ -92,9 +82,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <CheckBox
-                            Content="指定格式"
-                            IsChecked="{Binding Format.EnableFormat}" />
+                        <CheckBox Content="指定格式" IsChecked="{Binding Format.EnableFormat}" />
                         <ComboBox
                             Grid.Column="2"
                             IsEditable="True"
@@ -109,15 +97,9 @@
                                     <Grid>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Extension, Mode=OneWay}" />
-                                            <TextBlock
-                                                Opacity="0.6"
-                                                Text="（" />
-                                            <TextBlock
-                                                Opacity="0.6"
-                                                Text="{Binding Name, Mode=OneWay}" />
-                                            <TextBlock
-                                                Opacity="0.6"
-                                                Text="）" />
+                                            <TextBlock Opacity="0.6" Text="（" />
+                                            <TextBlock Opacity="0.6" Text="{Binding Name, Mode=OneWay}" />
+                                            <TextBlock Opacity="0.6" Text="）" />
                                         </StackPanel>
 
                                         <TextBlock
@@ -131,9 +113,7 @@
                     </Grid>
                 </GroupBox>
                 <!--  视频  -->
-                <GroupBox
-                    Header="视频"
-                    Visibility="{Binding VideoOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource EqualConverter}}">
+                <GroupBox Header="视频" Visibility="{Binding VideoOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource EqualConverter}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />
@@ -172,9 +152,8 @@
                             SelectedIndex="1"
                             Text="{Binding Video.Code}" />
                         <!--  预设  -->
-                        <Label
-                            Grid.Row="2">
-                            <TextBlock Text="{Binding Video.Preset,Mode=OneWay,StringFormat=速度预设（{0}）}" />
+                        <Label Grid.Row="2">
+                            <TextBlock Text="{Binding Video.Preset, Mode=OneWay, StringFormat=速度预设 {0}}" />
                         </Label>
                         <Slider
                             x:Name="sldPreset"
@@ -201,10 +180,8 @@
                             VerticalAlignment="Center"
                             Content="快" />
                         <!--  CRF  -->
-                        <CheckBox
-                            Grid.Row="4"
-                            IsChecked="{Binding Video.EnableCrf}" >
-                            <TextBlock Text="{Binding Video.Crf,Mode=OneWay,StringFormat=CRF（{0}）}" />
+                        <CheckBox Grid.Row="4" IsChecked="{Binding Video.EnableCrf}">
+                            <TextBlock Text="{Binding Video.Crf, Mode=OneWay, StringFormat=CRF {0}}" />
                         </CheckBox>
                         <Slider
                             Grid.Row="4"
@@ -324,9 +301,7 @@
                     </Grid>
                 </GroupBox>
                 <!--  音频  -->
-                <GroupBox
-                    Header="音频"
-                    Visibility="{Binding AudioOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource EqualConverter}}">
+                <GroupBox Header="音频" Visibility="{Binding AudioOutputStrategy, ConverterParameter={x:Static local:ChannelOutputStrategy.Code}, Converter={StaticResource EqualConverter}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />
@@ -341,9 +316,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <!--  编码  -->
-                        <Label
-                            VerticalAlignment="Center"
-                            Content="编码" />
+                        <Label VerticalAlignment="Center" Content="编码" />
                         <ComboBox
                             Grid.Column="2"
                             IsEditable="True"
@@ -376,12 +349,8 @@
                     </Grid>
                 </GroupBox>
                 <!--  合并参数  -->
-                <GroupBox
-                    Header="合并参数"
-                    Visibility="{Binding CanSetCombine, Converter={StaticResource Bool2VisibilityConverter}}">
-                    <CheckBox
-                        Content="裁剪到视频长度"
-                        IsChecked="{Binding Combine.Shortest}" />
+                <GroupBox Header="合并参数" Visibility="{Binding CanSetCombine, Converter={StaticResource Bool2VisibilityConverter}}">
+                    <CheckBox Content="裁剪到视频长度" IsChecked="{Binding Combine.Shortest}" />
                 </GroupBox>
                 <!--  额外参数  -->
                 <GroupBox Header="额外参数">
