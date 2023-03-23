@@ -18,6 +18,11 @@ namespace SimpleFFmpegGUI.Dto
         public TimeSpan Duration { get; set; }
 
         /// <summary>
+        /// 已经花费的时间，不包含暂停的时间
+        /// </summary>
+        public TimeSpan RealDuration { get; set; }
+
+        /// <summary>
         /// 预计结束时间
         /// </summary>
         public DateTime FinishTime { get; set; }
@@ -75,10 +80,12 @@ namespace SimpleFFmpegGUI.Dto
                 {
                     Percent = 1;
                 }
-                var totalTime = Percent==0?TimeSpan.Zero:(DateTime.Now - (StartTime + PauseTime)) / Percent;
-                FinishTime = StartTime + PauseTime + totalTime;
-                LastTime = totalTime - (DateTime.Now - (StartTime + PauseTime));
                 Duration = DateTime.Now - StartTime;
+                RealDuration = Duration - PauseTime;
+                var totalTime = Percent == 0 ? TimeSpan.Zero : RealDuration / Percent;
+                FinishTime = StartTime + PauseTime + totalTime;
+                LastTime = totalTime - RealDuration;
+                LastTime = LastTime > TimeSpan.Zero ? LastTime : TimeSpan.Zero;
             }
             else
             {
