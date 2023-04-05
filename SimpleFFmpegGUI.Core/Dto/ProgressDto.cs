@@ -8,7 +8,7 @@ namespace SimpleFFmpegGUI.Dto
     public class ProgressDto
     {
         /// <summary>
-        /// 基础百分比，用于二压时，第二遍在在百分比的基础上加上0.5
+        /// 基础百分比，用于二压时，第二遍在在百分比的基础上加上一个值
         /// </summary>
         public double BasePercent { get; set; } = 0;
 
@@ -68,6 +68,12 @@ namespace SimpleFFmpegGUI.Dto
         public TimeSpan? VideoLength { get; set; }
 
         /// <summary>
+        /// 百分比压缩因子。用于二压时，Pass=1和Pass=2时采用的速度预设不同，因此编码速度有较大差异，
+        /// 需要为前后两次Pass分别乘以不同的因子以保证进度条正确
+        /// </summary>
+        public double PercentCompressionFactor { get; set; } = 1;
+
+        /// <summary>
         /// 更新进度
         /// </summary>
         /// <param name="VideoDuration"></param>
@@ -75,7 +81,8 @@ namespace SimpleFFmpegGUI.Dto
         {
             if (VideoLength.HasValue)
             {
-                Percent = VideoDuration.Ticks * 1.0 / VideoLength.Value.Ticks+ BasePercent;
+                //百分比=计算百分比*压缩系数+基准百分比，是一个线性的变化
+                Percent = VideoDuration.Ticks * 1.0 / VideoLength.Value.Ticks * PercentCompressionFactor + BasePercent;
                 if (Percent >= 1)
                 {
                     Percent = 1;

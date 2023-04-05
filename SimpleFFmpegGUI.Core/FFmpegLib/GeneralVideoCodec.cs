@@ -1,4 +1,5 @@
 ﻿using SimpleFFmpegGUI.FFmpegArgument;
+using System;
 
 namespace SimpleFFmpegGUI.FFmpegLib
 {
@@ -11,6 +12,8 @@ namespace SimpleFFmpegGUI.FFmpegLib
         public override string Name => null;
         public override int MaxCRF => 63;
 
+        public override double[] SpeedFPSRelationship => new[] { 1d, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
         public override FFmpegArgumentItem Speed(int speed)
         {
             if (speed > MaxSpeedLevel)
@@ -19,6 +22,8 @@ namespace SimpleFFmpegGUI.FFmpegLib
             }
             return new FFmpegArgumentItem("preset", FFmpegEnums.Presets[speed]); throw new System.NotImplementedException();
         }
+
+
     }
 
 }

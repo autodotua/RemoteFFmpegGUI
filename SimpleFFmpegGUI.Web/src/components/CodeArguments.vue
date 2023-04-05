@@ -93,7 +93,7 @@
               :value="c"
             ></el-option> </el-select
         ></el-form-item>
-        <el-form-item label="预设" class="bottom24">
+        <el-form-item label="速度预设" class="bottom24">
           <el-slider
             style="width: 90%"
             :max="8"
@@ -118,7 +118,20 @@
         ></el-form-item>
         <el-form-item label="二次编码" class="top24">
           <el-switch v-model="code.video.twoPass"> </el-switch>
+
+          <el-form-item label="首次编码预设" class="bottom24" v-if="code.video.twoPass">
+          <el-slider class="left24"
+            style="width: 90%"
+            :max="8"
+            :min="code.video.preset"
+            :show-tooltip="false"
+            v-model="code.video.firstPassPreset"
+            :marks="speedPresets"
+          >
+          </el-slider
+        ></el-form-item>
         </el-form-item>
+       
         <el-form-item label="平均码率" class="bottom24">
           <el-switch v-model="code.video.enableBitrate"> </el-switch>
           <el-slider

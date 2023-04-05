@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
 using static SimpleFFmpegGUI.FileSystemUtility;
+using System.Diagnostics;
 
 namespace SimpleFFmpegGUI.Manager
 {
@@ -431,14 +432,40 @@ namespace SimpleFFmpegGUI.Manager
             {
                 string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 Directory.CreateDirectory(tempDirectory);
+
+                VideoArgumentsGenerator vag = new VideoArgumentsGenerator();
+                vag.Codec(task.Arguments.Video.Code);
+                double pass1 = 1;
+                double pass2 = 1;
+                if (vag.VideoCodec != null)
+                {
+                    //计算Pass1和Pass2的进度条占比
+                    try
+                    {
+                        pass1 = vag.VideoCodec.SpeedFPSRelationship[task.Arguments.Video.FirstPassPreset];
+                        pass2 = vag.VideoCodec.SpeedFPSRelationship[task.Arguments.Video.Preset];
+                        double sum = pass1 + pass2;
+                        pass1 /= sum;
+                        pass2 /= sum;
+                        (pass1, pass2) = (pass2, pass1);//原来是值越大越快，这边因为表示进度，所以要转换为值越小越快
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                    }
+                }
+
+
                 Progress = GetProgress();
                 Progress.VideoLength *= 2;
-                message = $"正在转码（Pass=1）：{Path.GetFileName(task.Inputs[0].FilePath)}";
+                Progress.PercentCompressionFactor = pass1 * 2;
 
+                message = $"正在转码（Pass=1）：{Path.GetFileName(task.Inputs[0].FilePath)}";
                 string arg = ArgumentsGenerator.GetArguments(task, 1, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "NUL" : "/dev/null");
                 await RunAsync(arg, message, cancellationToken, tempDirectory);
-                Progress.BasePercent = 0.5;
 
+                Progress.PercentCompressionFactor = pass2 * 2;
+                Progress.BasePercent = pass1;
                 message = $"正在转码（Pass=2）：{Path.GetFileName(task.Inputs[0].FilePath)}";
                 arg = ArgumentsGenerator.GetArguments(task, 2);
                 await RunAsync(arg, message, cancellationToken, tempDirectory);

@@ -15,7 +15,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         /// <summary>
         /// 视频编码
         /// </summary>
-        private VideoCodec videoCodec;
+        public VideoCodec VideoCodec { get; private set; }
 
         /// <summary>
         /// 画面比例
@@ -52,7 +52,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         {
             if (mb.HasValue)
             {
-                arguments.Add(videoCodec.AverageBitrate(mb.Value));
+                arguments.Add(VideoCodec.AverageBitrate(mb.Value));
             }
             return this;
         }
@@ -65,13 +65,13 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         /// <exception cref="FFmpegArgumentException"></exception>
         public VideoArgumentsGenerator BufferRatio(double? ratio)
         {
-            if (ratio.HasValue && videoCodec.Name != VideoCodec.SVTAV1.Name)
+            if (ratio.HasValue && VideoCodec.Name != VideoCodec.SVTAV1.Name)
             {
                 if (maxBitrate == null)
                 {
                     throw new FFmpegArgumentException("应先设置最大码率，然后设置缓冲比例");
                 }
-                arguments.Add(videoCodec.BufferSize(ratio.Value * maxBitrate.Value));
+                arguments.Add(VideoCodec.BufferSize(ratio.Value * maxBitrate.Value));
             }
             return this;
         }
@@ -88,12 +88,12 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             {
                 if (c.Name.ToLower() == codec || c.Lib.ToLower() == codec)
                 {
-                    videoCodec = c;
+                    VideoCodec = c;
                     arguments.Add(new FFmpegArgumentItem("c:v", c.Lib));
                     return this;
                 }
             }
-            videoCodec = new GeneralVideoCodec();
+            VideoCodec = new GeneralVideoCodec();
             if (codec is not ("自动" or "auto") && !string.IsNullOrEmpty(codec))
             {
                 arguments.Add(new FFmpegArgumentItem("c:v", codec));
@@ -120,7 +120,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         {
             if (crf.HasValue)
             {
-                arguments.Add(videoCodec.CRF(crf.Value));
+                arguments.Add(VideoCodec.CRF(crf.Value));
             }
             return this;
         }
@@ -145,7 +145,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             if (mb.HasValue)
             {
                 maxBitrate = mb;
-                arguments.Add(videoCodec.MaxBitrate(mb.Value));
+                arguments.Add(VideoCodec.MaxBitrate(mb.Value));
             }
             return this;
         }
@@ -161,7 +161,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             {
                 return this;
             }
-            arguments.Add(videoCodec.Pass(pass.Value));
+            arguments.Add(VideoCodec.Pass(pass.Value));
             return this;
         }
 
@@ -174,7 +174,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         {
             if (!string.IsNullOrEmpty(format))
             {
-                arguments.Add(videoCodec.PixelFormat(format));
+                arguments.Add(VideoCodec.PixelFormat(format));
                 return this;
             }
             return this;
@@ -203,7 +203,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         {
             if (speed.HasValue)
             {
-                arguments.Add(videoCodec.Speed(speed.Value));
+                arguments.Add(VideoCodec.Speed(speed.Value));
             }
             return this;
         }
@@ -217,7 +217,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         {
             if (fps.HasValue)
             {
-                arguments.Add(videoCodec.FrameRate(fps.Value));
+                arguments.Add(VideoCodec.FrameRate(fps.Value));
             }
             return this;
         }
@@ -228,7 +228,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         /// <returns></returns>
         public override IEnumerable<FFmpegArgumentItem> ExtraArguments()
         {
-            return videoCodec == null ? Enumerable.Empty<FFmpegArgumentItem>() : videoCodec.ExtraArguments();
+            return VideoCodec == null ? Enumerable.Empty<FFmpegArgumentItem>() : VideoCodec.ExtraArguments();
         }
     }
 }

@@ -118,7 +118,14 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             else
             {
                 vg.Codec(oa.Video.Code);
-                vg.Speed(oa.Video.Preset);
+                if (pass == 1)
+                {
+                    vg.Speed(oa.Video.FirstPassPreset);
+                }
+                else
+                {
+                    vg.Speed(oa.Video.Preset);
+                }
                 vg.CRF(oa.Video.Crf);
                 vg.AverageBitrate(oa.Video.AverageBitrate);
                 vg.MaxBitrate(oa.Video.MaxBitrate);

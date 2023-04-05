@@ -14,7 +14,7 @@
           ? "自动"
           : args.video.code
       }}</el-descriptions-item>
-      <el-descriptions-item label="预设" v-if="showVideo">{{
+      <el-descriptions-item label="速度预设" v-if="showVideo">{{
         args.video.preset
       }}</el-descriptions-item>
       <el-descriptions-item label="CRF" v-if="showVideo">{{
@@ -22,6 +22,9 @@
       }}</el-descriptions-item>
       <el-descriptions-item label="二次编码" v-if="showVideo">{{
         args.video.twoPass ? "是" : "否"
+      }}</el-descriptions-item>
+      <el-descriptions-item label="首次编码速度预设" v-if="showVideo && args.video.twoPass">{{
+        args.video.firstPassPreset
       }}</el-descriptions-item>
       <el-descriptions-item label="帧率" v-if="showVideo">{{
         args.video.fps ? args.video.fps : "未定义"

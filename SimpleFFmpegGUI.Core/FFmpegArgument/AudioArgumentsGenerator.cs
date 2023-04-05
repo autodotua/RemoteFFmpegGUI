@@ -8,7 +8,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         /// <summary>
         /// 编码
         /// </summary>
-        private AudioCodec audioCodec;
+        public AudioCodec AudioCodec { get; private set; }
 
         /// <summary>
         /// 码率
@@ -19,7 +19,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         {
             if (kb.HasValue)
             {
-                arguments.Add(audioCodec.Bitrate(kb.Value));
+                arguments.Add(AudioCodec.Bitrate(kb.Value));
             }
             return this;
         }
@@ -36,12 +36,12 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             {
                 if (c.Name.ToLower() == codec || c.Lib.ToLower() == codec)
                 {
-                    audioCodec = c;
+                    AudioCodec = c;
                     arguments.Add(new FFmpegArgumentItem("c:a", c.Lib));
                     return this;
                 }
             }
-            audioCodec = new GeneralAudioCodec();
+            AudioCodec = new GeneralAudioCodec();
             if (codec is not ("自动" or "auto") && !string.IsNullOrEmpty(codec))
             {
                 arguments.Add(new FFmpegArgumentItem("c:a", codec));
@@ -73,7 +73,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         {
             if (hz.HasValue)
             {
-                arguments.Add(audioCodec.SamplingRate(hz.Value));
+                arguments.Add(AudioCodec.SamplingRate(hz.Value));
             }
             return this;
         }

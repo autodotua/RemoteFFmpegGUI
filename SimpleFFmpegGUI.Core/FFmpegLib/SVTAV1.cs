@@ -12,6 +12,9 @@ namespace SimpleFFmpegGUI.FFmpegLib
         public override int DefaultCRF => 28;
         public override int MaxCRF => 63;
 
+        public override double[] SpeedFPSRelationship => new[] { 0.05, 0.05, 0.1063, 0.2032, 0.5364, 3.5965, 9.4903, 16.3359, 27.3078 };
+
+
         public override FFmpegArgumentItem Speed(int speed)
         {
             if (speed < -1 || speed > MaxSpeedLevel)

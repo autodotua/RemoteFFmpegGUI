@@ -26,17 +26,54 @@ namespace SimpleFFmpegGUI.FFmpegLib
            AomAV1,
            SVTAV1
         };
+        private static Dictionary<string, VideoCodec> name2codec;
+
+        public static VideoCodec GetCodec(string name)
+        {
+            name2codec ??= VideoCodecs.ToDictionary(p => p.Name, p => p);
+            return name2codec.GetValueOrDefault(name);
+        }
 
 
-
+        /// <summary>
+        /// 默认CRF
+        /// </summary>
         public abstract int DefaultCRF { get; }
+
+        /// <summary>
+        /// 默认速度预设等级
+        /// </summary>
         public abstract int DefaultSpeedLevel { get; }
+
+        /// <summary>
+        /// 最大CRF
+        /// </summary>
         public abstract int MaxCRF { get; }
+
+        /// <summary>
+        /// 最大速度预设等级
+        /// </summary>
         public abstract int MaxSpeedLevel { get; }
+
+        /// <summary>
+        /// 速度预设与编码速度的关系
+        /// </summary>
+        /// <remarks>
+        /// 提供一个数组，其长度=<see cref="MaxSpeedLevel"/>+1，即速度预设的数量。下标值与速度预设值对应。
+        /// SpeedFPSRelationship[i]代表速度预设为i时，实际编码速度的一个相对值（帧/秒）。
+        /// 其绝对值不具有意义，但一组值之间的相对值代表其相对编码速度的快慢
+        /// </remarks>
+        public abstract double[] SpeedFPSRelationship { get; }
+
+        /// <summary>
+        /// 额外参数
+        /// </summary>
+        /// <returns></returns>
         public virtual IEnumerable<FFmpegArgumentItem> ExtraArguments()
         {
             return Enumerable.Empty<FFmpegArgumentItem>();
         }
+
         public virtual FFmpegArgumentItem AverageBitrate(double mb)
         {
             if (mb < 0)
