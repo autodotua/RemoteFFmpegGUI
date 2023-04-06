@@ -17,6 +17,8 @@ using System.Threading;
 using Task = System.Threading.Tasks.Task;
 using static SimpleFFmpegGUI.FileSystemUtility;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
 namespace SimpleFFmpegGUI.Manager
 {
@@ -152,6 +154,24 @@ namespace SimpleFFmpegGUI.Manager
             logger.Info(task, "取消当前任务");
             task.Status = TaskStatus.Cancel;
             cancel.Cancel();
+        }
+
+        /// <summary>
+        /// 取消任务
+        /// </summary>
+        public async Task CancelAsync()
+        {
+            logger.Info(task, "取消当前任务");
+            task.Status = TaskStatus.Cancel;
+            cancel.Cancel();
+            try
+            {
+                await Process.WaitForExitAsync();
+            }
+            catch (TaskCanceledException)
+            {
+
+            }
         }
 
         /// <summary>

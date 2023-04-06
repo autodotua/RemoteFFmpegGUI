@@ -73,6 +73,17 @@ namespace SimpleFFmpegGUI.Manager
         }
 
         /// <summary>
+        /// 取消主队列
+        /// </summary>
+        public Task CancelAsync()
+        {
+            CheckMainQueueProcessingTaskManager();
+            cancelQueue = true;
+
+            return MainQueueManager.CancelAsync();
+        }
+
+        /// <summary>
         /// 取消计划的队列
         /// </summary>
         public void CancelQueueSchedule()

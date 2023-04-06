@@ -49,7 +49,8 @@ namespace SimpleFFmpegGUI.Manager
         /// 运行时间
         /// </summary>
         public TimeSpan RunningTime => process.HasExited ? process.ExitTime - process.StartTime : throw new Exception("进程还未结束");
-        
+
+        private TaskCompletionSource<bool> tcs;
         /// <summary>
         /// 启动进程
         /// </summary>
@@ -70,7 +71,7 @@ namespace SimpleFFmpegGUI.Manager
                 //2Pass时会生成文件名相同的临时文件，如果多个FFmpeg一起运行会冲突，因此需要设置单独的工作目录
                 process.StartInfo.WorkingDirectory = workingDir;
             }
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+            tcs = new TaskCompletionSource<bool>();
             bool exit = false;
             cancellationToken?.Register(() =>
             {
@@ -99,7 +100,7 @@ namespace SimpleFFmpegGUI.Manager
                      }
                      else
                      {
-                         tcs.SetException(new Exception($"进程退出返回错误退出码：" + process.ExitCode));
+                         tcs.SetException(new Exception($"进程退出：" + process.ExitCode));
                      }
                      await Task.Delay(10000);
                      process.Dispose();
@@ -109,6 +110,15 @@ namespace SimpleFFmpegGUI.Manager
                      tcs.SetException(new Exception($"进程处理程序发生错误：" + ex.Message, ex));
                  }
              };
+            return tcs.Task;
+        }
+
+        public Task WaitForExitAsync()
+        {
+            if(tcs==null)
+            {
+                throw new Exception("进程还未开始");
+            }
             return tcs.Task;
         }
 

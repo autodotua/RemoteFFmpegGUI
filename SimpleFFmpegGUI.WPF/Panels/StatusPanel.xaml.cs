@@ -56,18 +56,27 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public StatusPanelViewModel ViewModel => App.ServiceProvider.GetService<StatusPanelViewModel>();
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        private async void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!await CommonDialog.ShowYesNoDialogAsync("取消任务", "是否取消任务？"))
+            {
+                return;
+            }
             UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
             Debug.Assert(task != null);
             Debug.Assert(task.ProcessManager != null);
             try
             {
-                task.ProcessManager.Cancel();
+                (sender as FrameworkElement).IsEnabled = false;
+                await task.ProcessManager.CancelAsync();
             }
             catch (Exception ex)
             {
                 this.CreateMessage().QueueError("取消失败", ex);
+            }
+            finally
+            {
+                (sender as FrameworkElement).IsEnabled = true;
             }
         }
 

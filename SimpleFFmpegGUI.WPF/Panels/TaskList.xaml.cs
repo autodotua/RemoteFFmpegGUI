@@ -25,6 +25,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
 namespace SimpleFFmpegGUI.WPF.Panels
 {
@@ -67,12 +68,31 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public TaskListViewModel ViewModel { get; } = App.ServiceProvider.GetService<TaskListViewModel>();
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        private async void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             var task = ViewModel.Tasks.SelectedTask;
             Debug.Assert(task != null);
-            TaskManager.CancelTask(task.Id, ViewModel.Queue);
-            task.UpdateSelf();
+            if (task.Status == TaskStatus.Processing)
+            {
+                if (!await CommonDialog.ShowYesNoDialogAsync("取消任务", "任务正在执行，是否取消？"))
+                {
+                    return;
+                }
+            }
+            try
+            {
+                IsEnabled = false;
+                TaskManager.CancelTask(task.Id, ViewModel.Queue);
+                task.UpdateSelf();
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError("取消失败", ex);
+            }
+            finally
+            {
+                IsEnabled = true;
+            }
         }
 
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)

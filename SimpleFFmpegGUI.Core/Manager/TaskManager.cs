@@ -3,6 +3,8 @@ using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
 namespace SimpleFFmpegGUI.Manager
 {
@@ -155,6 +157,36 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new ArgumentException($"找不到ID为{id}的任务");
             }
+            CheckCancelingTask(task);
+            if (queue.Tasks.Any(p => p.Id == task.Id))
+            {
+                queue.Managers.First(p => p.Task.Id == task.Id).Cancel();
+            }
+            task.Status = TaskStatus.Cancel;
+            db.Update(task);
+            db.SaveChanges();
+        }
+
+        public static async Task CancelTaskAsync(int id, QueueManager queue)
+        {
+            using var db = FFmpegDbContext.GetNew();
+            TaskInfo task = await db.Tasks.FindAsync(id);
+            if (task == null)
+            {
+                throw new ArgumentException($"找不到ID为{id}的任务");
+            }
+            CheckCancelingTask(task);
+            if (queue.Tasks.Any(p => p.Id == task.Id))
+            {
+                await queue.Managers.First(p => p.Task.Id == task.Id).CancelAsync();
+            }
+            task.Status = TaskStatus.Cancel;
+            db.Update(task);
+            await db.SaveChangesAsync();
+        }
+
+        private static void CheckCancelingTask(TaskInfo task)
+        {
             if (task.Status == TaskStatus.Cancel)
             {
                 throw new Exception("ID为{id}的任务已被取消");
@@ -167,13 +199,6 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new Exception("ID为{id}的任务已完成并出现错误");
             }
-            if (queue.Tasks.Any(p => p.Id == task.Id))
-            {
-                queue.Managers.First(p => p.Task.Id == task.Id).Cancel();
-            }
-            task.Status = TaskStatus.Cancel;
-            db.Update(task);
-            db.SaveChanges();
         }
 
         public static int TryCancelTasks(IEnumerable<int> ids, QueueManager queue)

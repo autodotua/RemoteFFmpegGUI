@@ -26,6 +26,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
+using Task = System.Threading.Tasks.Task;
 
 namespace SimpleFFmpegGUI.WPF
 {
@@ -216,9 +218,25 @@ namespace SimpleFFmpegGUI.WPF
             AddNewTab<AddTaskPage>();
         }
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        private async void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            queue.Cancel();
+            if (!await CommonDialog.ShowYesNoDialogAsync("终止队列", "是否终止队列？"))
+            {
+                return;
+            }
+            try
+            {
+                (sender as FrameworkElement).IsEnabled = false;
+                await queue.CancelAsync();
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError("终止队列失败", ex);
+            }
+            finally
+            {
+                (sender as FrameworkElement).IsEnabled = true;
+            }
         }
 
         private void CloseTabButton_Click(object sender, RoutedEventArgs e)
