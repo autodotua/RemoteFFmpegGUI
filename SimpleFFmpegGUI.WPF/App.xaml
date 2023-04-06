@@ -15,6 +15,7 @@
                 <ui:XamlControlsResources />
             </ResourceDictionary.MergedDictionaries>
             <converters:NameDescriptionAttributeValueConverter x:Key="NameDescriptionAttributeValueConverter"/>
+            <converters:HourMinSecTimeSpanConverter x:Key="HourMinSecTimeSpanConverter"/>
             <system:String x:Key="DateTimeFormat">yyyy-MM-dd HH:mm:ss</system:String>
             <system:String x:Key="TimeSpanFormat">hh\:mm\:ss\.fff</system:String>
         </ResourceDictionary>

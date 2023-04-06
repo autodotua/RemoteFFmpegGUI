@@ -17,7 +17,9 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class UITaskInfo : ModelBase, INotifyPropertyChanged
     {
-        public string Title => AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name) + "：" + InputText;
+        public string Title => Type == TaskType.Custom ?
+              AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name)
+            : AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name) + "：" + InputText;
         public string IOText => $"{InputText} → {OutputText}";
 
         public string InputText

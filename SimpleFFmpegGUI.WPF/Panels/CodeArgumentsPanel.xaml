@@ -47,7 +47,6 @@
                         Grid.Row="2"
                         Height="40"
                         ItemsSource="{Binding ChannelOutputStrategies}"
-                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                         SelectedItem="{Binding VideoOutputStrategy}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -56,7 +55,10 @@
                         </ListBox.ItemTemplate>
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" />
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    ScrollOwner="{x:Null}"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                     </ListBox>
@@ -67,7 +69,6 @@
                         Grid.Row="2"
                         Grid.Column="2"
                         ItemsSource="{Binding ChannelOutputStrategies}"
-                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                         SelectedItem="{Binding AudioOutputStrategy}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -76,7 +77,10 @@
                         </ListBox.ItemTemplate>
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" />
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    ScrollOwner="{x:Null}"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                     </ListBox>

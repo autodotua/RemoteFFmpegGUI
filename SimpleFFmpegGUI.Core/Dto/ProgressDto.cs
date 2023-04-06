@@ -71,6 +71,9 @@ namespace SimpleFFmpegGUI.Dto
         /// 百分比压缩因子。用于二压时，Pass=1和Pass=2时采用的速度预设不同，因此编码速度有较大差异，
         /// 需要为前后两次Pass分别乘以不同的因子以保证进度条正确
         /// </summary>
+        /// <remarks>
+        /// 可恶的NewBing，告诉我2Pass时前后两次Preset可以不同，被坑了。
+        /// </remarks>
         public double PercentCompressionFactor { get; set; } = 1;
 
         /// <summary>

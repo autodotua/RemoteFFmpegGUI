@@ -27,130 +27,25 @@
                             Padding="12"
                             Background="{DynamicResource SystemControlBackgroundListLowBrush}"
                             ClipToBounds="True">
-                            <ui:SimpleStackPanel Spacing="8">
-                                <TextBlock Text="{Binding Title}" TextAlignment="Center" />
-                                <Grid Margin="8" Visibility="{Binding ProcessStatus.HasDetail, Converter={StaticResource Bool2VisibilityConverter}}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="16" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <TextBlock
-                                        Grid.Row="0"
-                                        FontWeight="Bold"
-                                        Text="当前任务" />
-                                    <TextBlock
-                                        Grid.Row="0"
-                                        Grid.Column="2"
-                                        Text="{Binding ProcessStatus.Progress.Name}"
-                                        TextTrimming="CharacterEllipsis" />
-                                    <TextBlock
-                                        Grid.Row="2"
-                                        FontWeight="Bold"
-                                        Text="进度" />
-                                    <Grid Grid.Row="2" Grid.Column="2">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="0" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock
-                                            Margin="0,0,8,0"
-                                            Text="{Binding ProcessStatus.Progress.Percent, StringFormat={}0.00%}"
-                                            Visibility="{Binding ProcessStatus.Progress.IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
-                                        <ui:ProgressBar
-                                            Grid.Column="2"
-                                            IsIndeterminate="{Binding ProcessStatus.Progress.IsIndeterminate}"
-                                            Maximum="1"
-                                            Minimum="0"
-                                            ShowPaused="{Binding ProcessStatus.IsPaused}"
-                                            Value="{Binding ProcessStatus.Progress.Percent}" />
-                                    </Grid>
-                                    <TextBlock
-                                        Grid.Row="4"
-                                        FontWeight="Bold"
-                                        Text="当前位置" />
-                                    <TextBlock Grid.Row="4" Grid.Column="2">
-                                        <Run Text="{Binding ProcessStatus.Frame, Mode=OneWay}" />
-                                        <Run Text="帧     " />
-                                        <Run Text="{Binding ProcessStatus.Time, Mode=OneWay, StringFormat={}hh\\:mm\\:ss\\.fff}" />
-                                    </TextBlock>
-                                    <TextBlock
-                                        Grid.Row="6"
-                                        FontWeight="Bold"
-                                        Text="处理速度" />
-                                    <TextBlock Grid.Row="6" Grid.Column="2">
-                                        <Run Text="{Binding ProcessStatus.Fps, Mode=OneWay}" />
-                                        <Run Text="帧/秒  " />
-                                        <Run Text="{Binding ProcessStatus.Speed, Mode=OneWay}" />
-                                        <Run Text="X" />
-                                    </TextBlock>
-                                    <TextBlock
-                                        Grid.Row="8"
-                                        FontWeight="Bold"
-                                        Text="比特率" />
-                                    <TextBlock
-                                        Grid.Row="8"
-                                        Grid.Column="2"
-                                        Text="{Binding ProcessStatus.Bitrate, Mode=OneWay}" />
-                                    <TextBlock
-                                        Grid.Row="10"
-                                        FontWeight="Bold"
-                                        Text="开始时间" />
-                                    <TextBlock
-                                        Grid.Row="10"
-                                        Grid.Column="2"
-                                        Text="{Binding ProcessStatus.Progress.StartTime, StringFormat={StaticResource DateTimeFormat}}" />
-                                    <TextBlock
-                                        Grid.Row="12"
-                                        FontWeight="Bold"
-                                        Text="预计完成" />
-                                    <TextBlock
-                                        Grid.Row="12"
-                                        Grid.Column="2"
-                                        Text="{Binding ProcessStatus.Progress.FinishTime, StringFormat={StaticResource DateTimeFormat}}"
-                                        Visibility="{Binding ProcessStatus.Progress.IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
-                                    <TextBlock
-                                        Grid.Row="14"
-                                        FontWeight="Bold"
-                                        Text="已用/剩余" />
-                                    <TextBlock
-                                        Grid.Row="14"
-                                        Grid.Column="2"
-                                        Visibility="{Binding ProcessStatus.Progress.IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}">
-                                        <Run Text="{Binding ProcessStatus.Progress.RealDuration.TotalHours, StringFormat=N0, Mode=OneWay}" /><Run Text="{Binding ProcessStatus.Progress.RealDuration, StringFormat={}\\:mm\\:ss, Mode=OneWay}" />
-                                        <Run Text="/" />
-                                        <Run Text="{Binding ProcessStatus.Progress.LastTime.TotalHours, StringFormat=N0, Mode=OneWay}" /><Run Text="{Binding ProcessStatus.Progress.LastTime, StringFormat={}\\:mm\\:ss, Mode=OneWay}" />
-                                    </TextBlock>
-                                </Grid>
-                                <TextBox
+                            <DockPanel Height="224">
+                                <ui:CommandBar
+                                    Margin="-12,8,-12,-12"
                                     Background="Transparent"
-                                    BorderThickness="0"
-                                    Focusable="False"
-                                    IsReadOnly="True"
-                                    MaxLines="2"
-                                    MinLines="2"
-                                    Opacity="0.8"
-                                    Text="{Binding ProcessStatus.LastOutput}"
-                                    TextWrapping="Wrap" />
-                                <ui:CommandBar Margin="-12" Background="Transparent">
+                                    DockPanel.Dock="Bottom">
+                                    <ui:AppBarButton
+                                        Margin="0,0,140,0"
+                                        Label="输出"
+                                        Visibility="{Binding IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}">
+                                        <ui:FlyoutService.Flyout>
+                                            <ui:Flyout>
+                                                <TextBlock
+                                                    Width="360"
+                                                    FontFamily="Consolas"
+                                                    Text="{Binding ProcessStatus.LastOutput}"
+                                                    TextWrapping="Wrap" />
+                                            </ui:Flyout>
+                                        </ui:FlyoutService.Flyout>
+                                    </ui:AppBarButton>
                                     <ui:AppBarButton
                                         Click="CancelButton_Click"
                                         Icon="Cancel"
@@ -166,7 +61,126 @@
                                         IsEnabled="{Binding ProcessManager.Paused, Converter={StaticResource InverseBoolConverter}}"
                                         Label="暂停" />
                                 </ui:CommandBar>
-                            </ui:SimpleStackPanel>
+
+                                <ui:SimpleStackPanel Spacing="8">
+                                    <TextBlock
+                                        Margin="0,4"
+                                        Text="{Binding Title}"
+                                        TextAlignment="Center"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <Grid
+                                        Margin="8"
+                                        Visibility="{Binding ProcessStatus.HasDetail, Converter={StaticResource Bool2VisibilityConverter}}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="8" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="8" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="8" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="8" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="8" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock
+                                            Grid.Row="0"
+                                            FontWeight="Bold"
+                                            Text="当前任务" />
+                                        <TextBlock
+                                            Grid.Row="0"
+                                            Grid.Column="2"
+                                            Text="{Binding ProcessStatus.Progress.Name}"
+                                            TextTrimming="CharacterEllipsis" />
+                                        <TextBlock
+                                            Grid.Row="2"
+                                            FontWeight="Bold"
+                                            Text="进度" />
+                                        <Grid
+                                            Grid.Row="2"
+                                            Grid.Column="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="0" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Margin="0,0,8,0"
+                                                Text="{Binding ProcessStatus.Progress.Percent, StringFormat={}0.00%}"
+                                                Visibility="{Binding ProcessStatus.Progress.IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
+                                            <ui:ProgressBar
+                                                Grid.Column="2"
+                                                IsIndeterminate="{Binding ProcessStatus.Progress.IsIndeterminate}"
+                                                Maximum="1"
+                                                Minimum="0"
+                                                ShowPaused="{Binding ProcessStatus.IsPaused}"
+                                                Value="{Binding ProcessStatus.Progress.Percent}" />
+                                        </Grid>
+                                        <TextBlock
+                                            Grid.Row="4"
+                                            FontWeight="Bold"
+                                            Text="当前位置" />
+                                        <TextBlock
+                                            Grid.Row="4"
+                                            Grid.Column="2">
+                                            <Run Text="{Binding ProcessStatus.Frame, Mode=OneWay}" />
+                                            <Run Text="帧     " />
+                                            <Run Text="{Binding ProcessStatus.Time, Mode=OneWay, Converter={StaticResource HourMinSecTimeSpanConverter}, ConverterParameter=1}" />
+                                            <Run Text="    " />
+                                            <Run Text="{Binding ProcessStatus.Bitrate, Mode=OneWay}" />
+                                        </TextBlock>
+                                        <TextBlock
+                                            Grid.Row="6"
+                                            FontWeight="Bold"
+                                            Text="处理速度" />
+                                        <TextBlock
+                                            Grid.Row="6"
+                                            Grid.Column="2">
+                                            <Run Text="{Binding ProcessStatus.Fps, Mode=OneWay}" />
+                                            <Run Text="帧/秒  " />
+                                            <Run Text="{Binding ProcessStatus.Speed, Mode=OneWay}" /><Run Text="×" />
+                                        </TextBlock>
+                                        <TextBlock
+                                            Grid.Row="8"
+                                            FontWeight="Bold"
+                                            Text="开始/预计" />
+                                        <TextBlock
+                                            Grid.Row="8"
+                                            Grid.Column="2">
+                                            <Run Text="{Binding ProcessStatus.Progress.StartTime, StringFormat={StaticResource DateTimeFormat}}" />
+                                            <Run>→</Run>
+                                            <Run Text="{Binding ProcessStatus.Progress.FinishTime, StringFormat={StaticResource DateTimeFormat}}" />
+                                        </TextBlock>
+
+                                        <TextBlock
+                                            Grid.Row="10"
+                                            FontWeight="Bold"
+                                            Text="已用/剩余" />
+                                        <TextBlock
+                                            Grid.Row="10"
+                                            Grid.Column="2"
+                                            Visibility="{Binding ProcessStatus.Progress.IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}">
+                                            <Run Text="{Binding ProcessStatus.Progress.RealDuration, Converter={StaticResource HourMinSecTimeSpanConverter}, Mode=OneWay}" />
+                                            <Run Text="/" />
+                                            <Run Text="{Binding ProcessStatus.Progress.LastTime, Converter={StaticResource HourMinSecTimeSpanConverter}, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </Grid>
+                                    <TextBlock
+                                        Margin="8,0,8,8"
+                                        VerticalAlignment="Center"
+                                        FontFamily="Consolas"
+                                        Opacity="0.8"
+                                        Text="{Binding ProcessStatus.LastOutput}"
+                                        TextWrapping="Wrap"
+                                        Visibility="{Binding IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}}" />
+                                </ui:SimpleStackPanel>
+                            </DockPanel>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
