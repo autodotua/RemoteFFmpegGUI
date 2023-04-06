@@ -4,6 +4,7 @@ using Mapster;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
+using SimpleFFmpegGUI.WPF.Converters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,7 +17,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class UITaskInfo : ModelBase, INotifyPropertyChanged
     {
-        public string Title => DescriptionConverter.GetDescription(Type) + "：" + InputText;
+        public string Title => AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name) + "：" + InputText;
         public string IOText => $"{InputText} → {OutputText}";
 
         public string InputText

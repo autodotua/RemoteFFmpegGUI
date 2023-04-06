@@ -17,10 +17,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
 
         public override FFmpegArgumentItem Speed(int speed)
         {
-            if (speed < -1 || speed > MaxSpeedLevel)
-            {
-                throw new FFmpegArgumentException("编码速度值超出范围");
-            }
+            base.Speed(speed);
             return new FFmpegArgumentItem("preset", speed.ToString());
         }
 

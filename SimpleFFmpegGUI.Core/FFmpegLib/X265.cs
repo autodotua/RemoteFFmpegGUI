@@ -25,11 +25,14 @@ namespace SimpleFFmpegGUI.FFmpegLib
 
         public override FFmpegArgumentItem Speed(int speed)
         {
-            if (speed > MaxSpeedLevel)
-            {
-                throw new FFmpegArgumentException("速度值超出范围");
-            }
+            base.Speed(speed);
             return new FFmpegArgumentItem("preset", FFmpegEnums.Presets[speed]);
+        }
+
+        public override FFmpegArgumentItem Pass(int pass)
+        {
+            base.Pass(pass);
+            return new FFmpegArgumentItem("pass", pass.ToString(), "x265-params", ':');
         }
     }
 

@@ -137,7 +137,14 @@ namespace SimpleFFmpegGUI.FFmpegLib
             return new FFmpegArgumentItem("pass", pass.ToString());
         }
 
-        public abstract FFmpegArgumentItem Speed(int speed);
+        public virtual FFmpegArgumentItem Speed(int speed)
+        {
+            if (speed > MaxSpeedLevel)
+            {
+                throw new FFmpegArgumentException("速度值超出范围");
+            }
+            return null;
+        }
     }
 
 }

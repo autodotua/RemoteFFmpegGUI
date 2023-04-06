@@ -12,7 +12,6 @@ namespace SimpleFFmpegGUI.WPF.Model
         {
             Code = "H265";
             Preset = 2;
-            FirstPassPreset = 8;
             Crf = 25;
             AverageBitrate = 10;
             MaxBitrate = 20;
@@ -37,7 +36,6 @@ namespace SimpleFFmpegGUI.WPF.Model
                     var codec = VideoCodec.GetCodec(Code) ?? VideoCodec.General;
                     MaxPreset = codec.MaxSpeedLevel;
                     Preset = codec.DefaultSpeedLevel;
-                    FirstPassPreset = codec.DefaultSpeedLevel;
                     MaxCRF = codec.MaxCRF;
                     Crf = codec.DefaultCRF;
                     break;

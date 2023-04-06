@@ -23,8 +23,6 @@ namespace SimpleFFmpegGUI.Model
 
         private int preset;
 
-        private int firstPassPreset = 8;
-
         private string size;
 
         private bool twoPass;
@@ -111,15 +109,6 @@ namespace SimpleFFmpegGUI.Model
             get => preset;
             set => this.SetValueAndNotify(ref preset, value, nameof(Preset));
         } 
-        
-        /// <summary>
-        /// 2Pass时，首次编码的编码速度或速度预设
-        /// </summary>
-        public int FirstPassPreset
-        {
-            get => firstPassPreset;
-            set => this.SetValueAndNotify(ref firstPassPreset, value, nameof(FirstPassPreset));
-        }
 
         /// <summary>
         /// 视频尺寸（分辨率）

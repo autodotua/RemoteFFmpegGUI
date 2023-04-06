@@ -239,41 +239,6 @@
                             Grid.Row="6"
                             Content="二次编码"
                             IsChecked="{Binding Video.TwoPass}" />
-                        <Grid
-                            Grid.Row="6"
-                            Grid.Column="2"
-                            Visibility="{Binding Video.TwoPass, Converter={StaticResource Bool2VisibilityConverter}}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="8" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="8" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="8" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Label VerticalAlignment="Center">
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    Text="{Binding Video.FirstPassPreset, Mode=OneWay, StringFormat=首次速度预设： {0}}" />
-                            </Label>
-                            <Slider
-                                Grid.Column="4"
-                                AutoToolTipPlacement="TopLeft"
-                                Maximum="{Binding Video.MaxPreset}"
-                                Minimum="{Binding Video.Preset}"
-                                TickFrequency="1"
-                                TickPlacement="BottomRight"
-                                Value="{Binding Video.FirstPassPreset}" />
-                            <Label
-                                Grid.Column="2"
-                                VerticalAlignment="Center"
-                                Content="慢" />
-                            <Label
-                                Grid.Column="6"
-                                VerticalAlignment="Center"
-                                Content="快" />
-                        </Grid>
 
                         <!--  平均码率  -->
                         <CheckBox

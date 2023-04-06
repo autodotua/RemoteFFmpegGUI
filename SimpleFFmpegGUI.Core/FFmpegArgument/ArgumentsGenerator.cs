@@ -118,14 +118,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             else
             {
                 vg.Codec(oa.Video.Code);
-                if (pass == 1)
-                {
-                    vg.Speed(oa.Video.FirstPassPreset);
-                }
-                else
-                {
-                    vg.Speed(oa.Video.Preset);
-                }
+                vg.Speed(oa.Video.Preset);
                 vg.CRF(oa.Video.Crf);
                 vg.AverageBitrate(oa.Video.AverageBitrate);
                 vg.MaxBitrate(oa.Video.MaxBitrate);
@@ -187,7 +180,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             {
                 throw new FFmpegArgumentException("不能同时禁用视频和音频");
             }
-            if(oa.Video.TwoPass&&string.IsNullOrWhiteSpace(oa.Format))
+            if (oa.Video.TwoPass && string.IsNullOrWhiteSpace(oa.Format))
             {
                 throw new FFmpegArgumentException("需要二次编码时，必须指定格式（Format）");
             }
