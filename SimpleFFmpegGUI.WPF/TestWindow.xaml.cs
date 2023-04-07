@@ -390,8 +390,8 @@ namespace SimpleFFmpegGUI.WPF
         /// <exception cref="Exception"></exception>
         private async Task TestAsync(string input)
         {
-            var media = await MediaInfoManager.GetMediaInfoAsync(input, false);
-            var frameCount = media.VideoStreams[0].AvgFrameRate * media.VideoStreams[0].Duration.TotalSeconds;
+            var media = await MediaInfoManager.GetMediaInfoAsync(input);
+            var frameCount = media.Videos[0].FrameRate * media.Videos[0].DurationSeconds;
             await CreateRefVideosAsync(input, sizes);
             ViewModel.MaxProgress = ViewModel.Tests.Sum(p => p.Items.Count(q => q.IsChecked));
             if (stopping)

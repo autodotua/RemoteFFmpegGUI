@@ -24,7 +24,7 @@
       </el-table-column>
 
       <el-table-column prop="timeText" label="时间" width="180" />
-      <el-table-column label="状态" width="80">
+      <el-table-column label="类型" width="80">
         <template slot-scope="scope">
           <span v-if="scope.row.type == 'E'" style="color: red">错误</span>
           <span style="color: orange" v-if="scope.row.type == 'W'">警告</span>
@@ -97,7 +97,7 @@ export default Vue.extend({
       totalCount: 0,
       pageCount: 1,
       page: 1,
-      countPerPage: 10,
+      countPerPage: 100,
       typeFilter: null,
       timeRange: [],
       taskName: "",

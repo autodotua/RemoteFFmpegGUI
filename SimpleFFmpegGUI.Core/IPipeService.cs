@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using SimpleFFmpegGUI.Model.MediaInfo;
 
 namespace SimpleFFmpegGUI
 {
@@ -29,7 +30,7 @@ namespace SimpleFFmpegGUI
 
         void DeleteTasks(IEnumerable<int> ids);
 
-        MediaInfoDto GetInfo(string path);
+        MediaInfoGeneral GetInfo(string path);
 
         List<CodePreset> GetPresets();
 

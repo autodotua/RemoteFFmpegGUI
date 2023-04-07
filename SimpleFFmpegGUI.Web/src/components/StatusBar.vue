@@ -150,23 +150,10 @@
     </div>
     <div v-else style="height: 60px">
       <i
+        v-if="windowWidth > 988"
         class="el-icon-loading"
-        style="
-          font-size: 24px;
-          position: absolute;
-          left: 50%;
-          margin-left: -12px;
-        "
+        style="float: left; font-size: 2em; margin-top: 12px"
       ></i>
-      <a
-        style="
-          position: absolute;
-          left: 50%;
-          margin-left: -46px;
-          margin-top: 32px;
-        "
-        >正在执行任务</a
-      >
       <el-popconfirm
         title="真的要取消任务吗？"
         style="float: right; margin-right: 36px; margin-top: 8px"
@@ -176,6 +163,15 @@
           >取消</el-button
         ></el-popconfirm
       >
+      <div
+        v-if="windowWidth > 988"
+        style="margin-left: 48px; text-align: center; padding-top: 16px"
+      >
+        {{ status.lastOutput }}
+      </div>
+      <div v-else style="text-align: center; transform: translate(0,-4px);">
+        {{ status.lastOutput }}
+      </div>
     </div>
   </div>
 </template>

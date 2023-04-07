@@ -6,6 +6,7 @@ using Microsoft.WindowsAPICodePack.FzExtension;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
+using SimpleFFmpegGUI.Model.MediaInfo;
 using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections;
@@ -27,60 +28,19 @@ using System.Windows.Shapes;
 
 namespace SimpleFFmpegGUI.WPF.Pages
 {
-    public class MediaInfoPageViewModel : INotifyPropertyChanged
+    public class Bitrate2StringConverter : IValueConverter
     {
-        public MediaInfoPageViewModel()
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            long num = System.Convert.ToInt64(value);
+            string str = NumberConverter.ByteToFitString(num, 2, " bps", " Kbps", " Mbps", " Gbps", " Tbps");
+            return str;
         }
 
-        private string filePath;
-
-        public string FilePath
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            get => filePath;
-            set
-            {
-                this.SetValueAndNotify(ref filePath, value, nameof(FilePath));
-                if (!string.IsNullOrWhiteSpace(filePath) && System.IO.File.Exists(value))
-                {
-                    ShowInfoAsync();
-                }
-            }
+            throw new NotImplementedException();
         }
-
-        private bool working;
-
-        public bool Working
-        {
-            get => working;
-            set => this.SetValueAndNotify(ref working, value, nameof(Working));
-        }
-
-        private async Task ShowInfoAsync()
-        {
-            Working = true;
-            try
-            {
-                MediaInfo = await MediaInfoManager.GetMediaInfoAsync(FilePath);
-            }
-            catch (Exception ex)
-            {
-            }
-            finally
-            {
-                Working = false;
-            }
-        }
-
-        private MediaInfoDto mediaInfo;
-
-        public MediaInfoDto MediaInfo
-        {
-            get => mediaInfo;
-            set => this.SetValueAndNotify(ref mediaInfo, value, nameof(MediaInfo));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     /// <summary>
@@ -88,29 +48,19 @@ namespace SimpleFFmpegGUI.WPF.Pages
     /// </summary>
     public partial class MediaInfoPage : UserControl
     {
-        public MediaInfoPageViewModel ViewModel { get; set; }
-
         public MediaInfoPage(MediaInfoPageViewModel viewModel)
         {
             ViewModel = viewModel;
             DataContext = ViewModel;
             InitializeComponent();
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+            ViewModel.ReadMediaInfoError += (s, e) => this.CreateMessage().QueueError("读取媒体信息失败", e.ExceptionObject as Exception);
         }
 
-        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        public MediaInfoPageViewModel ViewModel { get; set; }
+        public void SetFile(string file)
         {
-            if (e.PropertyName == nameof(ViewModel.Working))
-            {
-                if (ViewModel.Working)
-                {
-                    ring.Show();
-                }
-                else
-                {
-                    ring.Hide();
-                }
-            }
+            ViewModel.FilePath = file;
         }
 
         protected override void OnDragOver(DragEventArgs e)
@@ -135,11 +85,6 @@ namespace SimpleFFmpegGUI.WPF.Pages
             }
         }
 
-        private void TextBox_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Keyboard.ClearFocus();
-        }
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
@@ -149,24 +94,81 @@ namespace SimpleFFmpegGUI.WPF.Pages
             }
         }
 
-        public void SetFile(string file)
+        private void TextBox_MouseLeave(object sender, MouseEventArgs e)
         {
-            ViewModel.FilePath = file;
+            Keyboard.ClearFocus();
+        }
+
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ViewModel.Working))
+            {
+                if (ViewModel.Working)
+                {
+                    ring.Show();
+                }
+                else
+                {
+                    ring.Hide();
+                }
+            }
         }
     }
 
-    public class Bitrate2StringConverter : IValueConverter
+    public class MediaInfoPageViewModel : INotifyPropertyChanged
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        private string filePath;
+
+        private MediaInfoGeneral mediaInfo;
+
+        private bool working;
+
+        public MediaInfoPageViewModel()
         {
-            long num = System.Convert.ToInt64(value);
-            string str = NumberConverter.ByteToFitString(num, 2, " bps", " kbps", " mbps", " gbps", " tbps");
-            return str;
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public event EventHandler<UnhandledExceptionEventArgs> ReadMediaInfoError;
+
+        public string FilePath
+        {
+            get => filePath;
+            set
+            {
+                this.SetValueAndNotify(ref filePath, value, nameof(FilePath));
+                if (!string.IsNullOrWhiteSpace(filePath) && System.IO.File.Exists(value))
+                {
+                    ShowInfoAsync().ConfigureAwait(false);
+                }
+            }
+        }
+        public MediaInfoGeneral MediaInfo
+        {
+            get => mediaInfo;
+            set => this.SetValueAndNotify(ref mediaInfo, value, nameof(MediaInfo));
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public bool Working
         {
-            throw new NotImplementedException();
+            get => working;
+            set => this.SetValueAndNotify(ref working, value, nameof(Working));
+        }
+
+        private async Task ShowInfoAsync()
+        {
+            Working = true;
+            try
+            {
+                MediaInfo = await MediaInfoManager.GetMediaInfoAsync(FilePath);
+            }
+            catch (Exception ex)
+            {
+                ReadMediaInfoError?.Invoke(this, new UnhandledExceptionEventArgs(ex, false));
+            }
+            finally
+            {
+                Working = false;
+            }
         }
     }
 }

@@ -1,9 +1,12 @@
 ﻿using FFMpegCore;
 using Mapster;
+using Newtonsoft.Json.Linq;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Model;
+using SimpleFFmpegGUI.Model.MediaInfo;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -20,37 +23,68 @@ namespace SimpleFFmpegGUI.Manager
             return tempPath;
         }
 
-        public static async Task<MediaInfoDto> GetMediaInfoAsync(string path, bool includeDetail = true)
+        public static async Task<MediaInfoGeneral> GetMediaInfoAsync(string path)
         {
-            IMediaAnalysis result = null;
-            try
+            MediaInfoGeneral mediaInfo = null;
+            await Task.Run(() =>
             {
-                result = await FFProbe.AnalyseAsync(path);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("查询信息失败：" + ex.Message);
-            }
-            var info = result.Adapt<MediaInfoDto>();
-            if (includeDetail)
-            {
-                await Task.Run(() =>
+                var mediaInfoJSON = GetMediaInfoProcessOutput(path);
+                mediaInfo = ParseMediaInfoJSON(mediaInfoJSON);
+                mediaInfo.Raw = mediaInfoJSON.ToString(Newtonsoft.Json.Formatting.Indented);
+                foreach (var video in mediaInfo.Videos)
                 {
-                    try
+                    if (!string.IsNullOrEmpty(video.Encoded_Library_Settings))
                     {
-                        string mediaInfo = MediaInfoModule.GetInfo(path);
-                        info.Detail = mediaInfo;
-                        var encodingSettingsString = FindEncodingSettingsString(mediaInfo);
-                        var streams = ParseMediaInfoOutput(mediaInfo);
-                        if (encodingSettingsString != null)
-                        {
-                            var settings = ParseEncodingSettings(encodingSettingsString);
-                        }
+                        video.EncodingSettings = ParseEncodingSettings(video.Encoded_Library_Settings);
                     }
-                    catch (Exception ex)
-                    {
-                    }
-                });
+                }
+
+            });
+            return mediaInfo;
+        }
+
+        private static JObject GetMediaInfoProcessOutput(string path)
+        {
+            string tmpFile = System.IO.Path.GetTempFileName();
+            var p = Process.Start(new ProcessStartInfo
+            {
+                FileName = "MediaInfo",
+                Arguments = $"--output=JSON --BOM --LogFile=\"{tmpFile}\" \"{path}\"",
+                CreateNoWindow = true,
+            });
+            p.WaitForExit();
+            string output = System.IO.File.ReadAllText(tmpFile);
+            return JObject.Parse(output);
+        }
+
+        private static MediaInfoGeneral ParseMediaInfoJSON(JObject json)
+        {
+            MediaInfoGeneral info = null;
+            var tracks = json["media"]["track"] as JArray;
+            foreach (JObject track in tracks)
+            {
+                if (track["@type"].Value<string>() == "General")
+                {
+                    info = track.ToObject<MediaInfoGeneral>();
+                }
+                else if (track["@type"].Value<string>() == "Video")
+                {
+                    Debug.Assert(info != null);
+                    info.Videos.Add(track.ToObject<MediaInfoVideo>());
+                    info.Videos[^1].Index = info.Videos.Count;
+                }
+                else if (track["@type"].Value<string>() == "Audio")
+                {
+                    Debug.Assert(info != null);
+                    info.Audios.Add(track.ToObject<MediaInfoAudio>());
+                    info.Audios[^1].Index = info.Audios.Count;
+                }
+                else if (track["@type"].Value<string>() == "Text")
+                {
+                    Debug.Assert(info != null);
+                    info.Texts.Add(track.ToObject<MediaInfoText>());
+                    info.Texts[^1].Index = info.Texts.Count;
+                }
             }
             return info;
         }
@@ -120,71 +154,6 @@ namespace SimpleFFmpegGUI.Manager
                 return match.Groups[1].Value; // 返回匹配到的编码设置项字符串
             }
             return null; // 如果没有找到，返回null
-        }
-        
-        public static List<MediaInfoStream> ParseMediaInfoOutput(string output)
-        {
-            // 初始化一个空的MediaInfoStream列表
-            List<MediaInfoStream> streams = new List<MediaInfoStream>();
-
-            // Split the output by line breaks
-            string[] lines = output.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-
-            // 初始化一个空引用，表示当前的流对象
-            MediaInfoStream currentStream = null;
-
-            // 遍历每一行
-            foreach (string line in lines)
-            {
-                // 去掉行首和行尾的空白字符
-                string trimmedLine = line.Trim();
-
-                // 如果行为空，跳过
-                if (string.IsNullOrEmpty(trimmedLine))
-                {
-                    continue;
-                }
-
-                // 如果行没有冒号，说明是一个流类型的名称
-                if (!trimmedLine.Contains(":"))
-                {
-                    // 创建一个新的MediaInfoStream对象，以去掉空白字符的行作为名称
-                    currentStream = new MediaInfoStream(trimmedLine);
-
-                    // 把MediaInfoStream对象添加到列表中
-                    streams.Add(currentStream);
-                }
-                else
-                {
-                    // 如果没有当前的流对象，跳过这一行
-                    if (currentStream == null)
-                    {
-                        continue;
-                    }
-
-                    // 按第一个冒号分割这一行，得到流属性的名称和值
-                    string[] parts = trimmedLine.Split(new[] { ":" }, 2, StringSplitOptions.None);
-
-                    // 如果不是正好两个部分，跳过这一行
-                    if (parts.Length != 2)
-                    {
-                        continue;
-                    }
-
-                    // 去掉部分首尾的空白字符
-                    string name = parts[0].Trim();
-                    string value = parts[1].Trim();
-
-                    // 创建一个新的MediaInfoStreamItem对象，以名称和值作为参数
-                    MediaInfoItem item = new MediaInfoItem(name, value);
-
-                    // 把MediaInfoStreamItem对象添加到当前的MediaInfoStream对象中
-                    currentStream.Add(item);
-                }
-            }
-
-            // 返回MediaInfoStream列表
-            return streams;
         }
     }
 }

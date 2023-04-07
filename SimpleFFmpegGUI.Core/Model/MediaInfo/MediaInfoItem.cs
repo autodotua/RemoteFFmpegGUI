@@ -2,8 +2,8 @@
 {
     public class MediaInfoItem
     {
-        public string Name { get; set; } // 编码设置项的名称
-        public object Value { get; set; } // 编码设置项的值
+        public string Name { get; set; } 
+        public object Value { get; set; } 
         public MediaInfoItem()
         {
 

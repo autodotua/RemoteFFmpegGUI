@@ -279,7 +279,7 @@ export default Vue.extend({
       taskID: 0,
       pageCount: 1,
       page: 1,
-      countPerPage: 10,
+      countPerPage: 100,
       statusFilter: null,
       scheduleTime: "",
       hasSchedule: false,

@@ -10,6 +10,7 @@ using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
+using SimpleFFmpegGUI.Model.MediaInfo;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -146,17 +147,17 @@ namespace SimpleFFmpegGUI.WPF
 
         public async Task SetVideoAsync(string path, TimeSpan? from, TimeSpan? to)
         {
-            MediaInfoDto mediaInfo;
+            MediaInfoGeneral mediaInfo;
             ViewModel.FilePath = path;
             try
             {
-                mediaInfo = await MediaInfoManager.GetMediaInfoAsync(path, false);
+                mediaInfo = await MediaInfoManager.GetMediaInfoAsync(path);
             }
             catch (Exception ex)
             {
                 throw new Exception("查询视频信息失败", ex);
             }
-            if (mediaInfo.VideoStreams.Count == 0)
+            if (mediaInfo.Videos.Count == 0)
             {
                 throw new Exception("文件没有视频流");
             }
