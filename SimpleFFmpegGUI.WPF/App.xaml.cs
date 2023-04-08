@@ -5,6 +5,7 @@ using log4net.Layout;
 using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.Controls;
 using SimpleFFmpegGUI.Manager;
+using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
 using SimpleFFmpegGUI.WPF.Pages;
 using SimpleFFmpegGUI.WPF.Panels;
@@ -40,8 +41,16 @@ namespace SimpleFFmpegGUI.WPF
 #if !DEBUG
 
                 WPFUnhandledExceptionCatcher.RegistAll().UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
-
 #endif
+
+            try
+            {
+                FFmpegDbContext.Migrate();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("数据库迁移失败", ex);
+            }
 
             Unosquare.FFME.Library.FFmpegDirectory = FzLib.Program.App.ProgramDirectoryPath;
             var serviceCollection = new ServiceCollection();

@@ -95,6 +95,18 @@ namespace SimpleFFmpegGUI
 
         public static IHostBuilder CreateHostBuilder(string pipeName)
         {
+            try
+            {
+                FFmpegDbContext.Migrate();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("数据库迁移失败：" + ex);
+                Console.WriteLine("程序终止");
+                Console.ReadKey();
+                Environment.Exit(-1);
+                return null;
+            }
             return Host.CreateDefaultBuilder()
                     .ConfigureServices(services =>
                     {

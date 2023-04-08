@@ -3,7 +3,6 @@ using System;
 
 namespace SimpleFFmpegGUI.Model
 {
-    [Index(nameof(Key))]
     public class Config : ModelBase
     {
         public Config()
