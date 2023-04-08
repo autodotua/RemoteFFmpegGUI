@@ -1,4 +1,5 @@
-﻿using SimpleFFmpegGUI.Model;
+﻿using SimpleFFmpegGUI.FFmpegArgument;
+using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -239,7 +240,8 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     logger.Error(task, "运行错误：" + ex.ToString());
                     task.Status = TaskStatus.Error;
-                    task.Message = ffmpegManager.GetErrorMessage() ?? "运行错误，请查看日志";
+                    task.Message = ex is FFmpegArgumentException ? 
+                        ex.Message : ffmpegManager.GetErrorMessage() ?? "运行错误，请查看日志";
                 }
                 else
                 {

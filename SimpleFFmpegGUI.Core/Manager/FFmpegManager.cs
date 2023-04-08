@@ -323,7 +323,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 if (realLength <= arg.From.Value)
                 {
-                    throw new Exception("开始时间在视频结束时间之后");
+                    throw new FFmpegArgumentException("开始时间在视频结束时间之后");
                 }
                 return realLength - arg.From.Value;
             }
@@ -332,7 +332,7 @@ namespace SimpleFFmpegGUI.Manager
                 TimeSpan endTime = (arg.From.HasValue ? arg.From.Value : TimeSpan.Zero) + arg.Duration.Value;
                 if (endTime > realLength)
                 {
-                    throw new Exception("裁剪后的结束时间在视频结束时间之后");
+                    throw new FFmpegArgumentException("裁剪后的结束时间在视频结束时间之后");
                 }
                 return arg.Duration.Value;
             }
@@ -340,7 +340,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 if (arg.To.Value > realLength)
                 {
-                    throw new Exception("裁剪后的结束时间在视频结束时间之后");
+                    throw new FFmpegArgumentException("裁剪后的结束时间在视频结束时间之后");
                 }
                 return arg.To.Value - start;
             }
