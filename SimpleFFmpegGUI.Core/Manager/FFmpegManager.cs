@@ -303,7 +303,7 @@ namespace SimpleFFmpegGUI.Manager
             TimeSpan realLength;
             try
             {
-                realLength = FFProbe.Analyse(path).Duration;
+                realLength = MediaInfoManager.GetVideoDurationByFFprobeAsync(path).Result;
             }
             catch (Exception)
             {

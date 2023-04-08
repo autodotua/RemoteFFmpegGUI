@@ -210,8 +210,55 @@
                                             Text="采样率" />
                                         <TextBlock Text="{Binding SamplingRate}" />
                                     </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="默认" />
+                                        <TextBlock Text="{Binding Default}" />
+                                    </StackPanel>
+                                </ui:SimpleStackPanel>
+                            </GroupBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
+                <ItemsControl ItemsSource="{Binding MediaInfo.Texts}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <GroupBox Header="{Binding Index}">
+                                <GroupBox.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Text="{Binding ., StringFormat={}字幕 {0}}"
+                                            TextAlignment="Center" />
+                                    </DataTemplate>
+                                </GroupBox.HeaderTemplate>
+                                <ui:SimpleStackPanel
+                                    Margin="0,0,0,16"
+                                    Spacing="4">
 
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Style="{StaticResource KeyStyle}">编码</TextBlock>
+                                        <TextBlock Text="{Binding Format}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="语言" />
+                                        <TextBlock Text="{Binding Language}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="标题" />
+                                        <TextBlock Text="{Binding Title}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Style="{StaticResource KeyStyle}"
+                                            Text="默认" />
+                                        <TextBlock Text="{Binding Default}" />
+                                    </StackPanel>
                                 </ui:SimpleStackPanel>
                             </GroupBox>
                         </DataTemplate>

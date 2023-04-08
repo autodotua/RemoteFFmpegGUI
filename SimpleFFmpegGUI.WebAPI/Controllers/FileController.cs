@@ -19,13 +19,12 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
     public class FileController : FFmpegControllerBase
     {
         public static ConcurrentDictionary<string, string> Guid2File { get; } = new ConcurrentDictionary<string, string>();
-        private static ConcurrentDictionary<string, string> File2Guid { get; } = new ConcurrentDictionary<string, string>();
-        private readonly IHostingEnvironment hostingEnvironment;
+        private readonly IWebHostEnvironment hostingEnvironment;
 
         public FileController(ILogger<MediaInfoController> logger,
             IConfiguration config,
         PipeClient pipeClient,
-        IHostingEnvironment hostingEnvironment) : base(logger, config, pipeClient)
+        IWebHostEnvironment hostingEnvironment) : base(logger, config, pipeClient)
         {
             this.hostingEnvironment = hostingEnvironment;
         }

@@ -15,14 +15,6 @@ namespace SimpleFFmpegGUI.Manager
 {
     public static class MediaInfoManager
     {
-        public static async Task<string> GetSnapshotAsync(string path, TimeSpan time)
-        {
-            string tempPath = System.IO.Path.GetTempFileName() + ".jpg";
-            FFmpegProcess process = new FFmpegProcess($"-ss {time.TotalSeconds:0.000}  -i \"{path}\" -vframes 1 {tempPath}");
-            await process.StartAsync(null, null);
-            return tempPath;
-        }
-
         public static async Task<MediaInfoGeneral> GetMediaInfoAsync(string path)
         {
             MediaInfoGeneral mediaInfo = null;
@@ -43,6 +35,18 @@ namespace SimpleFFmpegGUI.Manager
             return mediaInfo;
         }
 
+        public static async Task<string> GetSnapshotAsync(string path, TimeSpan time)
+        {
+            string tempPath = System.IO.Path.GetTempFileName() + ".jpg";
+            FFmpegProcess process = new FFmpegProcess($"-ss {time.TotalSeconds:0.000}  -i \"{path}\" -vframes 1 {tempPath}");
+            await process.StartAsync(null, null);
+            return tempPath;
+        }
+
+        public static async Task<TimeSpan> GetVideoDurationByFFprobeAsync(string path)
+        {
+            return (await FFProbe.AnalyseAsync(path)).Duration;
+        }
         private static JObject GetMediaInfoProcessOutput(string path)
         {
             string tmpFile = System.IO.Path.GetTempFileName();
@@ -57,39 +61,7 @@ namespace SimpleFFmpegGUI.Manager
             return JObject.Parse(output);
         }
 
-        private static MediaInfoGeneral ParseMediaInfoJSON(JObject json)
-        {
-            MediaInfoGeneral info = null;
-            var tracks = json["media"]["track"] as JArray;
-            foreach (JObject track in tracks)
-            {
-                if (track["@type"].Value<string>() == "General")
-                {
-                    info = track.ToObject<MediaInfoGeneral>();
-                }
-                else if (track["@type"].Value<string>() == "Video")
-                {
-                    Debug.Assert(info != null);
-                    info.Videos.Add(track.ToObject<MediaInfoVideo>());
-                    info.Videos[^1].Index = info.Videos.Count;
-                }
-                else if (track["@type"].Value<string>() == "Audio")
-                {
-                    Debug.Assert(info != null);
-                    info.Audios.Add(track.ToObject<MediaInfoAudio>());
-                    info.Audios[^1].Index = info.Audios.Count;
-                }
-                else if (track["@type"].Value<string>() == "Text")
-                {
-                    Debug.Assert(info != null);
-                    info.Texts.Add(track.ToObject<MediaInfoText>());
-                    info.Texts[^1].Index = info.Texts.Count;
-                }
-            }
-            return info;
-        }
-
-        public static List<MediaInfoItem> ParseEncodingSettings(string input)
+        private static List<MediaInfoItem> ParseEncodingSettings(string input)
         {
             List<MediaInfoItem> settings = new List<MediaInfoItem>(); // 创建一个空列表来存储编码设置项
             var parts = input.Split('/').Select(p => p.Trim()); // 用"/"来分割输入字符串为一个字符串数组
@@ -124,36 +96,36 @@ namespace SimpleFFmpegGUI.Manager
             return settings; // 返回编码设置项列表
         }
 
-        private static VideoCodeArguments EncodingSettings2VideoArguments(List<MediaInfoItem> items)
+        private static MediaInfoGeneral ParseMediaInfoJSON(JObject json)
         {
-            Dictionary<string, bool> key2bools = items
-                .Where(p => p.Value is bool)
-                .ToDictionary(p => p.Name, p => (bool)p.Value);
-            Dictionary<string, int> key2ints = items
-                .Where(p => p.Value is int)
-                .ToDictionary(p => p.Name, p => (int)p.Value);
-
-            Dictionary<string, double> key2doubles = items
-                            .Where(p => p.Value is double)
-                            .ToDictionary(p => p.Name, p => (double)p.Value);
-
-            Dictionary<string, string> key2strings = items
-                            .Where(p => p.Value is string)
-                            .ToDictionary(p => p.Name, p => (string)p.Value);
-
-            VideoCodeArguments args = new VideoCodeArguments();
-            throw new NotImplementedException();
-        }
-
-        private static string FindEncodingSettingsString(string str)
-        {
-            string pattern = @"Encoding settings\s*:\s*(.*)"; // 定义一个正则表达式来匹配编码设置项字符串
-            Match match = Regex.Match(str, pattern); // 用正则表达式匹配字符串
-            if (match.Success) // 如果匹配成功
+            MediaInfoGeneral info = null;
+            var tracks = json["media"]["track"] as JArray;
+            foreach (JObject track in tracks)
             {
-                return match.Groups[1].Value; // 返回匹配到的编码设置项字符串
+                if (track["@type"].Value<string>() == "General")
+                {
+                    info = track.ToObject<MediaInfoGeneral>();
+                }
+                else if (track["@type"].Value<string>() == "Video")
+                {
+                    Debug.Assert(info != null);
+                    info.Videos.Add(track.ToObject<MediaInfoVideo>());
+                    info.Videos[^1].Index = info.Videos.Count;
+                }
+                else if (track["@type"].Value<string>() == "Audio")
+                {
+                    Debug.Assert(info != null);
+                    info.Audios.Add(track.ToObject<MediaInfoAudio>());
+                    info.Audios[^1].Index = info.Audios.Count;
+                }
+                else if (track["@type"].Value<string>() == "Text")
+                {
+                    Debug.Assert(info != null);
+                    info.Texts.Add(track.ToObject<MediaInfoText>());
+                    info.Texts[^1].Index = info.Texts.Count;
+                }
             }
-            return null; // 如果没有找到，返回null
+            return info;
         }
     }
 }

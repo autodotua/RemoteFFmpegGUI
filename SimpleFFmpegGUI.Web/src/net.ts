@@ -8,7 +8,7 @@ function getUrl(controller: string): string {
                 return `/api/${controller}`;//发布
         }
         else {
-                return `http://autodotua.top:12316/api/${controller}`;//发布API调试
+                // return `http://autodotua.top:12316/api/${controller}`;//发布API调试
                 return `https://localhost:44305/${controller}`;//调试
         }
 }

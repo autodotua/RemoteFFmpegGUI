@@ -13,12 +13,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using SimpleFFmpegGUI.Model.MediaInfo;
 
 namespace SimpleFFmpegGUI
 {
     public class PipeService : IPipeService
     {
-        private static QueueManager manager = new QueueManager();
+        private static readonly QueueManager manager = new QueueManager();
         public static QueueManager Manager => manager;
 
         public PipeService()
@@ -48,7 +49,7 @@ namespace SimpleFFmpegGUI
             return id;
         }
 
-        public MediaInfoDto GetInfo(string path)
+        public MediaInfoGeneral GetInfo(string path)
         {
             return MediaInfoManager.GetMediaInfoAsync(path).Result;
         }
