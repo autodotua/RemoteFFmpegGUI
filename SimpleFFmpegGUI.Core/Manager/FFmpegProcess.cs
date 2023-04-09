@@ -10,9 +10,11 @@ namespace SimpleFFmpegGUI.Manager
     /// </summary>
     public class FFmpegProcess
     {
+        public ProcessPriorityClass priority = ProcessPriorityClass.Normal;
         private readonly Process process = new Process();
 
         private bool started = false;
+        private TaskCompletionSource<bool> tcs;
 
         public FFmpegProcess(string argument)
         {
@@ -45,12 +47,34 @@ namespace SimpleFFmpegGUI.Manager
         /// </summary>
         public int Id => !started ? throw new Exception("进程还未开始运行") : process.Id;
 
+        public ProcessPriorityClass Priority
+        {
+            get
+            {
+                if (started && process.HasExited)
+                {
+                    throw new Exception("进程已经退出");
+                }
+
+                return priority;
+            }
+            set
+            {
+                if (started && process.HasExited)
+                {
+                    throw new Exception("进程已经退出");
+                }
+                priority = value;
+                if (started)
+                {
+                    process.PriorityClass = value;
+                }
+            }
+        }
         /// <summary>
         /// 运行时间
         /// </summary>
         public TimeSpan RunningTime => process.HasExited ? process.ExitTime - process.StartTime : throw new Exception("进程还未结束");
-
-        private TaskCompletionSource<bool> tcs;
         /// <summary>
         /// 启动进程
         /// </summary>
@@ -82,6 +106,7 @@ namespace SimpleFFmpegGUI.Manager
                 }
             });
             process.Start();
+            process.PriorityClass = priority;
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             process.Exited += async (s, e) =>
@@ -115,7 +140,7 @@ namespace SimpleFFmpegGUI.Manager
 
         public Task WaitForExitAsync()
         {
-            if(tcs==null)
+            if (tcs == null)
             {
                 throw new Exception("进程还未开始");
             }

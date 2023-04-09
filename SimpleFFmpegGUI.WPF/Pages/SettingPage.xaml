@@ -29,13 +29,19 @@
                     Content="平滑滚动"
                     IsChecked="{Binding SmoothScroll}" />
 
-                <CheckBox
-                    Content="记住上次的输出参数"
-                    IsChecked="{Binding RememberLastArguments}" />
-                <TextBlock
-                    Opacity="0.5"
-                    Text="开启该选项时，默认预设功能将不可用"
-                    Visibility="{Binding RememberLastArguments, Converter={StaticResource Bool2VisibilityConverter}}" />
+                <ui:SimpleStackPanel
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <CheckBox
+                        VerticalAlignment="Center"
+                        Content="记住上次的输出参数"
+                        IsChecked="{Binding RememberLastArguments}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Opacity="0.5"
+                        Text="开启该选项时，默认预设功能将不可用"
+                        Visibility="{Binding RememberLastArguments, Converter={StaticResource Bool2VisibilityConverter}}" />
+                </ui:SimpleStackPanel>
                 <ui:SimpleStackPanel
                     Orientation="Horizontal"
                     Spacing="8">
@@ -67,6 +73,33 @@
                         <ui:SymbolIcon Symbol="OpenFile" />
                     </Button>
                 </ui:SimpleStackPanel>
+
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="108" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="64" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="默认进程优先级" />
+                    <Slider
+                        Grid.Column="2"
+                        Margin="0,-6,0,0"
+                        IsSnapToTickEnabled="True"
+                        LargeChange="01"
+                        Maximum="4"
+                        Minimum="0"
+                        SmallChange="1"
+                        TickFrequency="1"
+                        TickPlacement="BottomRight"
+                        Value="{Binding DefaultProcessPriority}" />
+                    <TextBlock
+                        Grid.Column="4"
+                        HorizontalAlignment="Right"
+                        Text="{Binding DefaultProcessPriority, Converter={StaticResource Index2StringConverter}, ConverterParameter=低;低于正常;正常;高于正常;高}" />
+                </Grid>
+
             </ui:SimpleStackPanel>
         </GroupBox>
         <GroupBox
@@ -106,7 +139,7 @@
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE106;" />
                 </ui:AppBarButton.Icon>
-            </ui:AppBarButton> 
+            </ui:AppBarButton>
             <ui:AppBarButton
                 Click="OKButton_Click"
                 Label="保存">

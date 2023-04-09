@@ -36,6 +36,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private DefaultOutputDirType defaultOutputDirType = DefaultOutputDirType.InputDir;
 
+        private int defaultProcessPriority = 2;
         private bool rememberLastArguments = true;
 
         private List<RemoteHost> remoteHosts = new List<RemoteHost>();
@@ -86,6 +87,11 @@ namespace SimpleFFmpegGUI.WPF
             get => defaultOutputDirType;
             set => this.SetValueAndNotify(ref defaultOutputDirType, value, nameof(DefaultOutputDirType));
         }
+        public int DefaultProcessPriority
+        {
+            get => defaultProcessPriority;
+            set => this.SetValueAndNotify(ref defaultProcessPriority, value, nameof(DefaultProcessPriority));
+        }
 
         public Dictionary<TaskType, OutputArguments> LastOutputArguments { get; set; } = new Dictionary<TaskType, OutputArguments>();
 
@@ -113,13 +119,11 @@ namespace SimpleFFmpegGUI.WPF
             set => this.SetValueAndNotify(ref startQueueAfterAddTask, value, nameof(StartQueueAfterAddTask));
         }
 
-        public bool WindowMaximum { get; set; } = false;
-
-        public string TestVideo { get; set; }
-        public int TestQCMode { get; set; } = 0;
-        public PerformanceTestLine[] TestItems { get; set; }
         public PerformanceTestCodecParameter[] TestCodecs { get; set; }
-
+        public PerformanceTestLine[] TestItems { get; set; }
+        public int TestQCMode { get; set; } = 0;
+        public string TestVideo { get; set; }
+        public bool WindowMaximum { get; set; } = false;
         public void Save()
         {
             this.Save(path, new JsonSerializerSettings().SetIndented());

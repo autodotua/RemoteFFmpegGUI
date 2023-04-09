@@ -89,6 +89,7 @@ namespace SimpleFFmpegGUI.Manager
         /// 暂停时，暂停开始的时间
         /// </summary>
         private DateTime pauseStartTime;
+        private FFmpegProcess process;
 
         public FFmpegManager(TaskInfo task)
         {
@@ -99,6 +100,8 @@ namespace SimpleFFmpegGUI.Manager
         /// 进程输出事件
         /// </summary>
         public event EventHandler<FFmpegOutputEventArgs> FFmpegOutput;
+
+        public event EventHandler<ProcessChangedEventArgs> ProcessChanged;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -122,6 +125,19 @@ namespace SimpleFFmpegGUI.Manager
         }
 
         /// <summary>
+        /// FFmpeg进程
+        /// </summary>
+        public FFmpegProcess Process
+        {
+            get => process;
+            set
+            {
+                var old = process;
+                process = value;
+                ProcessChanged?.Invoke(this, new ProcessChangedEventArgs(old, value));
+            }
+        }
+        /// <summary>
         /// 进度相关属性
         /// </summary>
         public ProgressDto Progress { get; private set; }
@@ -130,12 +146,6 @@ namespace SimpleFFmpegGUI.Manager
         /// FFmpeg任务
         /// </summary>
         public TaskInfo Task => task;
-
-        /// <summary>
-        /// FFmpeg进程
-        /// </summary>
-        private FFmpegProcess Process { get; set; }
-
         /// <summary>
         /// 测试输出参数是否合法
         /// </summary>
@@ -303,7 +313,7 @@ namespace SimpleFFmpegGUI.Manager
             TimeSpan realLength;
             try
             {
-                realLength = MediaInfoManager.GetVideoDurationByFFprobeAsync(path).Result;
+                realLength = MediaInfoManager.GetVideoDurationByFFprobe(path);
             }
             catch (Exception)
             {

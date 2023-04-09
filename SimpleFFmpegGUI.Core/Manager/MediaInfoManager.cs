@@ -47,6 +47,11 @@ namespace SimpleFFmpegGUI.Manager
         {
             return (await FFProbe.AnalyseAsync(path)).Duration;
         }
+
+        public static TimeSpan GetVideoDurationByFFprobe(string path)
+        {
+            return FFProbe.Analyse(path).Duration;
+        }
         private static JObject GetMediaInfoProcessOutput(string path)
         {
             string tmpFile = System.IO.Path.GetTempFileName();

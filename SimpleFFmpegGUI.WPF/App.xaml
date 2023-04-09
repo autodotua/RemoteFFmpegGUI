@@ -2,9 +2,10 @@
     x:Class="SimpleFFmpegGUI.WPF.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:SimpleFFmpegGUI.WPF.Converters"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:system="clr-namespace:System;assembly=System.Runtime"
-    xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:converters="clr-namespace:SimpleFFmpegGUI.WPF.Converters"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     Exit="Application_Exit"
     ShutdownMode="OnMainWindowClose">
     <Application.Resources>
@@ -14,8 +15,9 @@
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
             </ResourceDictionary.MergedDictionaries>
-            <converters:NameDescriptionAttributeValueConverter x:Key="NameDescriptionAttributeValueConverter"/>
-            <converters:HourMinSecTimeSpanConverter x:Key="HourMinSecTimeSpanConverter"/>
+            <converters:NameDescriptionAttributeValueConverter x:Key="NameDescriptionAttributeValueConverter" />
+            <converters:HourMinSecTimeSpanConverter x:Key="HourMinSecTimeSpanConverter" />
+            <converters:Index2StringConverter x:Key="Index2StringConverter" />
             <system:String x:Key="DateTimeFormat">yyyy-MM-dd HH:mm:ss</system:String>
             <system:String x:Key="TimeSpanFormat">hh\:mm\:ss\.fff</system:String>
         </ResourceDictionary>

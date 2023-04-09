@@ -27,7 +27,7 @@
                             Padding="12"
                             Background="{DynamicResource SystemControlBackgroundListLowBrush}"
                             ClipToBounds="True">
-                            <DockPanel Height="224">
+                            <DockPanel Height="256">
                                 <ui:CommandBar
                                     Margin="-12,8,-12,-12"
                                     Background="Transparent"
@@ -62,17 +62,18 @@
                                         Label="暂停" />
                                 </ui:CommandBar>
 
-                                <ui:SimpleStackPanel Spacing="8">
+                                <StackPanel>
                                     <TextBlock
-                                        Margin="8,4"
+                                        Margin="8,4,8,12"
+                                        FontWeight="Bold"
                                         Text="{Binding Title}"
                                         TextAlignment="Center"
                                         TextTrimming="CharacterEllipsis" />
                                     <Grid
-                                        Margin="8"
+                                        Margin="8,0"
                                         Visibility="{Binding ProcessStatus.HasDetail, Converter={StaticResource Bool2VisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="72" />
                                             <ColumnDefinition Width="16" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
@@ -171,6 +172,34 @@
                                             <Run Text="{Binding ProcessStatus.Progress.LastTime, Converter={StaticResource HourMinSecTimeSpanConverter}, Mode=OneWay}" />
                                         </TextBlock>
                                     </Grid>
+                                    <Grid Margin="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="72" />
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="64" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            FontWeight="Bold"
+                                            Text="进程优先级" />
+                                        <Slider
+                                            Grid.Column="2"
+                                            Margin="0,-6,0,0"
+                                            IsMoveToPointEnabled="True"
+                                            IsSnapToTickEnabled="True"
+                                            LargeChange="01"
+                                            Maximum="4"
+                                            Minimum="0"
+                                            SmallChange="1"
+                                            TickFrequency="1"
+                                            TickPlacement="BottomRight"
+                                            Value="{Binding ProcessPriority}" />
+                                        <TextBlock
+                                            Grid.Column="4"
+                                            HorizontalAlignment="Right"
+                                            Text="{Binding ProcessPriority, Converter={StaticResource Index2StringConverter}, ConverterParameter=低;低于正常;正常;高于正常;高}" />
+                                    </Grid>
                                     <TextBlock
                                         Margin="8,0,8,8"
                                         VerticalAlignment="Center"
@@ -179,7 +208,7 @@
                                         Text="{Binding ProcessStatus.LastOutput}"
                                         TextWrapping="Wrap"
                                         Visibility="{Binding IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}}" />
-                                </ui:SimpleStackPanel>
+                                </StackPanel>
                             </DockPanel>
                         </Border>
                     </DataTemplate>

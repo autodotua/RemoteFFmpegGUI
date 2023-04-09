@@ -67,7 +67,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             Debug.Assert(task.ProcessManager != null);
             try
             {
-                (sender as FrameworkElement).IsEnabled = false;
+                IsEnabled = false;
                 await task.ProcessManager.CancelAsync();
             }
             catch (Exception ex)
@@ -76,7 +76,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             finally
             {
-                (sender as FrameworkElement).IsEnabled = true;
+                IsEnabled = true;
             }
         }
 

@@ -16,6 +16,8 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class TasksAndStatuses : TaskCollectionBase
     {
+        private List<UITaskInfo> processingTasks;
+
         public TasksAndStatuses(QueueManager queue)
         {
             Refresh();
@@ -23,15 +25,82 @@ namespace SimpleFFmpegGUI.WPF.Model
             queue.TaskManagersChanged += Queue_TaskManagersChanged;
         }
 
+        public List<UITaskInfo> ProcessingTasks
+        {
+            get => processingTasks;
+            private set => this.SetValueAndNotify(ref processingTasks, value, nameof(ProcessingTasks));
+        }
+
+        public QueueManager Queue { get; }
+
+        public ObservableCollection<StatusDto> Statuses { get; } = new ObservableCollection<StatusDto>();
+
+        public void NotifyTaskReseted(UITaskInfo task)
+        {
+            if (!Tasks.Any(p => p.Id == task.Id))
+            {
+                Tasks.Add(task);
+            }
+        }
+
+        public override void Refresh()
+        {
+            var tasks = TaskManager.GetCurrentTasks(App.AppStartTime);
+            Tasks = new ObservableCollection<UITaskInfo>(tasks.Adapt<List<UITaskInfo>>());
+        }
+
+        private static void GetMainWindowAnd(Action<MainWindow> action)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                var mainWindow = App.ServiceProvider.GetService<MainWindow>();
+                Debug.Assert(mainWindow != null);
+                action(mainWindow);
+            });
+        }
+
+        private void Manager_StatusChanged(object sender, EventArgs e)
+        {
+            var manager = sender as FFmpegManager;
+            var newStatus = manager.GetStatus();
+
+            var task = Tasks.FirstOrDefault(p => p.Id == newStatus.Task.Id);
+            Debug.Assert(task != null);
+            Debug.Assert(task.ProcessStatus != null);
+
+            task.ProcessStatus = newStatus;
+            if (manager == Queue.MainQueueManager || Queue.Managers.Count == 1)//主队列，或者只有一个任务，则在状态栏上显示进度
+            {
+                GetMainWindowAnd(mainWindow =>
+                {
+                    if (newStatus.HasDetail)
+                    {
+                        mainWindow.TaskbarItemInfo.ProgressState =
+                        manager.Paused ? TaskbarItemProgressState.Paused : TaskbarItemProgressState.Normal;
+                        mainWindow.TaskbarItemInfo.ProgressValue = newStatus.Progress.Percent;
+                    }
+                    else
+                    {
+                        mainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
+                    }
+                });
+            }
+        }
+
+        /// <summary>
+        /// 任务队列发生改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Queue_TaskManagersChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)//新增任务
             {
                 var manager = e.NewItems[0] as FFmpegManager;
-                var unstartStatus = new StatusDto(manager.Task);
-                var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);
+                var unstartStatus = new StatusDto(manager.Task); //先放入一个StatusDto进行占位，因为此时Status还未生成
+                var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);//找到对应的UITaskInfo
                 Debug.Assert(task != null);
-                task.UpdateSelf();
+                task.UpdateSelf(); //用TaskInfo实体更新UITaskInfo
                 task.ProcessStatus = unstartStatus;
                 task.ProcessManager = manager;
                 if (manager == Queue.MainQueueManager)
@@ -70,70 +139,6 @@ namespace SimpleFFmpegGUI.WPF.Model
                 });
             }
             ProcessingTasks = Tasks.Where(p => p.ProcessStatus != null).ToList();
-        }
-
-        private List<UITaskInfo> processingTasks;
-
-        public List<UITaskInfo> ProcessingTasks
-        {
-            get => processingTasks;
-            private set => this.SetValueAndNotify(ref processingTasks, value, nameof(ProcessingTasks));
-        }
-
-        private void Manager_StatusChanged(object sender, EventArgs e)
-        {
-            var manager = sender as FFmpegManager;
-            var newStatus = manager.GetStatus();
-
-            var task = Tasks.FirstOrDefault(p => p.Id == newStatus.Task.Id);
-            Debug.Assert(task != null);
-            Debug.Assert(task.ProcessStatus != null);
-
-            task.ProcessStatus = newStatus;
-            if (manager == Queue.MainQueueManager || Queue.Managers.Count == 1)//主队列，或者只有一个任务，则在状态栏上显示进度
-            {
-                GetMainWindowAnd(mainWindow =>
-                {
-                    if (newStatus.HasDetail)
-                    {
-                        mainWindow.TaskbarItemInfo.ProgressState =
-                        manager.Paused ? TaskbarItemProgressState.Paused : TaskbarItemProgressState.Normal;
-                        mainWindow.TaskbarItemInfo.ProgressValue = newStatus.Progress.Percent;
-                    }
-                    else
-                    {
-                        mainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
-                    }
-                });
-            }
-        }
-
-        private static void GetMainWindowAnd(Action<MainWindow> action)
-        {
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                var mainWindow = App.ServiceProvider.GetService<MainWindow>();
-                Debug.Assert(mainWindow != null);
-                action(mainWindow);
-            });
-        }
-
-        public override void Refresh()
-        {
-            var tasks = TaskManager.GetCurrentTasks(App.AppStartTime);
-            Tasks = new ObservableCollection<UITaskInfo>(tasks.Adapt<List<UITaskInfo>>());
-        }
-
-        public ObservableCollection<StatusDto> Statuses { get; } = new ObservableCollection<StatusDto>();
-
-        public QueueManager Queue { get; }
-
-        public void NotifyTaskReseted(UITaskInfo task)
-        {
-            if(!Tasks.Any(p=>p.Id==task.Id))
-            {
-                Tasks.Add(task);
-            }
         }
     }
 }

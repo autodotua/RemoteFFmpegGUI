@@ -226,7 +226,7 @@ namespace SimpleFFmpegGUI.WPF
             }
             try
             {
-                (sender as FrameworkElement).IsEnabled = false;
+                IsEnabled = false;
                 await queue.CancelAsync();
             }
             catch (Exception ex)
@@ -235,7 +235,7 @@ namespace SimpleFFmpegGUI.WPF
             }
             finally
             {
-                (sender as FrameworkElement).IsEnabled = true;
+                IsEnabled = true;
             }
         }
 
