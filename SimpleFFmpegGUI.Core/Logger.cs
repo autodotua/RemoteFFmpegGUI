@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,10 +19,26 @@ namespace SimpleFFmpegGUI
         public Log Log { get; set; }
     }
 
+    public class ExceptionEventArgs : EventArgs
+    {
+        public ExceptionEventArgs(Exception exception)
+        {
+            Exception = exception;
+        }
+
+        public ExceptionEventArgs(Exception exception, string message)
+        {
+            Exception = exception;
+            Message = message;
+        }
+        public string Message { get; }
+        public Exception Exception { get; }
+    }
+
     public class Logger : IDisposable
     {
         private static HashSet<Logger> allLoggers = new HashSet<Logger>();
-        private static object lockObj=new object();
+        private object lockObj = new object();
         private FFmpegDbContext db = FFmpegDbContext.GetNew();
         private bool disposed = false;
         private Timer timer;
@@ -41,14 +58,13 @@ namespace SimpleFFmpegGUI
 
         public static event EventHandler<LogEventArgs> Log;
 
+        public static event EventHandler<ExceptionEventArgs> LogSaveFailed;
+
         public static void SaveAll()
         {
-            lock (lockObj)
+            foreach (var logger in allLoggers.ToList())
             {
-                foreach (var logger in allLoggers)
-                {
-                    logger.Save();
-                }
+                logger.Save();
             }
         }
 
@@ -120,9 +136,21 @@ namespace SimpleFFmpegGUI
 
         private void Save()
         {
-            if (db.ChangeTracker.HasChanges())
+            try
             {
-                db.SaveChanges();
+                lock (lockObj)
+                {
+                    if (db.ChangeTracker.HasChanges())
+                    {
+                        db.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("保存日志失败");
+                Debug.WriteLine(ex);
+                LogSaveFailed?.Invoke(this, new ExceptionEventArgs(ex, "保存日志失败"));
             }
         }
         private void StartTimer()

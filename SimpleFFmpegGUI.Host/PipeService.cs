@@ -1,7 +1,6 @@
 ﻿using FFMpegCore;
 using FzLib.Collection;
 using Mapster;
-using MediaInfo;
 using Newtonsoft.Json;
 using SimpleFFmpegGUI.FFmpegLib;
 using SimpleFFmpegGUI.Dto;

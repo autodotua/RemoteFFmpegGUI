@@ -123,10 +123,13 @@ namespace SimpleFFmpegGUI.WPF
 
         private void InitializeLogs()
         {
+            //本地日志
             AppLog = log4net.LogManager.GetLogger(GetType());
             AppLog.Info("程序启动");
 
+            //数据库日志
             Logger.Log += Logger_Log;
+            Logger.LogSaveFailed += Logger_LogSaveFailed;
             void Logger_Log(object sender, LogEventArgs e)
             {
                 switch (e.Log.Type)
@@ -135,6 +138,10 @@ namespace SimpleFFmpegGUI.WPF
                     case 'W': AppLog.Warn(e.Log.Message); break;
                     case 'I': AppLog.Info(e.Log.Message); break;
                 }
+            }
+            void Logger_LogSaveFailed(object sender, ExceptionEventArgs e)
+            {
+                AppLog.Error(e.Exception.Message, e.Exception);
             }
         }
 
