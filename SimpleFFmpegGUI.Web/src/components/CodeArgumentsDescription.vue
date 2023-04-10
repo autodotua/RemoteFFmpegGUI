@@ -1,7 +1,10 @@
 
 <template>
   <div>
-    <el-descriptions title="视频" v-if="type == 0||type==4&&args.concat.type!=1">
+    <el-descriptions
+      title="视频"
+      v-if="type == 0 || (type == 4 && args.concat.type != 1)"
+    >
       <el-descriptions-item label="策略">{{
         args.video == null
           ? args.disableVideo
@@ -45,7 +48,10 @@
         args.video.pixelFormat ? args.video.pixelFormat : "未定义"
       }}</el-descriptions-item>
     </el-descriptions>
-    <el-descriptions title="音频" v-if="type == 0||type==4&&args.concat.type!=1">
+    <el-descriptions
+      title="音频"
+      v-if="type == 0 || (type == 4 && args.concat.type != 1)"
+    >
       <el-descriptions-item label="策略">{{
         args.audio == null
           ? args.disableAudio
@@ -66,8 +72,8 @@
         args.audio.samplingRate ? args.audio.samplingRate : "未定义"
       }}</el-descriptions-item>
     </el-descriptions>
-    <el-descriptions title="容器" v-if="type == 0 || type == 1||type==4&&args.concat.type!=1">
-      <el-descriptions-item label="格式" v-if="showAudio">{{
+    <el-descriptions title="容器" v-if="type <= 2">
+      <el-descriptions-item label="格式">{{
         args.format ? args.format : "未定义"
       }}</el-descriptions-item>
     </el-descriptions>
@@ -80,13 +86,16 @@
           : "未定义"
       }}</el-descriptions-item>
     </el-descriptions>
-    <el-descriptions title="拼接参数" v-if="type == 4&&args.concat">
+    <el-descriptions title="拼接参数" v-if="type == 4 && args.concat">
       <el-descriptions-item label="格式">
-        <a v-if="args.concat.type==0">通过ts中转</a>
-        <a v-if="args.concat.type==1">使用concat格式</a>
-     </el-descriptions-item>
+        <a v-if="args.concat.type == 0">通过ts中转</a>
+        <a v-if="args.concat.type == 1">使用concat格式</a>
+      </el-descriptions-item>
     </el-descriptions>
-    <el-descriptions title="其他参数" v-if="type == 0||type == 1||type == 3">
+    <el-descriptions
+      title="其他参数"
+      v-if="type == 0 || type == 1 || type == 3"
+    >
       <el-descriptions-item label="参数">{{
         args.extra ? args.extra : "未定义"
       }}</el-descriptions-item>
