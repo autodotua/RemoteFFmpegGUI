@@ -180,7 +180,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             {
                 throw new FFmpegArgumentException("不能同时禁用视频和音频");
             }
-            if (oa.Video.TwoPass && string.IsNullOrWhiteSpace(oa.Format))
+            if ((oa.Video?.TwoPass ?? false) && string.IsNullOrWhiteSpace(oa.Format))
             {
                 throw new FFmpegArgumentException("需要二次编码时，必须指定格式（Format）");
             }
