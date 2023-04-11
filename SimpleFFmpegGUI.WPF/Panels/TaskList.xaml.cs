@@ -250,5 +250,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             p.Start();
         }
+
+        public void ResetUI(bool compact)
+        {
+            bdDetail.Height = compact ? 108 : double.NaN;
+        }
     }
 }

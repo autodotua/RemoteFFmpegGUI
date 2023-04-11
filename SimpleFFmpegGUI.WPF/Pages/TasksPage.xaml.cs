@@ -24,6 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -92,6 +93,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
             InitializeComponent();
             ViewModel = viewModel;
             DataContext = ViewModel;
+            taskPanel.ResetUI(false);
         }
 
         private void FilterButton_Click(object sender, RoutedEventArgs e)

@@ -74,6 +74,7 @@
             </ComboBox>
         </Grid>
         <panels:TaskList
+            x:Name="taskPanel"
             Grid.Row="2"
             Margin="8"
             ShowAllTasks="True" />

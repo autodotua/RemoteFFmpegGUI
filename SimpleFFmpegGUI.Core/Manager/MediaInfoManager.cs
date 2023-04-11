@@ -66,6 +66,12 @@ namespace SimpleFFmpegGUI.Manager
             return JObject.Parse(output);
         }
 
+
+        /// <summary>
+        /// 解析编码设置（由NewBing生成）
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         private static List<MediaInfoItem> ParseEncodingSettings(string input)
         {
             List<MediaInfoItem> settings = new List<MediaInfoItem>(); // 创建一个空列表来存储编码设置项

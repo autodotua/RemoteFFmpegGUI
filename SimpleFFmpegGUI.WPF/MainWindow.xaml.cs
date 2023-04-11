@@ -7,6 +7,7 @@ using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Converters;
 using SimpleFFmpegGUI.WPF.Model;
 using SimpleFFmpegGUI.WPF.Pages;
+using SimpleFFmpegGUI.WPF.Panels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,7 +38,8 @@ namespace SimpleFFmpegGUI.WPF
     public partial class MainWindow : Window
     {
         private readonly QueueManager queue;
-
+        private TaskList taskPanel = new TaskList() { Margin = new Thickness(8, 0, 0, 0) };
+        private StatusPanel statusPanel = new StatusPanel() { Margin = new Thickness(12) };
         private FzLib.Program.Runtime.TrayIcon tray;
         public MainWindow(MainWindowViewModel viewModel, QueueManager queue)
         {
@@ -307,6 +309,56 @@ namespace SimpleFFmpegGUI.WPF
         private void Window_StateChanged(object sender, EventArgs e)
         {
             Config.Instance.WindowMaximum = WindowState == WindowState.Maximized;
+        }
+
+        private bool uiCompressMode = false;
+        private void ResetUI(bool force = false)
+        {
+          
+            if (tab.Items.Count == 0 && topTab.Content == null
+                && (uiCompressMode || force)) //左侧和右侧
+            {
+                RemoveFromGrid();
+                grdLeft.Children.Add(taskPanel);
+                grdMain.Children.Add(statusPanel);
+                Grid.SetColumn(statusPanel, 2);
+                uiCompressMode = false;
+            }
+            else if (!uiCompressMode || force)//全部在左侧
+            {
+                RemoveFromGrid();
+                grdLeft.Children.Add(taskPanel);
+                grdLeft.Children.Add(statusPanel);
+                Grid.SetRow(statusPanel, 2);
+                uiCompressMode = true;
+            }
+
+            grdLeft.RowDefinitions[2].Height = new GridLength(uiCompressMode?384:0);
+            grdLeft.RowDefinitions[2].MinHeight = uiCompressMode ? 384 : 0;
+            leftSplitter.Visibility = uiCompressMode ? Visibility.Visible : Visibility.Collapsed;
+            taskPanel.ResetUI(uiCompressMode);
+
+            void RemoveFromGrid()
+            {
+                if (taskPanel.Parent != null)
+                {
+                    (taskPanel.Parent as Grid).Children.Remove(taskPanel);
+                }
+                if (statusPanel.Parent != null)
+                {
+                    (statusPanel.Parent as Grid).Children.Remove(statusPanel);
+                }
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            ResetUI(true);
+        }
+
+        private void tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ResetUI();
         }
     }
 

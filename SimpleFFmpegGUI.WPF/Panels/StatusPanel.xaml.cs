@@ -64,6 +64,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
             Debug.Assert(task != null);
+            if(task==null)
+            {
+                return;
+            }
             Debug.Assert(task.ProcessManager != null);
             try
             {

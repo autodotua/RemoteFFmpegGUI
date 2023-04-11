@@ -2,12 +2,13 @@
     x:Class="SimpleFFmpegGUI.WPF.Panels.TaskList"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:SimpleFFmpegGUI.WPF.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:SimpleFFmpegGUI.Model;assembly=SimpleFFmpegGUI.Core"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    xmlns:uimodel="clr-namespace:SimpleFFmpegGUI.WPF.Model" xmlns:converters="clr-namespace:SimpleFFmpegGUI.WPF.Converters"
+    xmlns:uimodel="clr-namespace:SimpleFFmpegGUI.WPF.Model"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
@@ -85,7 +86,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.Resources>
-                            <converters:NameDescriptionAttributeValueConverter x:Key="NameDescriptionAttributeValueConverter"/>
+                            <converters:NameDescriptionAttributeValueConverter x:Key="NameDescriptionAttributeValueConverter" />
                         </Grid.Resources>
                         <TextBlock Text="{Binding Type, Converter={StaticResource NameDescriptionAttributeValueConverter}}" />
                         <TextBlock
@@ -142,6 +143,7 @@
             </ListView.ItemTemplate>
         </ListView>
         <Border
+            x:Name="bdDetail"
             Grid.Row="2"
             Height="192"
             BorderBrush="{DynamicResource TextControlBorderBrush}"
