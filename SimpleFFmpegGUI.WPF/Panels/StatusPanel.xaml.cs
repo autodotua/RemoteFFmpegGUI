@@ -22,30 +22,10 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace SimpleFFmpegGUI.WPF.Panels
 {
-    public class StatusPanelViewModel : INotifyPropertyChanged
-    {
-        private bool created = false;
-
-        public StatusPanelViewModel(QueueManager queue)
-        {
-            Debug.Assert(!created);
-            created = true;
-            Queue = queue;
-            queue.TaskManagersChanged += (s, e) => this.Notify(nameof(IsRunning));
-        }
-
-        public TasksAndStatuses Tasks => App.ServiceProvider.GetService<TasksAndStatuses>();
-
-        public QueueManager Queue { get; }
-
-        public bool IsRunning => Queue.Tasks.Any();
-
-        public event PropertyChangedEventHandler PropertyChanged;
-    }
-
     public partial class StatusPanel : UserControl
     {
         public StatusPanel()
@@ -54,7 +34,13 @@ namespace SimpleFFmpegGUI.WPF.Panels
             InitializeComponent();
         }
 
-        public StatusPanelViewModel ViewModel => App.ServiceProvider.GetService<StatusPanelViewModel>();
+
+        public StatusPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<StatusPanelViewModel>();
+
+        public void ResetUI(bool compact)
+        {
+            ViewModel.ShowSnapshot = !compact;
+        }
 
         private async void CancelButton_Click(object sender, RoutedEventArgs e)
         {
@@ -64,7 +50,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
             Debug.Assert(task != null);
-            if(task==null)
+            if (task == null)
             {
                 return;
             }
@@ -113,5 +99,32 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 this.CreateMessage().QueueError("恢复失败", ex);
             }
         }
+    }
+
+    public class StatusPanelViewModel : INotifyPropertyChanged
+    {
+        private bool created = false;
+
+        private bool showSnapshot = true;
+
+        public StatusPanelViewModel(QueueManager queue)
+        {
+            Debug.Assert(!created);
+            created = true;
+            Queue = queue;
+            queue.TaskManagersChanged += (s, e) => this.Notify(nameof(IsRunning));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool IsRunning => Queue.Tasks.Any();
+        public QueueManager Queue { get; }
+        public bool ShowSnapshot
+        {
+            get => showSnapshot;
+            set => this.SetValueAndNotify(ref showSnapshot, value, nameof(ShowSnapshot));
+        }
+
+        public TasksAndStatuses Tasks => App.ServiceProvider.GetService<TasksAndStatuses>();
     }
 }

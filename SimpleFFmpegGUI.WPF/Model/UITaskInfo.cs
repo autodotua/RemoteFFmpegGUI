@@ -11,6 +11,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
@@ -18,6 +20,21 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class UITaskInfo : ModelBase, INotifyPropertyChanged
     {
+        public UITaskInfo()
+        {
+            StartTimer();
+        }
+        PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+        private async void StartTimer()
+        {
+            while (await timer.WaitForNextTickAsync())
+            {
+                Stopwatch sw = Stopwatch.StartNew();
+                await UpdateSnapshotAsync();
+                sw.Stop();
+                Debug.WriteLine(sw.ElapsedMilliseconds);
+            }
+        }
         private OutputArguments arguments;
 
         private DateTime createTime;
@@ -43,6 +60,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         private TaskStatus status;
 
         private TaskType type;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public OutputArguments Arguments
@@ -307,11 +325,38 @@ namespace SimpleFFmpegGUI.WPF.Model
         {
             TaskManager.GetTask(Id).Adapt(this);
         }
+        private Uri snapshotSource;
+        private TimeSpan lastTime = default;
+        private async Task UpdateSnapshotAsync()
+        {
+            if (Type != TaskType.Code
+                || ProcessStatus == null
+                || !ProcessStatus.HasDetail
+                || processStatus.Progress == null)
+            {
+                SnapshotSource = null;
+                return;
+            }
+            var time = processStatus.Time + (Inputs[0].From ?? TimeSpan.Zero);
+            if (processStatus.IsPaused || lastTime == time)
+            {
+                return;
+            }
+            lastTime = time;
+            string path = await MediaInfoManager.GetSnapshotAsync(Inputs[0].FilePath, time);
+            SnapshotSource = new Uri(path);
+        }
+
+        public Uri SnapshotSource
+        {
+            get => snapshotSource;
+            set => this.SetValueAndNotify(ref snapshotSource, value, nameof(SnapshotSource));
+        }
 
         private void Manager_ProcessChanged(object sender, ProcessChangedEventArgs e)
         {
             //进程改变后（比如二压），重新应用
-            if(e.NewProcess!=null)
+            if (e.NewProcess != null)
             {
                 ProcessPriority = processPriority;
             }

@@ -337,6 +337,7 @@ namespace SimpleFFmpegGUI.WPF
             grdLeft.RowDefinitions[2].MinHeight = uiCompressMode ? 384 : 0;
             leftSplitter.Visibility = uiCompressMode ? Visibility.Visible : Visibility.Collapsed;
             taskPanel.ResetUI(uiCompressMode);
+            statusPanel.ResetUI(uiCompressMode);
 
             void RemoveFromGrid()
             {

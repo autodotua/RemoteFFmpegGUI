@@ -196,7 +196,6 @@ namespace SimpleFFmpegGUI.Manager
                 .OrderByDescending(p => p.Time).FirstOrDefault();
             return log?.Message;
         }
-
         /// <summary>
         /// 获取当前状态
         /// </summary>

@@ -37,8 +37,8 @@ namespace SimpleFFmpegGUI.Manager
 
         public static async Task<string> GetSnapshotAsync(string path, TimeSpan time)
         {
-            string tempPath = System.IO.Path.GetTempFileName() + ".jpg";
-            FFmpegProcess process = new FFmpegProcess($"-ss {time.TotalSeconds:0.000}  -i \"{path}\" -vframes 1 {tempPath}");
+            string tempPath = System.IO.Path.GetTempFileName() + ".bmp";
+            FFmpegProcess process = new FFmpegProcess($"-ss {time.TotalSeconds:0.000}  -i \"{path}\" -vframes 1 -vf scale=-1:480 {tempPath}");
             await process.StartAsync(null, null);
             return tempPath;
         }

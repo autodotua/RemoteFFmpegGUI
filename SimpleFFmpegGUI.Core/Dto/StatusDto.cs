@@ -1,10 +1,12 @@
 ﻿using FzLib;
 using Newtonsoft.Json;
+using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.Dto
 {
@@ -207,5 +209,6 @@ namespace SimpleFFmpegGUI.Dto
             get => time;
             set => this.SetValueAndNotify(ref time, value, nameof(Time));
         }
+      
     }
 }
