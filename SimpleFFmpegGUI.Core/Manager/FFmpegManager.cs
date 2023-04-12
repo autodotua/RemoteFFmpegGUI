@@ -248,27 +248,16 @@ namespace SimpleFFmpegGUI.Manager
             try
             {
                 logger.Info(task, "开始任务");
-                string tempDir = FileSystemUtility.GetTempDir();
                 await (task.Type switch
                 {
                     TaskType.Code => RunCodeProcessAsync(cancel.Token),
                     TaskType.Combine => RunCombineProcessAsync(cancel.Token),
                     TaskType.Compare => RunCompareProcessAsync(cancel.Token),
                     TaskType.Custom => RunCustomProcessAsync(cancel.Token),
-                    TaskType.Concat => RunConcatProcessAsync(tempDir, cancel.Token),
+                    TaskType.Concat => RunConcatProcessAsync(cancel.Token),
                     _ => throw new NotSupportedException("不支持的任务类型：" + task.Type),
                 });
 
-                if (Directory.Exists(tempDir))
-                {
-                    try
-                    {
-                        Directory.Delete(tempDir, true);
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-                }
                 logger.Info(task, "完成任务");
             }
             finally
@@ -459,13 +448,11 @@ namespace SimpleFFmpegGUI.Manager
             }
             else
             {
-                string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                string tempDirectory = GetTempDir("2pass");
                 Directory.CreateDirectory(tempDirectory);
 
                 VideoArgumentsGenerator vag = new VideoArgumentsGenerator();
                 vag.Codec(task.Arguments.Video.Code);
-
-
 
                 Progress = GetProgress();
                 Progress.VideoLength *= 2;
@@ -599,7 +586,7 @@ namespace SimpleFFmpegGUI.Manager
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NotSupportedException"></exception>
-        private async Task RunConcatProcessAsync(string tempDir, CancellationToken cancellationToken)
+        private async Task RunConcatProcessAsync(CancellationToken cancellationToken)
         {
             if (task.Inputs.Count < 2)
             {
@@ -607,8 +594,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             string message = $"正在拼接：{task.Inputs.Count}个文件";
 
-            string tempName = Guid.NewGuid().ToString() + ".txt";
-            string tempPath = Path.Combine(tempDir, tempName);
+            string tempPath = GetTempFileName("concat") + ".txt";
             using (var stream = File.CreateText(tempPath))
             {
                 foreach (var file in task.Inputs)

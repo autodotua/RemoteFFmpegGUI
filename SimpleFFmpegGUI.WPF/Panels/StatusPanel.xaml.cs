@@ -34,13 +34,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             InitializeComponent();
         }
 
-
         public StatusPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<StatusPanelViewModel>();
-
-        public void ResetUI(bool compact)
-        {
-            ViewModel.ShowSnapshot = !compact;
-        }
 
         private async void CancelButton_Click(object sender, RoutedEventArgs e)
         {
@@ -105,8 +99,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
     {
         private bool created = false;
 
-        private bool showSnapshot = true;
-
         public StatusPanelViewModel(QueueManager queue)
         {
             Debug.Assert(!created);
@@ -119,11 +111,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public bool IsRunning => Queue.Tasks.Any();
         public QueueManager Queue { get; }
-        public bool ShowSnapshot
-        {
-            get => showSnapshot;
-            set => this.SetValueAndNotify(ref showSnapshot, value, nameof(ShowSnapshot));
-        }
 
         public TasksAndStatuses Tasks => App.ServiceProvider.GetService<TasksAndStatuses>();
     }

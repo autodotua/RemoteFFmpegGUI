@@ -35,10 +35,10 @@ namespace SimpleFFmpegGUI.Manager
             return mediaInfo;
         }
 
-        public static async Task<string> GetSnapshotAsync(string path, TimeSpan time)
+        public static async Task<string> GetSnapshotAsync(string path, TimeSpan time,string scale)
         {
-            string tempPath = System.IO.Path.GetTempFileName() + ".bmp";
-            FFmpegProcess process = new FFmpegProcess($"-ss {time.TotalSeconds:0.000}  -i \"{path}\" -vframes 1 -vf scale=-1:480 {tempPath}");
+            string tempPath = FileSystemUtility.GetTempFileName("snapshot") + ".bmp";
+            FFmpegProcess process = new FFmpegProcess($"-ss {time.TotalSeconds:0.000}  -i \"{path}\" -vframes 1 -vf scale={scale} {tempPath}");
             await process.StartAsync(null, null);
             return tempPath;
         }
@@ -54,7 +54,7 @@ namespace SimpleFFmpegGUI.Manager
         }
         private static JObject GetMediaInfoProcessOutput(string path)
         {
-            string tmpFile = System.IO.Path.GetTempFileName();
+            string tmpFile = FileSystemUtility.GetTempFileName("mediainfo");
             var p = Process.Start(new ProcessStartInfo
             {
                 FileName = "MediaInfo",

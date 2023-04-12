@@ -93,7 +93,6 @@ namespace SimpleFFmpegGUI.WPF.Pages
             InitializeComponent();
             ViewModel = viewModel;
             DataContext = ViewModel;
-            taskPanel.ResetUI(false);
         }
 
         private void FilterButton_Click(object sender, RoutedEventArgs e)

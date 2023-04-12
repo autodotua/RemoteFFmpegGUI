@@ -1,6 +1,7 @@
 ﻿using FzLib;
 using FzLib.WPF.Converters;
 using Mapster;
+using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
@@ -20,21 +21,6 @@ namespace SimpleFFmpegGUI.WPF.Model
 {
     public class UITaskInfo : ModelBase, INotifyPropertyChanged
     {
-        public UITaskInfo()
-        {
-            StartTimer();
-        }
-        PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
-        private async void StartTimer()
-        {
-            while (await timer.WaitForNextTickAsync())
-            {
-                Stopwatch sw = Stopwatch.StartNew();
-                await UpdateSnapshotAsync();
-                sw.Stop();
-                Debug.WriteLine(sw.ElapsedMilliseconds);
-            }
-        }
         private OutputArguments arguments;
 
         private DateTime createTime;
@@ -45,22 +31,50 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         private List<InputArguments> inputs;
 
+
+        /// <summary>
+        /// 上一个缩略图的时间
+        /// </summary>
+        private TimeSpan lastTime = TimeSpan.MaxValue;
+
         private string message;
 
         private string output;
 
         private FFmpegManager processManager;
+
         private int processPriority = Config.Instance.DefaultProcessPriority;
+
         private StatusDto processStatus;
 
         private string realOutput;
+
+        private Uri snapshotSource;
 
         private DateTime? startTime;
 
         private TaskStatus status;
 
+        /// <summary>
+        /// 更新缩略图计时器
+        /// </summary>
+     private   PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+
         private TaskType type;
 
+        public UITaskInfo()
+        {
+            StartTimer();
+            App.ServiceProvider.GetService<MainWindow>().UiCompressModeChanged +=
+                (s, e) => UpdateSnapshotAsync().ConfigureAwait(false);
+            App.ServiceProvider.GetService<MainWindow>().StateChanged +=
+                (s, e) => UpdateSnapshotAsync().ConfigureAwait(false);
+        }
+
+        ~UITaskInfo()
+        {
+            timer.Dispose();
+        }
         public event PropertyChangedEventHandler PropertyChanged;
 
         public OutputArguments Arguments
@@ -270,6 +284,12 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public bool ResetButtonEnabled => Status is TaskStatus.Done or TaskStatus.Cancel or TaskStatus.Error;
 
+        public Uri SnapshotSource
+        {
+            get => snapshotSource;
+            set => this.SetValueAndNotify(ref snapshotSource, value, nameof(SnapshotSource));
+        }
+
         public bool StartButtonEnabled => Status is TaskStatus.Queue;
 
         public DateTime? StartTime
@@ -325,33 +345,6 @@ namespace SimpleFFmpegGUI.WPF.Model
         {
             TaskManager.GetTask(Id).Adapt(this);
         }
-        private Uri snapshotSource;
-        private TimeSpan lastTime = default;
-        private async Task UpdateSnapshotAsync()
-        {
-            if (Type != TaskType.Code
-                || ProcessStatus == null
-                || !ProcessStatus.HasDetail
-                || processStatus.Progress == null)
-            {
-                SnapshotSource = null;
-                return;
-            }
-            var time = processStatus.Time + (Inputs[0].From ?? TimeSpan.Zero);
-            if (processStatus.IsPaused || lastTime == time)
-            {
-                return;
-            }
-            lastTime = time;
-            string path = await MediaInfoManager.GetSnapshotAsync(Inputs[0].FilePath, time);
-            SnapshotSource = new Uri(path);
-        }
-
-        public Uri SnapshotSource
-        {
-            get => snapshotSource;
-            set => this.SetValueAndNotify(ref snapshotSource, value, nameof(SnapshotSource));
-        }
 
         private void Manager_ProcessChanged(object sender, ProcessChangedEventArgs e)
         {
@@ -360,6 +353,49 @@ namespace SimpleFFmpegGUI.WPF.Model
             {
                 ProcessPriority = processPriority;
             }
+        }
+
+        private async void StartTimer()
+        {
+            while (await timer.WaitForNextTickAsync())
+            {
+                Stopwatch sw = Stopwatch.StartNew();
+                await UpdateSnapshotAsync();
+                sw.Stop();
+                Debug.WriteLine(sw.ElapsedMilliseconds);
+            }
+        }
+        private async Task UpdateSnapshotAsync()
+        {
+            if (App.ServiceProvider.GetService<MainWindow>().IsUiCompressMode //视图在压缩模式
+                || Type != TaskType.Code //不是编码类型的任务
+                || ProcessStatus == null //没有状态
+                || !ProcessStatus.HasDetail) //状态无详情)
+            {
+                //取消执行并设置缩略图为空
+                SnapshotSource = null;
+                return;
+            }
+            var time = processStatus.Time + (Inputs[0].From ?? TimeSpan.Zero);
+            if (processStatus.IsPaused //任务暂停中
+                || App.ServiceProvider.GetService<MainWindow>().WindowState==System.Windows.WindowState.Minimized //窗口被最小化
+                || App.ServiceProvider.GetService<MainWindow>().Visibility!=System.Windows.Visibility.Visible //窗口不可见
+                || (lastTime - time).Duration().TotalSeconds < 1) //上一张缩略图和现在的时间差不到1s
+            {
+                //仅取消执行
+                return;
+            }
+            lastTime = time;
+            string path = null;
+            try
+            {
+                path = await MediaInfoManager.GetSnapshotAsync(Inputs[0].FilePath, time,"-1:480");
+            }
+            catch (Exception ex)
+            {
+                App.AppLog.Error($"获取视频{Inputs[0].FilePath}在{time}的快照失败", ex);
+            }
+            SnapshotSource = path == null ? null : new Uri(path);
         }
     }
 }

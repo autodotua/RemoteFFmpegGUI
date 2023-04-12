@@ -56,17 +56,30 @@ namespace SimpleFFmpegGUI
             return null;
         }
 
-        public static string GetTempDir()
+        /// <summary>
+        /// 获取名称随机的临时文件。得到的文件为：%TEMP%/<see cref="SimpleFFmpegGUI"/>/{type}/{随机名称}
+        /// </summary>
+        /// <returns></returns>
+        public static string GetTempFileName(string type)
         {
-            using var db = FFmpegDbContext.GetNew();
-            var value = db.Configs.FirstOrDefault(p => p.Key == TempDirKey)?.Value;
-            if (value == null)
-            {
-                string str = Guid.NewGuid().ToString();
-                value = Path.Combine(Path.GetTempPath(), str);
-                Directory.CreateDirectory(value);
-            }
-            return value;
+            return Path.Combine(GetTempDir(type,""), Guid.NewGuid().ToString());
+        }
+
+        /// <summary>
+        /// 获取临时目录。得到的目录为：%TEMP%/<see cref="SimpleFFmpegGUI"/>/{type}/{随机名称}
+        /// </summary>
+        /// <returns></returns>
+        public static string GetTempDir(string type)
+        {
+            string str = Guid.NewGuid().ToString();
+            return GetTempDir(type, str);
+        }
+
+        private static string GetTempDir(string type, string subName)
+        {
+            string path = Path.Combine(Path.GetTempPath(), nameof(SimpleFFmpegGUI), type, subName);
+            Directory.CreateDirectory(path);
+            return path;
         }
 
         /// <summary>

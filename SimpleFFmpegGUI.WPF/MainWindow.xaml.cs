@@ -310,35 +310,32 @@ namespace SimpleFFmpegGUI.WPF
         {
             Config.Instance.WindowMaximum = WindowState == WindowState.Maximized;
         }
-
-        private bool uiCompressMode = false;
+        public bool IsUiCompressMode { get; private set; }
         private void ResetUI(bool force = false)
         {
           
             if (tab.Items.Count == 0 && topTab.Content == null
-                && (uiCompressMode || force)) //左侧和右侧
+                && (IsUiCompressMode || force)) //左侧和右侧
             {
                 RemoveFromGrid();
                 grdLeft.Children.Add(taskPanel);
                 grdMain.Children.Add(statusPanel);
                 Grid.SetColumn(statusPanel, 2);
-                uiCompressMode = false;
+                IsUiCompressMode = false;
             }
-            else if (!uiCompressMode || force)//全部在左侧
+            else if (!IsUiCompressMode || force)//全部在左侧
             {
                 RemoveFromGrid();
                 grdLeft.Children.Add(taskPanel);
                 grdLeft.Children.Add(statusPanel);
                 Grid.SetRow(statusPanel, 2);
-                uiCompressMode = true;
+                IsUiCompressMode = true;
             }
 
-            grdLeft.RowDefinitions[2].Height = new GridLength(uiCompressMode?384:0);
-            grdLeft.RowDefinitions[2].MinHeight = uiCompressMode ? 384 : 0;
-            leftSplitter.Visibility = uiCompressMode ? Visibility.Visible : Visibility.Collapsed;
-            taskPanel.ResetUI(uiCompressMode);
-            statusPanel.ResetUI(uiCompressMode);
-
+            grdLeft.RowDefinitions[2].Height = new GridLength(IsUiCompressMode ? 384:0);
+            grdLeft.RowDefinitions[2].MinHeight = IsUiCompressMode ? 384 : 0;
+            leftSplitter.Visibility = IsUiCompressMode ? Visibility.Visible : Visibility.Collapsed;
+            UiCompressModeChanged?.Invoke(this, new EventArgs());
             void RemoveFromGrid()
             {
                 if (taskPanel.Parent != null)
@@ -351,6 +348,8 @@ namespace SimpleFFmpegGUI.WPF
                 }
             }
         }
+
+        public event EventHandler UiCompressModeChanged;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
