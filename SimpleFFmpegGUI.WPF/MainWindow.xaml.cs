@@ -154,7 +154,7 @@ namespace SimpleFFmpegGUI.WPF
                 "ffmpeg.exe",
                 "ffprobe.exe",
                 "ffplay.exe",
-                "mediainfo.dll"
+                "mediainfo.exe"
             };
 
             foreach (var file in files)

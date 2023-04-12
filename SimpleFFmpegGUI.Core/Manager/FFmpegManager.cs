@@ -530,7 +530,7 @@ namespace SimpleFFmpegGUI.Manager
             if (vmafModel != null)
             {
                 vmafModel = Path.GetFileName(vmafModel);
-                argument = @$"-lavfi ""ssim;[0:v][1:v]psnr;[0:v]setpts=PTS-STARTPTS[reference]; [1:v]setpts=PTS-STARTPTS[distorted]; [distorted][reference]libvmaf=model_path={vmafModel.Replace('\\', '/')}:n_threads={Environment.ProcessorCount}""  -f null -";
+                argument = @$"-lavfi ""ssim;[0:v][1:v]psnr;[0:v]setpts=PTS-STARTPTS[reference]; [1:v]setpts=PTS-STARTPTS[distorted]; [distorted][reference]libvmaf=model=version=vmaf_v0.6.1:n_threads={Environment.ProcessorCount}""  -f null -";
             }
             var arg = ArgumentsGenerator.GetArguments(task.Inputs, argument);
             FFmpegOutput += CheckOutput;
