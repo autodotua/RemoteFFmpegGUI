@@ -58,7 +58,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         /// <summary>
         /// 更新缩略图计时器
         /// </summary>
-     private   PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+        private PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
 
         private TaskType type;
 
@@ -378,8 +378,8 @@ namespace SimpleFFmpegGUI.WPF.Model
             }
             var time = processStatus.Time + (Inputs[0].From ?? TimeSpan.Zero);
             if (processStatus.IsPaused //任务暂停中
-                || App.ServiceProvider.GetService<MainWindow>().WindowState==System.Windows.WindowState.Minimized //窗口被最小化
-                || App.ServiceProvider.GetService<MainWindow>().Visibility!=System.Windows.Visibility.Visible //窗口不可见
+                || App.ServiceProvider.GetService<MainWindow>().WindowState == System.Windows.WindowState.Minimized //窗口被最小化
+                || App.ServiceProvider.GetService<MainWindow>().Visibility != System.Windows.Visibility.Visible //窗口不可见
                 || (lastTime - time).Duration().TotalSeconds < 1) //上一张缩略图和现在的时间差不到1s
             {
                 //仅取消执行
@@ -389,7 +389,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             string path = null;
             try
             {
-                path = await MediaInfoManager.GetSnapshotAsync(Inputs[0].FilePath, time,"-1:480");
+                path = await MediaInfoManager.GetSnapshotAsync(Inputs[0].FilePath, time, "-1:480");
             }
             catch (Exception ex)
             {

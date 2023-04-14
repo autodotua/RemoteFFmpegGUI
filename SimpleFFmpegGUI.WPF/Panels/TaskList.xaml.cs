@@ -230,8 +230,9 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void UpdateDetailHeight()
         {
-            bdDetail.Height = App.ServiceProvider.GetService<MainWindow>().IsUiCompressMode ? 108 : double.NaN;
+            bdDetail.Height = App.ServiceProvider.GetService<MainWindow>().IsUiCompressMode && !ShowAllTasks ? 108 : double.NaN;
         }
+
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateDetailHeight();

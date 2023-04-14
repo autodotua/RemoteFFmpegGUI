@@ -38,8 +38,8 @@ namespace SimpleFFmpegGUI.WPF
     public partial class MainWindow : Window
     {
         private readonly QueueManager queue;
-        private TaskList taskPanel = new TaskList() { Margin = new Thickness(8, 0, 0, 0) };
-        private StatusPanel statusPanel = new StatusPanel() { Margin = new Thickness(12) };
+        private TaskList taskPanel;
+        private StatusPanel statusPanel;
         private FzLib.Program.Runtime.TrayIcon tray;
         public MainWindow(MainWindowViewModel viewModel, QueueManager queue)
         {
@@ -161,7 +161,7 @@ namespace SimpleFFmpegGUI.WPF
             {
                 if (!File.Exists(file))
                 {
-                    await CommonDialog.ShowErrorDialogAsync("找不到" + file);
+                    await CommonDialog.ShowErrorDialogAsync("程序目录中缺少文件：" + file);
                     Close();
                     return;
                 }
@@ -310,10 +310,11 @@ namespace SimpleFFmpegGUI.WPF
         {
             Config.Instance.WindowMaximum = WindowState == WindowState.Maximized;
         }
+
         public bool IsUiCompressMode { get; private set; }
+
         private void ResetUI(bool force = false)
         {
-          
             if (tab.Items.Count == 0 && topTab.Content == null
                 && (IsUiCompressMode || force)) //左侧和右侧
             {
@@ -332,7 +333,7 @@ namespace SimpleFFmpegGUI.WPF
                 IsUiCompressMode = true;
             }
 
-            grdLeft.RowDefinitions[2].Height = new GridLength(IsUiCompressMode ? 384:0);
+            grdLeft.RowDefinitions[2].Height = new GridLength(IsUiCompressMode ? 384 : 0);
             grdLeft.RowDefinitions[2].MinHeight = IsUiCompressMode ? 384 : 0;
             leftSplitter.Visibility = IsUiCompressMode ? Visibility.Visible : Visibility.Collapsed;
             UiCompressModeChanged?.Invoke(this, new EventArgs());
@@ -353,10 +354,12 @@ namespace SimpleFFmpegGUI.WPF
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            taskPanel = new TaskList() { Margin = new Thickness(8, 0, 0, 0) };
+            statusPanel = new StatusPanel() { Margin = new Thickness(12) };
             ResetUI(true);
         }
 
-        private void tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void Tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ResetUI();
         }

@@ -147,7 +147,7 @@
             Grid.RowSpan="99"
             Grid.Column="2"
             Background="Transparent"
-            SelectionChanged="tab_SelectionChanged"
+            SelectionChanged="Tab_SelectionChanged"
             Visibility="{Binding TabControlVisibility}">
             <TabControl.ItemContainerStyle>
                 <Style
