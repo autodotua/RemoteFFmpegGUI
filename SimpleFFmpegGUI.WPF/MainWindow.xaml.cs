@@ -104,10 +104,12 @@ namespace SimpleFFmpegGUI.WPF
             }
             topTab.Content = panel;
             ViewModel.SetTabVisiable(false);
+            ResetUI();
             TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
             panel.RequestToClose += (s, e) =>
             {
                 topTab.Content = null;
+                ResetUI();
                 ViewModel.SetTabVisiable(true);
                 tcs.SetResult(panel);
                 grdLeft.IsEnabled = true;
@@ -142,6 +144,7 @@ namespace SimpleFFmpegGUI.WPF
                 }
                 tray.Show();
                 Hide();
+                tray.ShowMessage("任务将在后台继续执行");
             }
         }
 
@@ -315,7 +318,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void ResetUI(bool force = false)
         {
-            if (tab.Items.Count == 0 && topTab.Content == null
+            if (tab.Items.Count == 0 && !topTab.HasContent
                 && (IsUiCompressMode || force)) //左侧和右侧
             {
                 RemoveFromGrid();
