@@ -14,7 +14,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
 namespace SimpleFFmpegGUI.WPF.Model
@@ -49,7 +51,8 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         private string realOutput;
 
-        private Uri snapshotSource;
+        private bool showSnapshot;
+        private object snapshotSource;
 
         private DateTime? startTime;
 
@@ -284,7 +287,13 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public bool ResetButtonEnabled => Status is TaskStatus.Done or TaskStatus.Cancel or TaskStatus.Error;
 
-        public Uri SnapshotSource
+        public bool ShowSnapshot
+        {
+            get => showSnapshot;
+            set => this.SetValueAndNotify(ref showSnapshot, value, nameof(ShowSnapshot));
+        }
+
+        public object SnapshotSource
         {
             get => snapshotSource;
             set => this.SetValueAndNotify(ref snapshotSource, value, nameof(SnapshotSource));
@@ -365,6 +374,7 @@ namespace SimpleFFmpegGUI.WPF.Model
                 Debug.WriteLine(sw.ElapsedMilliseconds);
             }
         }
+
         private async Task UpdateSnapshotAsync()
         {
             if (App.ServiceProvider.GetService<MainWindow>().IsUiCompressMode //视图在压缩模式
@@ -372,9 +382,13 @@ namespace SimpleFFmpegGUI.WPF.Model
                 || ProcessStatus == null //没有状态
                 || !ProcessStatus.HasDetail) //状态无详情)
             {
-                //取消执行并设置缩略图为空
-                SnapshotSource = null;
+                ShowSnapshot = false;
+                //取消执行并不显示缩略图
                 return;
+            }
+            else
+            {
+                ShowSnapshot = true;
             }
             var time = processStatus.Time + (Inputs[0].From ?? TimeSpan.Zero);
             if (processStatus.IsPaused //任务暂停中

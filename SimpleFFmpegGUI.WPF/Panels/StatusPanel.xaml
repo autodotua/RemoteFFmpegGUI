@@ -53,7 +53,7 @@
                                 Width="360"
                                 Height="256"
                                 Margin="8"
-                                Visibility="{Binding SnapshotSource, Converter={StaticResource NotNullConverter}}">
+                                Visibility="{Binding ShowSnapshot, Converter={StaticResource Bool2VisibilityConverter}}">
                                 <Border.Background>
                                     <SolidColorBrush
                                         Opacity="0.5"

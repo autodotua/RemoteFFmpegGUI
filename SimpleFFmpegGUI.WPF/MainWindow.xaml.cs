@@ -183,7 +183,7 @@ namespace SimpleFFmpegGUI.WPF
         protected override async void OnDrop(DragEventArgs e)
         {
             base.OnDrop(e);
-            if (e.GetPosition(this).X > (Content as Grid).ColumnDefinitions[0].ActualWidth && tab.SelectedIndex >= 0)
+            if (e.GetPosition(this).X > (Content as Grid).ColumnDefinitions[0].ActualWidth && tab.SelectedIndex > 0)
             {
                 return;
             }
@@ -318,7 +318,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void ResetUI(bool force = false)
         {
-            if (tab.Items.Count == 0 && !topTab.HasContent
+            if (tab.SelectedIndex == 0 && !topTab.HasContent
                 && (IsUiCompressMode || force)) //左侧和右侧
             {
                 RemoveFromGrid();
@@ -364,6 +364,10 @@ namespace SimpleFFmpegGUI.WPF
 
         private void Tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!IsLoaded)
+            {
+                return;
+            }
             ResetUI();
         }
     }
