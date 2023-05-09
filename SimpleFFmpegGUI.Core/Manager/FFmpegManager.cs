@@ -258,6 +258,19 @@ namespace SimpleFFmpegGUI.Manager
                     _ => throw new NotSupportedException("不支持的任务类型：" + task.Type),
                 });
 
+
+                if (task.RealOutput!=null && File.Exists(task.RealOutput) &&  ConfigManager.SyncModifiedTime)
+                {
+                    try
+                    {
+                        File.SetLastWriteTime(task.RealOutput, File.GetLastWriteTime(task.Inputs[^1].FilePath));
+                    }
+                    catch(Exception ex)
+                    {
+                        logger.Error(task, "修改输出文件的修改时间失败："+ex.Message);
+                    }
+                }
+
                 logger.Info(task, "完成任务");
             }
             finally
@@ -466,6 +479,7 @@ namespace SimpleFFmpegGUI.Manager
                 arg = ArgumentsGenerator.GetArguments(task, 2);
                 await RunAsync(arg, message, cancellationToken, tempDirectory);
             }
+
         }
 
         /// <summary>
