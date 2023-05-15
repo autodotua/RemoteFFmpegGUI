@@ -45,5 +45,19 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             return await pipeClient.InvokeAsync(p => p.GetCpuUsage(TimeSpan.FromSeconds(0.1)));
         }
+
+        [HttpGet]
+        [Route("DefaultProcessPriority")]
+        public async Task<int> GetDefaultProcessPriority()
+        {
+            return await pipeClient.InvokeAsync(p => p.GetDefaultProcessPriority());
+        }
+
+        [HttpPost]
+        [Route("DefaultProcessPriority")]
+        public async Task SetDefaultProcessPriority(int priority)
+        {
+            await pipeClient.InvokeAsync(p=>p.SetDefaultProcessPriority(priority));
+        }
     }
 }

@@ -339,7 +339,7 @@ namespace SimpleFFmpegGUI.WPF
             grdLeft.RowDefinitions[2].Height = new GridLength(IsUiCompressMode ? 384 : 0);
             grdLeft.RowDefinitions[2].MinHeight = IsUiCompressMode ? 384 : 0;
             leftSplitter.Visibility = IsUiCompressMode ? Visibility.Visible : Visibility.Collapsed;
-            statusPanel.Margin = new Thickness(12, IsUiCompressMode ? 12 : 44, 12, 12);
+            statusPanel.Margin = new Thickness(12, IsUiCompressMode ? 12 : 44, 12, IsUiCompressMode ? 12 : 42);
             UiCompressModeChanged?.Invoke(this, new EventArgs());
             void RemoveFromGrid()
             {

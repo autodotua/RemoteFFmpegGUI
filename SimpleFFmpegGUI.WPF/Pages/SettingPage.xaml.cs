@@ -41,6 +41,12 @@ namespace SimpleFFmpegGUI.WPF.Pages
         public IEnumerable DefaultOutputDirTypes => Enum.GetValues<DefaultOutputDirType>();
 
         public ObservableCollection<RemoteHost> ObservableRemoteHosts { get; set; }
+
+        public int DefaultProcessPriority
+        {
+            get => ConfigManager.DefaultProcessPriority;
+            set => ConfigManager.DefaultProcessPriority = value;
+        }
     }
 
     /// <summary>
@@ -85,7 +91,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
         {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
             var path = dialog.GetFolderPath();
-            if(path != null)
+            if (path != null)
             {
                 ViewModel.DefaultOutputDirSpecialDirPath = path;
             }

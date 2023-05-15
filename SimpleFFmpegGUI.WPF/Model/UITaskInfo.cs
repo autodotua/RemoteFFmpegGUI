@@ -45,7 +45,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         private FFmpegManager processManager;
 
-        private int processPriority = Config.Instance.DefaultProcessPriority;
+        private int processPriority = ConfigManager.DefaultProcessPriority;
 
         private StatusDto processStatus;
 
@@ -236,33 +236,13 @@ namespace SimpleFFmpegGUI.WPF.Model
             get
             {
                 return processPriority;
-                //     ProcessManager.Process.Priority switch
-                //{
-                //    ProcessPriorityClass.RealTime => 0,
-                //    ProcessPriorityClass.High => 1,
-                //    ProcessPriorityClass.AboveNormal => 2,
-                //    ProcessPriorityClass.Normal => 3,
-                //    ProcessPriorityClass.BelowNormal => 4,
-                //    ProcessPriorityClass.Idle => 5,
-                //    _ => throw new InvalidEnumArgumentException(nameof(ProcessPriorityClass)),
-                //};
             }
             set
             {
                 processPriority = value;
                 if (ProcessManager.Process != null)
                 {
-
-                    ProcessManager.Process.Priority = value switch
-                    {
-                        5 => ProcessPriorityClass.RealTime,
-                        4 => ProcessPriorityClass.High,
-                        3 => ProcessPriorityClass.AboveNormal,
-                        2 => ProcessPriorityClass.Normal,
-                        1 => ProcessPriorityClass.BelowNormal,
-                        0 => ProcessPriorityClass.Idle,
-                        _ => ProcessPriorityClass.Normal,
-                    };
+                    ProcessManager.Process.Priority = value;
                 }
                 this.Notify(nameof(Manager), nameof(ProcessPriority));
             }

@@ -36,7 +36,6 @@ namespace SimpleFFmpegGUI.WPF
 
         private DefaultOutputDirType defaultOutputDirType = DefaultOutputDirType.InputDir;
 
-        private int defaultProcessPriority = 2;
         private bool rememberLastArguments = true;
 
         private List<RemoteHost> remoteHosts = new List<RemoteHost>();
@@ -86,11 +85,6 @@ namespace SimpleFFmpegGUI.WPF
         {
             get => defaultOutputDirType;
             set => this.SetValueAndNotify(ref defaultOutputDirType, value, nameof(DefaultOutputDirType));
-        }
-        public int DefaultProcessPriority
-        {
-            get => defaultProcessPriority;
-            set => this.SetValueAndNotify(ref defaultProcessPriority, value, nameof(DefaultProcessPriority));
         }
 
         public Dictionary<TaskType, OutputArguments> LastOutputArguments { get; set; } = new Dictionary<TaskType, OutputArguments>();

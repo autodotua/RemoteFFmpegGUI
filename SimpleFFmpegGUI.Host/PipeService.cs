@@ -252,5 +252,19 @@ namespace SimpleFFmpegGUI
             }
             return files.First();
         }
+
+        public int GetDefaultProcessPriority()
+        {
+            return ConfigManager.DefaultProcessPriority;
+        }
+
+        public void SetDefaultProcessPriority(int priority)
+        {
+            ConfigManager.DefaultProcessPriority = priority;
+            foreach (var task in manager.Managers)
+            {
+                task.Process.Priority=priority; 
+            }
+        }
     }
 }

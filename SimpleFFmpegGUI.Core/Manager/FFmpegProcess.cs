@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,13 +11,19 @@ namespace SimpleFFmpegGUI.Manager
     /// </summary>
     public class FFmpegProcess
     {
-        public ProcessPriorityClass priority = ProcessPriorityClass.Normal;
         private readonly Process process = new Process();
 
+        private ProcessPriorityClass priority = default;
+
         private bool started = false;
+
         private TaskCompletionSource<bool> tcs;
 
-        public FFmpegProcess(string argument)
+        private FFmpegProcess()
+        {
+            Priority = ConfigManager.DefaultProcessPriority;
+        }
+        public FFmpegProcess(string argument) : this()
         {
             process.StartInfo = new ProcessStartInfo()
             {
@@ -47,7 +54,7 @@ namespace SimpleFFmpegGUI.Manager
         /// </summary>
         public int Id => !started ? throw new Exception("进程还未开始运行") : process.Id;
 
-        public ProcessPriorityClass Priority
+        public int Priority
         {
             get
             {
@@ -56,7 +63,16 @@ namespace SimpleFFmpegGUI.Manager
                     throw new Exception("进程已经退出");
                 }
 
-                return priority;
+                return priority switch
+                {
+                    ProcessPriorityClass.RealTime => 5,
+                    ProcessPriorityClass.High => 4,
+                    ProcessPriorityClass.AboveNormal => 3,
+                    ProcessPriorityClass.Normal => 2,
+                    ProcessPriorityClass.BelowNormal => 1,
+                    ProcessPriorityClass.Idle => 0,
+                    _ => throw new InvalidEnumArgumentException()
+                };
             }
             set
             {
@@ -64,10 +80,19 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     throw new Exception("进程已经退出");
                 }
-                priority = value;
+                priority = value switch
+                {
+                    5 => ProcessPriorityClass.RealTime,
+                    4 => ProcessPriorityClass.High,
+                    3 => ProcessPriorityClass.AboveNormal,
+                    2 => ProcessPriorityClass.Normal,
+                    1 => ProcessPriorityClass.BelowNormal,
+                    0 => ProcessPriorityClass.Idle,
+                    _ => ProcessPriorityClass.Normal,
+                };
                 if (started)
                 {
-                    process.PriorityClass = value;
+                    process.PriorityClass = priority;
                 }
             }
         }

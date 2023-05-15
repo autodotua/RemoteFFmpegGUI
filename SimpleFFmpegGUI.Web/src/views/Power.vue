@@ -3,38 +3,27 @@
     <div class="top24">
       <h2>立即关机</h2>
       <el-popconfirm title="是否立即关机？" @confirm="shutdown" class="right12">
-        <el-button type="danger" slot="reference"
-          >立即关机</el-button
-        ></el-popconfirm
-      >
-      <el-button type="secondary" slot="reference" @click="abortShutdown"
-        >终止关机</el-button
-      >
+        <el-button type="danger" slot="reference">立即关机</el-button></el-popconfirm>
+      <el-button type="secondary" slot="reference" @click="abortShutdown">终止关机</el-button>
     </div>
 
     <div class="top24">
       <h2>队列结束后关机</h2>
       <a class="right12">是否在完成当前队列后自动关机</a>
-      <el-switch
-        v-model="shutdown_queue"
-        @change="setShutdownQueue"
-      ></el-switch>
+      <el-switch v-model="shutdown_queue" @change="setShutdownQueue"></el-switch>
+    </div>
+
+    <div class="top24">
+      <h2>进程优先级</h2>
+      <a>默认进程优先级</a>
+        <el-slider style="width: 240px" class="left12" @change="updateDefaultProcessPriority" :max="4" :show-tooltip="false"
+        v-model="defaultProcessPriority" :marks="processPriorities"></el-slider>
     </div>
 
     <div class="top24">
       <h2>CPU占用率</h2>
-      <div
-        v-for="item in cpuCoreUsages"
-        :key="item.id"
-        style="display: inline-block"
-        class="bottom12 right12"
-      >
-        <el-progress
-          :percentage="item.usage"
-          :width="48"
-          type="circle"
-          :color="colors"
-        ></el-progress>
+      <div v-for="item in cpuCoreUsages" :key="item.id" style="display: inline-block" class="bottom12 right12">
+        <el-progress :percentage="item.usage" :width="48" type="circle" :color="colors"></el-progress>
       </div>
     </div>
   </div>
@@ -56,11 +45,24 @@ export default Vue.extend({
     return {
       shutdown_queue: false,
       cpuCoreUsages: Array<any>(),
+      defaultProcessPriority: 2,
       colors: [
         { color: "green", percentage: 50 },
         { color: "orange", percentage: 80 },
         { color: "red", percentage: 100 },
       ],
+      processPriorities: {
+        0: "空闲",
+        1: "低于正常",
+        2: {
+          style: {
+            color: "#1989FA",
+          },
+          label: this.$createElement("strong", "正常"),
+        },
+        3: "高于正常",
+        4: "高",
+      },
     };
   },
   computed: {},
@@ -103,6 +105,12 @@ export default Vue.extend({
         closeLoading();
       });
     },
+    updateDefaultProcessPriority(priority: number) {
+      net.postDefaultProcessPriority(priority)
+        .catch(() => {
+          showError("修改默认进程优先级失败");
+        });
+    },
     loadCpuCoreUsage() {
       net.getCpuCoreUsage().then((r) => {
         this.cpuCoreUsages = [];
@@ -117,12 +125,22 @@ export default Vue.extend({
         });
       });
     },
+    loadDefaultProcessPriority() {
+      net.getDefaultProcessPriority()
+        .then((response) => {
+          this.defaultProcessPriority = response.data
+        })
+        .catch(() => {
+          showError("加载默认进程优先级失败");
+        });
+    }
   },
   components: {},
   mounted: function () {
     showLoading();
     this.$nextTick(function () {
       this.updateShutdownQueue();
+      this.loadDefaultProcessPriority();
       this.loadCpuCoreUsage();
       setInterval(() => {
         this.loadCpuCoreUsage();

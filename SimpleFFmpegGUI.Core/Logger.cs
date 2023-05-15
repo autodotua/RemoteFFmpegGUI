@@ -132,6 +132,7 @@ namespace SimpleFFmpegGUI
             };
             Log?.Invoke(null, new LogEventArgs(log));
             db.Logs.Add(log);
+            Debug.WriteLine($"[{type}] {message}");
         }
 
         private void Save()

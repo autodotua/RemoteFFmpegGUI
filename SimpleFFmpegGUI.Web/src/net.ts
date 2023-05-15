@@ -249,3 +249,13 @@ export function postCancelSchedule(): Promise<AxiosResponse<any>> {
         return Vue.axios
         .post(getUrl("Queue/CancelSchedule"))
 }
+
+export function getDefaultProcessPriority(): Promise<AxiosResponse<any>> {
+        return Vue.axios
+        .get(getUrl("Power/DefaultProcessPriority"))
+}
+
+export function postDefaultProcessPriority(priority:number): Promise<AxiosResponse<any>> {
+        return Vue.axios
+        .post(getUrl("Power/DefaultProcessPriority?priority="+priority))
+}

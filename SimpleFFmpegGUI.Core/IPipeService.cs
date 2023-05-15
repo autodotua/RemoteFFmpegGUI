@@ -93,5 +93,9 @@ namespace SimpleFFmpegGUI
         void CancelQueueSchedule();
 
         DateTime? GetQueueScheduleTime();
+
+        public int GetDefaultProcessPriority();
+
+        public void SetDefaultProcessPriority(int priority);
     }
 }
