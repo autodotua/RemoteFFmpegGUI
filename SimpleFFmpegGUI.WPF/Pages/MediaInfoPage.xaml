@@ -18,6 +18,7 @@
             x:Key="KeyStyle"
             TargetType="{x:Type TextBlock}">
             <Setter Property="Width" Value="160" />
+            <Setter Property="Padding" Value="2,8,12,8" />
         </Style>
 
     </UserControl.Resources>
@@ -160,6 +161,26 @@
                                             Text="旋转" />
                                         <TextBlock Text="{Binding Rotation}" />
                                     </StackPanel>
+                                    <Expander
+                                        Header="编码设置"
+                                        Visibility="{Binding EncodingSettings, Converter={StaticResource CountMoreThanZeroConverter}}">
+                                        <ItemsControl ItemsSource="{Binding EncodingSettings}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock
+                                                            VerticalAlignment="Center"
+                                                            Style="{StaticResource KeyStyle}"
+                                                            Text="{Binding Name}"
+                                                            TextWrapping="Wrap" />
+                                                        <TextBlock
+                                                            VerticalAlignment="Center"
+                                                            Text="{Binding Value}" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Expander>
                                 </ui:SimpleStackPanel>
                             </GroupBox>
                         </DataTemplate>

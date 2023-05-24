@@ -35,7 +35,7 @@ namespace SimpleFFmpegGUI.Manager
             return mediaInfo;
         }
 
-        public static async Task<string> GetSnapshotAsync(string path, TimeSpan time,string scale)
+        public static async Task<string> GetSnapshotAsync(string path, TimeSpan time, string scale)
         {
             string tempPath = FileSystemUtility.GetTempFileName("snapshot") + ".bmp";
             FFmpegProcess process = new FFmpegProcess($"-ss {time.TotalSeconds:0.000}  -i \"{path}\" -vframes 1 -vf scale={scale} {tempPath}");
@@ -43,15 +43,16 @@ namespace SimpleFFmpegGUI.Manager
             return tempPath;
         }
 
+        public static TimeSpan GetVideoDurationByFFprobe(string path)
+        {
+            return FFProbe.Analyse(path).Duration;
+        }
+
         public static async Task<TimeSpan> GetVideoDurationByFFprobeAsync(string path)
         {
             return (await FFProbe.AnalyseAsync(path)).Duration;
         }
 
-        public static TimeSpan GetVideoDurationByFFprobe(string path)
-        {
-            return FFProbe.Analyse(path).Duration;
-        }
         private static JObject GetMediaInfoProcessOutput(string path)
         {
             string tmpFile = FileSystemUtility.GetTempFileName("mediainfo");
@@ -65,7 +66,6 @@ namespace SimpleFFmpegGUI.Manager
             string output = System.IO.File.ReadAllText(tmpFile);
             return JObject.Parse(output);
         }
-
 
         /// <summary>
         /// 解析编码设置（由NewBing生成）
@@ -137,6 +137,99 @@ namespace SimpleFFmpegGUI.Manager
                 }
             }
             return info;
+        }
+
+        public static VideoCodeArguments ConvertToVideoArguments(MediaInfoGeneral mediaInfo)
+        {
+            VideoCodeArguments arguments = new VideoCodeArguments();
+            var tracks = JObject.Parse(mediaInfo.Raw)["media"]["track"] as JArray;
+            if (mediaInfo.Videos.Count == 0)
+            {
+                throw new Exception("源文件不含视频");
+            }
+            var video = mediaInfo.Videos[0];
+
+            if (video.EncodingSettings != null && video.EncodingSettings.Count > 0)
+            {
+                var settings = video.EncodingSettings.ToDictionary(p => p.Name, p => p.Value);
+                try
+                {
+                    arguments = new VideoCodeArguments();
+                    if (settings["rc"].Equals("crf"))
+                    {
+                        if (settings.ContainsKey("crf"))
+                        {
+                            arguments.Crf = Convert.ToInt32(settings["crf"]);
+                        }
+                    }
+                    else if (settings["rc"].Equals("abr"))
+                    {
+                        arguments.AverageBitrate = Convert.ToDouble(settings["bitrate"]) / 1000;
+                        if (Convert.ToDouble(settings["stats-read"]) > 0)
+                        {
+                            arguments.TwoPass = true;
+                        }
+                    }
+                    if (settings.ContainsKey("vbv-maxrate"))
+                    {
+                        arguments.MaxBitrate = Convert.ToDouble(settings["vbv-maxrate"]) / 1000;
+                        arguments.MaxBitrateBuffer = Convert.ToDouble(settings["vbv-bufsize"]) / 1000 / arguments.MaxBitrate;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+
+                int preset = 0;
+                if (settings.ContainsKey("no-signhide"))
+                {
+                    preset = 8;
+                }
+                else if (settings.ContainsKey("no-sao"))
+                {
+                    preset = 7;
+                }
+                else if (settings["subme"].Equals(1))
+                {
+                    preset = 6;
+                }
+                else if (settings["ref"].Equals(2))
+                {
+                    preset = 5;
+                }
+                else if (settings["max-merge"].Equals(2))
+                {
+                    preset = 4;
+                }
+                else if (settings["ref"].Equals(3))
+                {
+                    preset = 3;
+                }
+                else if (settings["ref"].Equals(4))
+                {
+                    preset = 2;
+                }
+                else if (settings["max-merge"].Equals(4))
+                {
+                    preset = 1;
+                }
+                arguments.Preset = preset;
+            }
+            else
+            {
+                throw new Exception("源视频未提供编码设置信息，无法转换为输出参数");
+            }
+
+            arguments.Code = video.Format switch
+            {
+                "AVC" => "H264",
+                "HEVC" => "H265",
+                _ => video.Format
+            };
+
+
+            return arguments;
         }
     }
 }

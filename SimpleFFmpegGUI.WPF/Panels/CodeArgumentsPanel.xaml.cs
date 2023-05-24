@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -273,6 +274,54 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             return ViewModel.GetArguments();
         }
+
+        protected override void OnDragOver(DragEventArgs e)
+        {
+            base.OnDragOver(e);
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
+                if (files.Length == 1 && File.Exists(files[0]))
+                {
+                    e.Effects = DragDropEffects.Link;
+                }
+            }
+        }
+
+        protected override async void OnDrop(DragEventArgs e)
+        {
+            base.OnDrop(e);
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
+                if (files.Length == 1 && File.Exists(files[0]))
+                {
+                    var file = files[0];
+                    try
+                    {
+                        var info = await MediaInfoManager.GetMediaInfoAsync(file);
+                        var videoArgs = MediaInfoManager.ConvertToVideoArguments(info);
+                        ViewModel.Video = videoArgs.Adapt<VideoArgumentsWithSwitch>();
+                        if(videoArgs.Crf.HasValue)
+                        {
+                            ViewModel.Video.EnableCrf = true;
+                        }
+                        if(videoArgs.AverageBitrate.HasValue)
+                        {
+                            ViewModel.Video.EnableAverageBitrate= true;
+                        }
+                        if(videoArgs.MaxBitrate.HasValue)
+                        {
+                            ViewModel.Video.EnableMaxBitrate= true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        this.CreateMessage().QueueError("解析视频编码参数失败", ex);
+                    }
+                }
+                }
+            }
 
         public CodeArgumentsPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<CodeArgumentsPanelViewModel>();
     }
