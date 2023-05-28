@@ -2,6 +2,7 @@
 using Mapster;
 using Newtonsoft.Json.Linq;
 using SimpleFFmpegGUI.Dto;
+using SimpleFFmpegGUI.FFmpegLib;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.Model.MediaInfo;
 using System;
@@ -142,6 +143,7 @@ namespace SimpleFFmpegGUI.Manager
         public static VideoCodeArguments ConvertToVideoArguments(MediaInfoGeneral mediaInfo)
         {
             VideoCodeArguments arguments = new VideoCodeArguments();
+
             var tracks = JObject.Parse(mediaInfo.Raw)["media"]["track"] as JArray;
             if (mediaInfo.Videos.Count == 0)
             {
@@ -149,12 +151,18 @@ namespace SimpleFFmpegGUI.Manager
             }
             var video = mediaInfo.Videos[0];
 
+            arguments.Code = video.Format switch
+            {
+                "AVC" => VideoCodec.X264.Name,
+                "HEVC" => VideoCodec.X265.Name,
+                _ => throw new Exception("仅支持H264或H265")
+            };
+
             if (video.EncodingSettings != null && video.EncodingSettings.Count > 0)
             {
                 var settings = video.EncodingSettings.ToDictionary(p => p.Name, p => p.Value);
                 try
                 {
-                    arguments = new VideoCodeArguments();
                     if (settings["rc"].Equals("crf"))
                     {
                         if (settings.ContainsKey("crf"))
@@ -182,37 +190,76 @@ namespace SimpleFFmpegGUI.Manager
                 }
 
                 int preset = 0;
-                if (settings.ContainsKey("no-signhide"))
+
+                if (arguments.Code == VideoCodec.X264.Name)
                 {
-                    preset = 8;
+                    if (settings["cabac"].Equals(0))
+                    {
+                        preset = 8;
+                    }
+                    else if (settings["subme"].Equals(1))
+                    {
+                        preset = 7;
+                    }
+                    else if (settings["subme"].Equals(2))
+                    {
+                        preset = 6;
+                    }
+                    else if (settings["subme"].Equals(4))
+                    {
+                        preset = 5;
+                    }
+                    else if (settings["subme"].Equals(6))
+                    {
+                        preset = 4;
+                    }
+                    else if (settings["subme"].Equals(7))
+                    {
+                        preset = 3;
+                    }
+                    else if (settings["subme"].Equals(8))
+                    {
+                        preset = 2;
+                    }
+                    else if (settings["subme"].Equals(9))
+                    {
+                        preset = 1;
+                    }
                 }
-                else if (settings.ContainsKey("no-sao"))
+                else if (arguments.Code == VideoCodec.X265.Name)
                 {
-                    preset = 7;
-                }
-                else if (settings["subme"].Equals(1))
-                {
-                    preset = 6;
-                }
-                else if (settings["ref"].Equals(2))
-                {
-                    preset = 5;
-                }
-                else if (settings["max-merge"].Equals(2))
-                {
-                    preset = 4;
-                }
-                else if (settings["ref"].Equals(3))
-                {
-                    preset = 3;
-                }
-                else if (settings["ref"].Equals(4))
-                {
-                    preset = 2;
-                }
-                else if (settings["max-merge"].Equals(4))
-                {
-                    preset = 1;
+                    if (settings.ContainsKey("no-signhide"))
+                    {
+                        preset = 8;
+                    }
+                    else if (settings.ContainsKey("no-sao"))
+                    {
+                        preset = 7;
+                    }
+                    else if (settings["subme"].Equals(1))
+                    {
+                        preset = 6;
+                    }
+                    else if (settings["ref"].Equals(2))
+                    {
+                        preset = 5;
+                    }
+                    else if (settings["max-merge"].Equals(2))
+                    {
+                        preset = 4;
+                    }
+                    else if (settings["ref"].Equals(3))
+                    {
+                        preset = 3;
+                    }
+                    else if (settings["ref"].Equals(4))
+                    {
+                        preset = 2;
+                    }
+                    else if (settings["max-merge"].Equals(4))
+                    {
+                        preset = 1;
+                    }
                 }
                 arguments.Preset = preset;
             }
@@ -220,14 +267,6 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new Exception("源视频未提供编码设置信息，无法转换为输出参数");
             }
-
-            arguments.Code = video.Format switch
-            {
-                "AVC" => "H264",
-                "HEVC" => "H265",
-                _ => video.Format
-            };
-
 
             return arguments;
         }

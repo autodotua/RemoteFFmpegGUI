@@ -31,7 +31,7 @@ namespace SimpleFFmpegGUI.FFmpegLib
         public static VideoCodec GetCodec(string name)
         {
             name2codec ??= VideoCodecs.ToDictionary(p => p.Name, p => p);
-            return name2codec.GetValueOrDefault(name);
+            return name == null ? null : name2codec.GetValueOrDefault(name);
         }
 
 
