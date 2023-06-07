@@ -38,8 +38,9 @@ namespace SimpleFFmpegGUI.WPF
     public partial class MainWindow : Window
     {
         private readonly QueueManager queue;
-        private TaskList taskPanel;
+        private bool hasShownTrayMessage = false;
         private StatusPanel statusPanel;
+        private TaskList taskPanel;
         private FzLib.Program.Runtime.TrayIcon tray;
         public MainWindow(MainWindowViewModel viewModel, QueueManager queue)
         {
@@ -53,6 +54,9 @@ namespace SimpleFFmpegGUI.WPF
             this.queue = queue;
         }
 
+        public event EventHandler UiCompressModeChanged;
+
+        public bool IsUiCompressMode { get; private set; }
         public MainWindowViewModel ViewModel { get; set; }
 
         /// <summary>
@@ -144,10 +148,13 @@ namespace SimpleFFmpegGUI.WPF
                 }
                 tray.Show();
                 Hide();
-                tray.ShowMessage("任务将在后台继续执行");
+                if (!hasShownTrayMessage)
+                {
+                    hasShownTrayMessage = true;
+                    tray.ShowMessage("任务将在后台继续执行");
+                }
             }
         }
-
         protected override async void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
@@ -277,45 +284,6 @@ namespace SimpleFFmpegGUI.WPF
             AddNewTab<PresetsPage>();
         }
 
-        private async void SettingButton_Click(object sender, RoutedEventArgs e)
-        {
-            await ShowTopTabAsync<SettingPage>();
-        }
-
-        private void StartButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (!TaskManager.HasQueueTasks())
-            {
-                this.CreateMessage().QueueError("没有排队中的任务");
-                return;
-            }
-            queue.StartQueue();
-        }
-
-        private void TasksButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddNewTab<TasksPage>();
-        }
-
-        private void TestButton_Click(object sender, RoutedEventArgs e)
-        {
-            var window = App.ServiceProvider.GetService<TestWindow>();
-            window.Owner = this;
-            window.Show();
-        }
-
-        private void Window_Closing(object sender, CancelEventArgs e)
-        {
-            Config.Instance.Save();
-        }
-
-        private void Window_StateChanged(object sender, EventArgs e)
-        {
-            Config.Instance.WindowMaximum = WindowState == WindowState.Maximized;
-        }
-
-        public bool IsUiCompressMode { get; private set; }
-
         private void ResetUI(bool force = false)
         {
             if (tab.SelectedIndex == 0 && !topTab.HasContent
@@ -354,13 +322,19 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        public event EventHandler UiCompressModeChanged;
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void SettingButton_Click(object sender, RoutedEventArgs e)
         {
-            taskPanel = new TaskList() { Margin = new Thickness(8, 0, 0, 0) };
-            statusPanel = new StatusPanel() { Margin = new Thickness(12) };
-            ResetUI(true);
+            await ShowTopTabAsync<SettingPage>();
+        }
+
+        private void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!TaskManager.HasQueueTasks())
+            {
+                this.CreateMessage().QueueError("没有排队中的任务");
+                return;
+            }
+            queue.StartQueue();
         }
 
         private void Tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -370,6 +344,35 @@ namespace SimpleFFmpegGUI.WPF
                 return;
             }
             ResetUI();
+        }
+
+        private void TasksButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddNewTab<TasksPage>();
+        }
+
+        private void TestButton_Click(object sender, RoutedEventArgs e)
+        {
+            var window = App.ServiceProvider.GetService<TestWindow>();
+            window.Owner = this;
+            window.Show();
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            Config.Instance.Save();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            taskPanel = new TaskList() { Margin = new Thickness(8, 0, 0, 0) };
+            statusPanel = new StatusPanel() { Margin = new Thickness(12) };
+            ResetUI(true);
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            Config.Instance.WindowMaximum = WindowState == WindowState.Maximized;
         }
     }
 

@@ -299,29 +299,37 @@ namespace SimpleFFmpegGUI.WPF.Panels
                     var file = files[0];
                     try
                     {
+                        IsEnabled = false;
                         var info = await MediaInfoManager.GetMediaInfoAsync(file);
                         var videoArgs = MediaInfoManager.ConvertToVideoArguments(info);
                         ViewModel.Video = videoArgs.Adapt<VideoArgumentsWithSwitch>();
-                        if(videoArgs.Crf.HasValue)
+                        if (videoArgs.Crf.HasValue)
                         {
                             ViewModel.Video.EnableCrf = true;
                         }
-                        if(videoArgs.AverageBitrate.HasValue)
+                        if (videoArgs.AverageBitrate.HasValue)
                         {
-                            ViewModel.Video.EnableAverageBitrate= true;
+                            ViewModel.Video.EnableAverageBitrate = true;
                         }
-                        if(videoArgs.MaxBitrate.HasValue)
+                        if (videoArgs.MaxBitrate.HasValue)
                         {
-                            ViewModel.Video.EnableMaxBitrate= true;
+                            ViewModel.Video.EnableMaxBitrate = true;
                         }
+                        this.CreateMessage().QueueSuccess("已加载指定视频参数");
                     }
                     catch (Exception ex)
                     {
                         this.CreateMessage().QueueError("解析视频编码参数失败", ex);
                     }
-                }
+                    finally
+                    {
+                        IsEnabled = true;
+                    }
+
                 }
             }
+
+        }
 
         public CodeArgumentsPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<CodeArgumentsPanelViewModel>();
     }
