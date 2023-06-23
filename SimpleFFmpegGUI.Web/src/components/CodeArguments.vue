@@ -304,16 +304,21 @@
     </div>
 
     <div>
-      <h3>{{ type == 3 ? "参数" : "额外参数" }}</h3>
-      <el-form-item label="ffmpeg参数">
+      <h3>{{ type == 3 ? "参数" : "其他参数" }}</h3>
+      <el-form-item label="额外参数">
         <el-input
           v-model="code.extra"
           type="textarea"
           autosize
           spellcheck="false"
           autocorrect="off"
-          placeholder="请输入ffmpeg的运行参数"
+          placeholder="请输入ffmpeg的输出参数"
         ></el-input>
+      </el-form-item>
+      <el-form-item label="同步文件时间">
+        <el-switch v-model="code.syncModifiedTime" class="right24">
+          </el-switch>
+          <a  class="gray">将输出文件的修改时间设置为最后一个输入文件的修改时间</a>
       </el-form-item>
     </div>
   </el-form>
@@ -415,6 +420,7 @@ export default Vue.component("code-arguments", {
         disableVideo: false,
         disableAudio: false,
         extra: "",
+        syncModifiedTime:false
       },
       presets: [],
       preset: null,
@@ -538,6 +544,7 @@ export default Vue.component("code-arguments", {
         input: null,
         combine: this.type == 1 ? combine : null,
         extra: this.code.extra,
+        syncModifiedTime:this.code.syncModifiedTime,
         disableVideo: videoArg == null && this.code.disableVideo,
         disableAudio: audioArg == null && this.code.disableAudio,
         format: this.code.enableFormat ? this.code.format : null,
@@ -641,6 +648,7 @@ export default Vue.component("code-arguments", {
       this.code.enableFormat = args.format != null;
       this.code.format = args.format;
       this.code.extra = args.Extra;
+      this.code.syncModifiedTime=args.syncModifiedTime;
     },
   },
   components: {},

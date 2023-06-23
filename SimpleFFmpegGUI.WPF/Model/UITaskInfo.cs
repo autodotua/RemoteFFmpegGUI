@@ -351,7 +351,6 @@ namespace SimpleFFmpegGUI.WPF.Model
                 Stopwatch sw = Stopwatch.StartNew();
                 await UpdateSnapshotAsync();
                 sw.Stop();
-                Debug.WriteLine(sw.ElapsedMilliseconds);
             }
         }
 

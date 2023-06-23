@@ -11,7 +11,6 @@ namespace SimpleFFmpegGUI.Manager
     public static class ConfigManager
     {
         public const string DefaultProcessPriorityKey = "DefaultProcessPriority";
-        public const string SyncModifiedTimeKey = "SyncModifiedTime";
         private static readonly Dictionary<string, object> cache = new Dictionary<string, object>();
 
         public static int DefaultProcessPriority
@@ -20,11 +19,6 @@ namespace SimpleFFmpegGUI.Manager
             set => SetConfig(DefaultProcessPriorityKey, value);
         }
 
-        public static bool SyncModifiedTime
-        {
-            get => GetConfig(SyncModifiedTimeKey, true);
-            set => SetConfig(SyncModifiedTimeKey, value);
-        }
         public static T GetConfig<T>(string key, T defaultValue)
         {
             if (cache.ContainsKey(key))

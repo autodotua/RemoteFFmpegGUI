@@ -259,15 +259,15 @@ namespace SimpleFFmpegGUI.Manager
                 });
 
 
-                if (task.RealOutput!=null && File.Exists(task.RealOutput) &&  ConfigManager.SyncModifiedTime)
+                if (task.RealOutput != null && File.Exists(task.RealOutput) && task.Arguments.SyncModifiedTime)
                 {
                     try
                     {
                         File.SetLastWriteTime(task.RealOutput, File.GetLastWriteTime(task.Inputs[^1].FilePath));
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        logger.Error(task, "修改输出文件的修改时间失败："+ex.Message);
+                        logger.Error(task, "修改输出文件的修改时间失败：" + ex.Message);
                     }
                 }
 

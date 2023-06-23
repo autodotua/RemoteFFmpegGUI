@@ -393,13 +393,21 @@
                         IsChecked="{Binding Combine.Shortest}" />
                 </GroupBox>
                 <!--  额外参数  -->
-                <GroupBox Header="额外参数">
-                    <TextBox
-                        ui:ControlHelper.PlaceholderText="请输入ffmpeg参数"
-                        MaxLines="3"
-                        MinLines="3"
-                        Text="{Binding Extra, UpdateSourceTrigger=PropertyChanged}"
-                        TextWrapping="Wrap" />
+                <GroupBox Header="其他">
+                    <ui:SimpleStackPanel
+                        Orientation="Vertical"
+                        Spacing="8">
+                        <TextBox
+                            ui:ControlHelper.PlaceholderText="额外ffmpeg输出参数"
+                            MaxLines="3"
+                            MinLines="3"
+                            Text="{Binding Extra, UpdateSourceTrigger=PropertyChanged}"
+                            TextWrapping="Wrap" />
+                        <CheckBox
+                            Content="同步文件修改时间"
+                            IsChecked="{Binding SyncModifiedTime}"
+                            ToolTip="将输出文件的修改时间设置为最后一个输入文件的修改时间" />
+                    </ui:SimpleStackPanel>
                 </GroupBox>
             </ui:SimpleStackPanel>
         </ScrollViewer>

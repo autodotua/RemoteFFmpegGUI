@@ -29,206 +29,33 @@ using System.Windows.Shapes;
 
 namespace SimpleFFmpegGUI.WPF.Panels
 {
-    public class CodeArgumentsPanelViewModel : INotifyPropertyChanged
+    public enum ChannelOutputStrategy
     {
-        public CodeArgumentsPanelViewModel()
-        {
-        }
+        [Description("重新编码")]
+        Code,
 
-        public OutputArguments Arguments { get; set; }
-        private TaskType type;
+        [Description("复制")]
+        Copy,
 
-        public void Update(TaskType type, OutputArguments argument = null)
-        {
-            this.type = type;
-            CanSpecifyFormat = type is TaskType.Code or TaskType.Combine or TaskType.Concat;
-            CanSetVideoAndAudio = type is TaskType.Code;
-            CanSetCombine = type is TaskType.Combine;
-            CanSetConcat = type is TaskType.Concat;
-            if (argument != null)
-            {
-                Video = argument.Video.Adapt<VideoArgumentsWithSwitch>();
-                Video?.Update();
-                VideoOutputStrategy = argument.Video == null ?
-                    (argument.DisableVideo ? ChannelOutputStrategy.Disable : ChannelOutputStrategy.Copy)
-                    : ChannelOutputStrategy.Code;
-                Audio = argument.Audio.Adapt<AudioArgumentsWithSwitch>();
-                Audio?.Update();
-                AudioOutputStrategy = argument.Audio == null ?
-                 (argument.DisableAudio ? ChannelOutputStrategy.Disable : ChannelOutputStrategy.Copy)
-                 : ChannelOutputStrategy.Code;
-                Format = new FormatArgumentWithSwitch() { Format = argument.Format };
-                Format.Update();
-                Combine = argument.Combine;
-                Extra = argument.Extra;
-            }
-        }
-
-        public OutputArguments GetArguments()
-        {
-            if (VideoOutputStrategy == ChannelOutputStrategy.Code)
-            {
-                Video.Apply();
-            }
-            if (AudioOutputStrategy == ChannelOutputStrategy.Code)
-            {
-                Audio.Apply();
-            }
-            Format.Apply();
-            return new OutputArguments()
-            {
-                Video = VideoOutputStrategy == ChannelOutputStrategy.Code ? Video.Adapt<VideoCodeArguments>() : null,
-                Audio = AudioOutputStrategy == ChannelOutputStrategy.Code ? Audio.Adapt<AudioCodeArguments>() : null,
-                Format = Format.Format,
-                Combine = Combine,
-                Extra = Extra,
-                DisableVideo = VideoOutputStrategy == ChannelOutputStrategy.Disable,
-                DisableAudio = audioOutputStrategy == ChannelOutputStrategy.Disable,
-            };
-        }
-
-        private bool canSetVideoAndAudio;
-
-        public bool CanSetVideoAndAudio
-        {
-            get => canSetVideoAndAudio;
-            set
-            {
-                this.SetValueAndNotify(ref canSetVideoAndAudio, value, nameof(CanSetVideoAndAudio));
-                if (value)
-                {
-                    VideoOutputStrategy = ChannelOutputStrategy.Code;
-                    AudioOutputStrategy = ChannelOutputStrategy.Code;
-                }
-                else
-                {
-                    VideoOutputStrategy = ChannelOutputStrategy.Disable;
-                    AudioOutputStrategy = ChannelOutputStrategy.Disable;
-                }
-            }
-        }
-
-        private bool canSetCombine;
-
-        public bool CanSetCombine
-        {
-            get => canSetCombine;
-            set => this.SetValueAndNotify(ref canSetCombine, value, nameof(CanSetCombine));
-        }
-
-        private bool canSetConcat;
-
-        public bool CanSetConcat
-        {
-            get => canSetConcat;
-            set => this.SetValueAndNotify(ref canSetConcat, value, nameof(CanSetConcat));
-        }
-
-        private bool canSpecifyFormat;
-
-        public bool CanSpecifyFormat
-        {
-            get => canSpecifyFormat;
-            set => this.SetValueAndNotify(ref canSpecifyFormat, value, nameof(CanSpecifyFormat));
-        }
-
-        public IEnumerable ChannelOutputStrategies => Enum.GetValues(typeof(ChannelOutputStrategy));
-
-        private ChannelOutputStrategy videoOutputStrategy = ChannelOutputStrategy.Code;
-
-        public ChannelOutputStrategy VideoOutputStrategy
-        {
-            get => videoOutputStrategy;
-            set
-            {
-                this.SetValueAndNotify(ref videoOutputStrategy, value, nameof(VideoOutputStrategy));
-                if (value == ChannelOutputStrategy.Code && Audio == null)
-                {
-                    Video = new VideoArgumentsWithSwitch();
-                }
-            }
-        }
-
-        private ChannelOutputStrategy audioOutputStrategy = ChannelOutputStrategy.Code;
-
-        public ChannelOutputStrategy AudioOutputStrategy
-        {
-            get => audioOutputStrategy;
-            set
-            {
-                this.SetValueAndNotify(ref audioOutputStrategy, value, nameof(AudioOutputStrategy));
-                if (value == ChannelOutputStrategy.Code && Audio == null)
-                {
-                    Audio = new AudioArgumentsWithSwitch();
-                }
-            }
-        }
-
-        private VideoArgumentsWithSwitch video = new VideoArgumentsWithSwitch();
-
-        public VideoArgumentsWithSwitch Video
-        {
-            get => video;
-            set => this.SetValueAndNotify(ref video, value, nameof(Video));
-        }
-
-        private AudioArgumentsWithSwitch audio = new AudioArgumentsWithSwitch();
-
-        public AudioArgumentsWithSwitch Audio
-        {
-            get => audio;
-            set => this.SetValueAndNotify(ref audio, value, nameof(Audio));
-        }
-
-        private FormatArgumentWithSwitch format = new FormatArgumentWithSwitch();
-
-        public FormatArgumentWithSwitch Format
-        {
-            get => format;
-            set => this.SetValueAndNotify(ref format, value, nameof(Format));
-        }
-
-        private CombineArguments combine = new CombineArguments();
-
-        public CombineArguments Combine
-        {
-            get => combine;
-            set => this.SetValueAndNotify(ref combine, value, nameof(Combine));
-        }
-
-        private string extra;
-
-        public string Extra
-        {
-            get => extra;
-            set => this.SetValueAndNotify(ref extra, value, nameof(Extra));
-        }
-
-
-        public IEnumerable Fpses => new double[] { 10, 20, 23.976, 24, 25, 29.97, 30, 48, 59.94, 60, 120 };
-
-        public IEnumerable VideoCodecs { get; } = new[] { "自动" }.Concat(VideoCodec.VideoCodecs.Select(p => p.Name));
-        public IEnumerable AudioCodecs { get; } = new[] { "自动", "AAC", "OPUS" };
-        public IEnumerable Formats => VideoFormat.Formats;
-        public IEnumerable Sizes { get; } = new[] { "-1:2160", "-1:1440", "-1:1080", "-1:720", "-1:576", "-1:480" };
-        public IEnumerable AspectRatios { get; } = new[] { "16:9", "4:3", "1:1", "3:4", "16:9", "2.35" };
-        public IEnumerable PixelFormats { get; } = new[] { "yuv420p", "yuvj420p", "yuv422p", "yuvj422p", "rgb24", "gray", "yuv420p10le" };
-        public IEnumerable AudioBitrates { get; } = new[] { 32, 64, 96, 128, 192, 256, 320 };
-
-        public IEnumerable AudioSamplingRates { get; } = new[] { 8000, 16000, 32000, 44100, 48000, 96000, 192000 };
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        [Description("不导出")]
+        Disable,
     }
 
     public partial class CodeArgumentsPanel : UserControl
     {
+        private bool canApplyDefaultPreset = true;
+
         public CodeArgumentsPanel()
         {
             DataContext = ViewModel;
             InitializeComponent();
         }
+        public CodeArgumentsPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<CodeArgumentsPanelViewModel>();
 
-        private bool canApplyDefaultPreset = true;
+        public OutputArguments GetOutputArguments()
+        {
+            return ViewModel.GetArguments();
+        }
 
         public void SetAsClone()
         {
@@ -269,12 +96,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             ViewModel.Update(type, arguments);
         }
-
-        public OutputArguments GetOutputArguments()
-        {
-            return ViewModel.GetArguments();
-        }
-
         protected override void OnDragOver(DragEventArgs e)
         {
             base.OnDragOver(e);
@@ -330,22 +151,213 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
 
         }
-
-        public CodeArgumentsPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<CodeArgumentsPanelViewModel>();
     }
 
-    public enum ChannelOutputStrategy
+    public class CodeArgumentsPanelViewModel : INotifyPropertyChanged
     {
-        [Description("重新编码")]
-        Code,
+        private AudioArgumentsWithSwitch audio = new AudioArgumentsWithSwitch();
 
-        [Description("复制")]
-        Copy,
+        private ChannelOutputStrategy audioOutputStrategy = ChannelOutputStrategy.Code;
 
-        [Description("不导出")]
-        Disable,
+        private bool canSetCombine;
+
+        private bool canSetConcat;
+
+        private bool canSetVideoAndAudio;
+
+        private bool canSpecifyFormat;
+
+        private CombineArguments combine = new CombineArguments();
+
+        private string extra;
+
+        private FormatArgumentWithSwitch format = new FormatArgumentWithSwitch();
+
+        private bool syncModifiedTime;
+
+        private TaskType type;
+
+        private VideoArgumentsWithSwitch video = new VideoArgumentsWithSwitch();
+
+        private ChannelOutputStrategy videoOutputStrategy = ChannelOutputStrategy.Code;
+
+        public CodeArgumentsPanelViewModel()
+        {
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public OutputArguments Arguments { get; set; }
+        public IEnumerable AspectRatios { get; } = new[] { "16:9", "4:3", "1:1", "3:4", "16:9", "2.35" };
+
+        public AudioArgumentsWithSwitch Audio
+        {
+            get => audio;
+            set => this.SetValueAndNotify(ref audio, value, nameof(Audio));
+        }
+
+        public IEnumerable AudioBitrates { get; } = new[] { 32, 64, 96, 128, 192, 256, 320 };
+
+        public IEnumerable AudioCodecs { get; } = new[] { "自动", "AAC", "OPUS" };
+
+        public ChannelOutputStrategy AudioOutputStrategy
+        {
+            get => audioOutputStrategy;
+            set
+            {
+                this.SetValueAndNotify(ref audioOutputStrategy, value, nameof(AudioOutputStrategy));
+                if (value == ChannelOutputStrategy.Code && Audio == null)
+                {
+                    Audio = new AudioArgumentsWithSwitch();
+                }
+            }
+        }
+
+        public IEnumerable AudioSamplingRates { get; } = new[] { 8000, 16000, 32000, 44100, 48000, 96000, 192000 };
+
+        public bool CanSetCombine
+        {
+            get => canSetCombine;
+            set => this.SetValueAndNotify(ref canSetCombine, value, nameof(CanSetCombine));
+        }
+
+        public bool CanSetConcat
+        {
+            get => canSetConcat;
+            set => this.SetValueAndNotify(ref canSetConcat, value, nameof(CanSetConcat));
+        }
+
+        public bool CanSetVideoAndAudio
+        {
+            get => canSetVideoAndAudio;
+            set
+            {
+                this.SetValueAndNotify(ref canSetVideoAndAudio, value, nameof(CanSetVideoAndAudio));
+                if (value)
+                {
+                    VideoOutputStrategy = ChannelOutputStrategy.Code;
+                    AudioOutputStrategy = ChannelOutputStrategy.Code;
+                }
+                else
+                {
+                    VideoOutputStrategy = ChannelOutputStrategy.Disable;
+                    AudioOutputStrategy = ChannelOutputStrategy.Disable;
+                }
+            }
+        }
+
+        public bool CanSpecifyFormat
+        {
+            get => canSpecifyFormat;
+            set => this.SetValueAndNotify(ref canSpecifyFormat, value, nameof(CanSpecifyFormat));
+        }
+
+        public IEnumerable ChannelOutputStrategies => Enum.GetValues(typeof(ChannelOutputStrategy));
+
+        public CombineArguments Combine
+        {
+            get => combine;
+            set => this.SetValueAndNotify(ref combine, value, nameof(Combine));
+        }
+
+        public string Extra
+        {
+            get => extra;
+            set => this.SetValueAndNotify(ref extra, value, nameof(Extra));
+        }
+
+        public FormatArgumentWithSwitch Format
+        {
+            get => format;
+            set => this.SetValueAndNotify(ref format, value, nameof(Format));
+        }
+
+        public IEnumerable Formats => VideoFormat.Formats;
+
+        public IEnumerable Fpses => new double[] { 10, 20, 23.976, 24, 25, 29.97, 30, 48, 59.94, 60, 120 };
+
+        public IEnumerable PixelFormats { get; } = new[] { "yuv420p", "yuvj420p", "yuv422p", "yuvj422p", "rgb24", "gray", "yuv420p10le" };
+
+        public IEnumerable Sizes { get; } = new[] { "-1:2160", "-1:1440", "-1:1080", "-1:720", "-1:576", "-1:480" };
+
+        public bool SyncModifiedTime
+        {
+            get => syncModifiedTime;
+            set => this.SetValueAndNotify(ref syncModifiedTime, value, nameof(SyncModifiedTime));
+        }
+
+        public VideoArgumentsWithSwitch Video
+        {
+            get => video;
+            set => this.SetValueAndNotify(ref video, value, nameof(Video));
+        }
+
+        public IEnumerable VideoCodecs { get; } = new[] { "自动" }.Concat(VideoCodec.VideoCodecs.Select(p => p.Name));
+
+        public ChannelOutputStrategy VideoOutputStrategy
+        {
+            get => videoOutputStrategy;
+            set
+            {
+                this.SetValueAndNotify(ref videoOutputStrategy, value, nameof(VideoOutputStrategy));
+                if (value == ChannelOutputStrategy.Code && Audio == null)
+                {
+                    Video = new VideoArgumentsWithSwitch();
+                }
+            }
+        }
+
+        public OutputArguments GetArguments()
+        {
+            if (VideoOutputStrategy == ChannelOutputStrategy.Code)
+            {
+                Video.Apply();
+            }
+            if (AudioOutputStrategy == ChannelOutputStrategy.Code)
+            {
+                Audio.Apply();
+            }
+            Format.Apply();
+            return new OutputArguments()
+            {
+                Video = VideoOutputStrategy == ChannelOutputStrategy.Code ? Video.Adapt<VideoCodeArguments>() : null,
+                Audio = AudioOutputStrategy == ChannelOutputStrategy.Code ? Audio.Adapt<AudioCodeArguments>() : null,
+                Format = Format.Format,
+                Combine = Combine,
+                Extra = Extra,
+                SyncModifiedTime = SyncModifiedTime,
+                DisableVideo = VideoOutputStrategy == ChannelOutputStrategy.Disable,
+                DisableAudio = audioOutputStrategy == ChannelOutputStrategy.Disable,
+            };
+        }
+
+        public void Update(TaskType type, OutputArguments argument = null)
+        {
+            this.type = type;
+            CanSpecifyFormat = type is TaskType.Code or TaskType.Combine or TaskType.Concat;
+            CanSetVideoAndAudio = type is TaskType.Code;
+            CanSetCombine = type is TaskType.Combine;
+            CanSetConcat = type is TaskType.Concat;
+            if (argument != null)
+            {
+                Video = argument.Video.Adapt<VideoArgumentsWithSwitch>();
+                Video?.Update();
+                VideoOutputStrategy = argument.Video == null ?
+                    (argument.DisableVideo ? ChannelOutputStrategy.Disable : ChannelOutputStrategy.Copy)
+                    : ChannelOutputStrategy.Code;
+                Audio = argument.Audio.Adapt<AudioArgumentsWithSwitch>();
+                Audio?.Update();
+                AudioOutputStrategy = argument.Audio == null ?
+                 (argument.DisableAudio ? ChannelOutputStrategy.Disable : ChannelOutputStrategy.Copy)
+                 : ChannelOutputStrategy.Code;
+                Format = new FormatArgumentWithSwitch() { Format = argument.Format };
+                Format.Update();
+                Combine = argument.Combine;
+                Extra = argument.Extra;
+                SyncModifiedTime = argument.SyncModifiedTime;
+            }
+        }
     }
-
     public class Int2StringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

@@ -99,6 +99,10 @@
       <el-descriptions-item label="参数">{{
         args.extra ? args.extra : "未定义"
       }}</el-descriptions-item>
+      >
+      <el-descriptions-item label="同步文件时间">{{
+        args.syncModifiedTime ? "是" : "否"
+      }}</el-descriptions-item>
     </el-descriptions>
   </div>
 </template>
