@@ -14,7 +14,7 @@ namespace SimpleFFmpegGUI.WebAPI
 {
     public class PipeClient
     {
-        private IIpcClient<IPipeService> mediaInfoClient;
+        private IIpcClient<IPipeService> client;
         private readonly string hostName;
         private readonly string hostPath;
         private readonly string pipeName;
@@ -41,7 +41,7 @@ namespace SimpleFFmpegGUI.WebAPI
                 .GetRequiredService<IIpcClientFactory<IPipeService>>();
 
             // create client
-            mediaInfoClient = clientFactory.CreateClient("m");
+            client = clientFactory.CreateClient("m");
             this.config = config;
         }
 
@@ -49,7 +49,7 @@ namespace SimpleFFmpegGUI.WebAPI
         {
             try
             {
-                return await mediaInfoClient.InvokeAsync(exp);
+                return await client.InvokeAsync(exp);
             }
             catch (IpcFaultException ex)
             {
@@ -61,7 +61,7 @@ namespace SimpleFFmpegGUI.WebAPI
         {
             try
             {
-                await mediaInfoClient.InvokeAsync(exp);
+                await client.InvokeAsync(exp);
             }
             catch (IpcFaultException ex)
             {

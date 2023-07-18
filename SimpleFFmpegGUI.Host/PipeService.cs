@@ -263,8 +263,13 @@ namespace SimpleFFmpegGUI
             ConfigManager.DefaultProcessPriority = priority;
             foreach (var task in manager.Managers)
             {
-                task.Process.Priority=priority; 
+                task.Process.Priority = priority;
             }
+        }
+
+        public string GetSnapshot(string path, double seconds)
+        {
+            return MediaInfoManager.GetSnapshotAsync(path, TimeSpan.FromSeconds(seconds), "-1:480", "jpg").Result;
         }
     }
 }

@@ -114,7 +114,7 @@ export default Vue.extend({
             this.taskName += " 等";
           }
         } else {
-          this.taskName = "？";
+          this.taskName = "未知";
         }
         // this.taskName += " => ";
         // if (r.data.output) {

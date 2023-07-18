@@ -4,78 +4,90 @@
     <div v-if="status.hasDetail">
       <div v-if="windowWidth > 768">
         <el-row>
-          <el-col :span="7">
-            <el-row><b>码率：</b>{{ status.bitrate }}</el-row>
-            <el-row
-              ><b>已用：</b
-              >{{ formatDoubleTimeSpan(status.progress.duration) }}</el-row
-            >
+          <el-col style="width: 108px">
+            <img
+              v-if="snapshotSrc != ''"
+              width="108"
+              height="64"
+              onerror="this.style.display='none'"
+              :src="snapshotSrc"
+            />
           </el-col>
-          <el-col :span="7">
-            <el-row
-              ><b>速度：</b>{{ status.fps }}FPS{{ "   " }}
-              {{ status.speed }}X</el-row
-            >
-            <el-row
-              ><b>剩余：</b
-              >{{ formatDoubleTimeSpan(status.progress.lastTime) }}</el-row
-            >
-          </el-col>
-          <el-col :span="7">
-            <el-row
-              ><b>进度：</b>{{ status.frame }}帧
-              {{ formatDoubleTimeSpan(status.time, true) }}
-            </el-row>
-            <el-row
-              ><b>预计：</b>
-              {{ formatDateTime(finishTime(), true, true, false) }}</el-row
-            >
-          </el-col>
+          <el-col style="width: calc(100% - 120px); padding-left: 12px">
+            <el-row>
+              <el-col :span="7">
+                <el-row><b>码率：</b>{{ status.bitrate }}</el-row>
+                <el-row
+                  ><b>已用：</b
+                  >{{ formatDoubleTimeSpan(status.progress.duration) }}</el-row
+                >
+              </el-col>
+              <el-col :span="7">
+                <el-row
+                  ><b>速度：</b>{{ status.fps }}FPS{{ "   " }}
+                  {{ status.speed }}X</el-row
+                >
+                <el-row
+                  ><b>剩余：</b
+                  >{{ formatDoubleTimeSpan(status.progress.lastTime) }}</el-row
+                >
+              </el-col>
+              <el-col :span="7">
+                <el-row
+                  ><b>进度：</b>{{ status.frame }}帧
+                  {{ formatDoubleTimeSpan(status.time, true) }}
+                </el-row>
+                <el-row
+                  ><b>预计：</b>
+                  {{ formatDateTime(finishTime(), true, true, false) }}</el-row
+                >
+              </el-col>
 
-          <el-col :span="3">
-            <el-popconfirm title="真的要取消任务吗？" @confirm="cancel">
-              <el-button
-                type="text"
-                style="color: red"
-                slot="reference"
-                size="big"
-                >取消</el-button
-              ></el-popconfirm
-            >
-          </el-col>
-        </el-row>
-        <el-row class="right24">
-          <el-col :span="8" class="one-line"
-            ><b>任务：</b
-            >{{ status.isPaused ? "暂停中" : status.progress.name }}</el-col
-          >
-          <el-col :span="16">
-            <el-progress
-              :text-inside="true"
-              class="unknown-progress"
-              :stroke-width="20"
-              color="transparent"
-              :percentage="100"
-              v-show="status.progress.isIndeterminate"
-              style="margin-right: 24px; margin-top: 4px"
-              :show-text="true"
-              text-color="black"
-              :format="(p) => '进度未知'"
-              define-back-color="#CCCA"
-            ></el-progress>
-            <el-progress
-              :text-inside="true"
-              v-show="status.progress.isIndeterminate == false"
-              :stroke-width="20"
-              :color="progressColor"
-              style="margin-right: 24px; margin-top: 4px"
-              :percentage="status.progress.percent * 100"
-              :format="(p) => p.toFixed(2) + '%'"
-              text-color="white"
-              define-back-color="#CCCA"
-            ></el-progress
-          ></el-col>
-        </el-row>
+              <el-col :span="3">
+                <el-popconfirm title="真的要取消任务吗？" @confirm="cancel">
+                  <el-button
+                    type="text"
+                    style="color: red"
+                    slot="reference"
+                    size="big"
+                    >取消</el-button
+                  ></el-popconfirm
+                >
+              </el-col>
+            </el-row>
+            <el-row class="right24">
+              <el-col :span="8" class="one-line"
+                ><b>任务：</b
+                >{{ status.isPaused ? "暂停中" : status.progress.name }}</el-col
+              >
+              <el-col :span="16">
+                <el-progress
+                  :text-inside="true"
+                  class="unknown-progress"
+                  :stroke-width="20"
+                  color="transparent"
+                  :percentage="100"
+                  v-show="status.progress.isIndeterminate"
+                  style="margin-right: 24px; margin-top: 4px"
+                  :show-text="true"
+                  text-color="black"
+                  :format="(p) => '进度未知'"
+                  define-back-color="#CCCA"
+                ></el-progress>
+                <el-progress
+                  :text-inside="true"
+                  v-show="status.progress.isIndeterminate == false"
+                  :stroke-width="20"
+                  :color="progressColor"
+                  style="margin-right: 24px; margin-top: 4px"
+                  :percentage="status.progress.percent * 100"
+                  :format="(p) => p.toFixed(2) + '%'"
+                  text-color="white"
+                  define-back-color="#CCCA"
+                ></el-progress
+              ></el-col>
+            </el-row> </el-col
+        ></el-row>
       </div>
       <div v-else>
         <el-row>
@@ -169,7 +181,7 @@
       >
         {{ status.lastOutput }}
       </div>
-      <div v-else style="text-align: center; transform: translate(0,-4px);">
+      <div v-else style="text-align: center; transform: translate(0, -4px)">
         {{ status.lastOutput }}
       </div>
     </div>
@@ -189,6 +201,7 @@ export default Vue.component("status-bar", {
   data() {
     return {
       walkingProgress: 0,
+      snapshotSrc: "",
     };
   },
   props: ["status", "windowWidth", "isPaused"],
@@ -215,30 +228,44 @@ export default Vue.component("status-bar", {
         })
         .catch(showError);
     },
+    updateSnapshot() {
+      if (
+        this.status != null &&
+        this.status.hasDetail &&
+        this.status.task != null &&
+        !this.status.isPaused
+      ) {
+        if (this.status.task.inputs.length >= 1) {
+          net
+            .getSnapshot(this.status.task.inputs[0].filePath, this.status.time)
+            .then((r) => {
+              var reader = new window.FileReader();
+              reader.readAsDataURL(r.data);
+              reader.onload = () => {
+                var imageDataUrl = reader.result;
+                this.snapshotSrc = imageDataUrl;
+              };
+            })
+            .catch((r) => {
+              console.log("下载截图错误");
+              console.log(r.response ? r.response.data : r);
+              this.snapshotSrc = "";
+            });
+        }
+      } else {
+        this.snapshotSrc = "";
+      }
+    },
   },
   components: {},
   mounted: function () {
     this.$nextTick(function () {
-      let delay = 0;
-      // setInterval(() => {
-      //   if (this.status.isPaused) {
-      //     //this.walkingProgress=0;
-      //     //return;
-      //   }
-      //   console.log(this.walkingProgress);
-      //   if (delay > 0) {
-      //     delay--;
-      //     if (delay == 0) {
-      //       this.walkingProgress = 0;
-      //     }
-      //     return;
-      //   }
-      //   if (this.walkingProgress >= 100) {
-      //     delay = 10;
-      //   } else {
-      //     this.walkingProgress++;
-      //   }
-      // }, 50);
+      setInterval(() => {
+        this.updateSnapshot();
+      }, 10 * 1000);
+      setTimeout(() => {
+      this.updateSnapshot();
+      }, 1000);
       return;
     });
   },

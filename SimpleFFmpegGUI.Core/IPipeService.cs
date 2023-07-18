@@ -97,5 +97,7 @@ namespace SimpleFFmpegGUI
         public int GetDefaultProcessPriority();
 
         public void SetDefaultProcessPriority(int priority);
+
+        public string GetSnapshot(string path,double seconds);
     }
 }

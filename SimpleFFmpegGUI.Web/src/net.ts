@@ -189,23 +189,23 @@ export function downloadExportPresetsUrl(): void {
 
 export function getShutdownQueue(): Promise<AxiosResponse<any>> {
         return Vue.axios
-        .get(getUrl("Power/ShutdownQueue"))
+                .get(getUrl("Power/ShutdownQueue"))
 }
 
-export function postShutdownQueue(on:boolean): Promise<AxiosResponse<any>> {
-        const  form = new FormData();
-        form.append("on",String(on))
+export function postShutdownQueue(on: boolean): Promise<AxiosResponse<any>> {
+        const form = new FormData();
+        form.append("on", String(on))
         return Vue.axios
-        .post(getUrl("Power/ShutdownQueue"),form)
+                .post(getUrl("Power/ShutdownQueue"), form)
 }
 export function postShutdown(): Promise<AxiosResponse<any>> {
         return Vue.axios
-        .post(getUrl("Power/Shutdown"))
+                .post(getUrl("Power/Shutdown"))
 }
 
 export function postAbortShutdown(): Promise<AxiosResponse<any>> {
         return Vue.axios
-        .post(getUrl("Power/AbortShutdown"))
+                .post(getUrl("Power/AbortShutdown"))
 }
 
 export function getFormats(): Promise<AxiosResponse<any>> {
@@ -217,13 +217,11 @@ export function setHeader(): void {
         Vue.axios.defaults.headers.common['Authorization'] = Cookies.get("token");
 }
 
-export function getHeader(): any
-{
-        if(Cookies.get("token")==null)
-        {
+export function getHeader(): any {
+        if (Cookies.get("token") == null) {
                 return {}
         }
-        return {"Authorization":Cookies.get("token")};
+        return { "Authorization": Cookies.get("token") };
 }
 
 export function getNeedToken(): Promise<AxiosResponse<any>> {
@@ -240,22 +238,31 @@ export function getQueueScheduleTime(): Promise<AxiosResponse<any>> {
         return Vue.axios
                 .get(getUrl("Queue/QueueScheduleTime"))
 }
-export function postSchedule(time:any): Promise<AxiosResponse<any>> {
+export function postSchedule(time: any): Promise<AxiosResponse<any>> {
         return Vue.axios
-        .post(getUrl("Queue/Schedule?time="+encodeURI(time)))
+                .post(getUrl("Queue/Schedule?time=" + encodeURI(time)))
 }
 
 export function postCancelSchedule(): Promise<AxiosResponse<any>> {
         return Vue.axios
-        .post(getUrl("Queue/CancelSchedule"))
+                .post(getUrl("Queue/CancelSchedule"))
 }
 
 export function getDefaultProcessPriority(): Promise<AxiosResponse<any>> {
         return Vue.axios
-        .get(getUrl("Power/DefaultProcessPriority"))
+                .get(getUrl("Power/DefaultProcessPriority"))
 }
 
-export function postDefaultProcessPriority(priority:number): Promise<AxiosResponse<any>> {
+export function postDefaultProcessPriority(priority: number): Promise<AxiosResponse<any>> {
         return Vue.axios
-        .post(getUrl("Power/DefaultProcessPriority?priority="+priority))
+                .post(getUrl("Power/DefaultProcessPriority?priority=" + priority))
+}
+
+
+export function getSnapshot(videoPath: string, seconds: number): Promise<AxiosResponse<any>> {
+        return Vue.axios
+                .get(getUrl("MediaInfo/Snapshot?videoPath=" + encodeURI(videoPath) + "&seconds=" + seconds),
+                        {
+                                responseType: 'blob'
+                        })
 }

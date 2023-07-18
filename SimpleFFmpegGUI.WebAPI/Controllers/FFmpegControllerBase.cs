@@ -58,7 +58,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                     var files=Directory.EnumerateFiles(InputDir,name, SearchOption.AllDirectories);
                     if(!files.Any())
                     {
-                        throw Oops.Oh("不存在文件" + name);
+                        throw Oops.Oh("找不到文件" + name);
                     }
                     if(files.Count()>2)
                     {
@@ -85,7 +85,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                 {
                     if (System.IO.File.Exists(path))
                     {
-                        throw Oops.Oh("不存在文件" + name);
+                        throw Oops.Oh("不存在文件" + path);
                     }
                     return path;
                 }
@@ -94,7 +94,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                 {
                     if (!await pipeClient.InvokeAsync(p => p.IsFileExist(path)))
                     {
-                        throw Oops.Oh("不存在文件" + name);
+                        throw Oops.Oh("不存在文件" + path);
                     }
                     return path;
                 }
