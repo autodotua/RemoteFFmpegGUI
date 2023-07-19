@@ -99,5 +99,8 @@ namespace SimpleFFmpegGUI
         public void SetDefaultProcessPriority(int priority);
 
         public string GetSnapshot(string path,double seconds);
+
+        public byte[] ReadFiles(string path);
+        System.Threading.Tasks.Task TestAsync();
     }
 }

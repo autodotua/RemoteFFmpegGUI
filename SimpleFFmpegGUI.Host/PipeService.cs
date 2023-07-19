@@ -271,5 +271,15 @@ namespace SimpleFFmpegGUI
         {
             return MediaInfoManager.GetSnapshotAsync(path, TimeSpan.FromSeconds(seconds), "-1:480", "jpg").Result;
         }
+
+        public byte[] ReadFiles(string path)
+        {
+            return File.ReadAllBytes(path);
+        }
+
+        public async System.Threading.Tasks.Task TestAsync()
+        {
+            await System.Threading.Tasks.Task.Yield();
+        }
     }
 }

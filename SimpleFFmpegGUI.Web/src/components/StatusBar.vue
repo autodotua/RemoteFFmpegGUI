@@ -4,14 +4,17 @@
     <div v-if="status.hasDetail">
       <div v-if="windowWidth > 768">
         <el-row>
-          <el-col style="width: 108px">
-            <img
-              v-if="snapshotSrc != ''"
-              width="108"
-              height="64"
-              onerror="this.style.display='none'"
-              :src="snapshotSrc"
-            />
+          <el-col style="width: 108px; height: 64px">
+            <div style="background-color: #7dd07d; width: 100%; height: 100%">
+              <img
+                width="108"
+                height="64"
+                style="cursor: pointer"
+                :src="snapshotSrc"
+                v-show="snapshotSrc != ''"
+                @click="clickSnapshot"
+              />
+            </div>
           </el-col>
           <el-col style="width: calc(100% - 120px); padding-left: 12px">
             <el-row>
@@ -202,6 +205,8 @@ export default Vue.component("status-bar", {
     return {
       walkingProgress: 0,
       snapshotSrc: "",
+      lastSnapshotTime: 1e10,
+      lastSnapshotFile: "",
     };
   },
   props: ["status", "windowWidth", "isPaused"],
@@ -228,17 +233,37 @@ export default Vue.component("status-bar", {
         })
         .catch(showError);
     },
+    clickSnapshot() {
+      this.$alert(
+        '<img src="' + this.snapshotSrc + '" style="width:100%">',
+        "缩略图",
+        {
+          dangerouslyUseHTMLString: true,
+        }
+      );
+    },
     updateSnapshot() {
+      if (this.status.isPaused) {
+        return;
+      }
       if (
         this.status != null &&
         this.status.hasDetail &&
         this.status.task != null &&
-        !this.status.isPaused
+        this.windowWidth > 768
       ) {
         if (this.status.task.inputs.length >= 1) {
+          if (
+            this.status.task.inputs[0].filePath == this.lastSnapshotFile &&
+            Math.abs(this.status.time - this.lastSnapshotTime) < 1
+          ) {
+            return;
+          }
           net
             .getSnapshot(this.status.task.inputs[0].filePath, this.status.time)
             .then((r) => {
+              this.lastSnapshotFile = this.status.task.inputs[0].filePath;
+              this.lastSnapshotTime = this.status.time;
               var reader = new window.FileReader();
               reader.readAsDataURL(r.data);
               reader.onload = () => {
@@ -250,10 +275,12 @@ export default Vue.component("status-bar", {
               console.log("下载截图错误");
               console.log(r.response ? r.response.data : r);
               this.snapshotSrc = "";
+              this.lastSnapshotFile = "";
             });
         }
       } else {
         this.snapshotSrc = "";
+        this.lastSnapshotFile = "";
       }
     },
   },
@@ -264,7 +291,7 @@ export default Vue.component("status-bar", {
         this.updateSnapshot();
       }, 10 * 1000);
       setTimeout(() => {
-      this.updateSnapshot();
+        this.updateSnapshot();
       }, 1000);
       return;
     });
@@ -287,13 +314,7 @@ export default Vue.component("status-bar", {
 .unknown-progress > div > div > div {
   text-align: center;
 }
-
-/* .el-progress__text {
-  font-size: 14px !important;
+.el-message-box {
+  width: 80% !important;
 }
-
-.el-progress-bar {
-  margin-right: -60px !important;
-  padding-right: 72px !important;
-} */
 </style>

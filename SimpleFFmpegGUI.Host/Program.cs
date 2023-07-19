@@ -58,6 +58,7 @@ namespace SimpleFFmpegGUI
                     .ConfigureLogging(builder =>
                     {
                         builder.AddConsole();
+                        builder.SetMinimumLevel(LogLevel.Information);
                     });
         }
 

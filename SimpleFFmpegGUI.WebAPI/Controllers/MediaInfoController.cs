@@ -36,7 +36,15 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 videoPath = await CheckAndGetInputFilePathAsync(videoPath);
                 string path = await pipeClient.InvokeAsync(p => p.GetSnapshot(videoPath, seconds));
-                return PhysicalFile(path, "image/jpeg");
+
+                if (CanAccessInputDir())
+                {
+                    return PhysicalFile(path, "image/jpeg");
+                }
+                else
+                {
+                    return File(await pipeClient.InvokeAsync(p => p.ReadFiles(path)), "image/jpeg");
+                }
             }
             catch (Exception ex)
             {
