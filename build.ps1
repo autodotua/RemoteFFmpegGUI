@@ -9,8 +9,6 @@ try {
     
     Write-Output "-w：生成Web（Web、WebAPI、Host）"
     Write-Output "-d：生成WPF"
-    Write-Output "-s：生成WPF（单文件）"
-    Write-Output "-f：生成WPF（包含框架）"
     Write-Output ""  
     
     Write-Output "请先阅读ReadMe"
@@ -23,8 +21,9 @@ try {
     Clear-Host
 
     
-    if(!$w -and !$d -and !$s -and !$f){
-        throw "未指定构建类型"
+    if(!$w -and !$d){
+        $w = $true
+        $d = $true
     }
     
     if (!(Test-Path bin)) {
@@ -45,8 +44,9 @@ try {
     }
     
     Clear-Host
-
-    Remove-Item Generation/Publish -Recurse
+    if (Test-Path Generation/Publish) {
+        Remove-Item Generation/Publish -Recurse
+    }
     
     if ($w) {
         mkdir -Force Generation/Publish/WebPackage
@@ -83,18 +83,14 @@ try {
         dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF -r win-x64 --self-contained false
         Write-Output "正在复制二进制库"
         Copy-Item bin/* Generation/Publish/WPF -Force -Recurse
-    }
 
-    if ($s) {
         Write-Output "正在发布WPF（单文件）"
         dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF_SingleFile -r win-x64 --self-contained false /p:PublishSingleFile=true
         Write-Output "正在复制二进制库"
         Copy-Item bin/* Generation/Publish/WPF_SingleFile -Force -Recurse  
-    }
-        
-    if ($f) {
+
         Write-Output "正在发布WPF（自包含）"
-        dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF_SelfContained -r win-x64 --self-contained true
+        dotnet publish SimpleFFmpegGUI.WPF -c Release -o Generation/Publish/WPF_SelfContained -r win-x64 --self-contained true /p:PublishSingleFile=true
         Write-Output "正在复制二进制库"
         Copy-Item bin/* Generation/Publish/WPF_SelfContained -Force -Recurse
     }
@@ -106,10 +102,9 @@ try {
     Write-Output "正在清理"
     Remove-Item Generation/Release -Recurse
 
-    Write-Output "操作完成"
-    Write-Output "Web包位于Generation/Publish/WebPackage，WPF包位于Generation/Publish/WPF。"
+    Write-Output "操作完成，生成的文件位于Generation/Publish"
 
-    ii Generation/Publish
+    Invoke-Item Generation/Publish
     pause
 }
 catch {

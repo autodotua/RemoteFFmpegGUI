@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
-    <PackageReference Include="FFME.Windows" Version="4.4.350" />
     <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="Mapster" Version="7.3.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
@@ -28,6 +27,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
+    <PackageReference Include="zgabi.FFME.Windows" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>

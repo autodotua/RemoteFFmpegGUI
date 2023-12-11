@@ -142,6 +142,19 @@ namespace SimpleFFmpegGUI.WPF
             DataContext = ViewModel;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             Unloaded += (s, e) => media.Close();
+            media.MessageLogged += async (s, e) =>
+            {
+                if (e.MessageType == Unosquare.FFME.Common.MediaLogMessageType.Error)
+                {
+                    await Dispatcher.Invoke(async () =>
+                       {
+                           await CommonDialog.ShowErrorDialogAsync("加载视频失败", e.Message);
+                           Close();
+                       });
+                }
+                Debug.WriteLine(e.Message);
+            };
+
         }
 
 
@@ -264,7 +277,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            Console.Write("{0},{1}",ViewModel.From, ViewModel.To);
+            Console.Write("{0},{1}", ViewModel.From, ViewModel.To);
             Application.Current.Shutdown();
         }
 
