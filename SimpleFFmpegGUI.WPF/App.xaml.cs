@@ -57,26 +57,9 @@ namespace SimpleFFmpegGUI.WPF
             ConfigureServices(serviceCollection);
             ServiceProvider = serviceCollection.BuildServiceProvider();
 
-            if (e.Args.Length > 1)
-            {
-                if (e.Args[0] == "cut")
-                {
-                    MainWindow = new CutWindow(new CutWindowViewModel(), e.Args[2..]);
-                    WindowInteropHelper helper = new WindowInteropHelper(MainWindow);
-                    helper.Owner = IntPtr.Parse(e.Args[1]);
-                    MainWindow.ShowDialog();
-                }
-                else
-                {
-                    throw new ArgumentException("未知参数：" + e.Args[0]);
-                }
-            }
-            else
-            {
-                ServiceProvider.GetService<FFmpegOutputPageViewModel>();
-                MainWindow = ServiceProvider.GetService<MainWindow>();
-                MainWindow.Show();
-            }
+            ServiceProvider.GetService<FFmpegOutputPageViewModel>();
+            MainWindow = ServiceProvider.GetService<MainWindow>();
+            MainWindow.Show();
         }
 
         private void ConfigureServices(IServiceCollection services)
@@ -89,6 +72,9 @@ namespace SimpleFFmpegGUI.WPF
 
             services.AddSingleton<MainWindow>();
             services.AddTransient<MainWindowViewModel>();
+
+            services.AddTransient<CutWindow>();
+            services.AddTransient<CutWindowViewModel>();
 
             services.AddTransient<TestWindow>();
             services.AddTransient<TestWindowViewModel>();

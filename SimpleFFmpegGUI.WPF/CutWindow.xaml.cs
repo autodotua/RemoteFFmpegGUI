@@ -37,91 +37,26 @@ using Size = System.Drawing.Size;
 
 namespace SimpleFFmpegGUI.WPF
 {
-    public class CutWindowViewModel : INotifyPropertyChanged
+    public static class AsyncEventExtension
     {
-        public CutWindowViewModel()
+        public static Task WaitForEventAsync(this object obj, string eventName)
         {
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private double currentP;
-
-        public double CurrentP
-        {
-            get => currentP;
-            set
+            var e = obj.GetType().GetEvent(eventName);
+            if (e == null)
             {
-                current = Length * value;
-                this.SetValueAndNotify(ref currentP, value, nameof(CurrentP), nameof(Current));
+                throw new ArgumentException($"找不到事件{eventName}");
             }
-        }
+            TaskCompletionSource tcs = new TaskCompletionSource();
+            EventHandler handler = null;
+            handler = new EventHandler(Finish);
+            e.AddEventHandler(obj, handler);
+            return tcs.Task;
 
-        private TimeSpan current = TimeSpan.Zero;
-
-        public TimeSpan Current
-        {
-            get => current;
-            set
+            void Finish(object sender, EventArgs a)
             {
-                currentP = value / Length;
-                this.SetValueAndNotify(ref current, value, nameof(Current), nameof(CurrentP));
+                e.RemoveEventHandler(obj, handler);
+                tcs.SetResult();
             }
-        }
-
-        public double FromP => From / Length;
-        public double ToP => To / Length;
-
-        private TimeSpan from = TimeSpan.Zero;
-
-        public TimeSpan From
-        {
-            get => from;
-            set => this.SetValueAndNotify(ref from, value, nameof(From), nameof(FromP));
-        }
-
-        private TimeSpan to = TimeSpan.Zero;
-
-        public TimeSpan To
-        {
-            get => to;
-            set => this.SetValueAndNotify(ref to, value, nameof(To), nameof(ToP));
-        }
-
-        private string filePath;
-
-        public string FilePath
-        {
-            get => filePath;
-            set => this.SetValueAndNotify(ref filePath, value, nameof(FilePath));
-        }
-
-        private TimeSpan length;
-
-        public TimeSpan Length
-        {
-            get => length;
-            set
-            {
-                to = value;
-                this.SetValueAndNotify(ref length, value, nameof(Length), nameof(To), nameof(FromP), nameof(ToP));
-            }
-        }
-
-        private bool isBarEnabled = true;
-
-        public bool IsBarEnabled
-        {
-            get => isBarEnabled;
-            set => this.SetValueAndNotify(ref isBarEnabled, value, nameof(IsBarEnabled));
-        }
-
-        private long frame;
-
-        public long Frame
-        {
-            get => frame;
-            set => this.SetValueAndNotify(ref frame, value, nameof(Frame));
         }
     }
 
@@ -130,15 +65,12 @@ namespace SimpleFFmpegGUI.WPF
     /// </summary>
     public partial class CutWindow : Window
     {
-        private readonly string[] args;
 
-        public CutWindowViewModel ViewModel { get; set; }
-
-        public CutWindow(CutWindowViewModel viewModel, string[] args)
+        public CutWindow(CutWindowViewModel viewModel)
         {
             InitializeComponent();
             ViewModel = viewModel;
-            this.args = args;
+
             DataContext = ViewModel;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             Unloaded += (s, e) => media.Close();
@@ -157,14 +89,31 @@ namespace SimpleFFmpegGUI.WPF
 
         }
 
+        public string FileName { get; private set; }
 
-        public async Task SetVideoAsync(string path, TimeSpan? from, TimeSpan? to)
+        public CutWindowViewModel ViewModel { get; set; }
+
+        public void Initialize(string fileName, TimeSpan? from, TimeSpan? to)
+        {
+            FileName = fileName;
+            if (from.HasValue)
+            {
+                ViewModel.From = from.Value;
+            }
+            if (to.HasValue)
+            {
+                ViewModel.To = to.Value;
+            }
+        }
+
+
+        public async Task SetVideoAsync()
         {
             MediaInfoGeneral mediaInfo;
-            ViewModel.FilePath = path;
+            ViewModel.FilePath = FileName;
             try
             {
-                mediaInfo = await MediaInfoManager.GetMediaInfoAsync(path);
+                mediaInfo = await MediaInfoManager.GetMediaInfoAsync(FileName);
             }
             catch (Exception ex)
             {
@@ -175,41 +124,7 @@ namespace SimpleFFmpegGUI.WPF
                 throw new Exception("文件没有视频流");
             }
             ViewModel.Length = mediaInfo.Duration;
-            if (from.HasValue)
-            {
-                ViewModel.From = from.Value;
-            }
-            if (to.HasValue)
-            {
-                ViewModel.To = to.Value;
-            }
-            //fps = mediaInfo.VideoStreams[0].AvgFrameRate;
-
-            var r = await media.Open(new Uri(path));
-        }
-
-        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(ViewModel.CurrentP):
-
-                    break;
-            }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private async void PauseButton_Click(object sender, RoutedEventArgs e)
-        {
-            await media.Pause();
-        }
-
-        private async void PlayButton_Click(object sender, RoutedEventArgs e)
-        {
-            await media.Play();
+            await media.Open(new Uri(FileName));
         }
 
         protected override async void OnPreviewKeyDown(KeyEventArgs e)
@@ -238,54 +153,11 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        private void JumpToFrom_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.Current = ViewModel.From;
-        }
-
-        private void JumpToTo_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.Current = ViewModel.To;
-        }
-
-        private void SetFrom_Click(object sender, RoutedEventArgs e)
-        {
-            if (ViewModel.Current >= ViewModel.To)
-            {
-                this.CreateMessage().QueueError("开始时间不可晚于结束时间");
-                return;
-            }
-            ViewModel.From = ViewModel.Current;
-            this.CreateMessage().QueueSuccess("已将开始时间设置为" + ViewModel.From.ToString(FindResource("TimeSpanFormat") as string));
-        }
-
-        private void SetTo_Click(object sender, RoutedEventArgs e)
-        {
-            if (ViewModel.Current <= ViewModel.From)
-            {
-                this.CreateMessage().QueueError("结束时间不可早于开始时间");
-                return;
-            }
-            ViewModel.To = ViewModel.Current;
-            this.CreateMessage().QueueSuccess("已将结束时间设置为" + ViewModel.To.ToString(FindResource("TimeSpanFormat") as string));
-        }
-
-        private void Slider_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        private void OKButton_Click(object sender, RoutedEventArgs e)
-        {
-            Console.Write("{0},{1}", ViewModel.From, ViewModel.To);
-            Application.Current.Shutdown();
-        }
-
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown();
+            DialogResult = false;
+            Close();
         }
-
 
         private async void JumpButton_Click(object sender, RoutedEventArgs e)
         {
@@ -321,86 +193,177 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
+        private void JumpToFrom_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Current = ViewModel.From;
+        }
+
+        private void JumpToTo_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Current = ViewModel.To;
+        }
+
         private void Media_RenderingVideo(object sender, Unosquare.FFME.Common.RenderingVideoEventArgs e)
         {
             ViewModel.Frame = e.PictureNumber;
         }
 
+        private void OKButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+            Close();
+        }
+
+        private async void PauseButton_Click(object sender, RoutedEventArgs e)
+        {
+            await media.Pause();
+        }
+
+        private async void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            await media.Play();
+        }
+
+        private void SetFrom_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.Current >= ViewModel.To)
+            {
+                this.CreateMessage().QueueError("开始时间不可晚于结束时间");
+                return;
+            }
+            ViewModel.From = ViewModel.Current;
+            this.CreateMessage().QueueSuccess("已将开始时间设置为" + ViewModel.From.ToString(FindResource("TimeSpanFormat") as string));
+        }
+
+        private void SetTo_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.Current <= ViewModel.From)
+            {
+                this.CreateMessage().QueueError("结束时间不可早于开始时间");
+                return;
+            }
+            ViewModel.To = ViewModel.Current;
+            this.CreateMessage().QueueSuccess("已将结束时间设置为" + ViewModel.To.ToString(FindResource("TimeSpanFormat") as string));
+        }
+
+        private void Slider_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ViewModel.CurrentP):
+
+                    break;
+            }
+        }
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (args.Length != 3)
-            {
-                await CommonDialog.ShowErrorDialogAsync("参数不全");
-                Application.Current.Shutdown();
-                return;
-            }
-            if (!File.Exists(args[0]))
+            if (!File.Exists(FileName))
             {
                 await CommonDialog.ShowErrorDialogAsync("文件不存在");
-                Application.Current.Shutdown();
+                Close();
                 return;
-            }
-            TimeSpan? from = null;
-            TimeSpan? to = null;
-            if (args[1] != "-")
-            {
-                if (TimeSpan.TryParse(args[1], out TimeSpan fromValue))
-                {
-                    from = fromValue;
-                }
-                else
-                {
-                    await CommonDialog.ShowErrorDialogAsync("无法解析开始时间");
-                    Application.Current.Shutdown();
-                    return;
-                }
-            }
-            if (args[1] != "-")
-            {
-                if (TimeSpan.TryParse(args[2], out TimeSpan toValue))
-                {
-                    to = toValue;
-                }
-                else
-                {
-                    await CommonDialog.ShowErrorDialogAsync("无法解析结束时间");
-                    Application.Current.Shutdown();
-                    return;
-                }
             }
             try
             {
-                await SetVideoAsync(args[0], from, to);
+                await SetVideoAsync();
             }
             catch (Exception ex)
             {
                 await CommonDialog.ShowErrorDialogAsync(ex, "加载视频失败");
-                Application.Current.Shutdown();
+                Close();
                 return;
             }
         }
     }
 
-    public static class AsyncEventExtension
+    public class CutWindowViewModel : INotifyPropertyChanged
     {
-        public static Task WaitForEventAsync(this object obj, string eventName)
-        {
-            var e = obj.GetType().GetEvent(eventName);
-            if (e == null)
-            {
-                throw new ArgumentException($"找不到事件{eventName}");
-            }
-            TaskCompletionSource tcs = new TaskCompletionSource();
-            EventHandler handler = null;
-            handler = new EventHandler(Finish);
-            e.AddEventHandler(obj, handler);
-            return tcs.Task;
+        private TimeSpan current = TimeSpan.Zero;
 
-            void Finish(object sender, EventArgs a)
+        private double currentP;
+
+        private string filePath;
+
+        private long frame;
+
+        private TimeSpan from = TimeSpan.Zero;
+
+        private bool isBarEnabled = true;
+
+        private TimeSpan length;
+
+        private TimeSpan to = TimeSpan.Zero;
+
+        public CutWindowViewModel()
+        {
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public TimeSpan Current
+        {
+            get => current;
+            set
             {
-                e.RemoveEventHandler(obj, handler);
-                tcs.SetResult();
+                currentP = value / Length;
+                this.SetValueAndNotify(ref current, value, nameof(Current), nameof(CurrentP));
             }
         }
+
+        public double CurrentP
+        {
+            get => currentP;
+            set
+            {
+                current = Length * value;
+                this.SetValueAndNotify(ref currentP, value, nameof(CurrentP), nameof(Current));
+            }
+        }
+        public string FilePath
+        {
+            get => filePath;
+            set => this.SetValueAndNotify(ref filePath, value, nameof(FilePath));
+        }
+
+        public long Frame
+        {
+            get => frame;
+            set => this.SetValueAndNotify(ref frame, value, nameof(Frame));
+        }
+
+        public TimeSpan From
+        {
+            get => from;
+            set => this.SetValueAndNotify(ref from, value, nameof(From), nameof(FromP));
+        }
+
+        public double FromP => From / Length;
+        public bool IsBarEnabled
+        {
+            get => isBarEnabled;
+            set => this.SetValueAndNotify(ref isBarEnabled, value, nameof(IsBarEnabled));
+        }
+
+        public TimeSpan Length
+        {
+            get => length;
+            set
+            {
+                to = value;
+                this.SetValueAndNotify(ref length, value, nameof(Length), nameof(To), nameof(FromP), nameof(ToP));
+            }
+        }
+
+        public TimeSpan To
+        {
+            get => to;
+            set => this.SetValueAndNotify(ref to, value, nameof(To), nameof(ToP));
+        }
+
+        public double ToP => To / Length;
     }
 }
