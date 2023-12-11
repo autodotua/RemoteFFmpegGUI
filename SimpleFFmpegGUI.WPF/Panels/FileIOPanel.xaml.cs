@@ -4,7 +4,7 @@ using FzLib.WPF.Converters;
 using Mapster;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.WindowsAPICodePack.FzExtension;
+using Microsoft.Win32;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
@@ -31,6 +31,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
 using Path = System.IO.Path;
 
 namespace SimpleFFmpegGUI.WPF.Panels
@@ -263,7 +264,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public void BrowseAndAddInput()
         {
-            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
+            var dialog = new OpenFileDialog().AddAllFilesFilter();
+            string path = dialog.GetPath(this.GetWindow());
             if (path != null)
             {
                 var input = new InputArgumentsDetail();
@@ -384,11 +386,9 @@ namespace SimpleFFmpegGUI.WPF.Panels
         private async void BrowseFileButton_Click(object sender, RoutedEventArgs e)
         {
             var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
-            string path = new FileFilterCollection()
-                .AddAll()
-                .CreateOpenFileDialog()
-                .SetParent(this.GetWindow())
-                .GetFilePath();
+
+            var dialog = new OpenFileDialog().AddAllFilesFilter();
+            string path = dialog.GetPath(this.GetWindow());
             if (path != null)
             {
                 if (input.Image2)
@@ -411,7 +411,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void BrowseOutputFileButton_Click(object sender, RoutedEventArgs e)
         {
-            string path = new FileFilterCollection().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFolderPath();
+            string path = new OpenFolderDialog().GetPath(this.GetWindow());
             if (path != null)
             {
                 ViewModel.OutputDir = path;

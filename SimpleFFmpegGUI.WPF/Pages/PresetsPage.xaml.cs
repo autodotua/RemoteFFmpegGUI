@@ -3,7 +3,7 @@ using FzLib;
 using FzLib.WPF;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.WindowsAPICodePack.FzExtension;
+using Microsoft.Win32;
 using ModernWpf.FzExtension.CommonDialog;
 using Newtonsoft.Json;
 using SimpleFFmpegGUI.Manager;
@@ -29,6 +29,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
 
 namespace SimpleFFmpegGUI.WPF.Pages
 {
@@ -78,7 +79,9 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            var path = new FileFilterCollection().Add("配置文件", "json").CreateSaveFileDialog().SetParent(this.GetWindow()).SetDefault("FFmpeg工具箱 预设.json").GetFilePath();
+            var dialog = new SaveFileDialog().AddFilter("配置文件", "json");
+            dialog.FileName = "FFmpeg工具箱 预设.json";
+            string path = dialog.GetPath(this.GetWindow());
             if (path != null)
 
             {
@@ -90,9 +93,9 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         private async void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            var path = new FileFilterCollection().Add("配置文件", "json").CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
+            var dialog = new OpenFileDialog().AddFilter("配置文件", "json");
+            string path = dialog.GetPath(this.GetWindow());
             if (path != null)
-
             {
                 try
                 {

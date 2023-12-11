@@ -1,7 +1,7 @@
 ﻿using FzLib;
+using FzLib.WPF;
 using FzLib.WPF.Converters;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using Microsoft.WindowsAPICodePack.FzExtension;
+using Microsoft.Win32;
 using ModernWpf.Controls;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.FFmpegLib;
@@ -25,6 +25,7 @@ using System.Windows.Data;
 using static SimpleFFmpegGUI.WPF.Model.PerformanceTestLine;
 using static SimpleFFmpegGUI.WPF.TestWindowViewModel;
 using static System.Net.Mime.MediaTypeNames;
+using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
 
 namespace SimpleFFmpegGUI.WPF
 {
@@ -46,7 +47,8 @@ namespace SimpleFFmpegGUI.WPF
 
         private void BrowseTestVideoButton_Click(object sender, RoutedEventArgs e)
         {
-            string path = new FileFilterCollection().Add("视频", "mp4", "mov", "mkv", "avi").CreateOpenFileDialog().GetFilePath();
+            var dialog = new OpenFileDialog().AddFilter("视频", "mp4", "mov", "mkv", "avi");
+            string path = dialog.GetPath(this);
             if (path != null)
             {
                 ViewModel.TestVideo = path;
@@ -242,7 +244,9 @@ namespace SimpleFFmpegGUI.WPF
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            string path = new FileFilterCollection().Add("CSV表格", "csv").CreateSaveFileDialog().SetDefault("编码测试结果").GetFilePath();
+            var dialog = new SaveFileDialog().AddFilter("CSV表格", "csv");
+            dialog.FileName = "编码测试结果.csv";
+            string path = dialog.GetPath(this);
             if (path == null)
             {
                 return;

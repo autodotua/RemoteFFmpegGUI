@@ -27,7 +27,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using Task = System.Threading.Tasks.Task;
 
 namespace SimpleFFmpegGUI.WPF

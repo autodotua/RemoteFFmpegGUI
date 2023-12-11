@@ -2,7 +2,7 @@
 using FzLib;
 using FzLib.WPF;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.WindowsAPICodePack.FzExtension;
+using Microsoft.Win32;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
@@ -87,7 +87,9 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string path = new FileFilterCollection().AddAll().CreateOpenFileDialog().SetParent(this.GetWindow()).GetFilePath();
+            var dialog = new OpenFileDialog().AddAllFilesFilter();
+
+            string path = dialog.GetPath(this.GetWindow());
             if (path != null)
             {
                 ViewModel.FilePath = path;

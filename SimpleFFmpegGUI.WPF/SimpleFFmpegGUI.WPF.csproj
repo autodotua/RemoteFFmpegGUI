@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.18362.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>SimpleFFmpegGUI.WPF</RootNamespace>
     <SatelliteResourceLanguages>zh-cn</SatelliteResourceLanguages>
@@ -21,12 +21,10 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="log4net" Version="2.0.15" />
-    <PackageReference Include="Mapster" Version="7.3.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="ModernWpfUI" Version="0.9.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.4" />
-    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
     <PackageReference Include="zgabi.FFME.Windows" Version="6.0.2" />
   </ItemGroup>
 
@@ -46,9 +44,6 @@
     </Reference>
     <Reference Include="ModernWpf.FzExtension">
       <HintPath>..\libs\ModernWpf.FzExtension.dll</HintPath>
-    </Reference>
-    <Reference Include="WindowsAPICodePack.FzExtension">
-      <HintPath>..\libs\WindowsAPICodePack.FzExtension.dll</HintPath>
     </Reference>
   </ItemGroup>
 

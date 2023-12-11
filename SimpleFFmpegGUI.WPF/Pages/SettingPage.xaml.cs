@@ -1,9 +1,9 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
 using FzLib;
+using FzLib.WPF;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using Microsoft.WindowsAPICodePack.FzExtension;
+using Microsoft.Win32;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
@@ -89,8 +89,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         private void BrowseSpecialDirPathButton_Click(object sender, RoutedEventArgs e)
         {
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-            var path = dialog.GetFolderPath();
+            var path = new OpenFolderDialog().GetPath(this.GetWindow());
             if (path != null)
             {
                 ViewModel.DefaultOutputDirSpecialDirPath = path;
