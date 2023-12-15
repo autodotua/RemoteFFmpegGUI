@@ -107,12 +107,6 @@ namespace SimpleFFmpegGUI.WPF
             set => this.SetValueAndNotify(ref smoothScroll, value, nameof(SmoothScroll));
         }
 
-        public bool StartQueueAfterAddTask
-        {
-            get => startQueueAfterAddTask;
-            set => this.SetValueAndNotify(ref startQueueAfterAddTask, value, nameof(StartQueueAfterAddTask));
-        }
-
         public PerformanceTestCodecParameter[] TestCodecs { get; set; }
         public PerformanceTestLine[] TestItems { get; set; }
         public int TestQCMode { get; set; } = 0;

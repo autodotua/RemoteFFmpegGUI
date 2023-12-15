@@ -107,13 +107,11 @@
                 Label="创建任务" />
             <ui:AppBarSeparator />
             <ui:CommandBar.SecondaryCommands>
-                <ui:AppBarToggleButton
-                    IsChecked="{Binding Source={x:Static r:Config.Instance}, Path=StartQueueAfterAddTask}"
-                    Label="创建后启动队列">
-                    <ui:AppBarToggleButton.Icon>
-                        <ui:FontIcon Glyph="&#xE756;" />
-                    </ui:AppBarToggleButton.Icon>
-                </ui:AppBarToggleButton>
+                <ui:AppBarButton
+                    Click="AddToQueueButton_Click"
+                    Icon="Add"
+                    Label="创建任务并启动队列"
+                    Tag="queue" />
                 <ui:AppBarToggleButton
                     Icon="Clear"
                     IsChecked="{Binding Source={x:Static r:Config.Instance}, Path=ClearFilesAfterAddTask}"

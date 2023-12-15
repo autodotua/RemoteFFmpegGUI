@@ -157,11 +157,10 @@ namespace SimpleFFmpegGUI.WPF.Pages
                 {
                     fileIOPanel.Reset();
                 }
-
-                if (Config.Instance.StartQueueAfterAddTask)
+                if("queue".Equals((sender as  Button).Tag as string))
                 {
-                    await Task.Run(() => App.ServiceProvider.GetService<QueueManager>().StartQueue());
-                    this.CreateMessage().QueueSuccess("已开始队列");
+                        await Task.Run(() => App.ServiceProvider.GetService<QueueManager>().StartQueue());
+                        this.CreateMessage().QueueSuccess("已开始队列");
                 }
                 SaveAsLastOutputArguments(args);
             }
@@ -254,7 +253,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
                     Inputs = inputs,
                     Output = output,
                     Argument = args,
-                    Start = Config.Instance.StartQueueAfterAddTask
+                    Start = "queue".Equals((sender as Button).Tag as string)
                 };
                 await PostAsync(host, "Task/Add/" + ViewModel.Type.ToString(), data);
 
