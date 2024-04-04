@@ -435,16 +435,40 @@ namespace SimpleFFmpegGUI.WPF.Panels
                     return;
                 }
                 this.GetWindow().IsEnabled = false;
-
-                var cut = App.ServiceProvider.GetService<CutWindow>();
-                cut.Initialize(input.FilePath, input.From, input.To);
-                if (cut.ShowDialog()==true)
+                (TimeSpan From, TimeSpan To)? result = null;
+                Process p = new Process()
                 {
-                    input.From = cut.ViewModel.From;
-                    input.To = cut.ViewModel.To;
+                    StartInfo = new ProcessStartInfo()
+                    {
+                        FileName = FzLib.Program.App.ProgramFilePath,
+                        RedirectStandardOutput = true,
+                    }
+                };
+                p.StartInfo.ArgumentList.Add("cut");
+                p.StartInfo.ArgumentList.Add(new WindowInteropHelper(this.GetWindow()).Handle.ToString());
+                p.StartInfo.ArgumentList.Add(input.FilePath);
+                p.StartInfo.ArgumentList.Add(input.From.HasValue ? input.From.Value.ToString() : "-");
+                p.StartInfo.ArgumentList.Add(input.To.HasValue ? input.To.Value.ToString() : "-");
+                p.Start();
+                var output = await p.StandardOutput.ReadToEndAsync();
+                string[] outputs = output.Split(',');
+                if (outputs.Length == 2)
+                {
+                    if (TimeSpan.TryParse(outputs[0], out TimeSpan from))
+                    {
+                        if (TimeSpan.TryParse(outputs[1], out TimeSpan to))
+                        {
+                            result = (from, to);
+                        }
+                    }
+                }
+                if (result.HasValue)
+                {
+                    var time = result.Value;
+                    input.From = time.From;
+                    input.To = time.To;
                     input.Duration = null;
                 }
-             
             }
             catch (Exception ex)
             {
