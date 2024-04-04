@@ -88,9 +88,6 @@ namespace SimpleFFmpegGUI.Model
             set => this.SetValueAndNotify(ref video, value, nameof(Video));
         }
 
-        /// <summary>
-        /// 将输出文件的修改时间设置为最后一个输入文件的修改时间
-        /// </summary>
-        public bool SyncModifiedTime { get; set; }
+        public ProcessedOptions ProcessedOptions { get; set; } = new ProcessedOptions();
     }
 }

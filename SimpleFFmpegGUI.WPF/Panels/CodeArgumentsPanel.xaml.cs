@@ -173,8 +173,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private FormatArgumentWithSwitch format = new FormatArgumentWithSwitch();
 
-        private bool syncModifiedTime;
-
+        private ProcessedOptions processedOptions = new ProcessedOptions();
         private TaskType type;
 
         private VideoArgumentsWithSwitch video = new VideoArgumentsWithSwitch();
@@ -278,14 +277,13 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public IEnumerable PixelFormats { get; } = new[] { "yuv420p", "yuvj420p", "yuv422p", "yuvj422p", "rgb24", "gray", "yuv420p10le" };
 
-        public IEnumerable Sizes { get; } = new[] { "-1:2160", "-1:1440", "-1:1080", "-1:720", "-1:576", "-1:480" };
-
-        public bool SyncModifiedTime
+        public ProcessedOptions ProcessedOptions
         {
-            get => syncModifiedTime;
-            set => this.SetValueAndNotify(ref syncModifiedTime, value, nameof(SyncModifiedTime));
+            get => processedOptions;
+            set => this.SetValueAndNotify(ref processedOptions, value, nameof(ProcessedOptions));
         }
 
+        public IEnumerable Sizes { get; } = new[] { "-1:2160", "-1:1440", "-1:1080", "-1:720", "-1:576", "-1:480" };
         public VideoArgumentsWithSwitch Video
         {
             get => video;
@@ -325,7 +323,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 Format = Format.Format,
                 Combine = Combine,
                 Extra = Extra,
-                SyncModifiedTime = SyncModifiedTime,
+                ProcessedOptions = ProcessedOptions,
                 DisableVideo = VideoOutputStrategy == ChannelOutputStrategy.Disable,
                 DisableAudio = audioOutputStrategy == ChannelOutputStrategy.Disable,
             };
@@ -353,8 +351,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 Format = new FormatArgumentWithSwitch() { Format = argument.Format };
                 Format.Update();
                 Combine = argument.Combine;
+                ProcessedOptions = argument.ProcessedOptions ?? new ProcessedOptions();
                 Extra = argument.Extra;
-                SyncModifiedTime = argument.SyncModifiedTime;
             }
         }
     }

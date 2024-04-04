@@ -259,15 +259,52 @@ namespace SimpleFFmpegGUI.Manager
                 });
 
 
-                if (task.RealOutput != null && File.Exists(task.RealOutput) && task.Arguments.SyncModifiedTime)
+                if (task.RealOutput != null && File.Exists(task.RealOutput) && task.Arguments.ProcessedOptions?.SyncModifiedTime == true)
                 {
                     try
                     {
-                        File.SetLastWriteTime(task.RealOutput, File.GetLastWriteTime(task.Inputs[^1].FilePath));
+                        var time = File.GetLastWriteTime(task.Inputs[^1].FilePath);
+                        File.SetLastWriteTime(task.RealOutput, time);
+                        logger.Info(task, $"已设置输出文件的修改时间为{time}");
                     }
                     catch (Exception ex)
                     {
                         logger.Error(task, "修改输出文件的修改时间失败：" + ex.Message);
+                    }
+                }
+
+                if (task.Inputs.Count > 0 && task.Arguments.ProcessedOptions?.DeleteInputFiles == true)
+                {
+                    DriveInfo[] allDrives = DriveInfo.GetDrives();
+                    foreach (var file in task.Inputs)
+                    {
+                        if (File.Exists(file.FilePath))
+                        {
+                            try
+                            {
+                                bool canDeleteToRecycleBin = false;
+                                bool deleted = false;
+                                if (OperatingSystem.IsWindows())
+                                {
+                                    var root = Path.GetPathRoot(Path.GetFullPath(file.FilePath));
+                                    canDeleteToRecycleBin = allDrives.First(p => p.Name == root).DriveType == DriveType.Fixed;
+                                }
+                                if (canDeleteToRecycleBin)
+                                {
+                                    deleted = RecycleBin.DeleteToRecycleBin(file.FilePath);
+                                    logger.Info(task, $"已将输入文件{file.FilePath}移至回收站");
+                                }
+                                if (!deleted)
+                                {
+                                    File.Delete(file.FilePath);
+                                    logger.Info(task, $"已彻底删除输入文件{file.FilePath}");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.Error(task, $"删除输入文件{file.FilePath}失败：{ex.Message}");
+                            }
+                        }
                     }
                 }
 
@@ -638,6 +675,54 @@ namespace SimpleFFmpegGUI.Manager
         private async Task RunCustomProcessAsync(CancellationToken cancellationToken)
         {
             await RunAsync(task.Arguments.Extra, null, cancellationToken);
+        }
+    }
+
+    public class RecycleBin
+    {
+        // 定义 SHFileOperation 函数的结构体
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct SHFILEOPSTRUCT
+        {
+            public IntPtr hwnd;
+            public uint wFunc;
+            public string pFrom;
+            public string pTo;
+            public ushort fFlags;
+            public int fAnyOperationsAborted;
+            public IntPtr hNameMappings;
+            public string lpszProgressTitle;
+        }
+
+        // 定义 SHFileOperation 函数的操作类型
+        private const uint FO_DELETE = 0x0003;
+        private const ushort FOF_ALLOWUNDO = 0x0040;
+
+        // 调用 SHFileOperation 函数
+        [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
+        private static extern int SHFileOperation(ref SHFILEOPSTRUCT FileOp);
+
+        // 删除文件到回收站
+        public static bool DeleteToRecycleBin(string filePath)
+        {
+            // 准备 SHFILEOPSTRUCT 结构体
+            SHFILEOPSTRUCT fileOp = new SHFILEOPSTRUCT();
+            fileOp.wFunc = FO_DELETE;
+            fileOp.pFrom = filePath + '\0'; // 文件路径必须以空字符结尾
+            fileOp.fFlags = FOF_ALLOWUNDO;
+
+            // 调用 SHFileOperation 函数
+            int result = SHFileOperation(ref fileOp);
+
+            // 检查结果
+            if (result == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

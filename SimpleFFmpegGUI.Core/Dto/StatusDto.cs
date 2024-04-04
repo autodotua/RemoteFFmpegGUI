@@ -16,7 +16,7 @@ namespace SimpleFFmpegGUI.Dto
         /// 识别FFmpeg输出的进度信息的正则
         /// </summary>
         private static readonly Regex rFFmpegOutput = new Regex(
-            @"frame= *(?<f>[0-9]+) *fps= *(?<fps>[0-9\.]+) *(q= *(?<q>[0-9\.\-]+) *)+size= *(?<size>([0-9\.a-zA-Z]+)|(N/A)) *time= *(?<time>[0-9\.\-:]+) *bitrate= *(?<b>([0-9\.a-z/]+)|(N/A)).*speed= *(?<speed>([0-9\.]+)|(N/A))x?", RegexOptions.Compiled);
+            @"(frame= *(?<f>[0-9]+) *fps= *(?<fps>[0-9\.]+) *(q= *(?<q>[0-9\.\-]+) *)+)?size= *(?<size>([0-9\.a-zA-Z ]+)|(N/A)) *time= *(?<time>[0-9\.\-:]+) *bitrate= *(?<b>([0-9\.a-z/]+)|(N/A)).*speed= *(?<speed>([0-9\. ]+)|(N/A))x?", RegexOptions.Compiled);
 
         private string bitrate;
 
@@ -64,8 +64,8 @@ namespace SimpleFFmpegGUI.Dto
                 try
                 {
                     var match = rFFmpegOutput.Match(lastOutput);
-                    Frame = int.Parse(match.Groups["f"].Value);
-                    Fps = double.Parse(match.Groups["fps"].Value);
+                    Frame = match.Groups["f"].Success ? int.Parse(match.Groups["f"].Value) : -1;
+                    Fps = match.Groups["fps"].Success ? double.Parse(match.Groups["fps"].Value) : -1;
                     Size = match.Groups["size"].Value.ToUpper();
                     Time = TimeSpan.Parse(match.Groups["time"].Value);
                     if (Time < TimeSpan.Zero)
@@ -74,7 +74,7 @@ namespace SimpleFFmpegGUI.Dto
                     }
                     Bitrate = match.Groups["b"].Value;
                     Speed = match.Groups["speed"].Value;
-                    Q = double.Parse(match.Groups["q"].Value);
+                    Q = match.Groups["q"].Success ? double.Parse(match.Groups["q"].Value) : -1;
 
                     if (progress != null)
                     {
@@ -88,6 +88,7 @@ namespace SimpleFFmpegGUI.Dto
                 }
                 catch
                 {
+
                 }
             }
         }
@@ -209,6 +210,6 @@ namespace SimpleFFmpegGUI.Dto
             get => time;
             set => this.SetValueAndNotify(ref time, value, nameof(Time));
         }
-      
+
     }
 }

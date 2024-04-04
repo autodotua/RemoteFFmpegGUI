@@ -73,7 +73,7 @@
             <ui:AppBarButton
                 Click="AddInputButton_Click"
                 IsEnabled="{Binding CanAddFile}"
-                Label="新增输入文件">
+                Label="新增">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xECC8;" />
                 </ui:AppBarButton.Icon>
@@ -82,11 +82,11 @@
                 Click="BrowseAndAddInputButton_Click"
                 Icon="OpenFile"
                 IsEnabled="{Binding CanAddFile}"
-                Label="浏览并新增输入文件" />
+                Label="浏览" />
             <ui:AppBarButton
                 Click="ClearFilesButton_Click"
                 Icon="Clear"
-                Label="清空输入文件" />
+                Label="清空" />
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Click="SaveToPresetButton_Click"
@@ -96,7 +96,7 @@
 
             <ui:AppBarButton
                 Click="AddToRemoteHostButton_Click"
-                Label="创建到远程主机">
+                Label="提交到远程">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE836;" />
                 </ui:AppBarButton.Icon>
@@ -105,13 +105,13 @@
                 Click="AddToQueueButton_Click"
                 Icon="Add"
                 Label="创建任务" />
+            <ui:AppBarButton
+                Click="AddToQueueButton_Click"
+                Icon="Add"
+                Label="创建并启动"
+                Tag="queue" />
             <ui:AppBarSeparator />
             <ui:CommandBar.SecondaryCommands>
-                <ui:AppBarButton
-                    Click="AddToQueueButton_Click"
-                    Icon="Add"
-                    Label="创建任务并启动队列"
-                    Tag="queue" />
                 <ui:AppBarToggleButton
                     Icon="Clear"
                     IsChecked="{Binding Source={x:Static r:Config.Instance}, Path=ClearFilesAfterAddTask}"

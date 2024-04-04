@@ -405,8 +405,12 @@
                             TextWrapping="Wrap" />
                         <CheckBox
                             Content="同步文件修改时间"
-                            IsChecked="{Binding SyncModifiedTime}"
+                            IsChecked="{Binding ProcessedOptions.SyncModifiedTime}"
                             ToolTip="将输出文件的修改时间设置为最后一个输入文件的修改时间" />
+                        <CheckBox
+                            Content="完成后删除输入文件"
+                            IsChecked="{Binding ProcessedOptions.DeleteInputFiles}"
+                            ToolTip="在处理完成后删除所有输入文件（优先删除到回收站）" />
                     </ui:SimpleStackPanel>
                 </GroupBox>
             </ui:SimpleStackPanel>
