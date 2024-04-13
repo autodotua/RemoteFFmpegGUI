@@ -101,7 +101,10 @@
       }}</el-descriptions-item>
       >
       <el-descriptions-item label="同步文件时间">{{
-        args.syncModifiedTime ? "是" : "否"
+        args.processedOptions.syncModifiedTime ? "是" : "否"
+      }}</el-descriptions-item>
+      <el-descriptions-item label="完成后删除输入文件">{{
+        args.processedOptions.deleteInputFiles ? "是" : "否"
       }}</el-descriptions-item>
     </el-descriptions>
   </div>

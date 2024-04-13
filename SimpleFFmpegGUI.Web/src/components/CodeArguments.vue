@@ -16,11 +16,11 @@
             :key="p.id"
             :label="p.name"
             :value="p.id"
-          ></el-option
-        ></el-select>
-        <el-button :disabled="preset == null" @click="updatePreset"
-          >更新</el-button
-        >
+          ></el-option></el-select>
+        <el-button
+          :disabled="preset == null"
+          @click="updatePreset"
+        >更新</el-button>
       </el-form-item>
       <el-form-item label="新增">
         <el-input
@@ -32,8 +32,7 @@
           style="display: inline"
           :disabled="newPresetName == null || newPresetName.trim() == ''"
           @click="savePreset"
-          >保存或更新“{{ newPresetName }}”</el-button
-        >
+        >保存或更新“{{ newPresetName }}”</el-button>
       </el-form-item>
     </div>
     <div v-if="type == 1">
@@ -50,7 +49,10 @@
     <div v-if="showFormats">
       <h3>容器</h3>
       <el-form-item label="指定输出容器">
-        <el-switch v-model="code.enableFormat" class="right24"> </el-switch>
+        <el-switch
+          v-model="code.enableFormat"
+          class="right24"
+        > </el-switch>
         <el-select
           v-if="code.enableFormat"
           v-model="code.format"
@@ -68,7 +70,10 @@
             }}</span>
           </el-option>
         </el-select>
-        <div v-if="code.enableFormat" class="gray">
+        <div
+          v-if="code.enableFormat"
+          class="gray"
+        >
           指定输出容器后，输出时会根据格式修改文件扩展名
         </div>
       </el-form-item>
@@ -76,24 +81,34 @@
     <div v-if="showVideosAndAudios">
       <h3>视频编码</h3>
       <el-form-item label="重编码">
-        <el-switch v-model="code.enableVideo" class="right24"> </el-switch>
-        <a v-show="!code.enableVideo" class="right12 gray">不导出视频</a>
+        <el-switch
+          v-model="code.enableVideo"
+          class="right24"
+        > </el-switch>
+        <a
+          v-show="!code.enableVideo"
+          class="right12 gray"
+        >不导出视频</a>
         <el-switch
           v-show="!code.enableVideo"
           v-model="code.disableVideo"
-        ></el-switch
-      ></el-form-item>
+        ></el-switch></el-form-item>
       <div v-show="code.enableVideo">
-        <el-form-item label="编码" size="small">
+        <el-form-item
+          label="编码"
+          size="small"
+        >
           <el-select v-model="code.video.code">
             <el-option
               v-for="c in videoCodes"
               :key="c"
               :label="c"
               :value="c"
-            ></el-option> </el-select
-        ></el-form-item>
-        <el-form-item label="速度预设" class="bottom24">
+            ></el-option> </el-select></el-form-item>
+        <el-form-item
+          label="速度预设"
+          class="bottom24"
+        >
           <el-slider
             style="width: 90%"
             :max="8"
@@ -101,9 +116,11 @@
             v-model="code.video.preset"
             :marks="speedPresets"
           >
-          </el-slider
-        ></el-form-item>
-        <el-form-item label="CRF" class="top24">
+          </el-slider></el-form-item>
+        <el-form-item
+          label="CRF"
+          class="top24"
+        >
           <el-switch v-model="code.video.enableCrf"> </el-switch>
           <el-slider
             v-show="code.video.enableCrf"
@@ -114,13 +131,18 @@
             :step="1"
             v-model="code.video.crf"
           >
-          </el-slider
-        ></el-form-item>
-        <el-form-item label="二次编码" class="top24">
+          </el-slider></el-form-item>
+        <el-form-item
+          label="二次编码"
+          class="top24"
+        >
           <el-switch v-model="code.video.twoPass"> </el-switch>
         </el-form-item>
-       
-        <el-form-item label="平均码率" class="bottom24">
+
+        <el-form-item
+          label="平均码率"
+          class="bottom24"
+        >
           <el-switch v-model="code.video.enableBitrate"> </el-switch>
           <el-slider
             v-show="code.video.enableBitrate"
@@ -131,9 +153,11 @@
             :step="0.1"
             v-model="code.video.bitrate"
           >
-          </el-slider
-        ></el-form-item>
-        <el-form-item label="最大码率" class="bottom24">
+          </el-slider></el-form-item>
+        <el-form-item
+          label="最大码率"
+          class="bottom24"
+        >
           <el-switch v-model="code.video.enableMaxBitrate"> </el-switch>
           <el-slider
             v-show="code.video.enableMaxBitrate"
@@ -144,8 +168,7 @@
             :step="0.1"
             v-model="code.video.maxBitrate"
           >
-          </el-slider
-        ></el-form-item>
+          </el-slider></el-form-item>
         <el-form-item
           label="缓冲倍率"
           class="bottom24"
@@ -160,12 +183,16 @@
             :step="0.5"
             v-model="code.video.maxBitrateBuffer"
           >
-          </el-slider
-        ></el-form-item>
-        <el-form-item label="帧率"
-          ><el-switch v-model="code.video.enableFps" class="right24">
+          </el-slider></el-form-item>
+        <el-form-item label="帧率"><el-switch
+            v-model="code.video.enableFps"
+            class="right24"
+          >
           </el-switch>
-          <div v-show="code.video.enableFps" class="inline">
+          <div
+            v-show="code.video.enableFps"
+            class="inline"
+          >
             <el-input-number
               size="small"
               v-model="code.video.fps"
@@ -181,14 +208,19 @@
               @click="code.video.fps = f"
               v-for="f in fpses"
               :key="f"
-              >{{ f }}帧</el-button
-            >
+            >{{ f }}帧</el-button>
           </div>
         </el-form-item>
         <el-form-item label="分辨率">
-          <el-switch v-model="code.video.enableSize" class="right24">
+          <el-switch
+            v-model="code.video.enableSize"
+            class="right24"
+          >
           </el-switch>
-          <div class="inline" v-show="code.video.enableSize">
+          <div
+            class="inline"
+            v-show="code.video.enableSize"
+          >
             <el-input
               size="small"
               class="right24 width160"
@@ -202,15 +234,20 @@
               type="text"
               class="right24"
               @click="code.video.size = v"
-              >{{ k }}</el-button
-            >
+            >{{ k }}</el-button>
           </div>
         </el-form-item>
 
         <el-form-item label="画面比例">
-          <el-switch v-model="code.video.enableAspectRatio" class="right24">
+          <el-switch
+            v-model="code.video.enableAspectRatio"
+            class="right24"
+          >
           </el-switch>
-          <div class="inline" v-show="code.video.enableAspectRatio">
+          <div
+            class="inline"
+            v-show="code.video.enableAspectRatio"
+          >
             <el-input
               size="small"
               class="right24 width160"
@@ -224,15 +261,20 @@
               type="text"
               class="right24"
               @click="code.video.aspectRatio = i"
-              >{{ i }}</el-button
-            >
-          </div></el-form-item
-        >
+            >{{ i }}</el-button>
+          </div>
+        </el-form-item>
 
         <el-form-item label="像素格式">
-          <el-switch v-model="code.video.enablePixelFormat" class="right24">
+          <el-switch
+            v-model="code.video.enablePixelFormat"
+            class="right24"
+          >
           </el-switch>
-          <div class="inline" v-show="code.video.enablePixelFormat">
+          <div
+            class="inline"
+            v-show="code.video.enablePixelFormat"
+          >
             <el-input
               size="small"
               class="right24 width160"
@@ -245,17 +287,22 @@
               type="text"
               class="right24"
               @click="code.video.pixelFormat = p"
-              >{{ p }}</el-button
-            >
-          </div></el-form-item
-        >
+            >{{ p }}</el-button>
+          </div>
+        </el-form-item>
       </div>
     </div>
     <div v-if="showVideosAndAudios">
       <h3>音频编码</h3>
       <el-form-item label="重编码">
-        <el-switch v-model="code.enableAudio" class="right24"> </el-switch>
-        <a v-show="!code.enableAudio" class="right12 gray">不导出音频</a>
+        <el-switch
+          v-model="code.enableAudio"
+          class="right24"
+        > </el-switch>
+        <a
+          v-show="!code.enableAudio"
+          class="right12 gray"
+        >不导出音频</a>
         <el-switch
           v-show="!code.enableAudio"
           v-model="code.disableAudio"
@@ -263,15 +310,20 @@
       </el-form-item>
       <div v-show="code.enableAudio">
         <el-form-item label="编码">
-          <el-select v-model="code.audio.code" size="small">
+          <el-select
+            v-model="code.audio.code"
+            size="small"
+          >
             <el-option
               v-for="c in audioCodes"
               :key="c"
               :label="c"
               :value="c"
-            ></el-option> </el-select
-        ></el-form-item>
-        <el-form-item label="码率" class="bottom24">
+            ></el-option> </el-select></el-form-item>
+        <el-form-item
+          label="码率"
+          class="bottom24"
+        >
           <el-switch v-model="code.audio.enableBitrate"> </el-switch>
           <el-slider
             v-show="code.audio.enableBitrate"
@@ -283,10 +335,15 @@
             v-model="code.audio.bitrate"
             :marks="audioBitrates"
           >
-          </el-slider
-        ></el-form-item>
-        <el-form-item label="采样率" style="margin-top: 24px">
-          <el-switch v-model="code.audio.enableSample" class="right24">
+          </el-slider></el-form-item>
+        <el-form-item
+          label="采样率"
+          style="margin-top: 24px"
+        >
+          <el-switch
+            v-model="code.audio.enableSample"
+            class="right24"
+          >
           </el-switch>
           <el-select
             v-model="code.audio.sample"
@@ -297,8 +354,7 @@
               :key="c"
               :label="c"
               :value="c"
-            ></el-option
-          ></el-select>
+            ></el-option></el-select>
         </el-form-item>
       </div>
     </div>
@@ -316,9 +372,20 @@
         ></el-input>
       </el-form-item>
       <el-form-item label="同步文件时间">
-        <el-switch v-model="code.syncModifiedTime" class="right24">
-          </el-switch>
-          <a  class="gray">将输出文件的修改时间设置为最后一个输入文件的修改时间</a>
+        <el-switch
+          v-model="code.processedOptions.syncModifiedTime"
+          class="right24"
+        >
+        </el-switch>
+        <a class="gray">将输出文件的修改时间设置为最后一个输入文件的修改时间</a>
+      </el-form-item>
+      <el-form-item label="删除输入文件">
+        <el-switch
+          v-model="code.processedOptions.deleteInputFiles"
+          class="right24"
+        >
+        </el-switch>
+        <a class="gray">处理完成后，删除所有输入文件</a>
       </el-form-item>
     </div>
   </el-form>
@@ -420,7 +487,10 @@ export default Vue.component("code-arguments", {
         disableVideo: false,
         disableAudio: false,
         extra: "",
-        syncModifiedTime:false
+        processedOptions: {
+          syncModifiedTime: false,
+          deleteInputFiles: false,
+        },
       },
       presets: [],
       preset: null,
@@ -437,14 +507,10 @@ export default Vue.component("code-arguments", {
   },
   computed: {
     showFormats(): boolean {
-      return (
-        [0, 1, 2, 4].includes(this.type) 
-      );
+      return [0, 1, 2, 4].includes(this.type);
     },
     showVideosAndAudios(): boolean {
-      return (
-        [0].includes(this.type)
-      );
+      return [0].includes(this.type);
     },
   },
   created() {
@@ -544,7 +610,7 @@ export default Vue.component("code-arguments", {
         input: null,
         combine: this.type == 1 ? combine : null,
         extra: this.code.extra,
-        syncModifiedTime:this.code.syncModifiedTime,
+        processedOptions:this.code.processedOptions,
         disableVideo: videoArg == null && this.code.disableVideo,
         disableAudio: audioArg == null && this.code.disableAudio,
         format: this.code.enableFormat ? this.code.format : null,
@@ -648,7 +714,7 @@ export default Vue.component("code-arguments", {
       this.code.enableFormat = args.format != null;
       this.code.format = args.format;
       this.code.extra = args.Extra;
-      this.code.syncModifiedTime=args.syncModifiedTime;
+      this.code.processedOptions = args.processedOptions;
     },
   },
   components: {},
