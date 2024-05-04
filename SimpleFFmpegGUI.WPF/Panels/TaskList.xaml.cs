@@ -70,9 +70,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private async void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            var task = ViewModel.Tasks.SelectedTask;
-            Debug.Assert(task != null);
-            if (task.Status == TaskStatus.Processing)
+            var tasks = App.ServiceProvider.GetService<TasksAndStatuses>().SelectedTasks;
+
+            Debug.Assert(tasks.Count > 0);
+            if (tasks.Any(p => p.Status == TaskStatus.Processing))
             {
                 if (!await CommonDialog.ShowYesNoDialogAsync("取消任务", "任务正在执行，是否取消？"))
                 {
@@ -82,8 +83,11 @@ namespace SimpleFFmpegGUI.WPF.Panels
             try
             {
                 IsEnabled = false;
-                TaskManager.CancelTask(task.Id, ViewModel.Queue);
-                task.UpdateSelf();
+                foreach (var task in tasks)
+                {
+                    TaskManager.CancelTask(task.Id, ViewModel.Queue);
+                    task.UpdateSelf();
+                }
             }
             catch (Exception ex)
             {
@@ -93,6 +97,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
             {
                 IsEnabled = true;
             }
+
+            ViewModel.NotifyCanExecute();
         }
 
         private void CloneButton_Click(object sender, RoutedEventArgs e)
@@ -103,6 +109,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
+            throw new NotImplementedException();
             bool delete = true;
             if (App.ServiceProvider.GetService<TasksAndStatuses>().SelectedTask.Status == SimpleFFmpegGUI.Model.TaskStatus.Processing)
             {
@@ -206,26 +213,36 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            var task = ViewModel.Tasks.SelectedTask;
-            Debug.Assert(task != null);
-            TaskManager.ResetTask(task.Id, ViewModel.Queue);
-            task.UpdateSelf();
-            App.ServiceProvider.GetService<TasksAndStatuses>().NotifyTaskReseted(task);
+            var tasks = App.ServiceProvider.GetService<TasksAndStatuses>().SelectedTasks;
+            Debug.Assert(tasks.Count > 0);
+            foreach (var task in tasks)
+            {
+                TaskManager.ResetTask(task.Id, ViewModel.Queue);
+                task.UpdateSelf();
+                App.ServiceProvider.GetService<TasksAndStatuses>().NotifyTaskReseted(task);
+            }
+
+            ViewModel.NotifyCanExecute();
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var task = ViewModel.Tasks.SelectedTask;
-                Debug.Assert(task != null);
-                ViewModel.Queue.StartStandalone(task.Id);
-                task.UpdateSelf();
+                var tasks = App.ServiceProvider.GetService<TasksAndStatuses>().SelectedTasks;
+                Debug.Assert(tasks.Count > 0);
+                foreach (var task in tasks)
+                {
+                    ViewModel.Queue.StartStandalone(task.Id);
+                    task.UpdateSelf();
+                }
             }
             catch (Exception ex)
             {
                 this.CreateMessage().QueueError("启动失败", ex);
             }
+
+            ViewModel.NotifyCanExecute();
         }
 
         private void UpdateDetailHeight()
@@ -238,6 +255,11 @@ namespace SimpleFFmpegGUI.WPF.Panels
             UpdateDetailHeight();
             App.ServiceProvider.GetService<MainWindow>().UiCompressModeChanged +=
                 (s, e) => UpdateDetailHeight();
+        }
+
+        private void Tasks_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ViewModel.NotifyCanExecute();
         }
     }
 
@@ -252,6 +274,17 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public bool CanCancel => Tasks.SelectedTasks.All(p => p.Status is TaskStatus.Queue or TaskStatus.Processing);
+
+        public bool CanReset => Tasks.SelectedTasks.All(p => p.Status is TaskStatus.Done or TaskStatus.Cancel or TaskStatus.Error);
+
+        public bool CanStart => Tasks.SelectedTasks.All(p => p.Status is TaskStatus.Queue);
+
+        public void NotifyCanExecute()
+        {
+            this.Notify(nameof(CanCancel), nameof(CanReset), nameof(CanStart));
+        }
+
         public QueueManager Queue { get; }
 
         public bool ShowAllTasks
@@ -263,5 +296,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public TaskCollectionBase Tasks => ShowAllTasks ?
                                        App.ServiceProvider.GetService<AllTasks>()
             : App.ServiceProvider.GetService<TasksAndStatuses>();
+
+        public SelectionMode SelectionMode => ShowAllTasks ? SelectionMode.Single : SelectionMode.Extended;
     }
 }

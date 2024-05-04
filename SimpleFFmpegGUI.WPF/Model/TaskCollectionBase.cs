@@ -1,6 +1,8 @@
 ﻿using FzLib;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
@@ -25,5 +27,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             get => selectedTask;
             set => this.SetValueAndNotify(ref selectedTask, value, nameof(SelectedTask));
         }
+
+        public IList<UITaskInfo> SelectedTasks=>Tasks.Where(p=>p.IsSelected).ToList();
     }
 }

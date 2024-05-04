@@ -23,14 +23,18 @@
         <ListView
             xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
             xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
+            x:Name="lvwTasks"
             c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}"
             ItemsSource="{Binding Tasks.Tasks}"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-            SelectedItem="{Binding Tasks.SelectedTask}">
+            SelectedItem="{Binding Tasks.SelectedTask}"
+            SelectionChanged="Tasks_SelectionChanged"
+            SelectionMode="{Binding SelectionMode}">
             <ListView.ItemContainerStyle>
                 <Style
                     BasedOn="{StaticResource DefaultListViewItemStyle}"
                     TargetType="{x:Type ListViewItem}">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="Padding" Value="8" />
                     <Setter Property="Margin" Value="0,0,16,0" />
@@ -296,19 +300,20 @@
                     <Button
                         Click="StartButton_Click"
                         Content="独立执行"
-                        IsEnabled="{Binding Tasks.SelectedTask.StartButtonEnabled}"
+                        IsEnabled="{Binding CanStart}"
                         Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
                         Click="CancelButton_Click"
                         Content="取消"
-                        IsEnabled="{Binding Tasks.SelectedTask.CancelButtonEnabled}"
+                        IsEnabled="{Binding CanCancel}"
                         ToolTip="取消执行任务，正在执行的任务会被停止"
                         Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
                         Click="ResetButton_Click"
                         Content="重置"
-                        IsEnabled="{Binding Tasks.SelectedTask.ResetButtonEnabled}"
-                        ToolTip="将任务设置为排队状态" />
+                        IsEnabled="{Binding CanReset}"
+                        ToolTip="将任务设置为排队状态"
+                        Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
                         Click="DeleteButton_Click"
                         Content="删除"
@@ -316,7 +321,9 @@
                     <Button
                         VerticalAlignment="Center"
                         Background="Transparent"
-                        DataContext="{Binding Tasks.SelectedTask}">
+                        DataContext="{Binding Tasks.SelectedTask}"
+                        Visibility="{Binding ElementName=lvwTasks, Path=SelectedItems.Count, Converter={StaticResource CountEqualsOneValueConverter}}">
+
                         <ui:SymbolIcon Symbol="More" />
                         <ui:FlyoutService.Flyout>
                             <ui:MenuFlyout>

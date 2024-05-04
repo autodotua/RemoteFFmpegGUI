@@ -33,6 +33,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         private List<InputArguments> inputs;
 
+        private bool isSelected;
 
         /// <summary>
         /// 上一个缩略图的时间
@@ -52,6 +53,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         private string realOutput;
 
         private bool showSnapshot;
+
         private object snapshotSource;
 
         private DateTime? startTime;
@@ -78,6 +80,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         {
             timer.Dispose();
         }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public OutputArguments Arguments
@@ -85,9 +88,6 @@ namespace SimpleFFmpegGUI.WPF.Model
             get => arguments;
             set => this.SetValueAndNotify(ref arguments, value, nameof(Arguments));
         }
-
-        public bool CancelButtonEnabled => Status is TaskStatus.Queue or TaskStatus.Processing;
-
         public Brush Color => Status switch
         {
             TaskStatus.Queue => System.Windows.Application.Current.FindResource("SystemControlForegroundBaseHighBrush") as Brush,
@@ -179,6 +179,11 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public bool IsIndeterminate => ProcessStatus == null || ProcessStatus.HasDetail == false || ProcessStatus.Progress.IsIndeterminate;
 
+        public bool IsSelected
+        {
+            get => isSelected;
+            set => this.SetValueAndNotify(ref isSelected, value, nameof(IsSelected));
+        }
         public string Message
         {
             get => message;
@@ -265,8 +270,6 @@ namespace SimpleFFmpegGUI.WPF.Model
             set => this.SetValueAndNotify(ref realOutput, value, nameof(RealOutput));
         }
 
-        public bool ResetButtonEnabled => Status is TaskStatus.Done or TaskStatus.Cancel or TaskStatus.Error;
-
         public bool ShowSnapshot
         {
             get => showSnapshot;
@@ -279,8 +282,6 @@ namespace SimpleFFmpegGUI.WPF.Model
             set => this.SetValueAndNotify(ref snapshotSource, value, nameof(SnapshotSource));
         }
 
-        public bool StartButtonEnabled => Status is TaskStatus.Queue;
-
         public DateTime? StartTime
         {
             get => startTime;
@@ -291,9 +292,6 @@ namespace SimpleFFmpegGUI.WPF.Model
         {
             get => status;
             set => this.SetValueAndNotify(ref status, value, nameof(Status),
-                nameof(ResetButtonEnabled),
-                nameof(StartButtonEnabled),
-                nameof(CancelButtonEnabled),
                 nameof(StatusText),
                 nameof(Color),
                 nameof(Percent));
@@ -305,8 +303,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             _ => DescriptionConverter.GetDescription(Status)
         };
 
-        public string Title => Type == TaskType.Custom ?
-                                                                                                                                                                                                                                                                                                                              AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name)
+        public string Title => Type == TaskType.Custom ?                                                                                                                                                                                                                                      AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name)
             : AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name) + "：" + InputText;
 
         public TaskType Type
