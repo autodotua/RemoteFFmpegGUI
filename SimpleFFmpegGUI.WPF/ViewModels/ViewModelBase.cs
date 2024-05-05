@@ -1,6 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleFFmpegGUI.WPF.Messages;
 using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace SimpleFFmpegGUI.WPF.ViewModels
@@ -9,22 +12,23 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
     {
         protected void QueueSuccessMessage(string message)
         {
-            View.CreateMessage().QueueSuccess(message);
+            WeakReferenceMessenger.Default.Send(new QueueMessagesMessage('S', message));
         }
-        protected void QueueErrorMessage(string message, Exception ex)
+        protected void QueueErrorMessage(string message, Exception ex = null)
         {
-            View.CreateMessage().QueueError(message, ex);
+            WeakReferenceMessenger.Default.Send(new QueueMessagesMessage('E', message, ex));
         }
 
         protected ContentControl View { get; set; }
+    }
 
-        public static TVM Bind<TVM>(ContentControl view) where TVM : ViewModelBase
+    public static class ViewModelExtension
+    {
+        public static TVM SetDataContext<TVM>(this FrameworkElement element) where TVM : ViewModelBase
         {
             TVM viewModel = App.ServiceProvider.GetRequiredService<TVM>();
-            viewModel.View = view;
+            element.DataContext = viewModel;
             return viewModel;
         }
-
-
     }
 }

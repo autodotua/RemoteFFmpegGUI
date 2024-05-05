@@ -1,10 +1,13 @@
-﻿using FzLib;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using FzLib;
 using FzLib.WPF;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Converters;
+using SimpleFFmpegGUI.WPF.Messages;
 using SimpleFFmpegGUI.WPF.Model;
 using SimpleFFmpegGUI.WPF.Pages;
 using SimpleFFmpegGUI.WPF.Panels;
@@ -23,10 +26,12 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
 using Task = System.Threading.Tasks.Task;
 
 namespace SimpleFFmpegGUI.WPF
@@ -51,6 +56,56 @@ namespace SimpleFFmpegGUI.WPF
             DataContext = ViewModel;
             InitializeComponent();
             this.queue = queue;
+            RegisterMessages();
+        }
+
+        private void RegisterMessages()
+        {
+            WeakReferenceMessenger.Default.Register<FileDialogMessage>(this, (_, m) =>
+            {
+                switch (m.Dialog)
+                {
+                    case OpenFileDialog ofd:
+                        m.Result = ofd.ShowDialog(this);
+                        break;
+                    case SaveFileDialog sfd:
+                        m.Result = sfd.ShowDialog(this);
+                        break;
+                    case OpenFolderDialog ofod:
+                        m.Result = ofod.ShowDialog(this);
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            WeakReferenceMessenger.Default.Register<WindowHandleMessage>(this, (_, m) =>
+            {
+                m.Handle = new WindowInteropHelper(this).Handle;
+            });
+
+            WeakReferenceMessenger.Default.Register<WindowEnableMessage>(this, (_, m) =>
+            {
+                IsEnabled = m.IsEnabled;
+            });
+
+            WeakReferenceMessenger.Default.Register<QueueMessagesMessage>(this, (_, m) =>
+            {
+                switch (m.Type)
+                {
+                    case 'S':
+                        this.CreateMessage().QueueSuccess(m.Message);
+                        break;
+                    case 'E' when m.Exception == null:
+                        this.CreateMessage().QueueError(m.Message);
+                        break;
+                    case 'E' when m.Exception != null:
+                        this.CreateMessage().QueueError(m.Message, m.Exception);
+                        break;
+                    default:
+                        break;
+                }
+            });
         }
 
         public event EventHandler UiCompressModeChanged;
@@ -158,13 +213,13 @@ namespace SimpleFFmpegGUI.WPF
         {
             base.OnContentRendered(e);
             await Task.Yield();
-            string[] files = new[]
-            {
+            string[] files =
+            [
                 "ffmpeg.exe",
                 "ffprobe.exe",
                 "ffplay.exe",
                 "mediainfo.exe"
-            };
+            ];
 
             foreach (var file in files)
             {

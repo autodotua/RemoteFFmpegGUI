@@ -1,31 +1,68 @@
-﻿using FzLib;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using FzLib;
 using FzLib.WPF.Converters;
 using Mapster;
+using Microsoft.Win32;
+using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Model;
+using SimpleFFmpegGUI.WPF.Messages;
 using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
+using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
 using Path = System.IO.Path;
 
 namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public class FileIOPanelViewModel : INotifyPropertyChanged
+    public partial class FileIOPanelViewModel : ViewModelBase
     {
+        /// <summary>
+        /// 是否可以修改输入文件数量
+        /// </summary>
+        [ObservableProperty]
         private bool canChangeInputsCount;
 
+        /// <summary>
+        /// 最多输入文件的个数
+        /// </summary>
+        [ObservableProperty]
         private int maxInputsCount = int.MaxValue;
 
         private int minInputsCount = 1;
 
+        /// <summary>
+        /// 输出目录
+        /// </summary>
+        [ObservableProperty]
         private string outputDir;
 
+        /// <summary>
+        /// 输出文件名
+        /// </summary>
+        [ObservableProperty]
         private string outputFileName;
 
+        /// <summary>
+        /// 是否可用视频分割
+        /// </summary>     
+        [ObservableProperty]
         private bool showTimeClip;
 
+        /// <summary>
+        /// 任务类型
+        /// </summary>
+        [NotifyPropertyChangedFor(nameof(CanSetOutputFileName))]
+        [ObservableProperty]
         private TaskType type;
 
         public FileIOPanelViewModel()
@@ -38,32 +75,12 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             Config.Instance.PropertyChanged += (s, e) => this.Notify(nameof(OutputDirPlaceholder));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// 是否可以修改输入文件数量
-        /// </summary>
-        public bool CanChangeInputsCount
-        {
-            get => canChangeInputsCount;
-            set => this.SetValueAndNotify(ref canChangeInputsCount, value, nameof(CanChangeInputsCount));
-        }
-
         /// <summary>
         /// 是否可以设置输出文件名
         /// </summary>
         public bool CanSetOutputFileName => !(Type == TaskType.Code && Inputs.Count > 1);
 
         public ObservableCollection<InputArgumentsDetail> Inputs { get; } = new ObservableCollection<InputArgumentsDetail>();
-
-        /// <summary>
-        /// 最多输入文件的个数
-        /// </summary>
-        public int MaxInputsCount
-        {
-            get => maxInputsCount;
-            set => this.SetValueAndNotify(ref maxInputsCount, value, nameof(MaxInputsCount));
-        }
 
         /// <summary>
         /// 最少输入文件的个数
@@ -82,15 +99,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         }
 
         /// <summary>
-        /// 输出目录
-        /// </summary>
-        public string OutputDir
-        {
-            get => outputDir;
-            set => this.SetValueAndNotify(ref outputDir, value, nameof(OutputDir));
-        }
-
-        /// <summary>
         /// 输出目录的提示
         /// </summary>
         public string OutputDirPlaceholder => "若为空，则保存到" +
@@ -101,33 +109,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 DefaultOutputDirType.SpecialDir => Config.Instance.DefaultOutputDirSpecialDirPath,
                 _ => throw new NotImplementedException()
             };
-
-        /// <summary>
-        /// 输出文件名
-        /// </summary>
-        public string OutputFileName
-        {
-            get => outputFileName;
-            set => this.SetValueAndNotify(ref outputFileName, value, nameof(OutputFileName));
-        }
-
-        /// <summary>
-        /// 是否可用视频分割
-        /// </summary>
-        public bool ShowTimeClip
-        {
-            get => showTimeClip;
-            set => this.SetValueAndNotify(ref showTimeClip, value, nameof(ShowTimeClip));
-        }
-
-        /// <summary>
-        /// 任务类型
-        /// </summary>
-        public TaskType Type
-        {
-            get => type;
-            set => this.SetValueAndNotify(ref type, value, nameof(Type), nameof(CanSetOutputFileName));
-        }
 
         /// <summary>
         /// 重置
@@ -158,7 +139,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         /// 更新任务类型
         /// </summary>
         /// <param name="type"></param>
-        public void Update(TaskType type)
+        public void UpdateType(TaskType type)
         {
             Type = type;
             CanChangeInputsCount = type is TaskType.Code or TaskType.Concat;
@@ -188,9 +169,9 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         /// <param name="inputs"></param>
         /// <param name="output"></param>
         /// <returns>若所有文件都被接受，返回True；若文件数量超过允许范围，返回False</returns>
-        public bool Update(TaskType type, List<InputArguments> inputs, string output)
+        public void Update(TaskType type, List<InputArguments> inputs, string output)
         {
-            Update(type);
+            UpdateType(type);
             Inputs.Clear();
 
             foreach (var input in inputs.Take(MaxInputsCount))
@@ -205,7 +186,10 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             }
             OutputDir = Path.GetDirectoryName(output);
             OutputFileName = Path.GetFileName(output);
-            return inputs.Count <= MaxInputsCount;
+            if( inputs.Count > MaxInputsCount)
+            {
+                QueueErrorMessage("输入文件超过该类型最大数量");
+            }
         }
 
         private void Inputs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -216,6 +200,114 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 Inputs[i].CanDelete = Inputs.Count > MinInputsCount;
             }
             this.Notify(nameof(CanSetOutputFileName));
+        }
+
+
+        [RelayCommand]
+        private async Task BrowseFile(InputArgumentsDetail input)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog().AddAllFilesFilter();
+            WeakReferenceMessenger.Default.Send(new FileDialogMessage(dialog));
+            string path = dialog.FileName;
+            if (path != null)
+            {
+                if (input.Image2)
+                {
+                    string seqFilename = FileSystemUtility.GetSequence(path);
+                    if (seqFilename != null)
+                    {
+                        bool rename = await CommonDialog.ShowYesNoDialogAsync("图像序列", $"指定的文件可能是图像序列中的一个，是否将输入路径修改为{seqFilename}？");
+                        if (rename)
+                        {
+                            path = seqFilename;
+                        }
+                    }
+                }
+                input.FilePath = path;
+            }
+        }
+
+        [RelayCommand]
+        private void RemoveFile(InputArgumentsDetail input)
+        {
+            Inputs.Remove(input);
+        }
+
+        [RelayCommand]
+        private void BrowseOutputFile()
+        {
+            var dialog = new OpenFolderDialog();
+            WeakReferenceMessenger.Default.Send(new FileDialogMessage(dialog));
+            string path = dialog.FolderName;
+            if (path != null)
+            {
+                OutputDir = path;
+            }
+        }
+
+        [RelayCommand]
+        private async Task ClipAsync(InputArgumentsDetail input)
+        {
+            try
+            {
+                Debug.Assert(input != null);
+                if (string.IsNullOrEmpty(input.FilePath))
+                {
+                 QueueErrorMessage("请先设置文件地址");
+                    return;
+                }
+                if (!File.Exists(input.FilePath))
+                {
+                   QueueErrorMessage($"找不到文件{input.FilePath}");
+                    return;
+                }
+                WeakReferenceMessenger.Default.Send(new WindowEnableMessage(false));
+                (TimeSpan From, TimeSpan To)? result = null;
+
+                var handle = WeakReferenceMessenger.Default.Send(new WindowHandleMessage()).Handle;
+
+                Process p = new Process()
+                {
+                    StartInfo = new ProcessStartInfo()
+                    {
+                        FileName = FzLib.Program.App.ProgramFilePath,
+                        RedirectStandardOutput = true,
+                    }
+                };
+                p.StartInfo.ArgumentList.Add("cut");
+                p.StartInfo.ArgumentList.Add(handle.ToString());
+                p.StartInfo.ArgumentList.Add(input.FilePath);
+                p.StartInfo.ArgumentList.Add(input.From.HasValue ? input.From.Value.ToString() : "-");
+                p.StartInfo.ArgumentList.Add(input.To.HasValue ? input.To.Value.ToString() : "-");
+                p.Start();
+                var output = await p.StandardOutput.ReadToEndAsync();
+                string[] outputs = output.Split(',');
+                if (outputs.Length == 2)
+                {
+                    if (TimeSpan.TryParse(outputs[0], out TimeSpan from))
+                    {
+                        if (TimeSpan.TryParse(outputs[1], out TimeSpan to))
+                        {
+                            result = (from, to);
+                        }
+                    }
+                }
+                if (result.HasValue)
+                {
+                    var time = result.Value;
+                    input.From = time.From;
+                    input.To = time.To;
+                    input.Duration = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync(ex);
+            }
+            finally
+            {
+                WeakReferenceMessenger.Default.Send(new WindowEnableMessage(true));
+            }
         }
     }
 }

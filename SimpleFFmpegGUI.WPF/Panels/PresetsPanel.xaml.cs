@@ -30,7 +30,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
     {
         public PresetsPanel()
         {
-            DataContext = ViewModel = ViewModelBase.Bind<PresetsPanelViewModel>(this);
+            ViewModel = this.SetDataContext<PresetsPanelViewModel>();
             InitializeComponent();
         }
 

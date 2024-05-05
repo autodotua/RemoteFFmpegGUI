@@ -1,10 +1,12 @@
-﻿using FzLib.WPF;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using FzLib.WPF;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
+using SimpleFFmpegGUI.WPF.Messages;
 using SimpleFFmpegGUI.WPF.Model;
 using SimpleFFmpegGUI.WPF.Pages;
 using SimpleFFmpegGUI.WPF.ViewModels;
@@ -32,16 +34,15 @@ using Path = System.IO.Path;
 
 namespace SimpleFFmpegGUI.WPF.Panels
 {
-
     public partial class FileIOPanel : UserControl
     {
         public FileIOPanel()
         {
-            DataContext = ViewModel;
+            ViewModel = this.SetDataContext<FileIOPanelViewModel>();
             InitializeComponent();
         }
 
-        public FileIOPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<FileIOPanelViewModel>();
+        public FileIOPanelViewModel ViewModel { get; }
 
         public void AddInput()
         {
@@ -126,15 +127,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public void Update(TaskType type, List<InputArguments> inputs, string output)
         {
-            if (!ViewModel.Update(type, inputs, output))
-            {
-                this.GetWindow().CreateMessage().QueueError("输入文件超过该类型最大数量");
-            }
+            ViewModel.Update(type, inputs, output);
         }
 
-        public void Update(TaskType type)
+        public void UpdateType(TaskType type)
         {
-            ViewModel.Update(type);
+            ViewModel.UpdateType(type);
             ViewModel.Reset(true);
         }
 
@@ -171,108 +169,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
             {
                 ViewModel.Inputs.Add(new InputArgumentsDetail());
             }
-        }
-
-        private async void BrowseFileButton_Click(object sender, RoutedEventArgs e)
-        {
-            var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
-
-            var dialog = new OpenFileDialog().AddAllFilesFilter();
-            string path = dialog.GetPath(this.GetWindow());
-            if (path != null)
-            {
-                if (input.Image2)
-                {
-                    string seqFilename = FileSystemUtility.GetSequence(path);
-                    if (seqFilename != null)
-                    {
-                        bool rename = await CommonDialog.ShowYesNoDialogAsync("图像序列", $"指定的文件可能是图像序列中的一个，是否将输入路径修改为{seqFilename}？");
-                        if (rename)
-                        {
-                            path = seqFilename;
-                        }
-                    }
-                }
-
-
-                input.FilePath = path;
-            }
-        }
-
-        private void BrowseOutputFileButton_Click(object sender, RoutedEventArgs e)
-        {
-            string path = new OpenFolderDialog().GetPath(this.GetWindow());
-            if (path != null)
-            {
-                ViewModel.OutputDir = path;
-            }
-        }
-
-        private async void ClipButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var input = (sender as FrameworkElement).DataContext as InputArgumentsDetail;
-                Debug.Assert(input != null);
-                if (string.IsNullOrEmpty(input.FilePath))
-                {
-                    this.CreateMessage().QueueError("请先设置文件地址");
-                    return;
-                }
-                if (!File.Exists(input.FilePath))
-                {
-                    this.CreateMessage().QueueError($"找不到文件{input.FilePath}");
-                    return;
-                }
-                this.GetWindow().IsEnabled = false;
-                (TimeSpan From, TimeSpan To)? result = null;
-                Process p = new Process()
-                {
-                    StartInfo = new ProcessStartInfo()
-                    {
-                        FileName = FzLib.Program.App.ProgramFilePath,
-                        RedirectStandardOutput = true,
-                    }
-                };
-                p.StartInfo.ArgumentList.Add("cut");
-                p.StartInfo.ArgumentList.Add(new WindowInteropHelper(this.GetWindow()).Handle.ToString());
-                p.StartInfo.ArgumentList.Add(input.FilePath);
-                p.StartInfo.ArgumentList.Add(input.From.HasValue ? input.From.Value.ToString() : "-");
-                p.StartInfo.ArgumentList.Add(input.To.HasValue ? input.To.Value.ToString() : "-");
-                p.Start();
-                var output = await p.StandardOutput.ReadToEndAsync();
-                string[] outputs = output.Split(',');
-                if (outputs.Length == 2)
-                {
-                    if (TimeSpan.TryParse(outputs[0], out TimeSpan from))
-                    {
-                        if (TimeSpan.TryParse(outputs[1], out TimeSpan to))
-                        {
-                            result = (from, to);
-                        }
-                    }
-                }
-                if (result.HasValue)
-                {
-                    var time = result.Value;
-                    input.From = time.From;
-                    input.To = time.To;
-                    input.Duration = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                await CommonDialog.ShowErrorDialogAsync(ex);
-            }
-            finally
-            {
-                this.GetWindow().IsEnabled = true;
-            }
-        }
-
-        private void DeleteFileButton_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.Inputs.Remove((sender as FrameworkElement).DataContext as InputArgumentsDetail);
         }
     }
 }

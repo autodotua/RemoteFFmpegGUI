@@ -74,16 +74,20 @@
                                         VerticalAlignment="Center"
                                         Orientation="Horizontal"
                                         Spacing="8">
-                                        <Button Click="BrowseFileButton_Click">
+                                        <Button
+                                            Command="{Binding DataContext.BrowseFileCommand, Source={x:Reference root}}"
+                                            CommandParameter="{Binding .}">
                                             <ui:SymbolIcon Symbol="OpenFile" />
                                         </Button>
                                         <Button
-                                            Click="ClipButton_Click"
+                                            Command="{Binding DataContext.ClipCommand, Source={x:Reference root}}"
+                                            CommandParameter="{Binding .}"
                                             Visibility="{Binding ElementName=root, Path=DataContext.ShowTimeClip, Converter={StaticResource Bool2VisibilityConverter}}">
                                             <ui:SymbolIcon Symbol="Cut" />
                                         </Button>
                                         <Button
-                                            Click="DeleteFileButton_Click"
+                                            Command="{Binding DataContext.RemoveFileCommand, Source={x:Reference root}}"
+                                            CommandParameter="{Binding .}"
                                             IsEnabled="{Binding CanDelete}"
                                             Visibility="{Binding ElementName=root, Path=DataContext.CanChangeInputsCount, Converter={StaticResource Bool2VisibilityConverter}}">
                                             <ui:SymbolIcon Symbol="Delete" />
@@ -244,7 +248,7 @@
             <Button
                 Grid.Column="2"
                 VerticalAlignment="Bottom"
-                Click="BrowseOutputFileButton_Click">
+                Command="{Binding BrowseOutputFileCommand}">
                 <ui:SymbolIcon Symbol="OpenFile" />
             </Button>
         </Grid>

@@ -96,7 +96,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
             switch (e.PropertyName)
             {
                 case nameof(ViewModel.Type):
-                    fileIOPanel.Update(ViewModel.Type);
+                    fileIOPanel.UpdateType(ViewModel.Type);
                     await argumentsPanel.UpdateTypeAsync(ViewModel.Type);
                     await presetsPanel.UpdateTypeAsync(ViewModel.Type);
                     break;
