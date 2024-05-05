@@ -4,14 +4,16 @@ using SimpleFFmpegGUI.Manager;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
     public class AllTasks : TaskCollectionBase
     {
-        public AllTasks()
+        public AllTasks(TaskManager tm)
         {
-            Refresh();
+            taskManager = tm;
+            RefreshAsync();
         }
 
         private int page = 0;
@@ -22,7 +24,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             set
             {
                 this.SetValueAndNotify(ref page, value, nameof(Page));
-                Refresh();
+                RefreshAsync();
             }
         }
 
@@ -34,7 +36,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             set
             {
                 this.SetValueAndNotify(ref countPerPage, value, nameof(CountPerPage));
-                Refresh();
+                RefreshAsync();
             }
         }
 
@@ -47,6 +49,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         }
 
         private int count;
+        private readonly TaskManager taskManager;
 
         public int Count
         {
@@ -54,9 +57,9 @@ namespace SimpleFFmpegGUI.WPF.Model
             set => this.SetValueAndNotify(ref count, value, nameof(Count));
         }
 
-        public override void Refresh()
+        public override async Task RefreshAsync()
         {
-            var tasks = TaskManager.GetTasks(null, Page * CountPerPage, CountPerPage);
+            var tasks = await taskManager.GetTasksAsync(null, Page * CountPerPage, CountPerPage);
             Count = tasks.TotalCount;
             PageCount = (int)Math.Ceiling(1.0 * Count / CountPerPage);
             Tasks = new ObservableCollection<UITaskInfo>(tasks.List.Adapt<List<UITaskInfo>>());

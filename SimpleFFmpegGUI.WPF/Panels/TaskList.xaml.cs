@@ -70,8 +70,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         private async void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            var tasks = App.ServiceProvider.GetService<TasksAndStatuses>().SelectedTasks;
-
+            var tasks = App.ServiceProvider.GetRequiredService<TasksAndStatuses>().SelectedTasks;
+            var tm = App.ServiceProvider.GetRequiredService<TaskManager>();
             Debug.Assert(tasks.Count > 0);
             if (tasks.Any(p => p.Status == TaskStatus.Processing))
             {
@@ -85,8 +85,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 IsEnabled = false;
                 foreach (var task in tasks)
                 {
-                    TaskManager.CancelTask(task.Id, ViewModel.Queue);
-                    task.UpdateSelf();
+                    await tm.CancelTaskAsync(task.Id);
+                    await task.UpdateSelfAsync();
                 }
             }
             catch (Exception ex)
@@ -120,8 +120,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 var task = ViewModel.Tasks.SelectedTask;
                 App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Remove(task);
                 Debug.Assert(task != null);
-                TaskManager.DeleteTask(task.Id, ViewModel.Queue);
-                task.UpdateSelf();
+                //TaskManager.DeleteTask(task.Id, ViewModel.Queue);
+                //task.UpdateSelf();
             }
         }
 
@@ -211,21 +211,22 @@ namespace SimpleFFmpegGUI.WPF.Panels
             OpenFileOrFolder(task.RealOutput, folder);
         }
 
-        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        private async void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            var tasks = App.ServiceProvider.GetService<TasksAndStatuses>().SelectedTasks;
+            var tasks = App.ServiceProvider.GetRequiredService<TasksAndStatuses>().SelectedTasks;
+            var tm = App.ServiceProvider.GetRequiredService<TaskManager>();
             Debug.Assert(tasks.Count > 0);
             foreach (var task in tasks)
             {
-                TaskManager.ResetTask(task.Id, ViewModel.Queue);
-                task.UpdateSelf();
+                await tm.ResetTaskAsync(task.Id);
+                await task.UpdateSelfAsync();
                 App.ServiceProvider.GetService<TasksAndStatuses>().NotifyTaskReseted(task);
             }
 
             ViewModel.NotifyCanExecute();
         }
 
-        private void StartButton_Click(object sender, RoutedEventArgs e)
+        private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -234,7 +235,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 foreach (var task in tasks)
                 {
                     ViewModel.Queue.StartStandalone(task.Id);
-                    task.UpdateSelf();
+                    await task.UpdateSelfAsync();
                 }
             }
             catch (Exception ex)

@@ -326,9 +326,10 @@ namespace SimpleFFmpegGUI.WPF
             await ShowTopTabAsync<SettingPage>();
         }
 
-        private void StartButton_Click(object sender, RoutedEventArgs e)
+        private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!TaskManager.HasQueueTasks())
+            var tm = App.ServiceProvider.GetRequiredService<TaskManager>();
+            if (!await tm.HasQueueTasksAsync())
             {
                 this.CreateMessage().QueueError("没有排队中的任务");
                 return;

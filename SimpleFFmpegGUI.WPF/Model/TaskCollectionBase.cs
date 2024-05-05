@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
     public abstract class TaskCollectionBase : INotifyPropertyChanged
     {
-        public abstract void Refresh();
+        public abstract Task RefreshAsync();
 
         private ObservableCollection<UITaskInfo> tasks;
 

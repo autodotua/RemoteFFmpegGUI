@@ -11,18 +11,22 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System;
 using System.Windows.Shell;
+using System.Threading.Tasks;
+using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
     public class TasksAndStatuses : TaskCollectionBase
     {
         private List<UITaskInfo> processingTasks;
+        private readonly TaskManager taskManager;
 
-        public TasksAndStatuses(QueueManager queue)
+        public TasksAndStatuses(QueueManager queue, TaskManager tm)
         {
-            Refresh();
             Queue = queue;
+            taskManager = tm;
             queue.TaskManagersChanged += Queue_TaskManagersChanged;
+            RefreshAsync();
         }
 
         public List<UITaskInfo> ProcessingTasks
@@ -43,9 +47,9 @@ namespace SimpleFFmpegGUI.WPF.Model
             }
         }
 
-        public override void Refresh()
+        public override async Task RefreshAsync()
         {
-            var tasks = TaskManager.GetCurrentTasks(App.AppStartTime);
+            var tasks = await taskManager.GetCurrentTasksAsync(App.AppStartTime);
             Tasks = new ObservableCollection<UITaskInfo>(tasks.Adapt<List<UITaskInfo>>());
         }
 

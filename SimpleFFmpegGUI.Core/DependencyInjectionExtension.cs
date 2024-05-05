@@ -6,7 +6,7 @@ namespace SimpleFFmpegGUI
 {
     public static class DependencyInjectionExtension
     {
-        public static void AddFFmpegServices(this ServiceCollection services)
+        public static void AddFFmpegServices(this IServiceCollection services)
         {
             services.AddDbContext<FFmpegDbContext>()
                 .AddTransient<Logger>()

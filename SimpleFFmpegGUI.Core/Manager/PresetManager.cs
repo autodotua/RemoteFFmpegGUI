@@ -41,7 +41,7 @@ namespace SimpleFFmpegGUI.Manager
             return preset.Id;
         }
 
-        public async void UpdatePresetAsync(CodePreset preset)
+        public async Task UpdatePresetAsync(CodePreset preset)
         {
             db.Presets.Update(preset);
             await db.SaveChangesAsync();

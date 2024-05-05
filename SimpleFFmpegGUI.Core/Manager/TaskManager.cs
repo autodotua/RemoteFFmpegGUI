@@ -52,7 +52,7 @@ namespace SimpleFFmpegGUI.Manager
             return task;
         }
 
-        public async Task<List<TaskInfo>> GetCurrentTasks(DateTime startTime)
+        public async Task<List<TaskInfo>> GetCurrentTasksAsync(DateTime startTime)
         {
             var tasks = db.Tasks.Where(p => p.IsDeleted == false);
             var runningTasks = await tasks.Where(p => p.Status == TaskStatus.Processing).ToListAsync();
@@ -104,7 +104,7 @@ namespace SimpleFFmpegGUI.Manager
             return db.Tasks.AnyAsync(p => p.IsDeleted == false && p.Status == TaskStatus.Queue);
         }
 
-        public async Task ResetTaskAsync(int id, QueueManager queue)
+        public async Task ResetTaskAsync(int id)
         {
             TaskInfo task = await db.Tasks.FindAsync(id) ?? throw new ArgumentException($"找不到ID为{id}的任务");
             if (queue.Tasks.Any(p => p.Id == id))
@@ -116,7 +116,7 @@ namespace SimpleFFmpegGUI.Manager
             await db.SaveChangesAsync();
         }
 
-        public async Task<int> TryResetTasksAsync(IEnumerable<int> ids, QueueManager queue)
+        public async Task<int> TryResetTasksAsync(IEnumerable<int> ids)
         {
             int count = 0;
             foreach (var id in ids)

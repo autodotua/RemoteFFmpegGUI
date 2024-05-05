@@ -28,16 +28,21 @@ namespace SimpleFFmpegGUI.WPF.Pages
 {
     public class LogsPageViewModel : INotifyPropertyChanged
     {
-        public LogsPageViewModel()
+        public LogsPageViewModel(TaskManager taskManager, LogManager logManager)
         {
-            Tasks = TaskManager.GetTasks().List.Adapt<List<UITaskInfo>>();
+            taskManager.GetTasksAsync().ContinueWith(data =>
+              {
+                  Tasks = data.Result.List.Adapt<List<UITaskInfo>>();
+              });
+            this.taskManager = taskManager;
+            this.logManager = logManager;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private List<Log> logs;
+        private IList<Log> logs;
 
-        public List<Log> Logs
+        public IList<Log> Logs
         {
             get => logs;
             set => this.SetValueAndNotify(ref logs, value, nameof(Logs));
@@ -75,12 +80,14 @@ namespace SimpleFFmpegGUI.WPF.Pages
             set => this.SetValueAndNotify(ref selectedTask, value, nameof(SelectedTask));
         }
 
-        public void FillLogs()
+        public async Task FillLogsAsync()
         {
-            Logs = LogManager.GetLogs(type: Type, taskId: SelectedTask?.Id ?? 0, from: From, to: To).List;
+            Logs = (await logManager.GetLogsAsync(type: Type, taskId: SelectedTask?.Id ?? 0, from: From, to: To)).List;
         }
 
         private int typeIndex;
+        private readonly TaskManager taskManager;
+        private readonly LogManager logManager;
 
         public int TypeIndex
         {
@@ -112,18 +119,18 @@ namespace SimpleFFmpegGUI.WPF.Pages
             InitializeComponent();
         }
 
-        private void FilterButton_Click(object sender, RoutedEventArgs e)
+        private async void FilterButton_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.FillLogs();
+            await ViewModel.FillLogsAsync();
         }
 
-        public void FillLogs(int taskID)
+        public async void FillLogs(int taskID)
         {
             var task = ViewModel.Tasks.FirstOrDefault(p => p.Id == taskID);
             Debug.Assert(task != null);
             ViewModel.SelectedTask = task;
             ViewModel.From = DateTime.MinValue;
-            ViewModel.FillLogs();
+            await ViewModel.FillLogsAsync();
         }
     }
 }

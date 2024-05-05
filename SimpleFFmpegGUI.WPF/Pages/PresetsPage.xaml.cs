@@ -38,12 +38,15 @@ namespace SimpleFFmpegGUI.WPF.Pages
     /// </summary>
     public partial class PresetsPage : UserControl
     {
-        public PresetsPage(PresetsPageViewModel viewModel)
+        private readonly PresetManager presetManager;
+
+        public PresetsPage(PresetsPageViewModel viewModel, PresetManager presetManager)
         {
             ViewModel = viewModel;
+            this.presetManager = presetManager;
             DataContext = ViewModel;
             InitializeComponent();
-            Loaded += (s, e) => ViewModel.FillPresets();
+            Loaded += async (s, e) => await ViewModel.FillPresetsAsync();
         }
 
         public PresetsPageViewModel ViewModel { get; set; }
@@ -54,8 +57,8 @@ namespace SimpleFFmpegGUI.WPF.Pages
                 IsEnabled = false;
                 try
                 {
-                    PresetManager.DeletePresets();
-                    ViewModel.FillPresets();
+                    await presetManager.DeletePresetsAsync();
+                    await ViewModel.FillPresetsAsync();
                 }
                 catch (Exception ex)
                 {
@@ -73,19 +76,19 @@ namespace SimpleFFmpegGUI.WPF.Pages
             var preset = (sender as Button).DataContext as CodePreset;
             if (await CommonDialog.ShowYesNoDialogAsync("删除预设", $"是否删除“{preset.Name}”？"))
             {
-                ViewModel.DeletePreset(preset);
+                await presetManager.DeletePresetAsync(preset.Id);
+                ViewModel.Presets.Remove(preset);
             }
         }
 
-        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new SaveFileDialog().AddFilter("配置文件", "json");
             dialog.FileName = "FFmpeg工具箱 预设.json";
             string path = dialog.GetPath(this.GetWindow());
             if (path != null)
-
             {
-                var json = PresetManager.Export();
+                var json = await presetManager.ExportAsync();
                 File.WriteAllText(path, json, new UTF8Encoding());
                 this.CreateMessage().QueueSuccess("导出成功");
             }
@@ -99,8 +102,8 @@ namespace SimpleFFmpegGUI.WPF.Pages
             {
                 try
                 {
-                    PresetManager.Import(File.ReadAllText(path, new UTF8Encoding()));
-                    ViewModel.FillPresets();
+                    await presetManager.ImportAsync(File.ReadAllText(path, new UTF8Encoding()));
+                    await ViewModel.FillPresetsAsync();
                     this.CreateMessage().QueueSuccess("导入成功，同名预设已被更新");
                 }
                 catch (Exception ex)
@@ -121,24 +124,24 @@ namespace SimpleFFmpegGUI.WPF.Pages
                 grd.RowDefinitions[2].Height = new GridLength(48);
                 lvw.IsHitTestVisible = false;
                 lvw.ScrollIntoView(preset);
-                grd.RowDefinitions[4].Height = new GridLength(1,GridUnitType.Star);
+                grd.RowDefinitions[4].Height = new GridLength(1, GridUnitType.Star);
                 argumentsPanel.Update(preset.Type, preset.Arguments);
             }
             else
             {
-                grd.RowDefinitions[2].Height = new GridLength(1,GridUnitType.Star);
+                grd.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
                 lvw.IsHitTestVisible = true;
                 grd.RowDefinitions[4].Height = new GridLength(0);
             }
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            Debug.Assert(ViewModel.SelectedPreset!=null); 
+            Debug.Assert(ViewModel.SelectedPreset != null);
             try
             {
                 ViewModel.SelectedPreset.Arguments = argumentsPanel.GetOutputArguments();
-                PresetManager.UpdatePreset(ViewModel.SelectedPreset);
+                await presetManager.UpdatePresetAsync(ViewModel.SelectedPreset);
                 ViewModel.SelectedPreset = null;
             }
             catch (Exception ex)
@@ -151,12 +154,12 @@ namespace SimpleFFmpegGUI.WPF.Pages
             ViewModel.SelectedPreset = null;
         }
 
-        private void SetDefaultButton_Click(object sender, RoutedEventArgs e)
+        private async void SetDefaultButton_Click(object sender, RoutedEventArgs e)
         {
             Debug.Assert(ViewModel.SelectedPreset != null);
             ViewModel.Presets.ForEach(p => p.Default = false);
             ViewModel.SelectedPreset.Default = true;
-            PresetManager.SetDefaultPreset(ViewModel.SelectedPreset.Id);
+            await presetManager.SetDefaultPresetAsync(ViewModel.SelectedPreset.Id);
         }
     }
 
@@ -167,9 +170,11 @@ namespace SimpleFFmpegGUI.WPF.Pages
         private CodePreset selectedPreset;
 
         private TaskType type = TaskType.Code;
+        private readonly PresetManager presetManager;
 
-        public PresetsPageViewModel()
+        public PresetsPageViewModel(PresetManager presetManager)
         {
+            this.presetManager = presetManager;
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -193,18 +198,13 @@ namespace SimpleFFmpegGUI.WPF.Pages
             set
             {
                 this.SetValueAndNotify(ref type, value, nameof(Type));
-                FillPresets();
+                FillPresetsAsync();
             }
         }
-        public void DeletePreset(CodePreset preset)
-        {
-            PresetManager.DeletePreset(preset.Id);
-            Presets.Remove(preset);
-        }
 
-        public void FillPresets()
+        public async Task FillPresetsAsync()
         {
-            Presets = new ObservableCollection<CodePreset>(PresetManager.GetPresets(Type));
+            Presets = new ObservableCollection<CodePreset>(await presetManager.GetPresetsAsync(Type));
         }
 
     }

@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using static SimpleFFmpegGUI.DependencyInjectionExtension;
 using System.Windows.Interop;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
@@ -83,7 +84,6 @@ namespace SimpleFFmpegGUI.WPF
         {
             services.AddSingleton<Config>();
 
-            services.AddSingleton<QueueManager>();
             services.AddSingleton<TasksAndStatuses>();
             services.AddSingleton<AllTasks>();
 
@@ -119,6 +119,8 @@ namespace SimpleFFmpegGUI.WPF
             services.AddTransient<FileIOPanelViewModel>();
             services.AddTransient<PresetsPanelViewModel>();
             services.AddTransient<StatusPanelViewModel>();
+
+            services.AddFFmpegServices();
         }
 
         private void InitializeLogs()

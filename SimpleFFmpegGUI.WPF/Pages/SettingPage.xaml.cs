@@ -31,9 +31,12 @@ namespace SimpleFFmpegGUI.WPF.Pages
 {
     public class SettingPageViewModel : Config
     {
-        public SettingPageViewModel()
+        private readonly ConfigManager configManager;
+
+        public SettingPageViewModel(ConfigManager configManager)
         {
             Config.Instance.Adapt(this);
+            this.configManager = configManager;
             ObservableRemoteHosts = new ObservableCollection<RemoteHost>(RemoteHosts);
             this.Notify(nameof(ObservableRemoteHosts));
         }
@@ -44,8 +47,8 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         public int DefaultProcessPriority
         {
-            get => ConfigManager.DefaultProcessPriority;
-            set => ConfigManager.DefaultProcessPriority = value;
+            get => configManager.DefaultProcessPriority;
+            set => configManager.DefaultProcessPriority = value;
         }
     }
 

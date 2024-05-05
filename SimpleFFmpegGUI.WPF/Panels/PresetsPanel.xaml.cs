@@ -1,4 +1,6 @@
-﻿using Enterwell.Clients.Wpf.Notifications;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Enterwell.Clients.Wpf.Notifications;
 using FzLib;
 using Mapster;
 using Microsoft.DotNet.PlatformAbstractions;
@@ -28,23 +30,43 @@ using System.Windows.Shapes;
 
 namespace SimpleFFmpegGUI.WPF.Panels
 {
-    public class PresetsPanelViewModel : INotifyPropertyChanged
+    public partial class PresetsPanelViewModel : ObservableObject
     {
-        public PresetsPanelViewModel()
+        public PresetsPanelViewModel(PresetManager presetManager)
         {
+            this.presetManager = presetManager;
         }
 
+        private readonly PresetManager presetManager;
+
+        [ObservableProperty]
         private ObservableCollection<CodePreset> presets;
 
-        public ObservableCollection<CodePreset> Presets
+        public INotificationMessageManager Manager { get; } = new NotificationMessageManager();
+
+        public void Update(TaskType type)
         {
-            get => presets;
-            set => this.SetValueAndNotify(ref presets, value, nameof(Presets));
+            this.type = type;
+            Presets = new ObservableCollection<CodePreset>(PresetManager.GetPresets().Where(p => p.Type == type));
+
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public INotificationMessageManager Manager { get; } = new NotificationMessageManager();
+        [RelayCommand]
+        private async Task UpdateAsync()
+        {
+            Debug.Assert(CodeArgumentsViewModel != null);
+            var preset = (sender as FrameworkElement).DataContext as CodePreset;
+            try
+            {
+                preset.Arguments = CodeArgumentsViewModel.GetArguments();
+                PresetManager.UpdatePreset(preset);
+                this.CreateMessage().QueueSuccess($"预设“{preset.Name}”更新成功");
+            }
+            catch (Exception ex)
+            {
+                this.CreateMessage().QueueError("更新预设失败", ex);
+            }
+        }
     }
 
     public partial class PresetsPanel : UserControl
@@ -60,8 +82,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public void Update(TaskType type)
         {
-            this.type = type;
-            ViewModel.Presets = new ObservableCollection<CodePreset>(PresetManager.GetPresets().Where(p => p.Type == type));
+            ViewModel.Update(type);
         }
 
         public CodeArgumentsPanelViewModel CodeArgumentsViewModel { get; set; }

@@ -46,7 +46,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         private FFmpegManager processManager;
 
-        private int processPriority = ConfigManager.DefaultProcessPriority;
+        private int processPriority = App.ServiceProvider.GetRequiredService<ConfigManager>().DefaultProcessPriority;
 
         private StatusDto processStatus;
 
@@ -303,7 +303,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             _ => DescriptionConverter.GetDescription(Status)
         };
 
-        public string Title => Type == TaskType.Custom ?                                                                                                                                                                                                                                      AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name)
+        public string Title => Type == TaskType.Custom ? AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name)
             : AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name) + "：" + InputText;
 
         public TaskType Type
@@ -317,9 +317,9 @@ namespace SimpleFFmpegGUI.WPF.Model
             return task.Adapt<UITaskInfo>();
         }
 
-        public TaskInfo GetTask()
+        public Task<TaskInfo> GetTaskAsync()
         {
-            return TaskManager.GetTask(Id);
+            return App.ServiceProvider.GetRequiredService<TaskManager>().GetTaskAsync(Id);
         }
 
         public TaskInfo ToTask()
@@ -327,9 +327,9 @@ namespace SimpleFFmpegGUI.WPF.Model
             return this.Adapt<TaskInfo>();
         }
 
-        public void UpdateSelf()
+        public async Task UpdateSelfAsync()
         {
-            TaskManager.GetTask(Id).Adapt(this);
+            (await GetTaskAsync()).Adapt(this);
         }
 
         private void Manager_ProcessChanged(object sender, ProcessChangedEventArgs e)
