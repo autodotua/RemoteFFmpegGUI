@@ -41,5 +41,9 @@ namespace SimpleFFmpegGUI.WPF.Panels
             return ViewModel.UpdateTypeAsync(type);
         }
 
+        public Task SaveToPresetAsync()
+        {
+            return ViewModel.SaveToPresetCommand.ExecuteAsync(null);
+        }
     }
 }

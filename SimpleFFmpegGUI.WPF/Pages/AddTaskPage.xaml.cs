@@ -195,7 +195,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         private async void SaveToPresetButton_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            await presetsPanel.SaveToPresetAsync();
         }
 
         private void BrowseAndAddInputButton_Click(object sender, RoutedEventArgs e)

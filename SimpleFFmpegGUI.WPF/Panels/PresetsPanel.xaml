@@ -37,7 +37,7 @@
                         Cursor="Hand">
                         <Border.InputBindings>
                             <MouseBinding
-                                Command="{Binding ApplyCommand}"
+                                Command="{Binding DataContext.ApplyCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}, Mode=FindAncestor}}"
                                 CommandParameter="{Binding .}"
                                 MouseAction="LeftClick" />
                         </Border.InputBindings>
@@ -71,17 +71,17 @@
                                 <ui:FlyoutService.Flyout>
                                     <ui:MenuFlyout>
                                         <MenuItem
-                                            Command="{Binding UpdateCommand}"
+                                            Command="{Binding DataContext.UpdateCommand, Source={x:Reference root}}"
                                             CommandParameter="{Binding .}"
                                             Header="更新参数"
                                             ToolTip="使用当前输出参数更新该预设" />
                                         <MenuItem
-                                            Command="{Binding DeleteCommand}"
+                                            Command="{Binding DataContext.DeleteCommand, Source={x:Reference root}}"
                                             CommandParameter="{Binding .}"
                                             Header="删除"
                                             ToolTip="删除该预设" />
                                         <MenuItem
-                                            Command="{Binding MakeDefaultCommand}"
+                                            Command="{Binding DataContext.MakeDefaultCommand, Source={x:Reference root}}"
                                             CommandParameter="{Binding .}"
                                             Header="设为默认"
                                             ToolTip="设置为当前任务类型的默认预设" />

@@ -100,6 +100,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         }
         public CodeArgumentsPanelViewModel CodeArgumentsViewModel { get; set; }
 
+
         [RelayCommand]
         private async Task SaveToPresetAsync()
         {
