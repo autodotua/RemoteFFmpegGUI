@@ -9,16 +9,6 @@ using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI
 {
-    public class LogEventArgs : EventArgs
-    {
-        public LogEventArgs(Log log)
-        {
-            Log = log;
-        }
-
-        public Log Log { get; set; }
-    }
-
     public class ExceptionEventArgs : EventArgs
     {
         public ExceptionEventArgs(Exception exception)
@@ -31,17 +21,31 @@ namespace SimpleFFmpegGUI
             Exception = exception;
             Message = message;
         }
-        public string Message { get; }
         public Exception Exception { get; }
+        public string Message { get; }
     }
 
+    public class LogEventArgs : EventArgs
+    {
+        public LogEventArgs(Log log)
+        {
+            Log = log;
+        }
+
+        public Log Log { get; set; }
+    }
     public class Logger : IDisposable
     {
         private static HashSet<Logger> allLoggers = new HashSet<Logger>();
-        private object lockObj = new object();
-        private FFmpegDbContext db = FFmpegDbContext.GetNew();
+        private readonly FFmpegDbContext db;
         private bool disposed = false;
+        private object lockObj = new object();
         private Timer timer;
+
+        public Logger(FFmpegDbContext db)
+        {
+            this.db = db;
+        }
         public Logger()
         {
             lock (lockObj)

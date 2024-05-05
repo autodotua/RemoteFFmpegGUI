@@ -81,7 +81,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 tasks = tasks.OrderByDescending(p => p.CreateTime);
             }
-            int count = tasks.Count();
+            int count = await tasks.CountAsync();
             if (skip > 0)
             {
                 tasks = tasks.Skip(skip);
@@ -219,7 +219,7 @@ namespace SimpleFFmpegGUI.Manager
             int count = 0;
             foreach (var id in ids)
             {
-                TaskInfo task =await db.Tasks.FindAsync(id);
+                TaskInfo task = await db.Tasks.FindAsync(id);
                 if (task == null)
                 {
                     continue;

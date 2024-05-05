@@ -188,9 +188,10 @@ namespace SimpleFFmpegGUI.Manager
         /// 获取错误信息
         /// </summary>
         /// <returns></returns>
-        public string GetErrorMessage()
+        public async Task<string> GetErrorMessageAsync()
         {
-            var logs = LogManager.GetLogs('O', Task.Id, DateTime.Now.AddSeconds(-5));
+            LogManager manager = new LogManager(new FFmpegDbContext());
+            var logs =await manager.GetLogsAsync('O', Task.Id, DateTime.Now.AddSeconds(-5));
             var log = logs.List
                 .Where(p => ErrorMessageRegexs.Any(q => q.IsMatch(p.Message)))
                 .OrderByDescending(p => p.Time).FirstOrDefault();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleFFmpegGUI.Model;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace SimpleFFmpegGUI.Manager
 
         private FFmpegProcess()
         {
-            Priority = ConfigManager.DefaultProcessPriority;
+            Priority = new ConfigManager(new FFmpegDbContext()).DefaultProcessPriority;
         }
         public FFmpegProcess(string argument) : this()
         {

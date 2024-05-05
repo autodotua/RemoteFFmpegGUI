@@ -1,4 +1,5 @@
-﻿using SimpleFFmpegGUI.FFmpegArgument;
+﻿using Microsoft.EntityFrameworkCore;
+using SimpleFFmpegGUI.FFmpegArgument;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
@@ -141,15 +142,14 @@ namespace SimpleFFmpegGUI.Manager
             running = true;
             scheduleTime = null;
             logger.Info("开始队列");
-            using FFmpegDbContext db = FFmpegDbContext.GetNew();
             List<TaskInfo> tasks;
-            while (!cancelQueue && GetQueueTasks(db).Any())
+            while (!cancelQueue && await GetQueueTasksQuery(db).AnyAsync())
             {
-                tasks = GetQueueTasks(db).OrderBy(p => p.CreateTime).ToList();
+                tasks = await GetQueueTasksQuery(db).OrderBy(p => p.CreateTime).ToListAsync();
 
                 var task = tasks[0];
 
-                await ProcessTaskAsync(db, task, true);
+                await ProcessTaskAsync(task, true);
             }
             running = false;
             bool cancelManually = cancelQueue;
@@ -168,12 +168,7 @@ namespace SimpleFFmpegGUI.Manager
         /// <exception cref="Exception"></exception>
         public async void StartStandalone(int id)
         {
-            using FFmpegDbContext db = FFmpegDbContext.GetNew();
-            var task = db.Tasks.Find(id);
-            if (task == null)
-            {
-                throw new Exception("找不到ID为" + id + "的任务");
-            }
+            var task = db.Tasks.Find(id) ?? throw new Exception("找不到ID为" + id + "的任务");
             if (task.Status != TaskStatus.Queue)
             {
                 throw new Exception("任务的状态不正确，不可开始任务");
@@ -183,7 +178,7 @@ namespace SimpleFFmpegGUI.Manager
                 throw new Exception("任务正在进行中，但状态不是正在处理中");
             }
             logger.Info(task, "开始独立任务");
-            await ProcessTaskAsync(db, task, false);
+            await ProcessTaskAsync(task, false);
             logger.Info(task, "独立任务完成");
         }
 
@@ -214,7 +209,7 @@ namespace SimpleFFmpegGUI.Manager
             }
         }
 
-        private IQueryable<TaskInfo> GetQueueTasks(FFmpegDbContext db)
+        private IQueryable<TaskInfo> GetQueueTasksQuery(FFmpegDbContext db)
         {
             return db.Tasks
                 .Where(p => p.Status == TaskStatus.Queue)
@@ -230,7 +225,7 @@ namespace SimpleFFmpegGUI.Manager
             task.Message = "";
             task.FFmpegArguments = "";
             db.Update(task);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             AddManager(task, ffmpegManager, main);
             try
             {
@@ -244,7 +239,7 @@ namespace SimpleFFmpegGUI.Manager
                     logger.Error(task, "运行错误：" + ex.ToString());
                     task.Status = TaskStatus.Error;
                     task.Message = ex is FFmpegArgumentException ?
-                        ex.Message : ffmpegManager.GetErrorMessage() ?? "运行错误，请查看日志";
+                        ex.Message : await ffmpegManager.GetErrorMessageAsync() ?? "运行错误，请查看日志";
                 }
                 else
                 {
@@ -256,7 +251,7 @@ namespace SimpleFFmpegGUI.Manager
                 task.FinishTime = DateTime.Now;
             }
             db.Update(task);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             RemoveManager(task, ffmpegManager, main);
         }
 
