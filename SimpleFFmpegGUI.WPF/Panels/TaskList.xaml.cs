@@ -1,5 +1,4 @@
-﻿using FzLib;
-using FzLib.WPF;
+﻿using FzLib.WPF;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.FzExtension.CommonDialog;
@@ -8,10 +7,10 @@ using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF;
 using SimpleFFmpegGUI.WPF.Model;
 using SimpleFFmpegGUI.WPF.Pages;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -34,16 +33,22 @@ namespace SimpleFFmpegGUI.WPF.Panels
         public TaskList()
         {
             InitializeComponent();
-            (Content as FrameworkElement).DataContext = ViewModel;
+            ViewModel = this.SetDataContext<TaskListViewModel>();
         }
+
+
+        public static readonly DependencyProperty ShowAllTasksProperty = DependencyProperty.Register(
+            nameof(ShowAllTasks), typeof(bool),
+            typeof(TaskList)
+            );
 
         public bool ShowAllTasks
         {
-            get => ViewModel.ShowAllTasks;
-            set => ViewModel.ShowAllTasks = value;
+            get => (bool)GetValue(ShowAllTasksProperty);
+            set => SetValue(ShowAllTasksProperty, value);
         }
 
-        public TaskListViewModel ViewModel { get; } = App.ServiceProvider.GetService<TaskListViewModel>();
+        public TaskListViewModel ViewModel { get; }
 
         private void ArgumentsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -210,42 +215,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
             OpenFileOrFolder(task.RealOutput, folder);
         }
-
-        private async void ResetButton_Click(object sender, RoutedEventArgs e)
-        {
-            var tasks = App.ServiceProvider.GetRequiredService<TasksAndStatuses>().SelectedTasks;
-            var tm = App.ServiceProvider.GetRequiredService<TaskManager>();
-            Debug.Assert(tasks.Count > 0);
-            foreach (var task in tasks)
-            {
-                await tm.ResetTaskAsync(task.Id);
-                await task.UpdateSelfAsync();
-                App.ServiceProvider.GetService<TasksAndStatuses>().NotifyTaskReseted(task);
-            }
-
-            ViewModel.NotifyCanExecute();
-        }
-
-        private async void StartButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var tasks = App.ServiceProvider.GetService<TasksAndStatuses>().SelectedTasks;
-                Debug.Assert(tasks.Count > 0);
-                foreach (var task in tasks)
-                {
-                    ViewModel.Queue.StartStandalone(task.Id);
-                    await task.UpdateSelfAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                this.CreateMessage().QueueError("启动失败", ex);
-            }
-
-            ViewModel.NotifyCanExecute();
-        }
-
+   
         private void UpdateDetailHeight()
         {
             bdDetail.Height = App.ServiceProvider.GetService<MainWindow>().IsUiCompressMode && !ShowAllTasks ? 108 : double.NaN;
@@ -262,42 +232,5 @@ namespace SimpleFFmpegGUI.WPF.Panels
         {
             ViewModel.NotifyCanExecute();
         }
-    }
-
-    public class TaskListViewModel : INotifyPropertyChanged
-    {
-        private bool showAllTasks;
-
-        public TaskListViewModel(QueueManager queue)
-        {
-            Queue = queue;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public bool CanCancel => Tasks.SelectedTasks.All(p => p.Status is TaskStatus.Queue or TaskStatus.Processing);
-
-        public bool CanReset => Tasks.SelectedTasks.All(p => p.Status is TaskStatus.Done or TaskStatus.Cancel or TaskStatus.Error);
-
-        public bool CanStart => Tasks.SelectedTasks.All(p => p.Status is TaskStatus.Queue);
-
-        public void NotifyCanExecute()
-        {
-            this.Notify(nameof(CanCancel), nameof(CanReset), nameof(CanStart));
-        }
-
-        public QueueManager Queue { get; }
-
-        public bool ShowAllTasks
-        {
-            get => showAllTasks;
-            set => this.SetValueAndNotify(ref showAllTasks, value, nameof(ShowAllTasks), nameof(Tasks));
-        }
-
-        public TaskCollectionBase Tasks => ShowAllTasks ?
-                                       App.ServiceProvider.GetService<AllTasks>()
-            : App.ServiceProvider.GetService<TasksAndStatuses>();
-
-        public SelectionMode SelectionMode => ShowAllTasks ? SelectionMode.Single : SelectionMode.Extended;
     }
 }

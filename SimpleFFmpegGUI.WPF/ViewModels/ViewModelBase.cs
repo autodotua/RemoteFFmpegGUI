@@ -10,13 +10,17 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 {
     public partial class ViewModelBase : ObservableObject
     {
+        protected TMessage SendMessage<TMessage>(TMessage message) where TMessage : class
+        {
+            return WeakReferenceMessenger.Default.Send(message);
+        }
         protected void QueueSuccessMessage(string message)
         {
-            WeakReferenceMessenger.Default.Send(new QueueMessagesMessage('S', message));
+            SendMessage(new QueueMessagesMessage('S', message));
         }
         protected void QueueErrorMessage(string message, Exception ex = null)
         {
-            WeakReferenceMessenger.Default.Send(new QueueMessagesMessage('E', message, ex));
+            SendMessage(new QueueMessagesMessage('E', message, ex));
         }
 
         protected ContentControl View { get; set; }

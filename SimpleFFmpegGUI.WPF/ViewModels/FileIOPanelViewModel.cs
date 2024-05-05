@@ -207,7 +207,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         private async Task BrowseFile(InputArgumentsDetail input)
         {
             var dialog = new Microsoft.Win32.OpenFileDialog().AddAllFilesFilter();
-            WeakReferenceMessenger.Default.Send(new FileDialogMessage(dialog));
+            SendMessage(new FileDialogMessage(dialog));
             string path = dialog.FileName;
             if (path != null)
             {
@@ -237,7 +237,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         private void BrowseOutputFile()
         {
             var dialog = new OpenFolderDialog();
-            WeakReferenceMessenger.Default.Send(new FileDialogMessage(dialog));
+            SendMessage(new FileDialogMessage(dialog));
             string path = dialog.FolderName;
             if (path != null)
             {
@@ -261,7 +261,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                    QueueErrorMessage($"找不到文件{input.FilePath}");
                     return;
                 }
-                WeakReferenceMessenger.Default.Send(new WindowEnableMessage(false));
+                SendMessage(new WindowEnableMessage(false));
                 (TimeSpan From, TimeSpan To)? result = null;
 
                 var handle = WeakReferenceMessenger.Default.Send(new WindowHandleMessage()).Handle;
@@ -306,7 +306,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             }
             finally
             {
-                WeakReferenceMessenger.Default.Send(new WindowEnableMessage(true));
+                SendMessage(new WindowEnableMessage(true));
             }
         }
     }

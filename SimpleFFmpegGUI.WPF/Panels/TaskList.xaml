@@ -298,18 +298,18 @@
                         </Style>
                     </ui:SimpleStackPanel.Resources>
                     <Button
-                        Click="StartButton_Click"
+                        Command="{Binding StartStandaloneCommand}"
                         Content="独立执行"
                         IsEnabled="{Binding CanStart}"
                         Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
-                        Click="CancelButton_Click"
+                        Command="{Binding CancelCommand}"
                         Content="取消"
                         IsEnabled="{Binding CanCancel}"
                         ToolTip="取消执行任务，正在执行的任务会被停止"
                         Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
-                        Click="ResetButton_Click"
+                        Command="{Binding ResetCommand}"
                         Content="重置"
                         IsEnabled="{Binding CanReset}"
                         ToolTip="将任务设置为排队状态"
