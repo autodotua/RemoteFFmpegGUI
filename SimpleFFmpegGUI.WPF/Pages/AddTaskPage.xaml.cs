@@ -15,6 +15,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -85,19 +86,19 @@ namespace SimpleFFmpegGUI.WPF.Pages
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             DataContext = ViewModel;
             InitializeComponent();
-            presetsPanel.CodeArgumentsViewModel = argumentsPanel.ViewModel;
+            presetsPanel.ViewModel.CodeArgumentsViewModel = argumentsPanel.ViewModel;
         }
 
         private bool canInitializeType = true;
 
-        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private async void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
                 case nameof(ViewModel.Type):
                     fileIOPanel.Update(ViewModel.Type);
-                    argumentsPanel.Update(ViewModel.Type);
-                    presetsPanel.Update(ViewModel.Type);
+                    await argumentsPanel.UpdateTypeAsync(ViewModel.Type);
+                    await presetsPanel.UpdateTypeAsync(ViewModel.Type);
                     break;
 
                 default:
@@ -194,7 +195,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
 
         private async void SaveToPresetButton_Click(object sender, RoutedEventArgs e)
         {
-            await presetsPanel.SaveToPresetAsync();
+            throw new NotImplementedException();
         }
 
         private void BrowseAndAddInputButton_Click(object sender, RoutedEventArgs e)

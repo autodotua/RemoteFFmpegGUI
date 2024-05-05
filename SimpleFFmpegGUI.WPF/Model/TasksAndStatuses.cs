@@ -96,7 +96,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Queue_TaskManagersChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private async void Queue_TaskManagersChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)//新增任务
             {
@@ -104,7 +104,7 @@ namespace SimpleFFmpegGUI.WPF.Model
                 var unstartStatus = new StatusDto(manager.Task); //先放入一个StatusDto进行占位，因为此时Status还未生成
                 var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);//找到对应的UITaskInfo
                 Debug.Assert(task != null);
-                task.UpdateSelf(); //用TaskInfo实体更新UITaskInfo
+                await task.UpdateSelfAsync(); //用TaskInfo实体更新UITaskInfo
                 task.ProcessStatus = unstartStatus;
                 task.ProcessManager = manager;
                 if (manager == Queue.MainQueueManager)
@@ -127,7 +127,7 @@ namespace SimpleFFmpegGUI.WPF.Model
                 Debug.Assert(task != null);
                 task.ProcessManager = null;
                 task.ProcessStatus = null;
-                task.UpdateSelf();
+                await task.UpdateSelfAsync();
 
                 Statuses.Remove(status);
                 manager.StatusChanged -= Manager_StatusChanged;

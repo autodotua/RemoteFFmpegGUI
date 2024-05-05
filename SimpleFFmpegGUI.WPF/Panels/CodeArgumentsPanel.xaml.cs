@@ -62,7 +62,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
             canApplyDefaultPreset = false;
         }
 
-        public async void Update(TaskType type)
+        public async Task UpdateTypeAsync(TaskType type)
         {
             bool updated = false;
             if (canApplyDefaultPreset)//允许修改参数
@@ -78,12 +78,13 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 }
                 if (!updated)//记住上次输出参数为False，或不存在上次的参数
                 {
-                    if (PresetManager.GetDefaultPreset(type) is CodePreset defaultPreset)
-                    {
-                        ViewModel.Update(type, defaultPreset.Arguments);
-                        (await this.CreateMessageAsync()).QueueSuccess($"已加载默认预设“{defaultPreset.Name}”");
-                        updated = true;
-                    }
+                    throw new NotImplementedException();
+                    //if (PresetManager.GetDefaultPreset(type) is CodePreset defaultPreset)
+                    //{
+                    //    ViewModel.Update(type, defaultPreset.Arguments);
+                    //    (await this.CreateMessageAsync()).QueueSuccess($"已加载默认预设“{defaultPreset.Name}”");
+                    //    updated = true;
+                    //}
                 }
             }
             if (!updated)

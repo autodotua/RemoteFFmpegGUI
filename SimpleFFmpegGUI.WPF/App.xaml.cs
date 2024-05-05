@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using static SimpleFFmpegGUI.DependencyInjectionExtension;
 using System.Windows.Interop;
+using SimpleFFmpegGUI.WPF.ViewModels;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
 

@@ -34,8 +34,13 @@
                         Padding="10,2"
                         BorderBrush="{DynamicResource SystemControlBackgroundListLowBrush}"
                         BorderThickness="0,1"
-                        Cursor="Hand"
-                        MouseLeftButtonDown="ApplyButton_Click">
+                        Cursor="Hand">
+                        <Border.InputBindings>
+                            <MouseBinding
+                                Command="{Binding ApplyCommand}"
+                                CommandParameter="{Binding .}"
+                                MouseAction="LeftClick" />
+                        </Border.InputBindings>
                         <Border.Style>
                             <Style TargetType="{x:Type Border}">
                                 <Style.Triggers>
@@ -66,15 +71,18 @@
                                 <ui:FlyoutService.Flyout>
                                     <ui:MenuFlyout>
                                         <MenuItem
-                                            Click="UpdateButton_Click"
+                                            Command="{Binding UpdateCommand}"
+                                            CommandParameter="{Binding .}"
                                             Header="更新参数"
                                             ToolTip="使用当前输出参数更新该预设" />
                                         <MenuItem
-                                            Click="DeleteButton_Click"
+                                            Command="{Binding DeleteCommand}"
+                                            CommandParameter="{Binding .}"
                                             Header="删除"
                                             ToolTip="删除该预设" />
                                         <MenuItem
-                                            Click="MakeDefaultButton_Click"
+                                            Command="{Binding MakeDefaultCommand}"
+                                            CommandParameter="{Binding .}"
                                             Header="设为默认"
                                             ToolTip="设置为当前任务类型的默认预设" />
                                     </ui:MenuFlyout>

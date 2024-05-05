@@ -95,9 +95,9 @@ namespace SimpleFFmpegGUI.WPF.Pages
             DataContext = ViewModel;
         }
 
-        private void FilterButton_Click(object sender, RoutedEventArgs e)
+        private async void FilterButton_Click(object sender, RoutedEventArgs e)
         {
-            App.ServiceProvider.GetService<AllTasks>().Refresh();
+            await App.ServiceProvider.GetService<AllTasks>().RefreshAsync();
         }
     }
 }
