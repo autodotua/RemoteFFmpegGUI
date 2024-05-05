@@ -10,13 +10,13 @@ namespace SimpleFFmpegGUI.Dto
             List = new List<T>();
         }
 
-        public PagedListDto(IEnumerable<T> collection, int totalCount)
+        public PagedListDto(IList<T> list, int totalCount)
         {
             TotalCount = totalCount;
-            List = new List<T>(collection);
+            List = list;
         }
 
-        public List<T> List { get; set; }
+        public IList<T> List { get; set; }
 
         [JsonProperty]
         public int TotalCount { get; set; }

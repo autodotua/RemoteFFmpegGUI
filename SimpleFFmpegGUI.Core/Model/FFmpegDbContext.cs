@@ -45,11 +45,6 @@ namespace SimpleFFmpegGUI.Model
             }
         }
 
-        internal static FFmpegDbContext GetNew()
-        {
-            return new FFmpegDbContext();
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite(connectionString);

@@ -11,7 +11,8 @@ namespace SimpleFFmpegGUI.Manager
 {
     public class QueueManager
     {
-        private Logger logger = new Logger();
+        private readonly FFmpegDbContext db;
+        private readonly Logger logger;
         private bool cancelQueue = false;
 
         /// <summary>
@@ -23,8 +24,10 @@ namespace SimpleFFmpegGUI.Manager
         private DateTime? scheduleTime = null;
         private List<FFmpegManager> taskProcessManagers = new List<FFmpegManager>();
 
-        public QueueManager()
+        public QueueManager(FFmpegDbContext db, Logger logger)
         {
+            this.db = db;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -218,7 +221,7 @@ namespace SimpleFFmpegGUI.Manager
                 .Where(p => !p.IsDeleted);
         }
 
-        private async Task ProcessTaskAsync(FFmpegDbContext db, TaskInfo task, bool main)
+        private async Task ProcessTaskAsync(TaskInfo task, bool main)
         {
             FFmpegManager ffmpegManager = new FFmpegManager(task);
 
@@ -240,7 +243,7 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     logger.Error(task, "运行错误：" + ex.ToString());
                     task.Status = TaskStatus.Error;
-                    task.Message = ex is FFmpegArgumentException ? 
+                    task.Message = ex is FFmpegArgumentException ?
                         ex.Message : ffmpegManager.GetErrorMessage() ?? "运行错误，请查看日志";
                 }
                 else
