@@ -6,8 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF.Panels;
-using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

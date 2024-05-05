@@ -125,7 +125,7 @@ namespace SimpleFFmpegGUI.Manager
             await db.SaveChangesAsync();
         }
 
-        public Task<CodePreset> GetDefaultPreset(TaskType type)
+        public Task<CodePreset> GetDefaultPresetAsync(TaskType type)
         {
             return db.Presets.FirstOrDefaultAsync(p => p.Type == type && p.Default && !p.IsDeleted);
         }
