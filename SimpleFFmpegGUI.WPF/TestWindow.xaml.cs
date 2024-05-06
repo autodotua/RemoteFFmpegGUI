@@ -32,11 +32,13 @@ namespace SimpleFFmpegGUI.WPF
     public partial class TestWindow : Window
     {
         private const string TestDir = "test";
+        private readonly Logger logger;
         private FFmpegManager runningFFmpeg = null;
         private bool stopping = false;
-        public TestWindow(TestWindowViewModel viewModel)
+        public TestWindow(TestWindowViewModel viewModel,Logger logger)
         {
             ViewModel = viewModel;
+            this.logger = logger;
             DataContext = ViewModel;
             InitializeComponent();
             CreateDataGrids();
@@ -162,7 +164,7 @@ namespace SimpleFFmpegGUI.WPF
                 {
                     continue;
                 }
-                runningFFmpeg = new FFmpegManager(task);
+                runningFFmpeg = new FFmpegManager(task, logger);
                 runningFFmpeg.StatusChanged += (s, e) =>
                 {
                     var status = runningFFmpeg.GetStatus();
@@ -450,7 +452,7 @@ namespace SimpleFFmpegGUI.WPF
                     string qctext = ViewModel.QCMode == 0 ? $"bitrate={test.MBitrate}M&factor={codec.BitrateFactor}" : $"crf={codec.CRF}";
                     task.Output = Path.GetFullPath($"{TestDir}/codec={codec.Name}&size={sizeTexts[j]}&speed={codec.CpuSpeed}&{qctext}.mp4");
 
-                    runningFFmpeg = new FFmpegManager(task);
+                    runningFFmpeg = new FFmpegManager(task, logger);
                     runningFFmpeg.StatusChanged += (s, e) =>
                     {
                         var status = runningFFmpeg.GetStatus();
@@ -506,7 +508,7 @@ namespace SimpleFFmpegGUI.WPF
                     ViewModel.DetailProgress = 0;
 
 
-                    runningFFmpeg = new FFmpegManager(qualityTask);
+                    runningFFmpeg = new FFmpegManager(qualityTask, logger);
                     runningFFmpeg.StatusChanged += (s, e) =>
                     {
                         var status = runningFFmpeg.GetStatus();

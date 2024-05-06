@@ -12,10 +12,11 @@ namespace SimpleFFmpegGUI.Manager
     /// <summary>
     /// 计算机电源管理，控制关机
     /// </summary>
-    public class PowerManager
+    public class PowerManager(Logger logger)
     {
         private static readonly string abortShutdownCommand = "-a";
         private static readonly string shutdownCommand = $"-s -t 180 -c \"{FzLib.Program.App.ProgramName}\"";
+        private readonly Logger logger = logger;
         private bool shutdownAfterQueueFinished = false;
 
         public bool ShutdownAfterQueueFinished
@@ -24,7 +25,6 @@ namespace SimpleFFmpegGUI.Manager
             set
             {
                 shutdownAfterQueueFinished = value;
-                using Logger logger = new Logger();
                 logger.Info("收到队列结束后自动关机命令：" + value.ToString());
             }
         }
@@ -105,14 +105,12 @@ namespace SimpleFFmpegGUI.Manager
 
         public void AbortShutdown()
         {
-            using Logger logger = new Logger();
             logger.Warn("收到终止关机命令");
             Shutdown(false);
         }
 
         public void Shutdown()
         {
-            using Logger logger = new Logger();
             logger.Warn("收到关机命令");
             Shutdown(true);
         }

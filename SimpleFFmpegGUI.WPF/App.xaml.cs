@@ -83,6 +83,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void ConfigureServices(IServiceCollection services)
         {
+            services.AddFFmpegServices();
             services.AddSingleton<Config>();
 
             services.AddSingleton<TasksAndStatuses>();
@@ -120,8 +121,6 @@ namespace SimpleFFmpegGUI.WPF
             services.AddTransient<FileIOPanelViewModel>();
             services.AddTransient<PresetsPanelViewModel>();
             services.AddTransient<StatusPanelViewModel>();
-
-            services.AddFFmpegServices();
         }
 
         private void InitializeLogs()

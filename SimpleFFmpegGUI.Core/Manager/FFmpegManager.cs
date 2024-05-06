@@ -78,7 +78,7 @@ namespace SimpleFFmpegGUI.Manager
         /// <summary>
         /// 日志
         /// </summary>
-        private Logger logger = new Logger();
+        private Logger logger;
 
         /// <summary>
         /// 任务是否被暂停
@@ -91,9 +91,10 @@ namespace SimpleFFmpegGUI.Manager
         private DateTime pauseStartTime;
         private FFmpegProcess process;
 
-        public FFmpegManager(TaskInfo task)
+        public FFmpegManager(TaskInfo task, Logger logger)
         {
             this.task = task;
+            this.logger = logger;
         }
 
         /// <summary>

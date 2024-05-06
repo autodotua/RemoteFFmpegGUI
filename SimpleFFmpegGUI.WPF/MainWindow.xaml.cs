@@ -89,6 +89,35 @@ namespace SimpleFFmpegGUI.WPF
                 IsEnabled = m.IsEnabled;
             });
 
+
+            WeakReferenceMessenger.Default.Register<AddNewTabMessage>(this, (_, m) =>
+            {
+                m.Page = AddNewTab(m.Type);
+            });
+            
+            WeakReferenceMessenger.Default.Register<ShowCodeArgumentsMessage>(this, (_, m) =>
+            {
+                var task = m.Task;
+                Debug.Assert(task != null);
+                var panel = new CodeArgumentsPanel
+                {
+                    IsHitTestVisible = false
+                };
+                panel.ViewModel.Update(task.Type, task.Arguments);
+                ScrollViewer scr = new ScrollViewer();
+                scr.Content = panel;
+                Window win = new Window()
+                {
+                    Owner = this.GetWindow(),
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Content = scr,
+                    Width = 600,
+                    Height = 800,
+                    Title = "详细参数 - FFmpeg工具箱"
+                };
+                win.Show();
+            });
+
             WeakReferenceMessenger.Default.Register<QueueMessagesMessage>(this, (_, m) =>
             {
                 switch (m.Type)
@@ -119,15 +148,26 @@ namespace SimpleFFmpegGUI.WPF
         /// <typeparam name="T"></typeparam>
         /// <param name="title"></param>
         /// <param name="beforeLoad"></param>
-        public T AddNewTab<T>(string title = null/*, Action<T> beforeLoad = null*/) where T : UserControl
+        public T AddNewTab<T>(string title = null) where T : UserControl
         {
-            title ??= PageHelper.GetTitle<T>();
-            T panel = App.ServiceProvider.GetService<T>();
+            return AddNewTab(typeof(T), title) as T;
+        }
+
+        /// <summary>
+        /// 新增一个Tab项
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="title"></param>
+        /// <param name="beforeLoad"></param>
+        public object AddNewTab(Type type, string title = null)
+        {
+            title ??= PageHelper.GetTitle(type);
+            object page = App.ServiceProvider.GetService(type);
             //beforeLoad?.Invoke(panel);
-            var tabItem = new TabItem() { Header = title, Content = panel };
+            var tabItem = new TabItem() { Header = title, Content = page };
             tab.Items.Add(tabItem);
             tab.SelectedIndex = tab.Items.Count - 1;
-            return panel;
+            return page;
         }
 
         /// <summary>

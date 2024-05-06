@@ -45,9 +45,6 @@ namespace SimpleFFmpegGUI
         public Logger(FFmpegDbContext db)
         {
             this.db = db;
-        }
-        public Logger()
-        {
             lock (lockObj)
             {
                 StartTimer();
@@ -86,7 +83,6 @@ namespace SimpleFFmpegGUI
                     timer.Dispose();
                     Save();
                 }
-                db.Dispose();
             }
         }
 

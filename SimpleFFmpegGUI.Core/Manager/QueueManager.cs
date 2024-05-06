@@ -25,10 +25,11 @@ namespace SimpleFFmpegGUI.Manager
         private DateTime? scheduleTime = null;
         private List<FFmpegManager> taskProcessManagers = new List<FFmpegManager>();
 
-        public QueueManager(FFmpegDbContext db, Logger logger)
+        public QueueManager(FFmpegDbContext db, Logger logger, PowerManager powerManager)
         {
             this.db = db;
             this.logger = logger;
+            PowerManager = powerManager;
         }
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace SimpleFFmpegGUI.Manager
         /// <summary>
         /// 电源性能管理
         /// </summary>
-        public PowerManager PowerManager { get; } = new PowerManager();
+        public PowerManager PowerManager { get; } 
 
         /// <summary>
         /// 独立任务
@@ -218,7 +219,7 @@ namespace SimpleFFmpegGUI.Manager
 
         private async Task ProcessTaskAsync(TaskInfo task, bool main)
         {
-            FFmpegManager ffmpegManager = new FFmpegManager(task);
+            FFmpegManager ffmpegManager = new FFmpegManager(task, logger);
 
             task.Status = TaskStatus.Processing;
             task.StartTime = DateTime.Now;

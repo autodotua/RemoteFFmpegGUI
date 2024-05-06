@@ -14,6 +14,7 @@ namespace SimpleFFmpegGUI
                 .AddTransient<ConfigManager>()
                 .AddTransient<PresetManager>()
                 .AddTransient<TaskManager>()
+                .AddTransient<PowerManager>()
                 .AddSingleton<QueueManager>();
         }
     }

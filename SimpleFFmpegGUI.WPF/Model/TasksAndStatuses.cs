@@ -103,8 +103,6 @@ namespace SimpleFFmpegGUI.WPF.Model
                 var manager = e.NewItems[0] as FFmpegManager;
                 var unstartStatus = new StatusDto(manager.Task); //先放入一个StatusDto进行占位，因为此时Status还未生成
 
-                throw new NotImplementedException();
-                //Null reference
                 var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);//找到对应的UITaskInfo
                 Debug.Assert(task != null);
                 await task.UpdateSelfAsync(); //用TaskInfo实体更新UITaskInfo

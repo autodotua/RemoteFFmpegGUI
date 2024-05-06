@@ -5,11 +5,15 @@ using FzLib;
 using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
+using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Messages;
 using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.Pages;
+using SimpleFFmpegGUI.WPF.Panels;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,15 +22,33 @@ using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
 namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public partial class TaskListViewModel(QueueManager queue, TasksAndStatuses tasksAndStatuses, TaskManager taskManager) : ViewModelBase
+    public partial class TaskListViewModel : ViewModelBase
     {
+        private readonly QueueManager queue;
+
+        private readonly TaskManager taskManager;
+
+        private readonly TasksAndStatuses tasksAndStatuses;
+
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(Tasks))]
         private bool showAllTasks;
 
-        private readonly QueueManager queue = queue;
-        private readonly TasksAndStatuses tasksAndStatuses = tasksAndStatuses;
-        private readonly TaskManager taskManager = taskManager;
+        public TaskListViewModel(QueueManager queue, TasksAndStatuses tasksAndStatuses, TaskManager taskManager)
+        {
+            this.queue = queue;
+            this.taskManager = taskManager;
+            this.tasksAndStatuses = tasksAndStatuses;
+            Tasks.PropertyChanged += Tasks_PropertyChanged;
+        }
+
+        private void Tasks_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Tasks.SelectedTask))
+            {
+                NotifyCanExecute();
+            }
+        }
 
         public bool CanCancel => Tasks.SelectedTasks.All(p => p.Status is TaskStatus.Queue or TaskStatus.Processing);
 
@@ -34,53 +56,16 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
         public bool CanStart => Tasks.SelectedTasks.All(p => p.Status is TaskStatus.Queue);
 
+        public SelectionMode SelectionMode => ShowAllTasks ? SelectionMode.Single : SelectionMode.Extended;
+
+        public TaskCollectionBase Tasks => ShowAllTasks ?
+                                       App.ServiceProvider.GetRequiredService<AllTasks>()
+            : App.ServiceProvider.GetRequiredService<TasksAndStatuses>();
+
         public void NotifyCanExecute()
         {
             this.Notify(nameof(CanCancel), nameof(CanReset), nameof(CanStart));
         }
-
-        public TaskCollectionBase Tasks => ShowAllTasks ?
-                                       App.ServiceProvider.GetService<AllTasks>()
-            : App.ServiceProvider.GetService<TasksAndStatuses>();
-
-        public SelectionMode SelectionMode => ShowAllTasks ? SelectionMode.Single : SelectionMode.Extended;
-
-        [RelayCommand]
-        private async Task ResetAsync()
-        {
-            var tasks = tasksAndStatuses.SelectedTasks;
-            Debug.Assert(tasks.Count > 0);
-            foreach (var task in tasks)
-            {
-                await taskManager.ResetTaskAsync(task.Id);
-                await task.UpdateSelfAsync();
-                App.ServiceProvider.GetService<TasksAndStatuses>().NotifyTaskReseted(task);
-            }
-
-            NotifyCanExecute();
-        }
-
-        [RelayCommand]
-        private async Task StartStandaloneAsync()
-        {
-            try
-            {
-                var tasks = tasksAndStatuses.SelectedTasks;
-                Debug.Assert(tasks.Count > 0);
-                foreach (var task in tasks)
-                {
-                    queue.StartStandalone(task.Id);
-                    await task.UpdateSelfAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-             QueueErrorMessage("启动失败", ex);
-            }
-
-            NotifyCanExecute();
-        }
-
         [RelayCommand]
         private async Task CancelAsync()
         {
@@ -113,5 +98,116 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
             NotifyCanExecute();
         }
+
+        [RelayCommand]
+        private void Clone()
+        {
+            (SendMessage(new AddNewTabMessage(typeof(AddTaskPage))).Page as AddTaskPage)
+                .SetAsClone(Tasks.SelectedTask.ToTask());
+        }
+
+        private void OpenFileOrFolder(string path, bool folder)
+        {
+            var p = new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    UseShellExecute = true
+                }
+            };
+            if (folder)
+            {
+                p.StartInfo.FileName = "explorer.exe";
+                p.StartInfo.Arguments = @$"/select,""{path}""";
+            }
+            else
+            {
+                p.StartInfo.FileName = path;
+            }
+            p.Start();
+        }
+
+        [RelayCommand]
+        private void ShowArguments()
+        {
+            SendMessage(new ShowCodeArgumentsMessage(Tasks.SelectedTask));
+        }
+
+        [RelayCommand]
+        private void OpenOutputDir()
+        {
+            var task = Tasks.SelectedTask;
+            Debug.Assert(task != null);
+
+            OpenOutputFileOrFolder(task, true);
+        }
+
+        [RelayCommand]
+        private void OpenOutputFile()
+        {
+            var task = Tasks.SelectedTask;
+            Debug.Assert(task != null);
+            OpenOutputFileOrFolder(task, false);
+        }
+
+        private void OpenOutputFileOrFolder(UITaskInfo task, bool folder)
+        {
+            if (string.IsNullOrWhiteSpace(task.RealOutput))
+            {
+                QueueErrorMessage("输出为空");
+                return;
+            }
+            if (!File.Exists(task.RealOutput))
+            {
+                QueueErrorMessage("找不到目标文件：" + task.RealOutput);
+                return;
+            }
+            OpenFileOrFolder(task.RealOutput, folder);
+        }
+
+        [RelayCommand]
+        private async Task ResetAsync()
+        {
+            var tasks = tasksAndStatuses.SelectedTasks;
+            Debug.Assert(tasks.Count > 0);
+            foreach (var task in tasks)
+            {
+                await taskManager.ResetTaskAsync(task.Id);
+                await task.UpdateSelfAsync();
+                App.ServiceProvider.GetService<TasksAndStatuses>().NotifyTaskReseted(task);
+            }
+
+            NotifyCanExecute();
+        }
+
+        [RelayCommand]
+        private void ShowLogs()
+        {
+            var task = Tasks.SelectedTask;
+            Debug.Assert(task != null);
+            (SendMessage(new AddNewTabMessage(typeof(LogsPage))).Page as LogsPage).FillLogs(task.Id);
+        }
+
+        [RelayCommand]
+        private async Task StartStandaloneAsync()
+        {
+            try
+            {
+                var tasks = tasksAndStatuses.SelectedTasks;
+                Debug.Assert(tasks.Count > 0);
+                foreach (var task in tasks)
+                {
+                    queue.StartStandalone(task.Id);
+                    await task.UpdateSelfAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                QueueErrorMessage("启动失败", ex);
+            }
+
+            NotifyCanExecute();
+        }
+
     }
 }

@@ -14,10 +14,12 @@ namespace SimpleFFmpegGUI.Manager
         private static readonly Dictionary<string, object> cache = new Dictionary<string, object>();
 
         private readonly FFmpegDbContext db;
+        private readonly Logger logger;
 
-        public ConfigManager(FFmpegDbContext db)
+        public ConfigManager(FFmpegDbContext db,Logger logger)
         {
             this.db = db;
+            this.logger = logger;
         }
 
         public int DefaultProcessPriority
@@ -40,7 +42,6 @@ namespace SimpleFFmpegGUI.Manager
             T value = Parse<T>(item.Value);
             cache.Add(key, value);
 
-            using Logger logger = new Logger();
             logger.Info($"读取配置：[{key}]={value}");
             return value;
         }
@@ -68,7 +69,6 @@ namespace SimpleFFmpegGUI.Manager
 
             db.SaveChanges();
 
-            using Logger logger = new Logger();
             logger.Info($"写入配置：[{key}]={value}");
         }
 
