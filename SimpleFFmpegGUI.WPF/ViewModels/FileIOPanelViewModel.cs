@@ -110,6 +110,40 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 _ => throw new NotImplementedException()
             };
 
+        public string GetOutput(InputArguments inputArgs)
+        {
+            var input = inputArgs.FilePath;
+            string dir = OutputDir;
+            if (string.IsNullOrWhiteSpace(dir))//没有指定输出位置
+            {
+                dir = Config.Instance.DefaultOutputDirType switch
+                {
+                    DefaultOutputDirType.InputDir => Path.GetDirectoryName(input),
+                    DefaultOutputDirType.InputNewDir => Path.Combine(Path.GetDirectoryName(input), Config.Instance.DefaultOutputDirInputSubDirName),
+                    DefaultOutputDirType.SpecialDir => Config.Instance.DefaultOutputDirSpecialDirPath,
+                    _ => throw new NotImplementedException()
+                };
+            }
+            if (CanSetOutputFileName && !string.IsNullOrWhiteSpace(OutputFileName))
+            {
+                return Path.Combine(dir, OutputFileName);
+            }
+            return Path.Combine(dir, Path.GetFileName(input));
+        }
+
+        public List<InputArguments> GetInputs()
+        {
+            foreach (var input in Inputs)
+            {
+                input.Apply();
+            }
+            var inputs = Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath));
+            if (inputs.Count() < MinInputsCount)
+            {
+                throw new Exception("输入文件少于需要的文件数量");
+            }
+            return inputs.Cast<InputArguments>().ToList();
+        }
         /// <summary>
         /// 重置
         /// </summary>
@@ -132,6 +166,36 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 {
                     Inputs[i].FilePath = files[i];
                 }
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="inputs"></param>
+        /// <param name="output"></param>
+        /// <returns>若所有文件都被接受，返回True；若文件数量超过允许范围，返回False</returns>
+        public void Update(TaskType type, List<InputArguments> inputs, string output)
+        {
+            UpdateType(type);
+            Inputs.Clear();
+
+            foreach (var input in inputs.Take(MaxInputsCount))
+            {
+                var newInput = input.Adapt<InputArgumentsDetail>();
+                newInput.Update();
+                Inputs.Add(newInput);
+            }
+            while (Inputs.Count < MinInputsCount)
+            {
+                Inputs.Add(new InputArgumentsDetail());
+            }
+            OutputDir = Path.GetDirectoryName(output);
+            OutputFileName = Path.GetFileName(output);
+            if (inputs.Count > MaxInputsCount)
+            {
+                QueueErrorMessage("输入文件超过该类型最大数量");
             }
         }
 
@@ -161,48 +225,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 _ => false
             };
         }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="inputs"></param>
-        /// <param name="output"></param>
-        /// <returns>若所有文件都被接受，返回True；若文件数量超过允许范围，返回False</returns>
-        public void Update(TaskType type, List<InputArguments> inputs, string output)
-        {
-            UpdateType(type);
-            Inputs.Clear();
-
-            foreach (var input in inputs.Take(MaxInputsCount))
-            {
-                var newInput = input.Adapt<InputArgumentsDetail>();
-                newInput.Update();
-                Inputs.Add(newInput);
-            }
-            while (Inputs.Count < MinInputsCount)
-            {
-                Inputs.Add(new InputArgumentsDetail());
-            }
-            OutputDir = Path.GetDirectoryName(output);
-            OutputFileName = Path.GetFileName(output);
-            if( inputs.Count > MaxInputsCount)
-            {
-                QueueErrorMessage("输入文件超过该类型最大数量");
-            }
-        }
-
-        private void Inputs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            for (int i = 0; i < Inputs.Count; i++)
-            {
-                Inputs[i].Index = i + 1;
-                Inputs[i].CanDelete = Inputs.Count > MinInputsCount;
-            }
-            this.Notify(nameof(CanSetOutputFileName));
-        }
-
-
         [RelayCommand]
         private async Task BrowseFile(InputArgumentsDetail input)
         {
@@ -228,12 +250,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         }
 
         [RelayCommand]
-        private void RemoveFile(InputArgumentsDetail input)
-        {
-            Inputs.Remove(input);
-        }
-
-        [RelayCommand]
         private void BrowseOutputFile()
         {
             var dialog = new OpenFolderDialog();
@@ -253,12 +269,12 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 Debug.Assert(input != null);
                 if (string.IsNullOrEmpty(input.FilePath))
                 {
-                 QueueErrorMessage("请先设置文件地址");
+                    QueueErrorMessage("请先设置文件地址");
                     return;
                 }
                 if (!File.Exists(input.FilePath))
                 {
-                   QueueErrorMessage($"找不到文件{input.FilePath}");
+                    QueueErrorMessage($"找不到文件{input.FilePath}");
                     return;
                 }
                 SendMessage(new WindowEnableMessage(false));
@@ -308,6 +324,21 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             {
                 SendMessage(new WindowEnableMessage(true));
             }
+        }
+
+        private void Inputs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            for (int i = 0; i < Inputs.Count; i++)
+            {
+                Inputs[i].Index = i + 1;
+                Inputs[i].CanDelete = Inputs.Count > MinInputsCount;
+            }
+            this.Notify(nameof(CanSetOutputFileName));
+        }
+        [RelayCommand]
+        private void RemoveFile(InputArgumentsDetail input)
+        {
+            Inputs.Remove(input);
         }
     }
 }

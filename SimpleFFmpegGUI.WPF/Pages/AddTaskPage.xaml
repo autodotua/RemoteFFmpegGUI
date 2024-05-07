@@ -9,6 +9,7 @@
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:system="clr-namespace:System;assembly=netstandard"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
@@ -102,14 +103,22 @@
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
             <ui:AppBarButton
-                Click="AddToQueueButton_Click"
+                Command="{Binding AddToQueueCommand}"
                 Icon="Add"
-                Label="创建任务" />
+                Label="创建任务">
+                <ui:AppBarButton.CommandParameter>
+                    <system:Boolean>false</system:Boolean>
+                </ui:AppBarButton.CommandParameter>
+            </ui:AppBarButton>
             <ui:AppBarButton
-                Click="AddToQueueButton_Click"
+                Command="{Binding AddToQueueCommand}"
                 Icon="Add"
                 Label="创建并启动"
-                Tag="queue" />
+                Tag="queue">
+                <ui:AppBarButton.CommandParameter>
+                    <system:Boolean>true</system:Boolean>
+                </ui:AppBarButton.CommandParameter>
+            </ui:AppBarButton>
             <ui:AppBarSeparator />
             <ui:CommandBar.SecondaryCommands>
                 <ui:AppBarToggleButton

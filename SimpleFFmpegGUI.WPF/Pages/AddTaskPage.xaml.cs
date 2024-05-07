@@ -1,6 +1,5 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
 using FFMpegCore.Exceptions;
-using FzLib;
 using FzLib.Collection;
 using FzLib.WPF;
 using Mapster;
@@ -11,8 +10,8 @@ using SimpleFFmpegGUI.FFmpegArgument;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -32,46 +31,6 @@ using System.Windows.Shapes;
 
 namespace SimpleFFmpegGUI.WPF.Pages
 {
-    public class AddTaskPageViewModel : INotifyPropertyChanged
-    {
-        public AddTaskPageViewModel(QueueManager queue)
-        {
-            Queue = queue;
-        }
-
-        public IEnumerable TaskTypes => Enum.GetValues(typeof(TaskType));
-        private TaskType type;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public TaskType Type
-        {
-            get => type;
-            set
-            {
-                this.SetValueAndNotify(ref type, value, nameof(Type));
-                CanAddFile = value is TaskType.Code or TaskType.Concat;
-            }
-        }
-
-        public QueueManager Queue { get; }
-
-        private bool allowChangeType = true;
-
-        public bool AllowChangeType
-        {
-            get => allowChangeType;
-            set => this.SetValueAndNotify(ref allowChangeType, value, nameof(AllowChangeType));
-        }
-
-        private bool canAddFile;
-
-        public bool CanAddFile
-        {
-            get => canAddFile;
-            set => this.SetValueAndNotify(ref canAddFile, value, nameof(CanAddFile));
-        }
-    }
 
     /// <summary>
     /// Interaction logic for AddTaskPage.xaml
@@ -85,8 +44,12 @@ namespace SimpleFFmpegGUI.WPF.Pages
             ViewModel = viewModel;
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             DataContext = ViewModel;
+            ViewModel = this.SetDataContext<AddTaskPageViewModel>();
             InitializeComponent();
             presetsPanel.ViewModel.CodeArgumentsViewModel = argumentsPanel.ViewModel;
+            ViewModel.CodeArgumentsViewModel = argumentsPanel.ViewModel;
+            ViewModel.PresetsViewModel= presetsPanel.ViewModel;
+            ViewModel.FileIOViewModel = fileIOPanel.ViewModel;
         }
 
         private bool canInitializeType = true;
@@ -133,24 +96,21 @@ namespace SimpleFFmpegGUI.WPF.Pages
                     case TaskType.Code://需要将输入文件单独加入任务
                         foreach (var input in inputs)
                         {
-                            TaskInfo task = null;
-                            await tm.AddTaskAsync(TaskType.Code, new List<InputArguments>() { input }, fileIOPanel.GetOutput(input), args);
+                            TaskInfo task = await tm.AddTaskAsync(TaskType.Code, new List<InputArguments>() { input }, fileIOPanel.GetOutput(input), args);
                             Dispatcher.Invoke(() => App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task)));
                         }
                         this.CreateMessage().QueueSuccess($"已加入{inputs.Count}个任务队列");
                         break;
                     case TaskType.Custom or TaskType.Compare://不存在文件输出
                         {
-                            TaskInfo task = null;
-                            await tm.AddTaskAsync(ViewModel.Type, inputs, null, args);
+                            TaskInfo task = await tm.AddTaskAsync(ViewModel.Type, inputs, null, args);
                             App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
                             this.CreateMessage().QueueSuccess("已加入队列");
                         }
                         break;
                     default:
                         {
-                            TaskInfo task = null;
-                            await tm.AddTaskAsync(ViewModel.Type, inputs, fileIOPanel.GetOutput(inputs[0]), args);
+                            TaskInfo task = await tm.AddTaskAsync(ViewModel.Type, inputs, fileIOPanel.GetOutput(inputs[0]), args);
                             App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
                             this.CreateMessage().QueueSuccess("已加入队列");
                         }
@@ -303,15 +263,6 @@ namespace SimpleFFmpegGUI.WPF.Pages
             }
         }
 
-        private void SaveAsLastOutputArguments(OutputArguments arguments)
-        {
-            if (!Config.Instance.RememberLastArguments)
-            {
-                return;
-            }
-            Config.Instance.LastOutputArguments.AddOrSetValue(ViewModel.Type, arguments);
-            Config.Instance.Save();
-        }
 
         private void ClearFilesButton_Click(object sender, RoutedEventArgs e)
         {

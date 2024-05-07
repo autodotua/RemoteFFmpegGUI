@@ -65,40 +65,8 @@ namespace SimpleFFmpegGUI.WPF.Panels
             }
         }
 
-        public List<InputArguments> GetInputs()
-        {
-            foreach (var input in ViewModel.Inputs)
-            {
-                input.Apply();
-            }
-            var inputs = ViewModel.Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath));
-            if (inputs.Count() < ViewModel.MinInputsCount)
-            {
-                throw new Exception("输入文件少于需要的文件数量");
-            }
-            return inputs.Cast<InputArguments>().ToList();
-        }
 
-        public string GetOutput(InputArguments inputArgs)
-        {
-            var input = inputArgs.FilePath;
-            string dir = ViewModel.OutputDir;
-            if (string.IsNullOrWhiteSpace(dir))//没有指定输出位置
-            {
-                dir = Config.Instance.DefaultOutputDirType switch
-                {
-                    DefaultOutputDirType.InputDir => Path.GetDirectoryName(input),
-                    DefaultOutputDirType.InputNewDir => Path.Combine(Path.GetDirectoryName(input), Config.Instance.DefaultOutputDirInputSubDirName),
-                    DefaultOutputDirType.SpecialDir => Config.Instance.DefaultOutputDirSpecialDirPath,
-                    _ => throw new NotImplementedException()
-                };
-            }
-            if (ViewModel.CanSetOutputFileName && !string.IsNullOrWhiteSpace(ViewModel.OutputFileName))
-            {
-                return Path.Combine(dir, ViewModel.OutputFileName);
-            }
-            return Path.Combine(dir, Path.GetFileName(input));
-        }
+
 
         /// <summary>
         /// 用于添加到远程主机，获取输出文件名
