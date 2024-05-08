@@ -1,4 +1,5 @@
-﻿using FzLib;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using FzLib;
 using FzLib.DataStorage.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -22,29 +23,36 @@ namespace SimpleFFmpegGUI.WPF
         SpecialDir
     }
 
-    public class Config : IJsonSerializable, INotifyPropertyChanged
+    public partial class Config : ObservableObject, IJsonSerializable, INotifyPropertyChanged
     {
         private const string path = "config.json";
 
         private static bool loaded = false;
 
+        [ObservableProperty]
         private bool clearFilesAfterAddTask;
 
+        [ObservableProperty]
         private string defaultOutputDirInputSubDirName = "output";
 
+        [ObservableProperty]
         private string defaultOutputDirSpecialDirPath = "C:\\output";
 
+        [ObservableProperty]
         private DefaultOutputDirType defaultOutputDirType = DefaultOutputDirType.InputDir;
 
+        [ObservableProperty]
         private bool rememberLastArguments = true;
 
+        [ObservableProperty]
         private List<RemoteHost> remoteHosts = new List<RemoteHost>();
 
+        [ObservableProperty]
         private bool smoothScroll = true;
 
+        [ObservableProperty]
         private bool startQueueAfterAddTask = true;
 
-        public event PropertyChangedEventHandler PropertyChanged;
         public static Config Instance
         {
             get
@@ -63,49 +71,8 @@ namespace SimpleFFmpegGUI.WPF
                 return App.ServiceProvider.GetService<Config>();
             }
         }
-        public bool ClearFilesAfterAddTask
-        {
-            get => clearFilesAfterAddTask;
-            set => this.SetValueAndNotify(ref clearFilesAfterAddTask, value, nameof(ClearFilesAfterAddTask));
-        }
-
-        public string DefaultOutputDirInputSubDirName
-        {
-            get => defaultOutputDirInputSubDirName;
-            set => this.SetValueAndNotify(ref defaultOutputDirInputSubDirName, value, nameof(DefaultOutputDirInputSubDirName));
-        }
-
-        public string DefaultOutputDirSpecialDirPath
-        {
-            get => defaultOutputDirSpecialDirPath;
-            set => this.SetValueAndNotify(ref defaultOutputDirSpecialDirPath, value, nameof(DefaultOutputDirSpecialDirPath));
-        }
-
-        public DefaultOutputDirType DefaultOutputDirType
-        {
-            get => defaultOutputDirType;
-            set => this.SetValueAndNotify(ref defaultOutputDirType, value, nameof(DefaultOutputDirType));
-        }
 
         public Dictionary<TaskType, OutputArguments> LastOutputArguments { get; set; } = new Dictionary<TaskType, OutputArguments>();
-
-        public bool RememberLastArguments
-        {
-            get => rememberLastArguments;
-            set => this.SetValueAndNotify(ref rememberLastArguments, value, nameof(RememberLastArguments));
-        }
-
-        public List<RemoteHost> RemoteHosts
-        {
-            get => remoteHosts;
-            set => this.SetValueAndNotify(ref remoteHosts, value, nameof(RemoteHosts));
-        }
-
-        public bool SmoothScroll
-        {
-            get => smoothScroll;
-            set => this.SetValueAndNotify(ref smoothScroll, value, nameof(SmoothScroll));
-        }
 
         public PerformanceTestCodecParameter[] TestCodecs { get; set; }
         public PerformanceTestLine[] TestItems { get; set; }
@@ -115,6 +82,11 @@ namespace SimpleFFmpegGUI.WPF
         public void Save()
         {
             this.Save(path, new JsonSerializerSettings().SetIndented());
+        }
+        public Config DeepCopy()
+        {
+            var serialized = JsonConvert.SerializeObject(this);
+            return JsonConvert.DeserializeObject<Config>(serialized);
         }
     }
 

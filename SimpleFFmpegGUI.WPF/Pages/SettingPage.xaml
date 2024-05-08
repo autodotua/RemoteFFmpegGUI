@@ -27,7 +27,7 @@
                 Spacing="8">
                 <CheckBox
                     Content="平滑滚动"
-                    IsChecked="{Binding SmoothScroll}" />
+                    IsChecked="{Binding Configs.SmoothScroll}" />
 
                 <ui:SimpleStackPanel
                     Orientation="Horizontal"
@@ -35,12 +35,12 @@
                     <CheckBox
                         VerticalAlignment="Center"
                         Content="记住上次的输出参数"
-                        IsChecked="{Binding RememberLastArguments}" />
+                        IsChecked="{Binding Configs.RememberLastArguments}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Opacity="0.5"
                         Text="开启该选项时，默认预设功能将不可用"
-                        Visibility="{Binding RememberLastArguments, Converter={StaticResource Bool2VisibilityConverter}}" />
+                        Visibility="{Binding Configs.RememberLastArguments, Converter={StaticResource Bool2VisibilityConverter}}" />
                 </ui:SimpleStackPanel>
                 <ui:SimpleStackPanel
                     Orientation="Horizontal"
@@ -49,7 +49,7 @@
                         Width="200"
                         ui:ControlHelper.Header="默认输出文件夹"
                         ItemsSource="{Binding DefaultOutputDirTypes}"
-                        SelectedItem="{Binding DefaultOutputDirType}">
+                        SelectedItem="{Binding Configs.DefaultOutputDirType}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
@@ -59,17 +59,17 @@
                     <TextBox
                         Width="360"
                         ui:ControlHelper.Header="指定文件夹的名称"
-                        Text="{Binding DefaultOutputDirInputSubDirName}"
-                        Visibility="{Binding DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=InputNewDir}" />
+                        Text="{Binding Configs.DefaultOutputDirInputSubDirName}"
+                        Visibility="{Binding Configs.DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=InputNewDir}" />
                     <TextBox
                         Width="360"
                         ui:ControlHelper.Header="指定文件夹的路径"
-                        Text="{Binding DefaultOutputDirSpecialDirPath}"
-                        Visibility="{Binding DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=SpecialDir}" />
+                        Text="{Binding Configs.DefaultOutputDirSpecialDirPath}"
+                        Visibility="{Binding Configs.DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=SpecialDir}" />
                     <Button
                         VerticalAlignment="Bottom"
-                        Click="BrowseSpecialDirPathButton_Click"
-                        Visibility="{Binding DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=SpecialDir}">
+                        Command="{Binding BrowseSpecialDirPathCommand}"
+                        Visibility="{Binding Configs.DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=SpecialDir}">
                         <ui:SymbolIcon Symbol="OpenFile" />
                     </Button>
                 </ui:SimpleStackPanel>
@@ -106,7 +106,7 @@
             Grid.Row="2"
             Header="远程管理主机">
             <DataGrid
-                c:SmoothScrollViewerHelper.SmoothScroll="{Binding SmoothScroll}"
+                c:SmoothScrollViewerHelper.SmoothScroll="{Binding Configs.SmoothScroll}"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
                 CanUserDeleteRows="True"
@@ -129,19 +129,19 @@
             Margin="-8"
             MouseEnter="CommandBar_MouseEnter">
             <ui:AppBarButton
-                Click="AddRemoteHost_Click"
+                Command="{Binding AddRemoteHostCommand}"
                 Icon="Add"
                 Label="新增远程主机" />
             <ui:AppBarSeparator />
             <ui:AppBarButton
-                Click="CancelButton_Click"
+                Command="{Binding CancelCommand}"
                 Label="取消">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE106;" />
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
             <ui:AppBarButton
-                Click="OKButton_Click"
+                Command="{Binding SaveCommand}"
                 Label="保存">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE73E;" />
