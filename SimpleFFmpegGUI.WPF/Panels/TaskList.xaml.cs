@@ -30,16 +30,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
 {
     public partial class TaskList : UserControl
     {
+        public static readonly DependencyProperty ShowAllTasksProperty = DependencyProperty.Register(
+            nameof(ShowAllTasks), typeof(bool), typeof(TaskList));
+
         public TaskList()
         {
             InitializeComponent();
             ViewModel = this.SetDataContext<TaskListViewModel>();
         }
-
-
-        public static readonly DependencyProperty ShowAllTasksProperty = DependencyProperty.Register(
-            nameof(ShowAllTasks), typeof(bool), typeof(TaskList));
-
         public bool ShowAllTasks
         {
             get => (bool)GetValue(ShowAllTasksProperty);
@@ -48,6 +46,14 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public TaskListViewModel ViewModel { get; }
 
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
+            if (e.Property == ShowAllTasksProperty)
+            {
+                ViewModel.ShowAllTasks = (bool)e.NewValue;
+            }
+        }
         private void UpdateDetailHeight()
         {
             bdDetail.Height = App.ServiceProvider.GetService<MainWindow>().IsUiCompressMode && !ShowAllTasks ? 108 : double.NaN;
