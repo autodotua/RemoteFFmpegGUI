@@ -59,87 +59,10 @@ namespace SimpleFFmpegGUI.WPF
             RegisterMessages();
         }
 
-        private void RegisterMessages()
-        {
-            WeakReferenceMessenger.Default.Register<FileDialogMessage>(this, (_, m) =>
-            {
-                switch (m.Dialog)
-                {
-                    case OpenFileDialog ofd:
-                        m.Result = ofd.ShowDialog(this);
-                        break;
-                    case SaveFileDialog sfd:
-                        m.Result = sfd.ShowDialog(this);
-                        break;
-                    case OpenFolderDialog ofod:
-                        m.Result = ofod.ShowDialog(this);
-                        break;
-                    default:
-                        break;
-                }
-            });
-
-            WeakReferenceMessenger.Default.Register<WindowHandleMessage>(this, (_, m) =>
-            {
-                m.Handle = new WindowInteropHelper(this).Handle;
-            });
-
-            WeakReferenceMessenger.Default.Register<WindowEnableMessage>(this, (_, m) =>
-            {
-                IsEnabled = m.IsEnabled;
-            });
-
-
-            WeakReferenceMessenger.Default.Register<AddNewTabMessage>(this, (_, m) =>
-            {
-                m.Page = AddNewTab(m.Type);
-            });
-            
-            WeakReferenceMessenger.Default.Register<ShowCodeArgumentsMessage>(this, (_, m) =>
-            {
-                var task = m.Task;
-                Debug.Assert(task != null);
-                var panel = new CodeArgumentsPanel
-                {
-                    IsHitTestVisible = false
-                };
-                panel.ViewModel.Update(task.Type, task.Arguments);
-                ScrollViewer scr = new ScrollViewer();
-                scr.Content = panel;
-                Window win = new Window()
-                {
-                    Owner = this.GetWindow(),
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    Content = scr,
-                    Width = 600,
-                    Height = 800,
-                    Title = "详细参数 - FFmpeg工具箱"
-                };
-                win.Show();
-            });
-
-            WeakReferenceMessenger.Default.Register<QueueMessagesMessage>(this, (_, m) =>
-            {
-                switch (m.Type)
-                {
-                    case 'S':
-                        this.CreateMessage().QueueSuccess(m.Message);
-                        break;
-                    case 'E' when m.Exception == null:
-                        this.CreateMessage().QueueError(m.Message);
-                        break;
-                    case 'E' when m.Exception != null:
-                        this.CreateMessage().QueueError(m.Message, m.Exception);
-                        break;
-                    default:
-                        break;
-                }
-            });
-        }
-
         public event EventHandler UiCompressModeChanged;
 
         public bool IsUiCompressMode { get; private set; }
+
         public MainWindowViewModel ViewModel { get; set; }
 
         /// <summary>
@@ -249,6 +172,7 @@ namespace SimpleFFmpegGUI.WPF
                 }
             }
         }
+
         protected override async void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
@@ -378,6 +302,83 @@ namespace SimpleFFmpegGUI.WPF
             AddNewTab<PresetsPage>();
         }
 
+        private void RegisterMessages()
+        {
+            WeakReferenceMessenger.Default.Register<FileDialogMessage>(this, (_, m) =>
+            {
+                switch (m.Dialog)
+                {
+                    case OpenFileDialog ofd:
+                        m.Result = ofd.ShowDialog(this);
+                        break;
+                    case SaveFileDialog sfd:
+                        m.Result = sfd.ShowDialog(this);
+                        break;
+                    case OpenFolderDialog ofod:
+                        m.Result = ofod.ShowDialog(this);
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            WeakReferenceMessenger.Default.Register<WindowHandleMessage>(this, (_, m) =>
+            {
+                m.Handle = new WindowInteropHelper(this).Handle;
+            });
+
+            WeakReferenceMessenger.Default.Register<WindowEnableMessage>(this, (_, m) =>
+            {
+                IsEnabled = m.IsEnabled;
+            });
+
+
+            WeakReferenceMessenger.Default.Register<AddNewTabMessage>(this, (_, m) =>
+            {
+                m.Page = AddNewTab(m.Type);
+            });
+            
+            WeakReferenceMessenger.Default.Register<ShowCodeArgumentsMessage>(this, (_, m) =>
+            {
+                var task = m.Task;
+                Debug.Assert(task != null);
+                var panel = new CodeArgumentsPanel
+                {
+                    IsHitTestVisible = false
+                };
+                panel.ViewModel.Update(task.Type, task.Arguments);
+                ScrollViewer scr = new ScrollViewer();
+                scr.Content = panel;
+                Window win = new Window()
+                {
+                    Owner = this.GetWindow(),
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Content = scr,
+                    Width = 600,
+                    Height = 800,
+                    Title = "详细参数 - FFmpeg工具箱"
+                };
+                win.Show();
+            });
+
+            WeakReferenceMessenger.Default.Register<QueueMessagesMessage>(this, (_, m) =>
+            {
+                switch (m.Type)
+                {
+                    case 'S':
+                        this.CreateMessage().QueueSuccess(m.Message);
+                        break;
+                    case 'E' when m.Exception == null:
+                        this.CreateMessage().QueueError(m.Message);
+                        break;
+                    case 'E' when m.Exception != null:
+                        this.CreateMessage().QueueError(m.Message, m.Exception);
+                        break;
+                    default:
+                        break;
+                }
+            });
+        }
         private void ResetUI(bool force = false)
         {
             if (tab.SelectedIndex == 0 && !topTab.HasContent

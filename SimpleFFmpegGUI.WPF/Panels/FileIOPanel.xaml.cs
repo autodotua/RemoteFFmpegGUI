@@ -44,55 +44,6 @@ namespace SimpleFFmpegGUI.WPF.Panels
 
         public FileIOPanelViewModel ViewModel { get; }
 
-        public void AddInput()
-        {
-            if (ViewModel.Inputs.Count >= ViewModel.MaxInputsCount)
-            {
-                throw new NotSupportedException("无法继续增加输入文件");
-            }
-            ViewModel.Inputs.Add(new InputArgumentsDetail());
-        }
-
-        public void BrowseAndAddInput()
-        {
-            var dialog = new OpenFileDialog().AddAllFilesFilter();
-            string path = dialog.GetPath(this.GetWindow());
-            if (path != null)
-            {
-                var input = new InputArgumentsDetail();
-                input.FilePath = path;
-                ViewModel.Inputs.Add(input);
-            }
-        }
-
-
-
-
-        /// <summary>
-        /// 用于添加到远程主机，获取输出文件名
-        /// </summary>
-        /// <returns></returns>
-        public string GetOutputFileName()
-        {
-            if (ViewModel.CanSetOutputFileName)//需要可以设置输出文件名
-            {
-                if (!string.IsNullOrWhiteSpace(ViewModel.OutputFileName))//如果手动指定
-                {
-                    return ViewModel.OutputFileName;
-                }
-                if (ViewModel.Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath)).Any())//如果未手动指定并且存在输入文件
-                {
-                    return Path.GetFileName(ViewModel.Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath)).First().FilePath);
-                }
-            }
-            return null;
-        }
-
-        public void Reset()
-        {
-            ViewModel.Reset(false);
-        }
-
         public void Update(TaskType type, List<InputArguments> inputs, string output)
         {
             ViewModel.Update(type, inputs, output);

@@ -110,6 +110,29 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 _ => throw new NotImplementedException()
             };
 
+        public void AddInput()
+        {
+            if (Inputs.Count >= MaxInputsCount)
+            {
+                throw new NotSupportedException("无法继续增加输入文件");
+            }
+            Inputs.Add(new InputArgumentsDetail());
+        }
+
+        public List<InputArguments> GetInputs()
+        {
+            foreach (var input in Inputs)
+            {
+                input.Apply();
+            }
+            var inputs = Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath));
+            if (inputs.Count() < MinInputsCount)
+            {
+                throw new Exception("输入文件少于需要的文件数量");
+            }
+            return inputs.Cast<InputArguments>().ToList();
+        }
+
         public string GetOutput(InputArguments inputArgs)
         {
             var input = inputArgs.FilePath;
@@ -129,20 +152,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 return Path.Combine(dir, OutputFileName);
             }
             return Path.Combine(dir, Path.GetFileName(input));
-        }
-
-        public List<InputArguments> GetInputs()
-        {
-            foreach (var input in Inputs)
-            {
-                input.Apply();
-            }
-            var inputs = Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath));
-            if (inputs.Count() < MinInputsCount)
-            {
-                throw new Exception("输入文件少于需要的文件数量");
-            }
-            return inputs.Cast<InputArguments>().ToList();
         }
         /// <summary>
         /// 重置
@@ -339,6 +348,26 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         private void RemoveFile(InputArgumentsDetail input)
         {
             Inputs.Remove(input);
+        }
+
+        /// <summary>
+        /// 用于添加到远程主机，获取输出文件名
+        /// </summary>
+        /// <returns></returns>
+        public string GetOutputFileName()
+        {
+            if (CanSetOutputFileName)//需要可以设置输出文件名
+            {
+                if (!string.IsNullOrWhiteSpace(OutputFileName))//如果手动指定
+                {
+                    return OutputFileName;
+                }
+                if (Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath)).Any())//如果未手动指定并且存在输入文件
+                {
+                    return Path.GetFileName(Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath)).First().FilePath);
+                }
+            }
+            return null;
         }
     }
 }
