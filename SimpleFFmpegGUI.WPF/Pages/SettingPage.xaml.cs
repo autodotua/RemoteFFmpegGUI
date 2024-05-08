@@ -93,7 +93,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
         private void BrowseSpecialDirPathButton_Click(object sender, RoutedEventArgs e)
         {
             var path = new OpenFolderDialog().GetPath(this.GetWindow());
-            if (path != null)
+            if (!string.IsNullOrEmpty(path))
             {
                 ViewModel.DefaultOutputDirSpecialDirPath = path;
             }

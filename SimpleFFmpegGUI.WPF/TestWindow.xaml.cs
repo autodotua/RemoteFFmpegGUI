@@ -51,7 +51,7 @@ namespace SimpleFFmpegGUI.WPF
         {
             var dialog = new OpenFileDialog().AddFilter("视频", "mp4", "mov", "mkv", "avi");
             string path = dialog.GetPath(this);
-            if (path != null)
+            if (!string.IsNullOrEmpty(path))
             {
                 ViewModel.TestVideo = path;
             }

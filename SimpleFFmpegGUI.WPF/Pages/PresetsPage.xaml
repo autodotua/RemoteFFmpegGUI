@@ -9,6 +9,7 @@
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
+    x:Name="root"
     mc:Ignorable="d">
     <DockPanel>
 
@@ -16,15 +17,15 @@
             Grid.Row="99"
             DockPanel.Dock="Bottom">
             <ui:AppBarButton
-                Click="DeleteAllButton_Click"
+                Command="{Binding DeleteAllCommand}"
                 Icon="Delete"
                 Label="删除所有预设" />
             <ui:AppBarButton
-                Click="ImportButton_Click"
+                Command="{Binding ImportCommand}"
                 Icon="Download"
                 Label="导入" />
             <ui:AppBarButton
-                Click="ExportButton_Click"
+                Command="{Binding ExportCommand}"
                 Icon="Upload"
                 Label="导出所有预设" />
         </ui:CommandBar>
@@ -96,7 +97,8 @@
                             <Button
                                 Grid.Column="4"
                                 Background="Transparent"
-                                Click="DeleteButton_Click">
+                                Command="{Binding DataContext.DeleteCommand, ElementName=root}"
+                                CommandParameter="{Binding .}">
                                 <ui:SymbolIcon Symbol="Delete" />
                             </Button>
                         </Grid>
@@ -124,16 +126,16 @@
                         Spacing="8">
                         <Button
                             Width="96"
-                            Click="SetDefaultButton_Click"
+                            Command="{Binding SetDefaultAsyncCommand}"
                             Content="设为默认"
                             IsEnabled="{Binding SelectedPreset.Default, Converter={StaticResource InverseBoolConverter}}" />
                         <Button
                             Width="96"
-                            Click="CancelButton_Click"
-                            Content="取消" />
+                            Command="{Binding UnselectCommand}"
+                            Content="关闭" />
                         <Button
                             Width="96"
-                            Click="SaveButton_Click"
+                            Command="{Binding SaveCommand}"
                             Content="保存" />
                     </ui:SimpleStackPanel>
                 </Grid>

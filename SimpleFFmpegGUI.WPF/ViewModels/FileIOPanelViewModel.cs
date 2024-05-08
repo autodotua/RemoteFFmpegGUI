@@ -240,7 +240,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             var dialog = new Microsoft.Win32.OpenFileDialog().AddAllFilesFilter();
             SendMessage(new FileDialogMessage(dialog));
             string path = dialog.FileName;
-            if (path != null)
+            if (!string.IsNullOrEmpty(path))
             {
                 if (input.Image2)
                 {
@@ -264,7 +264,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             var dialog = new OpenFolderDialog();
             SendMessage(new FileDialogMessage(dialog));
             string path = dialog.FolderName;
-            if (path != null)
+            if (!string.IsNullOrEmpty(path))
             {
                 OutputDir = path;
             }

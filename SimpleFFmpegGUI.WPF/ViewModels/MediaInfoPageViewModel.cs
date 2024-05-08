@@ -60,7 +60,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             SendMessage(new FileDialogMessage(dialog));
 
             string path = dialog.FileName;
-            if (path != null)
+            if (!string.IsNullOrEmpty(path))
             {
                 FilePath = path;
             }
