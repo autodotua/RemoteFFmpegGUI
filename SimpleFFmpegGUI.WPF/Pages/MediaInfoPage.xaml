@@ -13,7 +13,6 @@
     AllowDrop="True"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <local:Bitrate2StringConverter x:Key="Bitrate2StringConverter" />
         <Style
             x:Key="KeyStyle"
             TargetType="{x:Type TextBlock}">
@@ -42,7 +41,7 @@
             <TextBox Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}" />
             <Button
                 Grid.Column="2"
-                Click="Button_Click">
+                Command="{Binding BrowseFileCommand}">
                 <ui:SymbolIcon Symbol="BrowsePhotos" />
             </Button>
         </Grid>
@@ -318,10 +317,5 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Background="Transparent" />
-        <mext:ProgressRingOverlay
-            x:Name="ring"
-            Grid.RowSpan="99"
-            Grid.ColumnSpan="99"
-            Margin="-8" />
     </Grid>
 </UserControl>

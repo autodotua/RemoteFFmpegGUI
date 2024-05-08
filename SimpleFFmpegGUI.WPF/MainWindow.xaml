@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mext="clr-namespace:ModernWpf.FzExtension;assembly=ModernWpf.FzExtension"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="FFmpeg 工具箱"
@@ -316,5 +317,10 @@
             Grid.Column="2"
             Background="{DynamicResource SystemControlBackgroundChromeBlackHighBrush}"
             Visibility="{Binding TopTabVisibility}" />
+        <mext:ProgressRingOverlay
+            x:Name="ring"
+            Grid.RowSpan="99"
+            Grid.ColumnSpan="99"
+            Margin="-8" />
     </Grid>
 </Window>

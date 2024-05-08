@@ -329,7 +329,14 @@ namespace SimpleFFmpegGUI.WPF
 
             WeakReferenceMessenger.Default.Register<WindowEnableMessage>(this, (_, m) =>
             {
-                IsEnabled = m.IsEnabled;
+                if(m.IsEnabled)
+                {
+                    ring.Hide();
+                }
+                else
+                {
+                    ring.Show();
+                }
             });
 
 
@@ -379,6 +386,7 @@ namespace SimpleFFmpegGUI.WPF
                 }
             });
         }
+
         private void ResetUI(bool force = false)
         {
             if (tab.SelectedIndex == 0 && !topTab.HasContent

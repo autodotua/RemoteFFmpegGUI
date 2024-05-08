@@ -17,6 +17,7 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:NameDescriptionAttributeValueConverter x:Key="NameDescriptionAttributeValueConverter" />
             <converters:HourMinSecTimeSpanConverter x:Key="HourMinSecTimeSpanConverter" />
+            <converters:Bitrate2StringConverter x:Key="Bitrate2StringConverter" />
             <converters:CountEqualsOneValueConverter x:Key="CountEqualsOneValueConverter" />
             <converters:Index2StringConverter x:Key="Index2StringConverter" />
             <system:String x:Key="DateTimeFormat">yyyy-MM-dd HH:mm:ss</system:String>
