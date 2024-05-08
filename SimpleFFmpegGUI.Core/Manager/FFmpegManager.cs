@@ -91,10 +91,10 @@ namespace SimpleFFmpegGUI.Manager
         private DateTime pauseStartTime;
         private FFmpegProcess process;
 
-        public FFmpegManager(TaskInfo task, Logger logger)
+        public FFmpegManager(TaskInfo task)
         {
             this.task = task;
-            this.logger = logger;
+            logger = new Logger(new FFmpegDbContext());
         }
 
         /// <summary>

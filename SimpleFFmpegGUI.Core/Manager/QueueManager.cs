@@ -219,7 +219,7 @@ namespace SimpleFFmpegGUI.Manager
 
         private async Task ProcessTaskAsync(TaskInfo task, bool main)
         {
-            FFmpegManager ffmpegManager = new FFmpegManager(task, logger);
+            FFmpegManager ffmpegManager = new FFmpegManager(task);
 
             task.Status = TaskStatus.Processing;
             task.StartTime = DateTime.Now;

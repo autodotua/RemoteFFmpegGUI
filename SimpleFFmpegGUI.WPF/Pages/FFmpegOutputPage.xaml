@@ -13,7 +13,6 @@
     xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:system="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Loaded="UserControl_Loaded"
     mc:Ignorable="d">
     <DockPanel>
 
@@ -21,11 +20,11 @@
             Grid.Row="99"
             DockPanel.Dock="Bottom">
             <ui:AppBarButton
-                Click="ClearAllButton_Click"
+                Command="{Binding ClearAllCommand}"
                 Icon="Clear"
                 Label="清空" />
             <ui:AppBarButton
-                Click="CopyAllButton_Click"
+                Command="{Binding CopyAllCommand}"
                 Icon="Copy"
                 Label="复制全部内容" />
 

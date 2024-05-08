@@ -11,7 +11,7 @@ namespace SimpleFFmpegGUI.Manager
 {
     public class TaskManager
     {
-        private readonly bool taskChecked = false;
+        private static bool taskChecked = false;
         private static readonly object lockObj = new object();
         private readonly FFmpegDbContext db;
         private readonly Logger logger;
@@ -26,6 +26,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 lock (lockObj)
                 {
+                    taskChecked = true;
                     foreach (var item in db.Tasks.Where(p => p.Status == TaskStatus.Processing))
                     {
                         item.Status = TaskStatus.Error;
@@ -109,7 +110,7 @@ namespace SimpleFFmpegGUI.Manager
             TaskInfo task = await db.Tasks.FindAsync(id) ?? throw new ArgumentException($"找不到ID为{id}的任务");
             if (queue.Tasks.Any(p => p.Id == id))
             {
-                throw new Exception("ID为{id}的任务正在进行中");
+                throw new Exception($"ID为{id}的任务正在进行中");
             }
             task.Status = TaskStatus.Queue;
             db.Update(task);
@@ -154,17 +155,18 @@ namespace SimpleFFmpegGUI.Manager
 
         private void CheckCancelingTask(TaskInfo task)
         {
+            int id = task.Id;
             if (task.Status == TaskStatus.Cancel)
             {
-                throw new Exception("ID为{id}的任务已被取消");
+                throw new Exception($"ID为{id}的任务已被取消");
             }
             if (task.Status == TaskStatus.Done)
             {
-                throw new Exception("ID为{id}的任务已完成");
+                throw new Exception($"ID为{id}的任务已完成");
             }
             if (task.Status == TaskStatus.Error)
             {
-                throw new Exception("ID为{id}的任务已完成并出现错误");
+                throw new Exception($"ID为{id}的任务已完成并出现错误");
             }
         }
 

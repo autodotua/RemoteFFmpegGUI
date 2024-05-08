@@ -206,7 +206,7 @@
                                 Margin="-8,-4"
                                 Padding="8,4"
                                 Background="Transparent"
-                                Command="{Binding DataContext.ShowArgumentsCommand,ElementName=root}"
+                                Command="{Binding DataContext.ShowArgumentsCommand, ElementName=root}"
                                 Cursor="Hand">
                                 <TextBlock TextDecorations="Underline">详细参数</TextBlock>
                             </Button>

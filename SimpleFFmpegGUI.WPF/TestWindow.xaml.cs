@@ -164,7 +164,7 @@ namespace SimpleFFmpegGUI.WPF
                 {
                     continue;
                 }
-                runningFFmpeg = new FFmpegManager(task, logger);
+                runningFFmpeg = new FFmpegManager(task);
                 runningFFmpeg.StatusChanged += (s, e) =>
                 {
                     var status = runningFFmpeg.GetStatus();
@@ -452,7 +452,7 @@ namespace SimpleFFmpegGUI.WPF
                     string qctext = ViewModel.QCMode == 0 ? $"bitrate={test.MBitrate}M&factor={codec.BitrateFactor}" : $"crf={codec.CRF}";
                     task.Output = Path.GetFullPath($"{TestDir}/codec={codec.Name}&size={sizeTexts[j]}&speed={codec.CpuSpeed}&{qctext}.mp4");
 
-                    runningFFmpeg = new FFmpegManager(task, logger);
+                    runningFFmpeg = new FFmpegManager(task);
                     runningFFmpeg.StatusChanged += (s, e) =>
                     {
                         var status = runningFFmpeg.GetStatus();
@@ -508,7 +508,7 @@ namespace SimpleFFmpegGUI.WPF
                     ViewModel.DetailProgress = 0;
 
 
-                    runningFFmpeg = new FFmpegManager(qualityTask, logger);
+                    runningFFmpeg = new FFmpegManager(qualityTask);
                     runningFFmpeg.StatusChanged += (s, e) =>
                     {
                         var status = runningFFmpeg.GetStatus();
