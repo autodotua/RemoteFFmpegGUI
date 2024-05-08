@@ -49,7 +49,7 @@
             </ComboBox>
             <Button
                 VerticalAlignment="Bottom"
-                Click="FilterButton_Click">
+                Command="{Binding FillLogsCommand}">
                 筛选
             </Button>
         </WrapPanel>
