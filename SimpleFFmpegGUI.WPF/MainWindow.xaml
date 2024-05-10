@@ -225,44 +225,43 @@
                 Grid.ColumnSpan="99">
 
                 <ui:AppBarButton
-                    x:Name="btnMediaInfo"
-                    Click="MediaInfoButton_Click"
+                    Command="{Binding ShowMediaInfoCommand}"
                     Icon="Zoom"
                     Label="查询媒体信息" />
 
                 <ui:AppBarSeparator />
                 <ui:AppBarButton
-                    Click="StartButton_Click"
+                    Command="{Binding StartQueueCommand}"
                     Icon="Play"
                     Label="开始队列"
                     Visibility="{Binding StartMainQueueButtonVisibility}" />
                 <ui:AppBarButton
-                    Click="CancelButton_Click"
+                    Command="{Binding StopQueueCommand}"
                     Icon="Stop"
                     Label="终止队列"
                     Visibility="{Binding StopMainQueueButtonVisibility}" />
                 <ui:AppBarButton
-                    Click="AddButton_Click"
+                    Command="{Binding ShowAddTaskCommand}"
                     Icon="Add"
                     Label="创建任务" />
                 <ui:CommandBar.SecondaryCommands>
                     <ui:AppBarButton
-                        Click="SettingButton_Click"
+                        Command="{Binding ShowSettings}"
                         Icon="Setting"
                         Label="设置" />
                     <ui:AppBarButton
-                        Click="TasksButton_Click"
+                        Command="{Binding ShowTasksCommand}"
                         Icon="List"
                         Label="查看所有任务" />
                     <ui:AppBarButton
-                        Click="PresetsButton_Click"
+                        Command="{Binding ShowPresetsCommand}"
                         Label="查看预设">
                         <ui:AppBarButton.Icon>
                             <ui:FontIcon Glyph="&#xE179;" />
                         </ui:AppBarButton.Icon>
                     </ui:AppBarButton>
                     <ui:AppBarButton
-                        Click="LogsButton_Click"
+                        Command="{Binding ShowLogsCommand}"
                         Label="查看日志">
                         <ui:AppBarButton.Icon>
                             <ui:FontIcon Glyph="&#xE81C;" />
@@ -276,7 +275,7 @@
                         </ui:AppBarButton.Icon>
                     </ui:AppBarButton>
                     <ui:AppBarButton
-                        Click="FFmpegOutputButton_Click"
+                        Command="{Binding ShowFFmpegOutputsCommand}"
                         Label="FFmpeg输出命令行">
                         <ui:AppBarButton.Icon>
                             <ui:FontIcon Glyph="&#xE1A2;" />

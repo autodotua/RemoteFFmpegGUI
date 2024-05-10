@@ -1,0 +1,95 @@
+﻿using CommunityToolkit.Mvvm.Input;
+using FzLib;
+using Microsoft.Extensions.DependencyInjection;
+using ModernWpf.FzExtension.CommonDialog;
+using SimpleFFmpegGUI.Manager;
+using SimpleFFmpegGUI.WPF.Messages;
+using SimpleFFmpegGUI.WPF.Pages;
+using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls.Primitives;
+
+namespace SimpleFFmpegGUI.WPF.ViewModels
+{
+    public partial class MainWindowViewModel : ViewModelBase
+    {
+        public QueueManager queue;
+        private readonly TaskManager taskManager;
+        private bool isTabControlVisiable = true;
+
+        public MainWindowViewModel(QueueManager queue, TaskManager taskManager)
+        {
+            this.queue = queue;
+            this.taskManager = taskManager;
+            queue.TaskManagersChanged += (s, e) => this.Notify(nameof(StartMainQueueButtonVisibility), nameof(StopMainQueueButtonVisibility));
+        }
+
+        public Visibility StartMainQueueButtonVisibility => queue.MainQueueTask == null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility StopMainQueueButtonVisibility => queue.MainQueueTask == null ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility TabControlVisibility => isTabControlVisiable ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility TopTabVisibility => isTabControlVisiable ? Visibility.Collapsed : Visibility.Visible;
+
+        public void SetTabVisiable(bool isTabControlVisiable)
+        {
+            this.isTabControlVisiable = isTabControlVisiable;
+            this.Notify(nameof(TabControlVisibility), nameof(TopTabVisibility));
+        }
+
+        [RelayCommand]
+        private async Task StartQueueAsync()
+        {
+            if (!await taskManager.HasQueueTasksAsync())
+            {
+                QueueErrorMessage("没有排队中的任务");
+                return;
+            }
+            queue.StartQueue();
+        }
+
+
+        [RelayCommand]
+        private async Task StopQueueAsync()
+        {
+            if (!await CommonDialog.ShowYesNoDialogAsync("终止队列", "是否终止队列？"))
+            {
+                return;
+            }
+            try
+            {
+                SendMessage(new WindowEnableMessage(false));
+                await queue.CancelAsync();
+            }
+            catch (Exception ex)
+            {
+                QueueErrorMessage("终止队列失败", ex);
+            }
+            finally
+            {
+                SendMessage(new WindowEnableMessage(true));
+            }
+        }
+
+
+        private void ShowPage<T>(bool top = false)
+        {
+            SendMessage(new AddNewTabMessage(typeof(T), top));
+        }
+        [RelayCommand]
+        private void ShowTasks() => ShowPage<TasksPage>();
+        [RelayCommand]
+        private void ShowPresets() => ShowPage<PresetsPage>();
+        [RelayCommand]
+        private void ShowSettings() => ShowPage<SettingPage>(true);
+        [RelayCommand]
+        private void ShowAddTask() => ShowPage<AddTaskPage>();
+        [RelayCommand]
+        private void ShowFFmpegOutputs() => ShowPage<FFmpegOutputPage>();
+        [RelayCommand]
+        private void ShowLogs() => ShowPage<LogsPage>();
+        [RelayCommand]
+        private void ShowMediaInfo() => ShowPage<MediaInfoPage>();
+
+    }
+}

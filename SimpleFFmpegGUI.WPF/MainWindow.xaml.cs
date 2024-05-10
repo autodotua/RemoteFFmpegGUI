@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using FzLib;
 using FzLib.WPF;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
@@ -11,6 +10,7 @@ using SimpleFFmpegGUI.WPF.Messages;
 using SimpleFFmpegGUI.WPF.Model;
 using SimpleFFmpegGUI.WPF.Pages;
 using SimpleFFmpegGUI.WPF.Panels;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,9 +36,6 @@ using Task = System.Threading.Tasks.Task;
 
 namespace SimpleFFmpegGUI.WPF
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private readonly QueueManager queue;
@@ -46,17 +43,16 @@ namespace SimpleFFmpegGUI.WPF
         private StatusPanel statusPanel;
         private TaskList taskPanel;
         private FzLib.Program.Runtime.TrayIcon tray;
-        public MainWindow(MainWindowViewModel viewModel, QueueManager queue)
+        public MainWindow(QueueManager queue)
         {
             if (Config.Instance.WindowMaximum)
             {
                 WindowState = WindowState.Maximized;
             }
-            ViewModel = viewModel;
-            DataContext = ViewModel;
+            ViewModel = this.SetDataContext<MainWindowViewModel>();
             InitializeComponent();
-            this.queue = queue;
             RegisterMessages();
+            this.queue = queue;
         }
 
         public event EventHandler UiCompressModeChanged;
@@ -117,8 +113,20 @@ namespace SimpleFFmpegGUI.WPF
         /// <returns></returns>
         public async Task<T> ShowTopTabAsync<T>(Func<T, Task> beforeLoad = null) where T : UserControl, ICloseablePage
         {
+            if(beforeLoad==null)
+            {
+                return await ShowTopTabAsync(typeof(T)) as T;
+            }
+            else
+            {
+                return await ShowTopTabAsync(typeof(T),o=>beforeLoad(o as T)) as T;
+            }
+        }  
+
+        public async Task<object> ShowTopTabAsync(Type type, Func<object, Task> beforeLoad = null) 
+        {
             grdLeft.IsEnabled = false;
-            T panel = App.ServiceProvider.GetService<T>();
+            ICloseablePage panel = App.ServiceProvider.GetService(type) as ICloseablePage;
             if (beforeLoad != null)
             {
                 await beforeLoad(panel);
@@ -126,7 +134,7 @@ namespace SimpleFFmpegGUI.WPF
             topTab.Content = panel;
             ViewModel.SetTabVisiable(false);
             ResetUI();
-            TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
             panel.RequestToClose += (s, e) =>
             {
                 topTab.Content = null;
@@ -243,32 +251,6 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        private void AddButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddNewTab<AddTaskPage>();
-        }
-
-        private async void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (!await CommonDialog.ShowYesNoDialogAsync("终止队列", "是否终止队列？"))
-            {
-                return;
-            }
-            try
-            {
-                IsEnabled = false;
-                await queue.CancelAsync();
-            }
-            catch (Exception ex)
-            {
-                this.CreateMessage().QueueError("终止队列失败", ex);
-            }
-            finally
-            {
-                IsEnabled = true;
-            }
-        }
-
         private void CloseTabButton_Click(object sender, RoutedEventArgs e)
         {
             DependencyObject obj = e.Source as DependencyObject;
@@ -280,26 +262,6 @@ namespace SimpleFFmpegGUI.WPF
                     tab.Items.Remove(item);
                 }
             }
-        }
-
-        private void FFmpegOutputButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddNewTab<FFmpegOutputPage>();
-        }
-
-        private void LogsButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddNewTab<LogsPage>();
-        }
-
-        private void MediaInfoButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddNewTab<MediaInfoPage>();
-        }
-
-        private void PresetsButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddNewTab<PresetsPage>();
         }
 
         private void RegisterMessages()
@@ -329,7 +291,7 @@ namespace SimpleFFmpegGUI.WPF
 
             WeakReferenceMessenger.Default.Register<WindowEnableMessage>(this, (_, m) =>
             {
-                if(m.IsEnabled)
+                if (m.IsEnabled)
                 {
                     ring.Hide();
                 }
@@ -342,9 +304,16 @@ namespace SimpleFFmpegGUI.WPF
 
             WeakReferenceMessenger.Default.Register<AddNewTabMessage>(this, (_, m) =>
             {
-                m.Page = AddNewTab(m.Type);
+                if(m.Top)
+                {
+                    m.Page = ShowTopTabAsync(m.Type);
+                }
+                else
+                {
+                    m.Page = AddNewTab(m.Type);
+                }
             });
-            
+
             WeakReferenceMessenger.Default.Register<ShowCodeArgumentsMessage>(this, (_, m) =>
             {
                 var task = m.Task;
@@ -425,34 +394,12 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        private async void SettingButton_Click(object sender, RoutedEventArgs e)
-        {
-            await ShowTopTabAsync<SettingPage>();
-        }
-
-        private async void StartButton_Click(object sender, RoutedEventArgs e)
-        {
-            var tm = App.ServiceProvider.GetRequiredService<TaskManager>();
-            if (!await tm.HasQueueTasksAsync())
-            {
-                this.CreateMessage().QueueError("没有排队中的任务");
-                return;
-            }
-            queue.StartQueue();
-        }
-
         private void Tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!IsLoaded)
+            if (IsLoaded)
             {
-                return;
+                ResetUI();
             }
-            ResetUI();
-        }
-
-        private void TasksButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddNewTab<TasksPage>();
         }
 
         private void TestButton_Click(object sender, RoutedEventArgs e)
@@ -477,32 +424,6 @@ namespace SimpleFFmpegGUI.WPF
         private void Window_StateChanged(object sender, EventArgs e)
         {
             Config.Instance.WindowMaximum = WindowState == WindowState.Maximized;
-        }
-    }
-
-    public class MainWindowViewModel : INotifyPropertyChanged
-    {
-        public QueueManager queue;
-
-        private bool isTabControlVisiable = true;
-
-        public MainWindowViewModel(QueueManager queue)
-        {
-            this.queue = queue;
-            queue.TaskManagersChanged += (s, e) => this.Notify(nameof(StartMainQueueButtonVisibility), nameof(StopMainQueueButtonVisibility));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public Visibility StartMainQueueButtonVisibility => queue.MainQueueTask == null ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility StopMainQueueButtonVisibility => queue.MainQueueTask == null ? Visibility.Collapsed : Visibility.Visible;
-        public Visibility TabControlVisibility => isTabControlVisiable ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility TopTabVisibility => isTabControlVisiable ? Visibility.Collapsed : Visibility.Visible;
-
-        public void SetTabVisiable(bool isTabControlVisiable)
-        {
-            this.isTabControlVisiable = isTabControlVisiable;
-            this.Notify(nameof(TabControlVisibility), nameof(TopTabVisibility));
         }
     }
 }
