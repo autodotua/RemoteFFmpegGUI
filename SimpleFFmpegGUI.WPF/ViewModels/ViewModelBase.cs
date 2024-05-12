@@ -22,8 +22,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         {
             SendMessage(new QueueMessagesMessage('E', message, ex));
         }
-
-        protected ContentControl View { get; set; }
     }
 
     public static class ViewModelExtension

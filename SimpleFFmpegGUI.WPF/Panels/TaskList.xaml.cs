@@ -62,8 +62,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateDetailHeight();
-            App.ServiceProvider.GetService<MainWindow>().UiCompressModeChanged +=
-                (s, e) => UpdateDetailHeight();
+            this.GetWindow<MainWindow>().IsUiCompressModeChanged += (s, e) => UpdateDetailHeight();
         }
     }
 }

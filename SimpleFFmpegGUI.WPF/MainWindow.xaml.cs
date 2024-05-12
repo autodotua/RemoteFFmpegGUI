@@ -43,6 +43,8 @@ namespace SimpleFFmpegGUI.WPF
         private StatusPanel statusPanel;
         private TaskList taskPanel;
         private FzLib.Program.Runtime.TrayIcon tray;
+        private bool isUiCompressMode;
+
         public MainWindow(QueueManager queue)
         {
             if (Config.Instance.WindowMaximum)
@@ -55,9 +57,20 @@ namespace SimpleFFmpegGUI.WPF
             this.queue = queue;
         }
 
-        public event EventHandler UiCompressModeChanged;
+        public bool IsUiCompressMode
+        {
+            get => isUiCompressMode;
+            private set
+            {
+                if (isUiCompressMode != value)
+                {
+                    isUiCompressMode = value;
+                    IsUiCompressModeChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
 
-        public bool IsUiCompressMode { get; private set; }
+        public event EventHandler IsUiCompressModeChanged;
 
         public MainWindowViewModel ViewModel { get; set; }
 
@@ -113,17 +126,17 @@ namespace SimpleFFmpegGUI.WPF
         /// <returns></returns>
         public async Task<T> ShowTopTabAsync<T>(Func<T, Task> beforeLoad = null) where T : UserControl, ICloseablePage
         {
-            if(beforeLoad==null)
+            if (beforeLoad == null)
             {
                 return await ShowTopTabAsync(typeof(T)) as T;
             }
             else
             {
-                return await ShowTopTabAsync(typeof(T),o=>beforeLoad(o as T)) as T;
+                return await ShowTopTabAsync(typeof(T), o => beforeLoad(o as T)) as T;
             }
-        }  
+        }
 
-        public async Task<object> ShowTopTabAsync(Type type, Func<object, Task> beforeLoad = null) 
+        public async Task<object> ShowTopTabAsync(Type type, Func<object, Task> beforeLoad = null)
         {
             grdLeft.IsEnabled = false;
             ICloseablePage panel = App.ServiceProvider.GetService(type) as ICloseablePage;
@@ -302,13 +315,22 @@ namespace SimpleFFmpegGUI.WPF
 
             WeakReferenceMessenger.Default.Register<AddNewTabMessage>(this, (_, m) =>
             {
-                if(m.Top)
+                if (m.ShowWindow)
                 {
-                    m.Page = ShowTopTabAsync(m.Type);
+                    var win = App.ServiceProvider.GetRequiredService(m.Type) as Window;
+                    win.Owner = this;
+                    win.Show();
                 }
                 else
                 {
-                    m.Page = AddNewTab(m.Type);
+                    if (m.Top)
+                    {
+                        m.Page = ShowTopTabAsync(m.Type);
+                    }
+                    else
+                    {
+                        m.Page = AddNewTab(m.Type);
+                    }
                 }
             });
 
@@ -373,12 +395,12 @@ namespace SimpleFFmpegGUI.WPF
                 Grid.SetRow(statusPanel, 2);
                 IsUiCompressMode = true;
             }
+            SendSnapshotEnabledMessage();
 
             grdLeft.RowDefinitions[2].Height = new GridLength(IsUiCompressMode ? 384 : 0);
             grdLeft.RowDefinitions[2].MinHeight = IsUiCompressMode ? 384 : 0;
             leftSplitter.Visibility = IsUiCompressMode ? Visibility.Visible : Visibility.Collapsed;
             statusPanel.Margin = new Thickness(12, IsUiCompressMode ? 12 : 44, 12, IsUiCompressMode ? 12 : 42);
-            UiCompressModeChanged?.Invoke(this, new EventArgs());
             void RemoveFromGrid()
             {
                 if (taskPanel.Parent != null)
@@ -392,6 +414,18 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
+        private void SendSnapshotEnabledMessage()
+        {
+            WeakReferenceMessenger.Default.Send(new SnapshotEnabledMessage(
+                new Snapshot
+                {
+                    DisplayFrame = IsUiCompressMode == false,
+                    CanUpdate = IsUiCompressMode == false
+                                    && WindowState is WindowState.Maximized or WindowState.Normal
+                                    && Visibility == Visibility.Visible
+                }));
+        }
+
         private void Tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (IsLoaded)
@@ -400,11 +434,11 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        private void TestButton_Click(object sender, RoutedEventArgs e)
+        protected override void OnStateChanged(EventArgs e)
         {
-            var window = App.ServiceProvider.GetService<TestWindow>();
-            window.Owner = this;
-            window.Show();
+            base.OnStateChanged(e);
+            Config.Instance.WindowMaximum = WindowState == WindowState.Maximized;
+            SendSnapshotEnabledMessage();
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -417,11 +451,6 @@ namespace SimpleFFmpegGUI.WPF
             taskPanel = new TaskList() { Margin = new Thickness(8, 0, 0, 0) };
             statusPanel = new StatusPanel() { Margin = new Thickness(12) };
             ResetUI(true);
-        }
-
-        private void Window_StateChanged(object sender, EventArgs e)
-        {
-            Config.Instance.WindowMaximum = WindowState == WindowState.Maximized;
         }
     }
 }

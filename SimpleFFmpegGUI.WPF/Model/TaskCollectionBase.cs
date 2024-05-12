@@ -1,4 +1,6 @@
-﻿using FzLib;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using FzLib;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -7,27 +9,15 @@ using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
-    public abstract class TaskCollectionBase : INotifyPropertyChanged
+    public abstract partial class TaskCollectionBase : ViewModelBase
     {
         public abstract Task RefreshAsync();
 
+        [ObservableProperty]
         private ObservableCollection<UITaskInfo> tasks;
 
-        public ObservableCollection<UITaskInfo> Tasks
-        {
-            get => tasks;
-            set => this.SetValueAndNotify(ref tasks, value, nameof(Tasks));
-        }
-
+        [ObservableProperty]
         private UITaskInfo selectedTask;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public UITaskInfo SelectedTask
-        {
-            get => selectedTask;
-            set => this.SetValueAndNotify(ref selectedTask, value, nameof(SelectedTask));
-        }
 
         public IList<UITaskInfo> SelectedTasks=>Tasks.Where(p=>p.IsSelected).ToList();
     }

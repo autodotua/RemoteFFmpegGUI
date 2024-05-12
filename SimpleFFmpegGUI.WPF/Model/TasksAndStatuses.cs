@@ -13,12 +13,17 @@ using System;
 using System.Windows.Shell;
 using System.Threading.Tasks;
 using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using SimpleFFmpegGUI.WPF.Messages;
 
 namespace SimpleFFmpegGUI.WPF.Model
 {
-    public class TasksAndStatuses : TaskCollectionBase
+    public partial class TasksAndStatuses : TaskCollectionBase
     {
+        [ObservableProperty]
         private List<UITaskInfo> processingTasks;
+
         private readonly TaskManager taskManager;
 
         public TasksAndStatuses(QueueManager queue, TaskManager tm)
@@ -27,12 +32,15 @@ namespace SimpleFFmpegGUI.WPF.Model
             taskManager = tm;
             queue.TaskManagersChanged += Queue_TaskManagersChanged;
             RefreshAsync();
-        }
-
-        public List<UITaskInfo> ProcessingTasks
-        {
-            get => processingTasks;
-            private set => this.SetValueAndNotify(ref processingTasks, value, nameof(ProcessingTasks));
+            WeakReferenceMessenger.Default.Register<SnapshotEnabledMessage>(this, async (_, m) =>
+            {
+                foreach (var task in Tasks)
+                {
+                    task.Snapshot.DisplayFrame = m.Options.DisplayFrame;
+                    task.Snapshot.CanUpdate = m.Options.CanUpdate;
+                    await task.UpdateSnapshotAsync();
+                }
+            });
         }
 
         public QueueManager Queue { get; }

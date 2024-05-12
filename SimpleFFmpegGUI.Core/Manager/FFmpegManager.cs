@@ -682,27 +682,10 @@ namespace SimpleFFmpegGUI.Manager
 
     public class RecycleBin
     {
-        // 定义 SHFileOperation 函数的结构体
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        private struct SHFILEOPSTRUCT
-        {
-            public IntPtr hwnd;
-            public uint wFunc;
-            public string pFrom;
-            public string pTo;
-            public ushort fFlags;
-            public int fAnyOperationsAborted;
-            public IntPtr hNameMappings;
-            public string lpszProgressTitle;
-        }
-
         // 定义 SHFileOperation 函数的操作类型
         private const uint FO_DELETE = 0x0003;
-        private const ushort FOF_ALLOWUNDO = 0x0040;
 
-        // 调用 SHFileOperation 函数
-        [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
-        private static extern int SHFileOperation(ref SHFILEOPSTRUCT FileOp);
+        private const ushort FOF_ALLOWUNDO = 0x0040;
 
         // 删除文件到回收站
         public static bool DeleteToRecycleBin(string filePath)
@@ -725,6 +708,24 @@ namespace SimpleFFmpegGUI.Manager
             {
                 return false;
             }
+        }
+
+        // 调用 SHFileOperation 函数
+        [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
+        private static extern int SHFileOperation(ref SHFILEOPSTRUCT FileOp);
+
+        // 定义 SHFileOperation 函数的结构体
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct SHFILEOPSTRUCT
+        {
+            public IntPtr hwnd;
+            public uint wFunc;
+            public string pFrom;
+            public string pTo;
+            public ushort fFlags;
+            public int fAnyOperationsAborted;
+            public IntPtr hNameMappings;
+            public string lpszProgressTitle;
         }
     }
 }

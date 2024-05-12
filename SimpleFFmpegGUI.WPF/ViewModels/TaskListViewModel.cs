@@ -29,16 +29,17 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         private readonly TaskManager taskManager;
 
         private readonly TasksAndStatuses tasksAndStatuses;
-
+        private readonly AllTasks allTasks;
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(Tasks))]
         private bool showAllTasks;
 
-        public TaskListViewModel(QueueManager queue, TasksAndStatuses tasksAndStatuses, TaskManager taskManager)
+        public TaskListViewModel(QueueManager queue, TasksAndStatuses tasksAndStatuses, AllTasks allTasks, TaskManager taskManager)
         {
             this.queue = queue;
             this.taskManager = taskManager;
             this.tasksAndStatuses = tasksAndStatuses;
+            this.allTasks = allTasks;
             Tasks.PropertyChanged += Tasks_PropertyChanged;
         }
 
@@ -58,9 +59,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
         public SelectionMode SelectionMode => ShowAllTasks ? SelectionMode.Single : SelectionMode.Extended;
 
-        public TaskCollectionBase Tasks => ShowAllTasks ?
-                                       App.ServiceProvider.GetRequiredService<AllTasks>()
-            : App.ServiceProvider.GetRequiredService<TasksAndStatuses>();
+        public TaskCollectionBase Tasks => ShowAllTasks ? allTasks : tasksAndStatuses;
 
         public void NotifyCanExecute()
         {
@@ -174,7 +173,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             {
                 await taskManager.ResetTaskAsync(task.Id);
                 await task.UpdateSelfAsync();
-                App.ServiceProvider.GetService<TasksAndStatuses>().NotifyTaskReseted(task);
+                tasksAndStatuses.NotifyTaskReseted(task);
             }
 
             NotifyCanExecute();

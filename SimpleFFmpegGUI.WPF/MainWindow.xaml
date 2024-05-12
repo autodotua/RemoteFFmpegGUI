@@ -18,7 +18,6 @@
     AllowDrop="True"
     Closing="Window_Closing"
     Loaded="Window_Loaded"
-    StateChanged="Window_StateChanged"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.Resources>
@@ -268,7 +267,7 @@
                         </ui:AppBarButton.Icon>
                     </ui:AppBarButton>
                     <ui:AppBarButton
-                        Click="TestButton_Click"
+                        Command="{Binding ShowTestsCommand}"
                         Label="编码性能测试">
                         <ui:AppBarButton.Icon>
                             <ui:FontIcon Glyph="&#xE916;" />

@@ -72,9 +72,9 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         }
 
 
-        private void ShowPage<T>(bool top = false)
+        private void ShowPage<T>(bool top = false, bool showWindow = false)
         {
-            SendMessage(new AddNewTabMessage(typeof(T), top));
+            SendMessage(new AddNewTabMessage(typeof(T), top, showWindow));
         }
         [RelayCommand]
         private void ShowTasks() => ShowPage<TasksPage>();
@@ -90,6 +90,8 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         private void ShowLogs() => ShowPage<LogsPage>();
         [RelayCommand]
         private void ShowMediaInfo() => ShowPage<MediaInfoPage>();
+        [RelayCommand]
+        private void ShowTests() => ShowPage<TestWindow>(showWindow: true);
 
     }
 }

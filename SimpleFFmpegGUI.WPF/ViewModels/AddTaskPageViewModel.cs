@@ -28,8 +28,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
     public partial class AddTaskPageViewModel : ViewModelBase
     {
         private readonly TaskManager taskManager;
-
-
+        private readonly TasksAndStatuses tasks;
         [ObservableProperty]
         private bool allowChangeType = true;
 
@@ -37,9 +36,10 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         [NotifyPropertyChangedFor(nameof(CanAddFile))]
         private TaskType type;
 
-        public AddTaskPageViewModel(TaskManager taskManager)
+        public AddTaskPageViewModel(TaskManager taskManager,TasksAndStatuses tasks)
         {
             this.taskManager = taskManager;
+            this.tasks = tasks;
         }
 
         public bool CanAddFile => Type is TaskType.Code or TaskType.Concat;
@@ -116,21 +116,21 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                         foreach (var input in inputs)
                         {
                             TaskInfo task = await taskManager.AddTaskAsync(TaskType.Code, new List<InputArguments>() { input }, FileIOViewModel.GetOutput(input), args);
-                            App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
+                            tasks.Tasks.Insert(0, UITaskInfo.FromTask(task));
                         }
                         QueueSuccessMessage($"已加入{inputs.Count}个任务队列");
                         break;
                     case TaskType.Custom or TaskType.Compare://不存在文件输出
                         {
                             TaskInfo task = await taskManager.AddTaskAsync(Type, inputs, null, args);
-                            App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
+                            tasks.Tasks.Insert(0, UITaskInfo.FromTask(task));
                             QueueSuccessMessage("已加入队列");
                         }
                         break;
                     default:
                         {
                             TaskInfo task = await taskManager.AddTaskAsync(Type, inputs, FileIOViewModel.GetOutput(inputs[0]), args);
-                            App.ServiceProvider.GetService<TasksAndStatuses>().Tasks.Insert(0, UITaskInfo.FromTask(task));
+                            tasks.Tasks.Insert(0, UITaskInfo.FromTask(task));
                             QueueSuccessMessage("已加入队列");
                         }
                         break;

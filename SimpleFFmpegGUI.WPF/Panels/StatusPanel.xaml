@@ -54,14 +54,14 @@
                                 Width="360"
                                 Height="256"
                                 Margin="8"
-                                Visibility="{Binding ShowSnapshot, Converter={StaticResource Bool2VisibilityConverter}}">
+                                Visibility="{Binding Snapshot.DisplayFrame, Converter={StaticResource Bool2VisibilityConverter}}">
                                 <Border.Background>
                                     <SolidColorBrush
                                         Opacity="0.5"
                                         Color="Black" />
                                 </Border.Background>
                                 <Image
-                                    Source="{Binding SnapshotSource, IsAsync=True}"
+                                    Source="{Binding Snapshot.Source, IsAsync=True}"
                                     Stretch="UniformToFill" />
                             </Border>
                             <Border
