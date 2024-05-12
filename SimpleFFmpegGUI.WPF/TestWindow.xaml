@@ -18,6 +18,7 @@
     ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
     Closing="Window_Closing"
+    IsEnabled="{Binding IsEnabled}"
     ShowInTaskbar="False"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
@@ -73,12 +74,12 @@
                                     <TextBlock Text="测试项目" />
                                     <Button
                                         Background="Transparent"
-                                        Click="SelectAllButton_Click"
+                                        Command="{Binding SelectAllCommand}"
                                         Content="全选"
                                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                                     <Button
                                         Background="Transparent"
-                                        Click="SelectNoneButton_Click"
+                                        Command="{Binding SelectNoneCommand}"
                                         Content="全不选"
                                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                                 </ui:SimpleStackPanel>
@@ -191,7 +192,7 @@
                         <Button
                             Grid.Column="4"
                             VerticalAlignment="Bottom"
-                            Click="BrowseTestVideoButton_Click"
+                            Command="{Binding BrowseTestVideoCommand}"
                             DockPanel.Dock="Right">
                             <Button.Content>
                                 <ui:SymbolIcon Symbol="BrowsePhotos" />
@@ -247,35 +248,35 @@
                         Grid.Column="2"
                         Width="84"
                         HorizontalAlignment="Stretch"
-                        Click="ClearButton_Click"
+                        Command="{Binding ResetCommand}"
                         Content="重置"
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
                         Grid.Column="4"
                         Width="84"
                         HorizontalAlignment="Stretch"
-                        Click="OpenDirButton_Click"
+                        Command="{Binding OpenDirCommand}"
                         Content="打开目录"
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
                         Grid.Column="6"
                         Width="84"
                         HorizontalAlignment="Stretch"
-                        Click="ExportButton_Click"
+                        Command="{Binding ExportCommand}"
                         Content="导出"
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
                     <Button
                         Grid.Column="8"
                         Width="84"
                         HorizontalAlignment="Stretch"
-                        Click="StopButton_Click"
+                        Command="{Binding StopCommand}"
                         Content="停止测试"
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}}" />
                     <Button
                         Grid.Column="8"
                         Width="84"
                         HorizontalAlignment="Stretch"
-                        Click="StartButton_Click"
+                        Command="{Binding StartCommand}"
                         Content="开始测试"
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
 

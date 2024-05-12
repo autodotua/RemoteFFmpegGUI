@@ -246,7 +246,7 @@
                     Label="创建任务" />
                 <ui:CommandBar.SecondaryCommands>
                     <ui:AppBarButton
-                        Command="{Binding ShowSettings}"
+                        Command="{Binding ShowSettingsCommand}"
                         Icon="Setting"
                         Label="设置" />
                     <ui:AppBarButton

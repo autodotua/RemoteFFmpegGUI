@@ -42,7 +42,7 @@ namespace SimpleFFmpegGUI.Manager
             T value = Parse<T>(item.Value);
             cache.Add(key, value);
 
-            logger.Info($"读取配置：[{key}]={value}");
+            logger?.Info($"读取配置：[{key}]={value}");
             return value;
         }
         public void SetConfig<T>(string key, T value)
@@ -69,7 +69,7 @@ namespace SimpleFFmpegGUI.Manager
 
             db.SaveChanges();
 
-            logger.Info($"写入配置：[{key}]={value}");
+            logger?.Info($"写入配置：[{key}]={value}");
         }
 
         private static string GetString<T>(T data)
