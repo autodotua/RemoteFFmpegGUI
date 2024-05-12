@@ -63,10 +63,18 @@ namespace SimpleFFmpegGUI.WPF
             {
                 if (e.Args[0] == "cut")
                 {
-                    MainWindow = new CutWindow(new CutWindowViewModel(), e.Args[2..]);
+                    MainWindow = new CutWindow(e.Args[2..]);
                     WindowInteropHelper helper = new WindowInteropHelper(MainWindow);
                     helper.Owner = IntPtr.Parse(e.Args[1]);
-                    MainWindow.ShowDialog();
+                    try
+                    {
+                        MainWindow.ShowDialog();
+                    }
+                    catch (System.ComponentModel.Win32Exception)
+                    {
+                        helper.Owner = 0;
+                        MainWindow.ShowDialog();
+                    }
                 }
                 else
                 {
@@ -115,6 +123,8 @@ namespace SimpleFFmpegGUI.WPF
 
             services.AddTransient<FFmpegOutputPage>();
             services.AddSingleton<FFmpegOutputPageViewModel>();
+
+            services.AddTransient<CutWindowViewModel>();
 
             services.AddTransient<TaskListViewModel>();
             services.AddTransient<CodeArgumentsPanelViewModel>();

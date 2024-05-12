@@ -221,19 +221,17 @@ namespace SimpleFFmpegGUI.WPF
                 return;
             }
             IEnumerable<string> files = e.Data.GetData(DataFormats.FileDrop) as string[];
-            files = files.Where(p => File.Exists(p));
+            files = files.Where(File.Exists);
             if (files.Any())
             {
                 List<SelectDialogItem> items = Enum
-                    .GetValues(typeof(TaskType))
-                    .Cast<TaskType>()
-                    .ToList()
+                    .GetValues<TaskType>()
                     .Select(p => new SelectDialogItem(AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(p, p => p.Name),
                         AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(p, p => p.Description)))
                     .ToList();
                 items.Add(new SelectDialogItem("查询信息", "查看媒体的元数据信息"));
                 int typeCount = Enum.GetValues(typeof(TaskType)).Length;
-                this.Activate();
+                Activate();
                 var index = await CommonDialog.ShowSelectItemDialogAsync("选择操作", items);
                 if (index == -1)
                 {
