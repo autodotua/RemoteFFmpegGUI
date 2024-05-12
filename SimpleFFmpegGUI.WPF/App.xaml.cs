@@ -8,7 +8,6 @@ using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Model;
 using SimpleFFmpegGUI.WPF.Pages;
-using SimpleFFmpegGUI.WPF.Panels;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

@@ -1,28 +1,5 @@
-﻿using FzLib;
-using Mapster;
-using Microsoft.Extensions.DependencyInjection;
-using ModernWpf.FzExtension.CommonDialog;
-using SimpleFFmpegGUI.Manager;
-using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF;
-using SimpleFFmpegGUI.WPF.Model;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using SimpleFFmpegGUI.WPF.ViewModels;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace SimpleFFmpegGUI.WPF.Panels
 {
@@ -30,88 +7,10 @@ namespace SimpleFFmpegGUI.WPF.Panels
     {
         public StatusPanel()
         {
-            DataContext = ViewModel;
+            ViewModel = this.SetDataContext<StatusPanelViewModel>();
             InitializeComponent();
         }
 
-        public StatusPanelViewModel ViewModel { get; } = App.ServiceProvider.GetService<StatusPanelViewModel>();
-
-        private async void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (!await CommonDialog.ShowYesNoDialogAsync("取消任务", "是否取消任务？"))
-            {
-                return;
-            }
-            UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
-            Debug.Assert(task != null);
-            if (task == null)
-            {
-                return;
-            }
-            Debug.Assert(task.ProcessManager != null);
-            try
-            {
-                IsEnabled = false;
-                await task.ProcessManager.CancelAsync();
-            }
-            catch (Exception ex)
-            {
-                this.CreateMessage().QueueError("取消失败", ex);
-            }
-            finally
-            {
-                IsEnabled = true;
-            }
-        }
-
-        private void PauseButton_Click(object sender, RoutedEventArgs e)
-        {
-            UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
-            Debug.Assert(task != null);
-            Debug.Assert(task.ProcessManager != null);
-            try
-            {
-                task.ProcessManager.Suspend();
-            }
-            catch (Exception ex)
-            {
-                this.CreateMessage().QueueError("该任务无法暂停", ex);
-            }
-        }
-
-        private void ResumeButton_Click(object sender, RoutedEventArgs e)
-        {
-            UITaskInfo task = (sender as Control).DataContext as UITaskInfo;
-            Debug.Assert(task != null);
-            Debug.Assert(task.ProcessManager != null);
-            try
-            {
-                task.ProcessManager.Resume();
-            }
-            catch (Exception ex)
-            {
-                this.CreateMessage().QueueError("恢复失败", ex);
-            }
-        }
-    }
-
-    public class StatusPanelViewModel : INotifyPropertyChanged
-    {
-        private bool created = false;
-
-        public StatusPanelViewModel(QueueManager queue)
-        {
-            Debug.Assert(!created);
-            created = true;
-            Queue = queue;
-            queue.TaskManagersChanged += (s, e) => this.Notify(nameof(IsRunning));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public bool IsRunning => Queue.Tasks.Any();
-        public QueueManager Queue { get; }
-
-        public TasksAndStatuses Tasks => App.ServiceProvider.GetService<TasksAndStatuses>();
+        public StatusPanelViewModel ViewModel { get; }
     }
 }
