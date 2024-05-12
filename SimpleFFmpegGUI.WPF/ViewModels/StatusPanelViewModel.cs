@@ -4,7 +4,7 @@ using FzLib;
 using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -21,7 +21,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         [ObservableProperty]
         private bool isEnabled = true;
 
-        public StatusPanelViewModel(QueueManager queue, TasksAndStatuses tasks)
+        public StatusPanelViewModel(QueueManager queue, CurrentTasksViewModel tasks)
         {
             Debug.Assert(!created);
             created = true;
@@ -34,9 +34,9 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
         public QueueManager Queue { get; }
 
-        public TasksAndStatuses Tasks { get; }
+        public CurrentTasksViewModel Tasks { get; }
         [RelayCommand]
-        private async Task CancelAsync(UITaskInfo task)
+        private async Task CancelAsync(TaskInfoViewModel task)
         {
             if (!await CommonDialog.ShowYesNoDialogAsync("取消任务", "是否取消任务？"))
             {
@@ -64,7 +64,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         }
 
         [RelayCommand]
-        private void Pause(UITaskInfo task)
+        private void Pause(TaskInfoViewModel task)
         {
             Debug.Assert(task != null);
             Debug.Assert(task.ProcessManager != null);
@@ -79,7 +79,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         }
 
         [RelayCommand]
-        private void Resume(UITaskInfo task)
+        private void Resume(TaskInfoViewModel task)
         {
             Debug.Assert(task != null);
             Debug.Assert(task.ProcessManager != null);

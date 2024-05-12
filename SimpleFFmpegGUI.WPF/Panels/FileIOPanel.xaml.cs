@@ -7,7 +7,7 @@ using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Messages;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.Pages;
 using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
@@ -81,12 +81,12 @@ namespace SimpleFFmpegGUI.WPF.Panels
                 }
                 if (File.Exists(file))
                 {
-                    ViewModel.Inputs.Add(new InputArgumentsDetail() { FilePath = file });
+                    ViewModel.Inputs.Add(new InputArgumentsViewModel() { FilePath = file });
                 }
             }
             while (ViewModel.Inputs.Count < ViewModel.MinInputsCount)
             {
-                ViewModel.Inputs.Add(new InputArgumentsDetail());
+                ViewModel.Inputs.Add(new InputArgumentsViewModel());
             }
         }
     }

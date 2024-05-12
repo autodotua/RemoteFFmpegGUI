@@ -1,9 +1,9 @@
-﻿using SimpleFFmpegGUI.WPF.Model;
+﻿using SimpleFFmpegGUI.WPF.ViewModels;
 
 namespace SimpleFFmpegGUI.WPF.Messages
 {
-    public class SnapshotEnabledMessage(Snapshot options)
+    public class SnapshotEnabledMessage(SnapshotViewModel options)
     {
-        public Snapshot Options { get; private set; } = options;
+        public SnapshotViewModel Options { get; private set; } = options;
     }
 }

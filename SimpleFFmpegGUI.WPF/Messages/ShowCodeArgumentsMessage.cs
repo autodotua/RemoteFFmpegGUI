@@ -1,10 +1,10 @@
 ﻿using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 
 namespace SimpleFFmpegGUI.WPF.Messages
 {
-    public class ShowCodeArgumentsMessage(UITaskInfo task)
+    public class ShowCodeArgumentsMessage(TaskInfoViewModel task)
     {
-        public UITaskInfo Task { get; } = task;
+        public TaskInfoViewModel Task { get; } = task;
     }
 }

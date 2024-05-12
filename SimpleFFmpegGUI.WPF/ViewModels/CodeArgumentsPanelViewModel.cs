@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 using SimpleFFmpegGUI.FFmpegLib;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.Panels;
 using System;
 using System.Collections;
@@ -20,7 +20,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
     {
         private readonly PresetManager presetManager;
 
-        private AudioArgumentsWithSwitch audio = new AudioArgumentsWithSwitch();
+        private AudioArgumentsViewModel audio = new AudioArgumentsViewModel();
 
         private ChannelOutputStrategy audioOutputStrategy = ChannelOutputStrategy.Code;
 
@@ -46,7 +46,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         private string extra;
 
         [ObservableProperty]
-        private FormatArgumentWithSwitch format = new FormatArgumentWithSwitch();
+        private FormatArgumentViewModel format = new FormatArgumentViewModel();
 
         [ObservableProperty]
         private ProcessedOptions processedOptions = new ProcessedOptions();
@@ -54,7 +54,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         private TaskType type;
 
         [ObservableProperty]
-        private VideoArgumentsWithSwitch video = new VideoArgumentsWithSwitch();
+        private VideoArgumentsViewModel video = new VideoArgumentsViewModel();
 
         [ObservableProperty]
         private ChannelOutputStrategy videoOutputStrategy = ChannelOutputStrategy.Code;
@@ -68,7 +68,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
         public IEnumerable AspectRatios { get; } = new[] { "16:9", "4:3", "1:1", "3:4", "16:9", "2.35" };
 
-        public AudioArgumentsWithSwitch Audio
+        public AudioArgumentsViewModel Audio
         {
             get => audio;
             set => this.SetValueAndNotify(ref audio, value, nameof(Audio));
@@ -86,7 +86,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 this.SetValueAndNotify(ref audioOutputStrategy, value, nameof(AudioOutputStrategy));
                 if (value == ChannelOutputStrategy.Code && Audio == null)
                 {
-                    Audio = new AudioArgumentsWithSwitch();
+                    Audio = new AudioArgumentsViewModel();
                 }
             }
         }
@@ -137,17 +137,17 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             CanSetConcat = type is TaskType.Concat;
             if (argument != null)
             {
-                Video = argument.Video.Adapt<VideoArgumentsWithSwitch>();
+                Video = argument.Video.Adapt<VideoArgumentsViewModel>();
                 Video?.Update();
                 VideoOutputStrategy = argument.Video == null ?
                     argument.DisableVideo ? ChannelOutputStrategy.Disable : ChannelOutputStrategy.Copy
                     : ChannelOutputStrategy.Code;
-                Audio = argument.Audio.Adapt<AudioArgumentsWithSwitch>();
+                Audio = argument.Audio.Adapt<AudioArgumentsViewModel>();
                 Audio?.Update();
                 AudioOutputStrategy = argument.Audio == null ?
                  argument.DisableAudio ? ChannelOutputStrategy.Disable : ChannelOutputStrategy.Copy
                  : ChannelOutputStrategy.Code;
-                Format = new FormatArgumentWithSwitch() { Format = argument.Format };
+                Format = new FormatArgumentViewModel() { Format = argument.Format };
                 Format.Update();
                 Combine = argument.Combine;
                 ProcessedOptions = argument.ProcessedOptions ?? new ProcessedOptions();
@@ -204,7 +204,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 case nameof(VideoOutputStrategy):
                     if (VideoOutputStrategy == ChannelOutputStrategy.Code && Audio == null)
                     {
-                        Video = new VideoArgumentsWithSwitch();
+                        Video = new VideoArgumentsViewModel();
                     }
                     break;
             }

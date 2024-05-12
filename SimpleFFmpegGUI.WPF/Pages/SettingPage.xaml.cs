@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;

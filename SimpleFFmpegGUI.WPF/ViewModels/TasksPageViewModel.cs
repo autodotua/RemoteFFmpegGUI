@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using FzLib;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -12,7 +12,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 {
     public partial class TasksPageViewModel : ViewModelBase
     {
-        public TasksPageViewModel(AllTasks allTasks)
+        public TasksPageViewModel(AllTasksViewModel allTasks)
         {
             AllTasks = allTasks;
             AllTasks.PropertyChanged += AllTasks_PropertyChanged;
@@ -43,6 +43,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         [ObservableProperty]
         private IEnumerable pages;
 
-        public AllTasks AllTasks { get; }
+        public AllTasksViewModel AllTasks { get; }
     }
 }

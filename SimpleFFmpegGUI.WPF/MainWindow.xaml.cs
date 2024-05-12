@@ -7,7 +7,7 @@ using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Converters;
 using SimpleFFmpegGUI.WPF.Messages;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.Pages;
 using SimpleFFmpegGUI.WPF.Panels;
 using SimpleFFmpegGUI.WPF.ViewModels;
@@ -417,7 +417,7 @@ namespace SimpleFFmpegGUI.WPF
         private void SendSnapshotEnabledMessage()
         {
             WeakReferenceMessenger.Default.Send(new SnapshotEnabledMessage(
-                new Snapshot
+                new SnapshotViewModel
                 {
                     DisplayFrame = IsUiCompressMode == false,
                     CanUpdate = IsUiCompressMode == false

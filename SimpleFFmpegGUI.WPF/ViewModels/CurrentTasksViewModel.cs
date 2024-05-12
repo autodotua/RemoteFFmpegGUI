@@ -17,16 +17,16 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using SimpleFFmpegGUI.WPF.Messages;
 
-namespace SimpleFFmpegGUI.WPF.Model
+namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public partial class TasksAndStatuses : TaskCollectionBase
+    public partial class CurrentTasksViewModel : TaskCollectionViewModelBase
     {
         [ObservableProperty]
-        private List<UITaskInfo> processingTasks;
+        private List<TaskInfoViewModel> processingTasks;
 
         private readonly TaskManager taskManager;
 
-        public TasksAndStatuses(QueueManager queue, TaskManager tm)
+        public CurrentTasksViewModel(QueueManager queue, TaskManager tm)
         {
             Queue = queue;
             taskManager = tm;
@@ -47,7 +47,7 @@ namespace SimpleFFmpegGUI.WPF.Model
 
         public ObservableCollection<StatusDto> Statuses { get; } = new ObservableCollection<StatusDto>();
 
-        public void NotifyTaskReseted(UITaskInfo task)
+        public void NotifyTaskReseted(TaskInfoViewModel task)
         {
             if (!Tasks.Any(p => p.Id == task.Id))
             {
@@ -58,7 +58,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         public override async Task RefreshAsync()
         {
             var tasks = await taskManager.GetCurrentTasksAsync(App.AppStartTime);
-            Tasks = new ObservableCollection<UITaskInfo>(tasks.Adapt<List<UITaskInfo>>());
+            Tasks = new ObservableCollection<TaskInfoViewModel>(tasks.Adapt<List<TaskInfoViewModel>>());
         }
 
         private static void GetMainWindowAnd(Action<MainWindow> action)
@@ -111,9 +111,9 @@ namespace SimpleFFmpegGUI.WPF.Model
                 var manager = e.NewItems[0] as FFmpegManager;
                 var unstartStatus = new StatusDto(manager.Task); //先放入一个StatusDto进行占位，因为此时Status还未生成
 
-                var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);//找到对应的UITaskInfo
+                var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);//找到对应的TaskInfoViewModel
                 Debug.Assert(task != null);
-                await task.UpdateSelfAsync(); //用TaskInfo实体更新UITaskInfo
+                await task.UpdateSelfAsync(); //用TaskInfo实体更新TaskInfoViewModel
                 task.ProcessStatus = unstartStatus;
                 task.ProcessManager = manager;
                 if (manager == Queue.MainQueueManager)

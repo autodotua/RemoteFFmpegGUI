@@ -6,7 +6,6 @@ using SimpleFFmpegGUI.FFmpegLib;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Messages;
-using SimpleFFmpegGUI.WPF.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,7 +16,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using static SimpleFFmpegGUI.WPF.Model.PerformanceTestLine;
+using static SimpleFFmpegGUI.WPF.ViewModels.PerformanceTestLine;
 using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
 
 namespace SimpleFFmpegGUI.WPF.ViewModels

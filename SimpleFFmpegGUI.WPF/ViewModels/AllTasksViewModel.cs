@@ -8,9 +8,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace SimpleFFmpegGUI.WPF.Model
+namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public partial class AllTasks : TaskCollectionBase
+    public partial class AllTasksViewModel : TaskCollectionViewModelBase
     {
         private readonly TaskManager taskManager;
 
@@ -26,7 +26,7 @@ namespace SimpleFFmpegGUI.WPF.Model
         [ObservableProperty]
         private int pageCount;
 
-        public AllTasks(TaskManager tm)
+        public AllTasksViewModel(TaskManager tm)
         {
             taskManager = tm;
             RefreshAsync();
@@ -36,7 +36,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             var tasks = await taskManager.GetTasksAsync(null, Page * CountPerPage, CountPerPage);
             Count = tasks.TotalCount;
             PageCount = (int)Math.Ceiling(1.0 * Count / CountPerPage);
-            Tasks = new ObservableCollection<UITaskInfo>(tasks.List.Adapt<List<UITaskInfo>>());
+            Tasks = new ObservableCollection<TaskInfoViewModel>(tasks.List.Adapt<List<TaskInfoViewModel>>());
         }
 
         protected override async void OnPropertyChanged(PropertyChangedEventArgs e)

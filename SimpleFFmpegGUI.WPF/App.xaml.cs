@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.Controls;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.Pages;
 using System;
 using System.Collections.Generic;
@@ -93,8 +93,8 @@ namespace SimpleFFmpegGUI.WPF
             services.AddFFmpegServices();
             services.AddSingleton<Config>();
 
-            services.AddSingleton<TasksAndStatuses>();
-            services.AddSingleton<AllTasks>();
+            services.AddSingleton<CurrentTasksViewModel>();
+            services.AddSingleton<AllTasksViewModel>();
 
             services.AddSingleton<MainWindow>();
             services.AddTransient<MainWindowViewModel>();

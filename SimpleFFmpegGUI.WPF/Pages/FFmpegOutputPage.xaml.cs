@@ -5,7 +5,7 @@ using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections;

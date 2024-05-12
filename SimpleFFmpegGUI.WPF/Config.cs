@@ -4,7 +4,7 @@ using FzLib.DataStorage.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

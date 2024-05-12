@@ -3,129 +3,62 @@ using System.ComponentModel;
 
 namespace SimpleFFmpegGUI.Model
 {
-    public class VideoCodeArguments : INotifyPropertyChanged
+    public class VideoCodeArguments :  IVideoCodeArguments
     {
-        private string aspect;
-
-        private double? averageBitrate;
-
-        private string code;
-
-        private int? crf;
-
-        private double? fps;
-
-        private double? maxBitrate;
-
-        private double? maxBitrateBuffer;
-
-        private string pixelFormat;
-
-        private int preset;
-
-        private string size;
-
-        private bool twoPass;
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// 画面比例
         /// </summary>
-        public string AspectRatio
-        {
-            get => aspect;
-            set => this.SetValueAndNotify(ref aspect, value, nameof(AspectRatio));
-        }
+        public string AspectRatio{ get; set; }
 
         /// <summary>
         /// 平均码率
         /// </summary>
-        public double? AverageBitrate
-        {
-            get => averageBitrate;
-            set => this.SetValueAndNotify(ref averageBitrate, value, nameof(AverageBitrate));
-        }
+        public double? AverageBitrate { get; set; }
 
         /// <summary>
         /// 编码
         /// </summary>
-        public string Code
-        {
-            get => code;
-            set => this.SetValueAndNotify(ref code, value, nameof(Code));
-        }
+        public string Code { get; set; }
 
         /// <summary>
         /// CRF（视频目标质量）
         /// </summary>
-        public int? Crf
-        {
-            get => crf;
-            set => this.SetValueAndNotify(ref crf, value, nameof(Crf));
-        }
+        public int? Crf { get; set; }
 
         /// <summary>
         /// 帧率
         /// </summary>
-        public double? Fps
-        {
-            get => fps;
-            set => this.SetValueAndNotify(ref fps, value, nameof(Fps));
-        }
+        public double? Fps { get; set; }
 
         /// <summary>
         /// 最大码率
         /// </summary>
-        public double? MaxBitrate
-        {
-            get => maxBitrate;
-            set => this.SetValueAndNotify(ref maxBitrate, value, nameof(MaxBitrate));
-        }
+        public double? MaxBitrate { get; set; }
 
         /// <summary>
         /// 最大码率缓冲倍率
         /// </summary>
-        public double? MaxBitrateBuffer
-        {
-            get => maxBitrateBuffer;
-            set => this.SetValueAndNotify(ref maxBitrateBuffer, value, nameof(MaxBitrateBuffer));
-        }
+        public double? MaxBitrateBuffer { get; set; }
 
         /// <summary>
         /// 像素格式
         /// </summary>
-        public string PixelFormat
-        {
-            get => pixelFormat;
-            set => this.SetValueAndNotify(ref pixelFormat, value, nameof(PixelFormat));
-        }
+        public string PixelFormat { get; set; }
 
         /// <summary>
         /// 编码速度或速度预设
         /// </summary>
-        public int Preset
-        {
-            get => preset;
-            set => this.SetValueAndNotify(ref preset, value, nameof(Preset));
-        } 
+        public int Preset { get; set; }
 
         /// <summary>
         /// 视频尺寸（分辨率）
         /// </summary>
-        public string Size
-        {
-            get => size;
-            set => this.SetValueAndNotify(ref size, value, nameof(Size));
-        }
+        public string Size { get; set; }
 
         /// <summary>
         /// 是否二次编码
         /// </summary>
-        public bool TwoPass
-        {
-            get => twoPass;
-            set => this.SetValueAndNotify(ref twoPass, value, nameof(TwoPass));
-        }
+        public bool TwoPass { get; set; }
     }
 }

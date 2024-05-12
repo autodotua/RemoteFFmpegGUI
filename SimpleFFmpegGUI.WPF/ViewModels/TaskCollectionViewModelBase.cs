@@ -7,18 +7,18 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SimpleFFmpegGUI.WPF.Model
+namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public abstract partial class TaskCollectionBase : ViewModelBase
+    public abstract partial class TaskCollectionViewModelBase : ViewModelBase
     {
         public abstract Task RefreshAsync();
 
         [ObservableProperty]
-        private ObservableCollection<UITaskInfo> tasks;
+        private ObservableCollection<TaskInfoViewModel> tasks;
 
         [ObservableProperty]
-        private UITaskInfo selectedTask;
+        private TaskInfoViewModel selectedTask;
 
-        public IList<UITaskInfo> SelectedTasks=>Tasks.Where(p=>p.IsSelected).ToList();
+        public IList<TaskInfoViewModel> SelectedTasks=>Tasks.Where(p=>p.IsSelected).ToList();
     }
 }

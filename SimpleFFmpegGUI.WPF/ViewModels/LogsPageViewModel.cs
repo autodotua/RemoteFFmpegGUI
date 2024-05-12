@@ -4,7 +4,7 @@ using FzLib;
 using Mapster;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,10 +25,10 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         private IList<Log> logs;
 
         [ObservableProperty]
-        private UITaskInfo selectedTask;
+        private TaskInfoViewModel selectedTask;
 
         [ObservableProperty]
-        private List<UITaskInfo> tasks;
+        private List<TaskInfoViewModel> tasks;
 
         [ObservableProperty]
         private DateTime to = DateTime.Today.AddDays(1);
@@ -40,7 +40,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         {
             taskManager.GetTasksAsync(take: 20).ContinueWith(data =>
               {
-                  Tasks = data.Result.List.Adapt<List<UITaskInfo>>();
+                  Tasks = data.Result.List.Adapt<List<TaskInfoViewModel>>();
               });
             this.logManager = logManager;
         }

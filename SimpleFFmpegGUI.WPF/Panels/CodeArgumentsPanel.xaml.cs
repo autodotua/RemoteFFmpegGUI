@@ -4,7 +4,7 @@ using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -95,7 +95,7 @@ namespace SimpleFFmpegGUI.WPF.Panels
                         IsEnabled = false;
                         var info = await MediaInfoManager.GetMediaInfoAsync(file);
                         var videoArgs = MediaInfoManager.ConvertToVideoArguments(info);
-                        ViewModel.Video = videoArgs.Adapt<VideoArgumentsWithSwitch>();
+                        ViewModel.Video = videoArgs.Adapt<VideoArgumentsViewModel>();
                         if (videoArgs.Crf.HasValue)
                         {
                             ViewModel.Video.EnableCrf = true;

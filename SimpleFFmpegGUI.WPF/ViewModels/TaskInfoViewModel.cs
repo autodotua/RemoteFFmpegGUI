@@ -24,9 +24,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
-namespace SimpleFFmpegGUI.WPF.Model
+namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public partial class UITaskInfo : ViewModelBase, IModel
+    public partial class TaskInfoViewModel : ViewModelBase, IModel
     {
         [ObservableProperty]
         private OutputArguments arguments;
@@ -87,12 +87,12 @@ namespace SimpleFFmpegGUI.WPF.Model
         [ObservableProperty]
         private TaskType type;
 
-        public UITaskInfo()
+        public TaskInfoViewModel()
         {
             StartTimer();
         }
 
-        ~UITaskInfo()
+        ~TaskInfoViewModel()
         {
             timer.Dispose();
         }
@@ -212,10 +212,10 @@ namespace SimpleFFmpegGUI.WPF.Model
         public string Title => Type == TaskType.Custom ? AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name)
             : AttributeHelper.GetAttributeValue<NameDescriptionAttribute, string>(Type, p => p.Name) + "：" + InputText;
 
-        public Snapshot Snapshot { get; } = new Snapshot();
-        public static UITaskInfo FromTask(TaskInfo task)
+        public SnapshotViewModel Snapshot { get; } = new SnapshotViewModel();
+        public static TaskInfoViewModel FromTask(TaskInfo task)
         {
-            return task.Adapt<UITaskInfo>();
+            return task.Adapt<TaskInfoViewModel>();
         }
 
         public Task<TaskInfo> GetTaskAsync()

@@ -2,9 +2,9 @@
 using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 
-namespace SimpleFFmpegGUI.WPF.Model
+namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public partial class Snapshot:ViewModelBase
+    public partial class SnapshotViewModel : ViewModelBase
     {
         [ObservableProperty]
         private bool displayFrame;

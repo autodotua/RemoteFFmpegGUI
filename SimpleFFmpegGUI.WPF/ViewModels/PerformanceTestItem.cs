@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleFFmpegGUI.WPF.Model
+namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public class PerformanceTestCodecParameter:INotifyPropertyChanged
+    public class PerformanceTestCodecParameter : INotifyPropertyChanged
     {
         private double bitrateFacor = 1;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -108,7 +108,7 @@ namespace SimpleFFmpegGUI.WPF.Model
             PSNR = 0;
             VMAF = 0;
             CpuUsage = 0;
-            OutputSize= 0;
+            OutputSize = 0;
         }
     }
 

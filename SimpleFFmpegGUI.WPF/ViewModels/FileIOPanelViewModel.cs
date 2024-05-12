@@ -8,7 +8,7 @@ using Microsoft.Win32;
 using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Messages;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -69,7 +69,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         {
             for (int i = 0; i < MinInputsCount; i++)
             {
-                Inputs.Add(new InputArgumentsDetail() { Index = i + 1, });
+                Inputs.Add(new InputArgumentsViewModel() { Index = i + 1, });
             }
             Inputs.CollectionChanged += Inputs_CollectionChanged;
             Config.Instance.PropertyChanged += (s, e) => this.Notify(nameof(OutputDirPlaceholder));
@@ -80,7 +80,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         /// </summary>
         public bool CanSetOutputFileName => !(Type == TaskType.Code && Inputs.Count > 1);
 
-        public ObservableCollection<InputArgumentsDetail> Inputs { get; } = new ObservableCollection<InputArgumentsDetail>();
+        public ObservableCollection<InputArgumentsViewModel> Inputs { get; } = new ObservableCollection<InputArgumentsViewModel>();
 
         /// <summary>
         /// 最少输入文件的个数
@@ -93,7 +93,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 this.SetValueAndNotify(ref minInputsCount, value, nameof(MinInputsCount));
                 while (value > Inputs.Count)
                 {
-                    Inputs.Add(new InputArgumentsDetail());
+                    Inputs.Add(new InputArgumentsViewModel());
                 }
             }
         }
@@ -116,7 +116,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             {
                 throw new NotSupportedException("无法继续增加输入文件");
             }
-            Inputs.Add(new InputArgumentsDetail());
+            Inputs.Add(new InputArgumentsViewModel());
         }
 
         public List<InputArguments> GetInputs()
@@ -167,7 +167,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 : MinInputsCount;
             while (Inputs.Count < count)
             {
-                Inputs.Add(new InputArgumentsDetail());
+                Inputs.Add(new InputArgumentsViewModel());
             }
             if (keepFiles)
             {
@@ -192,13 +192,13 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
             foreach (var input in inputs.Take(MaxInputsCount))
             {
-                var newInput = input.Adapt<InputArgumentsDetail>();
+                var newInput = input.Adapt<InputArgumentsViewModel>();
                 newInput.Update();
                 Inputs.Add(newInput);
             }
             while (Inputs.Count < MinInputsCount)
             {
-                Inputs.Add(new InputArgumentsDetail());
+                Inputs.Add(new InputArgumentsViewModel());
             }
             OutputDir = Path.GetDirectoryName(output);
             OutputFileName = Path.GetFileName(output);
@@ -235,7 +235,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             };
         }
         [RelayCommand]
-        private async Task BrowseFile(InputArgumentsDetail input)
+        private async Task BrowseFile(InputArgumentsViewModel input)
         {
             var dialog = new Microsoft.Win32.OpenFileDialog().AddAllFilesFilter();
             SendMessage(new FileDialogMessage(dialog));
@@ -271,7 +271,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         }
 
         [RelayCommand]
-        private async Task ClipAsync(InputArgumentsDetail input)
+        private async Task ClipAsync(InputArgumentsViewModel input)
         {
             try
             {
@@ -345,7 +345,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             this.Notify(nameof(CanSetOutputFileName));
         }
         [RelayCommand]
-        private void RemoveFile(InputArgumentsDetail input)
+        private void RemoveFile(InputArgumentsViewModel input)
         {
             Inputs.Remove(input);
         }

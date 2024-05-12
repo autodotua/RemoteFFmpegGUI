@@ -7,7 +7,7 @@ using ModernWpf.FzExtension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Messages;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.Pages;
 using SimpleFFmpegGUI.WPF.Panels;
 using System;
@@ -28,17 +28,17 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
         private readonly TaskManager taskManager;
 
-        private readonly TasksAndStatuses tasksAndStatuses;
-        private readonly AllTasks allTasks;
+        private readonly CurrentTasksViewModel currentTasks;
+        private readonly AllTasksViewModel allTasks;
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(Tasks))]
         private bool showAllTasks;
 
-        public TaskListViewModel(QueueManager queue, TasksAndStatuses tasksAndStatuses, AllTasks allTasks, TaskManager taskManager)
+        public TaskListViewModel(QueueManager queue, CurrentTasksViewModel currentTasks, AllTasksViewModel allTasks, TaskManager taskManager)
         {
             this.queue = queue;
             this.taskManager = taskManager;
-            this.tasksAndStatuses = tasksAndStatuses;
+            this.currentTasks = currentTasks;
             this.allTasks = allTasks;
             Tasks.PropertyChanged += Tasks_PropertyChanged;
         }
@@ -59,7 +59,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
         public SelectionMode SelectionMode => ShowAllTasks ? SelectionMode.Single : SelectionMode.Extended;
 
-        public TaskCollectionBase Tasks => ShowAllTasks ? allTasks : tasksAndStatuses;
+        public TaskCollectionViewModelBase Tasks => ShowAllTasks ? allTasks : currentTasks;
 
         public void NotifyCanExecute()
         {
@@ -68,7 +68,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         [RelayCommand]
         private async Task CancelAsync()
         {
-            var tasks = tasksAndStatuses.SelectedTasks;
+            var tasks = currentTasks.SelectedTasks;
             Debug.Assert(tasks.Count > 0);
             if (tasks.Any(p => p.Status == TaskStatus.Processing))
             {
@@ -149,7 +149,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             OpenOutputFileOrFolder(task, false);
         }
 
-        private void OpenOutputFileOrFolder(UITaskInfo task, bool folder)
+        private void OpenOutputFileOrFolder(TaskInfoViewModel task, bool folder)
         {
             if (string.IsNullOrWhiteSpace(task.RealOutput))
             {
@@ -167,13 +167,13 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         [RelayCommand]
         private async Task ResetAsync()
         {
-            var tasks = tasksAndStatuses.SelectedTasks;
+            var tasks = currentTasks.SelectedTasks;
             Debug.Assert(tasks.Count > 0);
             foreach (var task in tasks)
             {
                 await taskManager.ResetTaskAsync(task.Id);
                 await task.UpdateSelfAsync();
-                tasksAndStatuses.NotifyTaskReseted(task);
+                currentTasks.NotifyTaskReseted(task);
             }
 
             NotifyCanExecute();
@@ -192,7 +192,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         {
             try
             {
-                var tasks = tasksAndStatuses.SelectedTasks;
+                var tasks = currentTasks.SelectedTasks;
                 Debug.Assert(tasks.Count > 0);
                 foreach (var task in tasks)
                 {
