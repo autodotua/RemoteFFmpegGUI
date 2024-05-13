@@ -69,6 +69,30 @@ namespace SimpleFFmpegGUI.WebAPI
             }
         }
 
+        public async Task<TResult> InvokeAsync<TResult>(Expression<Func<IPipeService, Task<TResult>>> exp)
+        {
+            try
+            {
+                return await client.InvokeAsync(exp);
+            }
+            catch (IpcFaultException ex)
+            {
+                throw (ex.InnerException ?? ex).InnerException ?? ex.InnerException ?? ex;
+            }
+        }
+
+        public async Task InvokeAsync(Expression<Func<IPipeService,Task>> exp)
+        {
+            try
+            {
+                await client.InvokeAsync(exp);
+            }
+            catch (IpcFaultException ex)
+            {
+                throw (ex.InnerException ?? ex).InnerException ?? ex.InnerException ?? ex;
+            }
+        }
+
         private void EnsureHost()
         {
             if (hostName != null)

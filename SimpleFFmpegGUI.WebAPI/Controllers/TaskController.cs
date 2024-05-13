@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using FzLib;
 
 namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
@@ -31,7 +32,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("List")]
         public async Task<PagedListDto<TaskInfo>> GetTasks(int status = 0, int skip = 0, int take = 0)
         {
-            var tasks = await pipeClient.InvokeAsync(p => p.GetTasks(status == 0 ? null : (Model.TaskStatus)status, skip, take));
+            var tasks = await pipeClient.InvokeAsync(p => p.GetTasksAsync(status == 0 ? null : (Model.TaskStatus)status, skip, take));
 
             tasks.List.ForEach(p => HideAbsolutePath(p));
             return tasks;
@@ -41,7 +42,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("")]
         public async Task<IActionResult> GetTask(int id)
         {
-            var task = await pipeClient.InvokeAsync(p => p.GetTask(id));
+            var task = await pipeClient.InvokeAsync(p => p.GetTaskAsync(id));
             if (task == null)
             {
                 return NotFound();
@@ -90,7 +91,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                 file.FilePath = await CheckAndGetInputFilePathAsync(file.FilePath);
 
                 ids.Add(await pipeClient.InvokeAsync(p =>
-                 p.AddTask(TaskType.Code,
+                 p.AddTaskAsync(TaskType.Code,
                  new List<InputArguments>() { file },
               GetOutput(request, i),
                  request.Argument)));
@@ -118,7 +119,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
                 file.FilePath = await CheckAndGetInputFilePathAsync(file.FilePath);
             }
             ids.Add(await pipeClient.InvokeAsync(p =>
-                 p.AddTask(TaskType.Concat,
+                 p.AddTaskAsync(TaskType.Concat,
                  request.Inputs,
                  GetOutput(request, 0),
                  request.Argument)));
@@ -147,7 +148,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             request.Inputs.ForEach(p => p.FilePath = Path.Combine(InputDir, p.FilePath));
             var id = await pipeClient.InvokeAsync(p =>
-               p.AddTask(TaskType.Combine,
+               p.AddTaskAsync(TaskType.Combine,
                request.Inputs,
               GetOutput(request, 0),
                request.Argument));
@@ -176,7 +177,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             }
             request.Inputs.ForEach(p => p.FilePath = Path.Combine(InputDir, p.FilePath));
             var id = await pipeClient.InvokeAsync(p =>
-               p.AddTask(TaskType.Compare, request.Inputs, null, null));
+               p.AddTaskAsync(TaskType.Compare, request.Inputs, null, null));
             if (request.Start)
             {
                 await pipeClient.InvokeAsync(p => p.StartQueue()).ConfigureAwait(false);
@@ -191,7 +192,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             CheckNull(request.Argument, "参数");
             CheckNull(request.Argument.Extra, "参数");
             var id = await pipeClient.InvokeAsync(p =>
-               p.AddTask(TaskType.Custom, null, null,
+               p.AddTaskAsync(TaskType.Custom, null, null,
                request.Argument));
             if (request.Start)
             {
@@ -204,42 +205,42 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("Reset")]
         public async Task ResetTaskAsync(int id)
         {
-            await pipeClient.InvokeAsync(p => p.ResetTask(id));
+            await pipeClient.InvokeAsync(p => p.ResetTaskAsync(id));
         }
 
         [HttpPost]
         [Route("Reset/List")]
         public async Task ResetTasksAsync(IEnumerable<int> ids)
         {
-            await pipeClient.InvokeAsync(p => p.ResetTasks(ids));
+            await pipeClient.InvokeAsync(p => p.ResetTasksAsync(ids));
         }
 
         [HttpPost]
         [Route("Cancel")]
         public async Task CancelTaskAsync(int id)
         {
-            await pipeClient.InvokeAsync(p => p.CancelTask(id));
+            await pipeClient.InvokeAsync(p => p.CancelTaskAsync(id));
         }
 
         [HttpPost]
         [Route("Cancel/List")]
         public async Task CancelTasksAsync(IEnumerable<int> ids)
         {
-            await pipeClient.InvokeAsync(p => p.CancelTasks(ids));
+            await pipeClient.InvokeAsync(p => p.CancelTasksAsync(ids));
         }
 
         [HttpPost]
         [Route("Delete")]
         public async Task DeleteTaskAsync(int id)
         {
-            await pipeClient.InvokeAsync(p => p.DeleteTask(id));
+            await pipeClient.InvokeAsync(p => p.DeleteTaskAsync(id));
         }
 
         [HttpPost]
         [Route("Delete/List")]
         public async Task DeleteTasksAsync(IEnumerable<int> ids)
         {
-            await pipeClient.InvokeAsync(p => p.DeleteTasks(ids));
+            await pipeClient.InvokeAsync(p => p.DeleteTasksAsync(ids));
         }
 
         [HttpGet]

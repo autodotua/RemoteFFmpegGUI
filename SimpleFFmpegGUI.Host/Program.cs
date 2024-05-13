@@ -38,13 +38,13 @@ namespace SimpleFFmpegGUI
                 Console.WriteLine("数据库迁移失败：" + ex);
                 Console.WriteLine("程序终止");
                 Console.ReadKey();
-                Environment.Exit(-1);
                 return null;
             }
 
             return Host.CreateDefaultBuilder()
                     .ConfigureServices(services =>
                     {
+                        services.AddFFmpegServices();
                         services.AddSingleton<IPipeService, PipeService>();
                     })
                     .ConfigureIpcHost(builder =>

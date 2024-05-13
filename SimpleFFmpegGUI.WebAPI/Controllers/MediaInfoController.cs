@@ -24,7 +24,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             CheckNull(name, "文件");
             string path = await CheckAndGetInputFilePathAsync(name);
 
-            var result = await pipeClient.InvokeAsync(p => p.GetInfo(path));
+            var result = await pipeClient.InvokeAsync(p => p.GetInfoAsync(path));
             return result;
         }
 

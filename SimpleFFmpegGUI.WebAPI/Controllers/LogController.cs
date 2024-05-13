@@ -26,7 +26,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 to = to.Value.ToLocalTime();
             }
-            var result = await pipeClient.InvokeAsync(p => p.GetLogs(type, taskId, from, to, skip, take));
+            var result = await pipeClient.InvokeAsync(p => p.GetLogsAsync(type, taskId, from, to, skip, take));
             return result;
         }
     }

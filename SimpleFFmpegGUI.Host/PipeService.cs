@@ -13,44 +13,58 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using SimpleFFmpegGUI.Model.MediaInfo;
+using System.Threading.Tasks;
+using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
 namespace SimpleFFmpegGUI
 {
     public class PipeService : IPipeService
     {
-        private static readonly QueueManager manager = new QueueManager();
-        public static QueueManager Manager => manager;
+        private readonly TaskManager taskManager;
+        private readonly QueueManager queueManager;
+        private readonly PresetManager presetManager;
+        private readonly ConfigManager configManager;
+        private readonly LogManager logManager;
 
-        public PipeService()
+        public PipeService(TaskManager taskManager,
+                           QueueManager queueManager,
+                           PresetManager presetManager,
+                           ConfigManager configManager,
+                           LogManager logManager,
+                           Logger logger)
         {
-            using Logger logger = new Logger();
             logger.Info("已建立与客户端的连接");
+            this.taskManager = taskManager;
+            this.queueManager = queueManager;
+            this.presetManager = presetManager;
+            this.configManager = configManager;
+            this.logManager = logManager;
         }
 
         public void StartQueue()
         {
-            manager.StartQueue();
+            queueManager.StartQueue();
         }
 
         public void PauseQueue()
         {
-            manager.SuspendMainQueue();
+            queueManager.SuspendMainQueue();
         }
 
         public void ResumeQueue()
         {
-            manager.ResumeMainQueue();
+            queueManager.ResumeMainQueue();
         }
 
-        public int AddTask(TaskType type, List<InputArguments> inputs, string outputPath, OutputArguments arg)
+        public async Task<int> AddTaskAsync(TaskType type, List<InputArguments> inputs, string outputPath, OutputArguments arg)
         {
-            int id = TaskManager.AddTask(type, inputs, outputPath, arg).Id;
+            int id = (await taskManager.AddTaskAsync(type, inputs, outputPath, arg)).Id;
             return id;
         }
 
-        public MediaInfoGeneral GetInfo(string path)
+        public Task<MediaInfoGeneral> GetInfoAsync(string path)
         {
-            return MediaInfoManager.GetMediaInfoAsync(path).Result;
+            return MediaInfoManager.GetMediaInfoAsync(path);
         }
 
         public void Join(IEnumerable<string> path)
@@ -60,76 +74,76 @@ namespace SimpleFFmpegGUI
 
         public void CancelQueue()
         {
-            manager.Cancel();
+            queueManager.Cancel();
         }
 
-        public PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)
+        public Task<PagedListDto<TaskInfo>> GetTasksAsync(TaskStatus? status = null, int skip = 0, int take = 0)
         {
-            return TaskManager.GetTasks(status, skip, take);
+            return taskManager.GetTasksAsync(status, skip, take);
         }
 
-        public TaskInfo GetTask(int id)
+        public Task<TaskInfo> GetTaskAsync(int id)
         {
-            return TaskManager.GetTask(id);
+            return taskManager.GetTaskAsync(id);
         }
 
         public StatusDto GetStatus()
         {
-            StatusDto status = manager.MainQueueManager == null
+            StatusDto status = queueManager.MainQueueManager == null
                 ? new StatusDto()
-                : manager.MainQueueManager.GetStatus();
+                : queueManager.MainQueueManager.GetStatus();
 
             return status;
         }
 
-        public void ResetTask(int id)
+        public Task ResetTaskAsync(int id)
         {
-            TaskManager.ResetTask(id, manager);
+            return taskManager.ResetTaskAsync(id);
         }
 
-        public void CancelTask(int id)
+        public Task CancelTaskAsync(int id)
         {
-            TaskManager.CancelTask(id, manager);
+            return taskManager.CancelTaskAsync(id);
         }
 
-        public void ResetTasks(IEnumerable<int> ids)
+        public Task ResetTasksAsync(IEnumerable<int> ids)
         {
-            TaskManager.TryResetTasks(ids, manager);
+            return taskManager.TryResetTasksAsync(ids);
         }
 
-        public void CancelTasks(IEnumerable<int> ids)
+        public Task CancelTasksAsync(IEnumerable<int> ids)
         {
-            TaskManager.TryCancelTasks(ids, manager);
+            return taskManager.TryCancelTasksAsync(ids);
         }
 
-        public void DeleteTask(int id)
+        public Task DeleteTaskAsync(int id)
         {
-            TaskManager.DeleteTask(id, manager);
+            return taskManager.DeleteTaskAsync(id);
         }
 
-        public void DeleteTasks(IEnumerable<int> ids)
+        public Task DeleteTasksAsync(IEnumerable<int> ids)
         {
-            TaskManager.TryDeleteTasks(ids, manager);
+            return taskManager.TryDeleteTasks(ids);
         }
 
-        public int AddOrUpdatePreset(string name, TaskType type, OutputArguments arguments)
+        public Task<int> AddOrUpdatePresetAsync(string name, TaskType type, OutputArguments arguments)
         {
-            return PresetManager.AddOrUpdatePreset(name, type, arguments);
+            return presetManager.AddOrUpdatePresetAsync(name, type, arguments);
         }
 
-        public void DeletePreset(int id)
+        public Task DeletePresetAsync(int id)
         {
-            PresetManager.DeletePreset(id);
+            return presetManager.DeletePresetAsync(id);
         }
 
-        public List<CodePreset> GetPresets()
+        public Task<List<CodePreset>> GetPresetsAsync()
         {
-            return PresetManager.GetPresets();
+            return presetManager.GetPresetsAsync();
         }
 
-        public PagedListDto<Log> GetLogs(char? type = null, int taskId = 0, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0)
+        public Task<PagedListDto<Log>> GetLogsAsync(char? type = null, int taskId = 0, DateTime? from = null, DateTime? to = null, int skip = 0, int take = 0)
         {
-            return LogManager.GetLogs(type, taskId, from, to, skip, take);
+            return logManager.GetLogsAsync(type, taskId, from, to, skip, take);
         }
 
         public List<string> GetFiles(string dir)
@@ -181,42 +195,42 @@ namespace SimpleFFmpegGUI
             return VideoFormat.Formats;
         }
 
-        public void SetDefaultPreset(int id)
+        public Task SetDefaultPresetAsync(int id)
         {
-            PresetManager.SetDefaultPreset(id);
+            return presetManager.SetDefaultPresetAsync(id);
         }
 
-        public CodePreset GetDefaultPreset(TaskType type)
+        public Task<CodePreset> GetDefaultPresetAsync(TaskType type)
         {
-            return PresetManager.GetDefaultPreset(type);
+            return presetManager.GetDefaultPresetAsync(type);
         }
 
-        public void ImportPresets(string json)
+        public Task ImportPresetsAsync(string json)
         {
-            PresetManager.Import(json);
+            return presetManager.ImportAsync(json);
         }
 
-        public string ExportPresets()
+        public Task<string> ExportPresetsAsync()
         {
-            return PresetManager.Export();
+            return presetManager.ExportAsync();
         }
 
         public void SetShutdownAfterQueueFinished(bool v)
         {
-            Manager.PowerManager.ShutdownAfterQueueFinished = v;
+            queueManager.PowerManager.ShutdownAfterQueueFinished = v;
         }
         public bool IsShutdownAfterQueueFinished()
         {
-            return Manager.PowerManager.ShutdownAfterQueueFinished;
+            return queueManager.PowerManager.ShutdownAfterQueueFinished;
         }
 
         public void Shutdown()
         {
-            Manager.PowerManager.Shutdown();
+            queueManager.PowerManager.Shutdown();
         }
         public void AbortShutdown()
         {
-            Manager.PowerManager.AbortShutdown();
+            queueManager.PowerManager.AbortShutdown();
         }
 
         public CpuCoreUsageDto[] GetCpuUsage(TimeSpan sampleSpan)
@@ -226,17 +240,17 @@ namespace SimpleFFmpegGUI
 
         public void ScheduleQueue(DateTime time)
         {
-            Manager.ScheduleQueue(time);
+            queueManager.ScheduleQueue(time);
         }
 
         public void CancelQueueSchedule()
         {
-            Manager.CancelQueueSchedule();
+            queueManager.CancelQueueSchedule();
         }
 
         public DateTime? GetQueueScheduleTime()
         {
-            return Manager.GetQueueScheduleTime();
+            return queueManager.GetQueueScheduleTime();
         }
 
         public string GetSingleFileInDir(string dir, string name)
@@ -255,13 +269,13 @@ namespace SimpleFFmpegGUI
 
         public int GetDefaultProcessPriority()
         {
-            return ConfigManager.DefaultProcessPriority;
+            return configManager.DefaultProcessPriority;
         }
 
         public void SetDefaultProcessPriority(int priority)
         {
-            ConfigManager.DefaultProcessPriority = priority;
-            foreach (var task in manager.Managers)
+            configManager.DefaultProcessPriority = priority;
+            foreach (var task in queueManager.Managers)
             {
                 task.Process.Priority = priority;
             }

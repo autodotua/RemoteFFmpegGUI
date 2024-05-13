@@ -204,7 +204,7 @@ namespace SimpleFFmpegGUI.Manager
             return count;
         }
 
-        public async Task DeleteTask(int id)
+        public async Task DeleteTaskAsync(int id)
         {
             TaskInfo task = await db.Tasks.FindAsync(id) ?? throw new ArgumentException($"找不到ID为{id}的任务");
             if (queue.Tasks.Any(p => p.Id == task.Id))

@@ -26,9 +26,9 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         {
             if (type.HasValue)
             {
-                return (await pipeClient.InvokeAsync(p => p.GetPresets())).Where(p => p.Type == type).ToList();
+                return (await pipeClient.InvokeAsync(p => p.GetPresetsAsync())).Where(p => p.Type == type).ToList();
             }
-            return await pipeClient.InvokeAsync(p => p.GetPresets());
+            return await pipeClient.InvokeAsync(p => p.GetPresetsAsync());
         }
 
         [HttpPost]
@@ -36,14 +36,14 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         public Task<int> AddAsync([FromBody] CodePresetDto request)
         {
             CheckNull(request, "请求");
-            return pipeClient.InvokeAsync(p => p.AddOrUpdatePreset(request.Name, request.Type, request.Arguments));
+            return pipeClient.InvokeAsync(p => p.AddOrUpdatePresetAsync(request.Name, request.Type, request.Arguments));
         }
 
         [HttpPost]
         [Route("Delete")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            await pipeClient.InvokeAsync(p => p.DeletePreset(id));
+            await pipeClient.InvokeAsync(p => p.DeletePresetAsync(id));
             return Ok();
         }
 
@@ -51,7 +51,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         [Route("Export")]
         public async Task<FileResult> ExportAsync()
         {
-            string json = await pipeClient.InvokeAsync(p => p.ExportPresets());
+            string json = await pipeClient.InvokeAsync(p => p.ExportPresetsAsync());
             return File(json.ToUTF8Bytes(), "application/json");
         }
 
@@ -63,7 +63,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             byte[] buffer = new byte[s.Length];
             await s.ReadAsync(buffer, 0, buffer.Length);
             string json = buffer.ToUTF8String();
-            await pipeClient.InvokeAsync(p => p.ImportPresets(json));
+            await pipeClient.InvokeAsync(p => p.ImportPresetsAsync(json));
             return Ok();
         }
     }
