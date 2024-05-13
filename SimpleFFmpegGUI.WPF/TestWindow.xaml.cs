@@ -46,12 +46,12 @@ namespace SimpleFFmpegGUI.WPF
         /// </summary>
         private void CreateDataGrids()
         {
-            grpSpeed.Content = GetDataGrid(nameof(PerformanceTestItem.FPS), "0.00");
-            grpSSIM.Content = GetDataGrid(nameof(PerformanceTestItem.SSIM), "0.00%");
-            grpPSNR.Content = GetDataGrid(nameof(PerformanceTestItem.PSNR), "0.00");
-            grpVMAF.Content = GetDataGrid(nameof(PerformanceTestItem.VMAF), "0.00");
-            grpCpuUsage.Content = GetDataGrid(nameof(PerformanceTestItem.CpuUsage), "0.00%");
-            grpOutputSize.Content = GetDataGrid(nameof(PerformanceTestItem.OutputSize), "0.00");
+            grpSpeed.Content = GetDataGrid(nameof(PerformanceTestItemViewModel.Fps), "0.00");
+            grpSSIM.Content = GetDataGrid(nameof(PerformanceTestItemViewModel.Ssim), "0.00%");
+            grpPSNR.Content = GetDataGrid(nameof(PerformanceTestItemViewModel.Psnr), "0.00");
+            grpVMAF.Content = GetDataGrid(nameof(PerformanceTestItemViewModel.Vmaf), "0.00");
+            grpCpuUsage.Content = GetDataGrid(nameof(PerformanceTestItemViewModel.CpuUsage), "0.00%");
+            grpOutputSize.Content = GetDataGrid(nameof(PerformanceTestItemViewModel.OutputSize), "0.00");
 
             DataGrid GetDataGrid(string type, string format = null)
             {
@@ -135,7 +135,7 @@ namespace SimpleFFmpegGUI.WPF
                 };
                 FrameworkElementFactory factory = new FrameworkElementFactory(typeof(CheckBox));
                 factory.SetValue(MarginProperty, new Thickness(16, 0, 0, 0));
-                factory.SetBinding(CheckBox.IsCheckedProperty, new Binding($"{nameof(PerformanceTestLine.Items)}[{i}].{nameof(PerformanceTestItem.IsChecked)}")
+                factory.SetBinding(CheckBox.IsCheckedProperty, new Binding($"{nameof(PerformanceTestLine.Items)}[{i}].{nameof(PerformanceTestItemViewModel.IsChecked)}")
                 {
                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                 });

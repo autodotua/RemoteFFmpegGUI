@@ -85,7 +85,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             {
                 for (int i = 0; i < CodecsCount; i++)
                 {
-                    Codecs[i] = new PerformanceTestCodecParameter()
+                    Codecs[i] = new PerformanceTestCodecParameterViewModel()
                     {
                         CpuSpeed = VideoCodec.VideoCodecs[i].DefaultSpeedLevel,
                         CRF = VideoCodec.VideoCodecs[i].DefaultCRF,
@@ -111,7 +111,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             QCMode = Config.Instance.TestQCMode;
         }
 
-        public PerformanceTestCodecParameter[] Codecs { get; } = new PerformanceTestCodecParameter[CodecsCount];
+        public PerformanceTestCodecParameterViewModel[] Codecs { get; } = new PerformanceTestCodecParameterViewModel[CodecsCount];
 
 
         public PerformanceTestLine[] Tests { get; } = new PerformanceTestLine[SizesCount];
@@ -225,7 +225,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 }
                 foreach (var test in Tests)
                 {
-                    foreach (var item in test.Items.Where(p => p.FPS > 0))
+                    foreach (var item in test.Items.Where(p => p.Fps > 0))
                     {
                         var codec = Codecs.First(p => p.Name == item.Codec);
                         str.Append(item.Codec ?? "")
@@ -242,13 +242,13 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                             .Append(',')
                             .Append(codec.ExtraArguments ?? "")
                             .Append(',')
-                            .Append(item.FPS)
+                            .Append(item.Fps)
                             .Append(',')
-                            .Append(item.VMAF)
+                            .Append(item.Vmaf)
                             .Append(',')
-                            .Append(item.SSIM)
+                            .Append(item.Ssim)
                             .Append(',')
-                            .Append(item.PSNR)
+                            .Append(item.Psnr)
                             .Append(',')
                             .Append(item.CpuUsage)
                             .Append(',')
@@ -466,7 +466,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                         await runningFFmpeg.RunAsync();
                         item.CpuUsage = runningFFmpeg.LastProcess.CpuUsage;
                         item.ProcessDuration = runningFFmpeg.LastProcess.RunningTime;
-                        item.FPS = frameCount / item.ProcessDuration.TotalSeconds;
+                        item.Fps = frameCount / item.ProcessDuration.TotalSeconds;
                         item.OutputSize = 1.0 * new FileInfo(task.RealOutput).Length / 1024 / 1024;
                     }
                     catch (TaskCanceledException)
@@ -540,11 +540,11 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                     }
 
                     string message = qualityTask.Message;
-                    item.SSIM = double.Parse(Regex.Match(message, @"All:[0-9\.]+").Value[4..]);
-                    item.PSNR = double.Parse(Regex.Match(message, @"average:[0-9\.]+").Value[8..]);
+                    item.Ssim = double.Parse(Regex.Match(message, @"All:[0-9\.]+").Value[4..]);
+                    item.Psnr = double.Parse(Regex.Match(message, @"average:[0-9\.]+").Value[8..]);
                     try
                     {
-                        item.VMAF = double.Parse(Regex.Match(message, @"VMAF score: [0-9\.]+").Value[12..]);
+                        item.Vmaf = double.Parse(Regex.Match(message, @"VMAF score: [0-9\.]+").Value[12..]);
                     }
                     catch
                     {

@@ -19,7 +19,7 @@ namespace SimpleFFmpegGUI.Model
 
         public FFmpegDbContext()
         {
-            //Database.EnsureCreated();
+            Database.EnsureCreated();
         }
 
         public DbSet<Config> Configs { get; set; }

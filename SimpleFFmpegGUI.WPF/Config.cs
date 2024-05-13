@@ -74,7 +74,7 @@ namespace SimpleFFmpegGUI.WPF
 
         public Dictionary<TaskType, OutputArguments> LastOutputArguments { get; set; } = new Dictionary<TaskType, OutputArguments>();
 
-        public PerformanceTestCodecParameter[] TestCodecs { get; set; }
+        public PerformanceTestCodecParameterViewModel[] TestCodecs { get; set; }
         public PerformanceTestLine[] TestItems { get; set; }
         public int TestQCMode { get; set; } = 0;
         public string TestVideo { get; set; }
