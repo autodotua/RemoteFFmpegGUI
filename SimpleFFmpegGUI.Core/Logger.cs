@@ -144,7 +144,7 @@ namespace SimpleFFmpegGUI
                     if (db.ChangeTracker.HasChanges())
                     {
                         db.SaveChanges();
-                    }
+                    }   
                 }
             }
             catch (Exception ex)

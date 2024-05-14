@@ -17,7 +17,6 @@
         <converters:TimeSpanConverter
             x:Key="TimeSpanMMConverter"
             Format="hh\:mm\:ss\.fff" />
-        <local:Int2StringConverter x:Key="Int2StringConverter" />
         <Style
             BasedOn="{StaticResource DefaultComboBoxStyle}"
             TargetType="{x:Type ComboBox}">

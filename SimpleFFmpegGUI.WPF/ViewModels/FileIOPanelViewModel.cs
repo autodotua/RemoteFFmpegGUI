@@ -130,7 +130,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             {
                 throw new Exception("输入文件少于需要的文件数量");
             }
-            return inputs.Cast<InputArguments>().ToList();
+            return inputs.Adapt<List<InputArguments>>();
         }
 
         public string GetOutput(InputArguments inputArgs)

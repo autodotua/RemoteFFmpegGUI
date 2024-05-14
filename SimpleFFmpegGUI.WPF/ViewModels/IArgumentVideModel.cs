@@ -2,7 +2,7 @@
 
 namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public interface IArgumentVideModel : INotifyPropertyChanged
+    public interface IArgumentVideModel
     {
         /// <summary>
         /// 将原始数据更新到UI数据

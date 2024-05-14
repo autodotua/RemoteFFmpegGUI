@@ -20,6 +20,7 @@
             <converters:Bitrate2StringConverter x:Key="Bitrate2StringConverter" />
             <converters:CountEqualsOneValueConverter x:Key="CountEqualsOneValueConverter" />
             <converters:Index2StringConverter x:Key="Index2StringConverter" />
+            <converters:Int2StringConverter x:Key="Int2StringConverter" />
             <system:String x:Key="DateTimeFormat">yyyy-MM-dd HH:mm:ss</system:String>
             <system:String x:Key="TimeSpanFormat">hh\:mm\:ss\.fff</system:String>
         </ResourceDictionary>

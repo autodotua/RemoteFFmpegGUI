@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using FzLib;
 using FzLib.DataStorage.Serialization;
+using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using SimpleFFmpegGUI.Model;
@@ -23,7 +24,7 @@ namespace SimpleFFmpegGUI.WPF
         SpecialDir
     }
 
-    public partial class Config : ObservableObject, IJsonSerializable, INotifyPropertyChanged
+    public partial class Config : ObservableObject
     {
         private const string path = "config.json";
 
@@ -57,18 +58,25 @@ namespace SimpleFFmpegGUI.WPF
         {
             get
             {
+                var config = App.ServiceProvider.GetService<Config>();
                 if (!loaded)
                 {
                     loaded = true;
-                    try
+                    if (File.Exists(path))
                     {
-                        App.ServiceProvider.GetService<Config>().TryLoadFromJsonFile(path);
+                        try
+                        {
+                            var json = File.ReadAllText(path);
+                            var obj = JsonConvert.DeserializeObject<Config>(json);
+                            obj.Adapt(config);
+                        }
+                        catch (Exception ex)
+                        {
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                    }
+
                 }
-                return App.ServiceProvider.GetService<Config>();
+                return config;
             }
         }
 
@@ -81,7 +89,11 @@ namespace SimpleFFmpegGUI.WPF
         public bool WindowMaximum { get; set; } = false;
         public void Save()
         {
-            this.Save(path, new JsonSerializerSettings().SetIndented());
+            var json = JsonConvert.SerializeObject(this, new JsonSerializerSettings()
+            {
+                Formatting = Formatting.Indented
+            });
+            File.WriteAllText(path, json);
         }
         public Config DeepCopy()
         {
