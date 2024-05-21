@@ -36,6 +36,23 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         [NotifyPropertyChangedFor(nameof(CanAddFile))]
         private TaskType type;
 
+        /// <summary>
+        /// 设置Type（若新的Type不同于旧的）或以当前Type更新ViewModel（若相同）
+        /// </summary>
+        /// <param name="type"></param>
+        public void SetType(TaskType type)
+        {
+            if(Type!= type)
+            {
+                Type = type;
+            }
+            else
+            {
+                OnTypeUpdated();
+            }
+        }
+
+
         public AddTaskPageViewModel(TaskManager taskManager,CurrentTasksViewModel tasks)
         {
             this.taskManager = taskManager;
@@ -73,13 +90,9 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             }
         }
 
-        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        partial void OnTypeChanged(TaskType oldValue, TaskType newValue)
         {
-            base.OnPropertyChanged(e);
-            if (e.PropertyName == nameof(Type))
-            {
-                OnTypeUpdated();
-            }
+            OnTypeUpdated();
         }
 
         [RelayCommand(CanExecute = nameof(CanAddFile))]

@@ -260,6 +260,10 @@ namespace SimpleFFmpegGUI.Manager
                     _ => throw new NotSupportedException("不支持的任务类型：" + task.Type),
                 });
 
+                if(task.Status==TaskStatus.Error)
+                {
+                    Debug.Assert(false);
+                }
 
                 if (task.RealOutput != null && File.Exists(task.RealOutput) && task.Arguments.ProcessedOptions?.SyncModifiedTime == true)
                 {

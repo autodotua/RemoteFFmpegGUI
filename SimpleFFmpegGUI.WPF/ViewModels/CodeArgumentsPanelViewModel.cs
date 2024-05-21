@@ -22,7 +22,8 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
         private AudioArgumentsViewModel audio = new AudioArgumentsViewModel();
 
-        private ChannelOutputStrategy audioOutputStrategy = ChannelOutputStrategy.Code;
+        [ObservableProperty]
+        private ChannelOutputStrategy audioOutputStrategy = ChannelOutputStrategy.Copy;
 
         [ObservableProperty]
         private bool canApplyDefaultPreset = true;
@@ -57,7 +58,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         private VideoArgumentsViewModel video = new VideoArgumentsViewModel();
 
         [ObservableProperty]
-        private ChannelOutputStrategy videoOutputStrategy = ChannelOutputStrategy.Code;
+        private ChannelOutputStrategy videoOutputStrategy = ChannelOutputStrategy.Copy;
 
         public CodeArgumentsPanelViewModel(PresetManager presetManager)
         {
@@ -77,19 +78,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         public IEnumerable AudioBitrates { get; } = new[] { 32, 64, 96, 128, 192, 256, 320 };
 
         public IEnumerable AudioCodecs { get; } = new[] { "自动", "AAC", "OPUS" };
-
-        public ChannelOutputStrategy AudioOutputStrategy
-        {
-            get => audioOutputStrategy;
-            set
-            {
-                this.SetValueAndNotify(ref audioOutputStrategy, value, nameof(AudioOutputStrategy));
-                if (value == ChannelOutputStrategy.Code && Audio == null)
-                {
-                    Audio = new AudioArgumentsViewModel();
-                }
-            }
-        }
 
         public IEnumerable AudioSamplingRates { get; } = new[] { 8000, 16000, 32000, 44100, 48000, 96000, 192000 };
 
@@ -125,7 +113,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 Extra = Extra,
                 ProcessedOptions = ProcessedOptions,
                 DisableVideo = VideoOutputStrategy == ChannelOutputStrategy.Disable,
-                DisableAudio = audioOutputStrategy == ChannelOutputStrategy.Disable,
+                DisableAudio = AudioOutputStrategy == ChannelOutputStrategy.Disable,
             };
         }
         public void Update(TaskType type, OutputArguments argument = null)
@@ -184,29 +172,33 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 Update(type);
             }
         }
-        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+
+        partial void OnCanSetVideoAndAudioChanged(bool value)
         {
-            base.OnPropertyChanged(e);
-            switch (e.PropertyName)
+            if (CanSetVideoAndAudio)
             {
-                case nameof(CanSetVideoAndAudio):
-                    if (CanSetVideoAndAudio)
-                    {
-                        VideoOutputStrategy = ChannelOutputStrategy.Code;
-                        AudioOutputStrategy = ChannelOutputStrategy.Code;
-                    }
-                    else
-                    {
-                        VideoOutputStrategy = ChannelOutputStrategy.Disable;
-                        AudioOutputStrategy = ChannelOutputStrategy.Disable;
-                    }
-                    break;
-                case nameof(VideoOutputStrategy):
-                    if (VideoOutputStrategy == ChannelOutputStrategy.Code && Audio == null)
-                    {
-                        Video = new VideoArgumentsViewModel();
-                    }
-                    break;
+                VideoOutputStrategy = ChannelOutputStrategy.Code;
+                AudioOutputStrategy = ChannelOutputStrategy.Code;
+            }
+            else
+            {
+                VideoOutputStrategy = ChannelOutputStrategy.Disable;
+                AudioOutputStrategy = ChannelOutputStrategy.Disable;
+            }
+        }
+
+        partial void OnVideoOutputStrategyChanged(ChannelOutputStrategy value)
+        {
+            if (value == ChannelOutputStrategy.Code && Video == null)
+            {
+                Video = new VideoArgumentsViewModel();
+            }
+        }
+        partial void OnAudioOutputStrategyChanged(ChannelOutputStrategy value)
+        {
+            if (value == ChannelOutputStrategy.Code && Audio == null)
+            {
+                Audio = new AudioArgumentsViewModel();
             }
         }
     }
