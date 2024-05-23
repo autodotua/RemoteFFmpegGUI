@@ -52,8 +52,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         [ObservableProperty]
         private ProcessedOptions processedOptions = new ProcessedOptions();
 
-        private TaskType type;
-
         [ObservableProperty]
         private VideoArgumentsViewModel video = new VideoArgumentsViewModel();
 
@@ -116,9 +114,9 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 DisableAudio = AudioOutputStrategy == ChannelOutputStrategy.Disable,
             };
         }
+
         public void Update(TaskType type, OutputArguments argument = null)
         {
-            this.type = type;
             CanSpecifyFormat = type is TaskType.Code or TaskType.Combine or TaskType.Concat;
             CanSetVideoAndAudio = type is TaskType.Code;
             CanSetCombine = type is TaskType.Combine;
@@ -173,6 +171,14 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             }
         }
 
+        partial void OnAudioOutputStrategyChanged(ChannelOutputStrategy value)
+        {
+            if (value == ChannelOutputStrategy.Code && Audio == null)
+            {
+                Audio = new AudioArgumentsViewModel();
+            }
+        }
+
         partial void OnCanSetVideoAndAudioChanged(bool value)
         {
             if (CanSetVideoAndAudio)
@@ -192,13 +198,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             if (value == ChannelOutputStrategy.Code && Video == null)
             {
                 Video = new VideoArgumentsViewModel();
-            }
-        }
-        partial void OnAudioOutputStrategyChanged(ChannelOutputStrategy value)
-        {
-            if (value == ChannelOutputStrategy.Code && Audio == null)
-            {
-                Audio = new AudioArgumentsViewModel();
             }
         }
     }

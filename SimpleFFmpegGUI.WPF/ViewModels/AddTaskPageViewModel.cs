@@ -36,24 +36,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         [NotifyPropertyChangedFor(nameof(CanAddFile))]
         private TaskType type;
 
-        /// <summary>
-        /// 设置Type（若新的Type不同于旧的）或以当前Type更新ViewModel（若相同）
-        /// </summary>
-        /// <param name="type"></param>
-        public void SetType(TaskType type)
-        {
-            if(Type!= type)
-            {
-                Type = type;
-            }
-            else
-            {
-                OnTypeUpdated();
-            }
-        }
-
-
-        public AddTaskPageViewModel(TaskManager taskManager,CurrentTasksViewModel tasks)
+        public AddTaskPageViewModel(TaskManager taskManager, CurrentTasksViewModel tasks)
         {
             this.taskManager = taskManager;
             this.tasks = tasks;
@@ -88,11 +71,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                     throw new HttpRequestException($"{response.StatusCode}：{responseString}");
                 }
             }
-        }
-
-        partial void OnTypeChanged(TaskType oldValue, TaskType newValue)
-        {
-            OnTypeUpdated();
         }
 
         [RelayCommand(CanExecute = nameof(CanAddFile))]
@@ -253,13 +231,13 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 await CommonDialog.ShowErrorDialogAsync(ex, "获取参数失败");
             }
         }
-        public  async void OnTypeUpdated()
-        {
-            FileIOViewModel.UpdateType(Type);
-            await CodeArgumentsViewModel.UpdateTypeAsync(Type);
-            await PresetsViewModel.UpdateTypeAsync(Type);
-        }
 
+        async partial void OnTypeChanged(TaskType value)
+        {
+            FileIOViewModel.UpdateType(value);
+            await CodeArgumentsViewModel.UpdateTypeAsync(value);
+            await PresetsViewModel.UpdateTypeAsync(value);
+        }
         private void SaveAsLastOutputArguments(OutputArguments arguments)
         {
             if (!Config.Instance.RememberLastArguments)

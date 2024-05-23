@@ -54,7 +54,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
         public void SetAsClone(TaskInfo task)
         {
             canInitializeType = false;
-            ViewModel.SetType(task.Type);
+            ViewModel.SetAndNotify(nameof(ViewModel.Type), task.Type);
             fileIOPanel.Update(task.Type, task.Inputs, task.Output);
             argumentsPanel.Update(task.Type, task.Arguments);
         }
@@ -62,7 +62,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
         public void SetFiles(IEnumerable<string> files, TaskType type)
         {
             canInitializeType = false;
-            ViewModel.SetType(type);
+            ViewModel.SetAndNotify(nameof(ViewModel.Type), type);
             fileIOPanel.Update(type, files.Select(p => new InputArguments() { FilePath = p }).ToList(), null);
         }
 
@@ -75,7 +75,7 @@ namespace SimpleFFmpegGUI.WPF.Pages
         {
             if (canInitializeType)
             {
-                ViewModel.OnTypeUpdated();
+                ViewModel.SetAndNotify(nameof(ViewModel.Type),ViewModel.Type);
                 canInitializeType = false;
             }
         }
