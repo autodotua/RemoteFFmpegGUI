@@ -2,9 +2,10 @@
   <div>
     <div>
       <span style="float: right">
-        <a class="right12" v-if="isProcessing == false && hasSchedule"
-          >已计划开始时间</a
-        >
+        <a
+          class="right12"
+          v-if="isProcessing == false && hasSchedule"
+        >已计划开始时间</a>
         <el-date-picker
           v-if="isProcessing == false"
           class="right12"
@@ -20,73 +21,57 @@
           type="secondary"
           @click="schedule"
           class="right24"
-          >设置计划</el-button
-        >
+        >设置计划</el-button>
 
         <el-button
           v-if="isProcessing == false && hasSchedule"
           type="secondary"
           @click="cancelSchedule"
           class="right24"
-          >取消计划</el-button
-        >
+        >取消计划</el-button>
 
-        <el-button v-if="isProcessing == false" type="primary" @click="start"
-          >开始队列</el-button
-        >
+        <el-button
+          v-if="isProcessing == false"
+          type="primary"
+          @click="start"
+        >开始队列</el-button>
         <el-popconfirm
           v-if="isProcessing"
           title="真的要取消任务吗？"
           @confirm="cancel"
           class="right12"
         >
-          <el-button type="danger" slot="reference"
-            >停止</el-button
-          ></el-popconfirm
-        >
+          <el-button
+            type="danger"
+            slot="reference"
+          >停止</el-button></el-popconfirm>
         <el-button
           class="right12"
           v-if="isProcessing && isPaused == false"
           type="warning"
           @click="pause"
-          >暂停</el-button
-        >
+        >暂停</el-button>
         <el-button
           class="right12"
           v-if="isProcessing && isPaused"
           type="warn"
           @click="resume"
-          >继续</el-button
-        >
+        >继续</el-button>
       </span>
       <span style="float: left">
-        <el-popconfirm
-          title="真的要取消所选任务吗？正在执行的任务会被终止"
-          @confirm="deleteTasks"
+
+        <el-button
+          v-if="selection.length > 0"
+          type="danger"
           class="right12"
-        >
-          <el-button v-if="selection.length > 0" slot="reference" type="danger"
-            >删除</el-button
-          ></el-popconfirm
-        >
+          @click="cancelTasks"
+        >取消</el-button>
         <el-button
           v-if="selection.length > 0"
           class="right12"
           @click="resetTasks"
-          >重置</el-button
-        >
-        <el-popconfirm
-          title="真的要取消所选任务吗？正在执行的任务会被终止"
-          @confirm="cancelTasks"
-        >
-          <el-button
-            v-if="selection.length > 0"
-            type="warnning"
-            slot="reference"
-            >取消</el-button
-          ></el-popconfirm
-        ></span
-      >
+        >重置</el-button>
+      </span>
     </div>
     <el-table
       ref="table"
@@ -95,9 +80,16 @@
     >
       <el-table-column type="expand">
         <template slot-scope="props">
-          <el-form label-position="left" label-width="120px" class="pre-wrap">
+          <el-form
+            label-position="left"
+            label-width="120px"
+            class="pre-wrap"
+          >
             <el-form-item label="输入">
-              <div v-for="file in props.row.inputs" :key="file.filePath">
+              <div
+                v-for="file in props.row.inputs"
+                :key="file.filePath"
+              >
                 <a class="right24">
                   {{ file.filePath }}
                   <br v-if="file.image2" />
@@ -105,28 +97,34 @@
                   <br v-if="file.extra" />
                   {{ file.extra ? "额外参数：" + file.extra : "" }}
                 </a>
-                <a v-if="file.from" class="right12"> 开始：{{ file.from }}s</a>
-                <a v-if="file.to" class="right12"> 结束：{{ file.to }}s</a>
-                <a v-if="file.duration" class="right12">
-                  经过：{{ file.duration }}s</a
+                <a
+                  v-if="file.from"
+                  class="right12"
+                > 开始：{{ file.from }}s</a>
+                <a
+                  v-if="file.to"
+                  class="right12"
+                > 结束：{{ file.to }}s</a>
+                <a
+                  v-if="file.duration"
+                  class="right12"
                 >
+                  经过：{{ file.duration }}s</a>
               </div>
             </el-form-item>
             <el-form-item label="输出">{{ props.row.output }} </el-form-item>
-            <el-form-item label="创建时间"
-              >{{ props.row.createTime }}
+            <el-form-item label="创建时间">{{ props.row.createTime }}
             </el-form-item>
-            <el-form-item label="开始时间"
-              >{{ props.row.startTime }}
+            <el-form-item label="开始时间">{{ props.row.startTime }}
             </el-form-item>
-            <el-form-item label="结束时间"
-              >{{ props.row.finishTime }}
+            <el-form-item label="结束时间">{{ props.row.finishTime }}
             </el-form-item>
-            <el-form-item label="FFmpeg参数"
-              >{{ props.row.fFmpegArguments }}
+            <el-form-item label="FFmpeg参数">{{ props.row.fFmpegArguments }}
             </el-form-item>
-            <el-form-item label="信息" class="s"
-              >{{ props.row.message }}
+            <el-form-item
+              label="信息"
+              class="s"
+            >{{ props.row.message }}
             </el-form-item>
             <el-form-item label="参数">
               <code-arguments-description
@@ -137,32 +135,58 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="typeText" label="类型" width="90" />
-      <el-table-column label="状态" width="80">
+      <el-table-column
+        type="selection"
+        width="55"
+      />
+      <el-table-column
+        prop="typeText"
+        label="类型"
+        width="90"
+      />
+      <el-table-column
+        label="状态"
+        width="80"
+      >
         <template slot-scope="scope">
-          <span style="" v-if="scope.row.status == 1">待处理</span>
+          <span
+            style=""
+            v-if="scope.row.status == 1"
+          >待处理</span>
           <span
             style="color: orange; font-weight: bold"
             v-if="scope.row.status == 2"
-            >进行中</span
-          >
-          <span style="color: green" v-if="scope.row.status == 3">完成</span>
-          <span style="color: red" v-if="scope.row.status == 4">错误</span>
-          <span style="color: gray" v-if="scope.row.status == 5">取消</span>
-        </template></el-table-column
-      >
-      <el-table-column prop="inputText" label="输入" min-width="360" />
+          >进行中</span>
+          <span
+            style="color: green"
+            v-if="scope.row.status == 3"
+          >完成</span>
+          <span
+            style="color: red"
+            v-if="scope.row.status == 4"
+          >错误</span>
+          <span
+            style="color: gray"
+            v-if="scope.row.status == 5"
+          >取消</span>
+        </template></el-table-column>
+      <el-table-column
+        prop="inputText"
+        label="输入"
+        min-width="360"
+      />
 
-      <el-table-column label="操作" width="180">
+      <el-table-column
+        label="操作"
+        width="180"
+      >
         <template slot-scope="scope">
           <el-button
             @click="resetTask(scope.row)"
             type="text"
             size="small"
             :disabled="scope.row.status == 1 || scope.row.status == 2"
-            >重置</el-button
-          >
+          >重置</el-button>
           <el-popconfirm
             v-if="scope.row.status == 2"
             title="真的要取消任务吗？任务会终止"
@@ -178,9 +202,7 @@
                 scope.row.status == 4 ||
                 scope.row.status == 5
               "
-              >取消</el-button
-            ></el-popconfirm
-          >
+            >取消</el-button></el-popconfirm>
           <el-button
             v-else
             slot="reference"
@@ -192,30 +214,30 @@
               scope.row.status == 5
             "
             @click="cancelTask(scope.row)"
-            >取消</el-button
-          >
+          >取消</el-button>
 
           <el-button
             slot="reference"
             type="text"
             size="small"
             @click="remake(scope.row)"
-            >重制</el-button
-          >
+          >重制</el-button>
 
           <el-button
             slot="reference"
             type="text"
             size="small"
             @click="jump('log?id=' + scope.row.id)"
-            >日志</el-button
-          >
+          >日志</el-button>
         </template>
       </el-table-column>
 
       <el-table-column align="right">
         <template slot="header">
-          <el-button type="text" @click="fillData()">刷新</el-button>
+          <el-button
+            type="text"
+            @click="fillData()"
+          >刷新</el-button>
         </template>
       </el-table-column>
     </el-table>
