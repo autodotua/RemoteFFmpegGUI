@@ -17,9 +17,9 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
     public class TaskController : FFmpegControllerBase
     {
-        public TaskController(ILogger<MediaInfoController> logger,
+        public TaskController(ILogger<MediaInfoController> Logger,
             IConfiguration config,
-        PipeClient pipeClient) : base(logger, config, pipeClient) { }
+        PipeClient pipeClient) : base(Logger, config, pipeClient) { }
 
         /// <summary>
         ///

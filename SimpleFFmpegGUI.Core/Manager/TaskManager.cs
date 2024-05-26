@@ -14,13 +14,11 @@ namespace SimpleFFmpegGUI.Manager
         private static bool taskChecked = false;
         private static readonly object lockObj = new object();
         private readonly FFmpegDbContext db;
-        private readonly Logger logger;
         private readonly QueueManager queue;
 
-        public TaskManager(FFmpegDbContext db, Logger logger, QueueManager queueManager)
+        public TaskManager(FFmpegDbContext db,  QueueManager queueManager)
         {
             this.db = db;
-            this.logger = logger;
             queue = queueManager;
             if (!taskChecked)
             {
@@ -49,7 +47,7 @@ namespace SimpleFFmpegGUI.Manager
             };
             db.Tasks.Add(task);
             await db.SaveChangesAsync();
-            logger.Info(task, "新建任务");
+            Logger.Info(task, "新建任务");
             return task;
         }
 

@@ -23,7 +23,7 @@ namespace SimpleFFmpegGUI.Manager
             int skip = 0,
             int take = 0)
         {
-            Logger.SaveAll();
+            await Logger.SaveAllAsync();
 
             IQueryable<Log> logs = db.Logs;
             if (type.HasValue)

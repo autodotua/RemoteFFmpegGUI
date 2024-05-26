@@ -10,9 +10,9 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
     public class LogController : FFmpegControllerBase
     {
-        public LogController(ILogger<MediaInfoController> logger,
+        public LogController(ILogger<MediaInfoController> Logger,
             IConfiguration config,
-        PipeClient pipeClient) : base(logger, config, pipeClient) { }
+        PipeClient pipeClient) : base(Logger, config, pipeClient) { }
 
         [HttpGet]
         [Route("List")]

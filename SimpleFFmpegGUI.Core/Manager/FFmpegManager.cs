@@ -76,11 +76,6 @@ namespace SimpleFFmpegGUI.Manager
         private string lastOutput;
 
         /// <summary>
-        /// 日志
-        /// </summary>
-        private Logger logger;
-
-        /// <summary>
         /// 任务是否被暂停
         /// </summary>
         private bool paused;
@@ -94,7 +89,6 @@ namespace SimpleFFmpegGUI.Manager
         public FFmpegManager(TaskInfo task)
         {
             this.task = task;
-            logger = new Logger(new FFmpegDbContext());
         }
 
         /// <summary>
@@ -162,7 +156,7 @@ namespace SimpleFFmpegGUI.Manager
         /// </summary>
         public void Cancel()
         {
-            logger.Info(task, "取消当前任务");
+            Logger.Info(task, "取消当前任务");
             task.Status = TaskStatus.Cancel;
             cancel.Cancel();
         }
@@ -172,7 +166,7 @@ namespace SimpleFFmpegGUI.Manager
         /// </summary>
         public async Task CancelAsync()
         {
-            logger.Info(task, "取消当前任务");
+            Logger.Info(task, "取消当前任务");
             task.Status = TaskStatus.Cancel;
             cancel.Cancel();
             try
@@ -228,7 +222,7 @@ namespace SimpleFFmpegGUI.Manager
             }
             Paused = false;
             Progress.PauseTime += DateTime.Now - pauseStartTime;
-            logger.Info(task, "恢复队列");
+            Logger.Info(task, "恢复队列");
             ProcessExtension.ResumeProcess(Process.Id);
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -249,7 +243,7 @@ namespace SimpleFFmpegGUI.Manager
             cancel = new CancellationTokenSource();
             try
             {
-                logger.Info(task, "开始任务");
+                Logger.Info(task, "开始任务");
                 await (task.Type switch
                 {
                     TaskType.Code => RunCodeProcessAsync(cancel.Token),
@@ -271,11 +265,11 @@ namespace SimpleFFmpegGUI.Manager
                     {
                         var time = File.GetLastWriteTime(task.Inputs[^1].FilePath);
                         File.SetLastWriteTime(task.RealOutput, time);
-                        logger.Info(task, $"已设置输出文件的修改时间为{time}");
+                        Logger.Info(task, $"已设置输出文件的修改时间为{time}");
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(task, "修改输出文件的修改时间失败：" + ex.Message);
+                        Logger.Error(task, "修改输出文件的修改时间失败：" + ex.Message);
                     }
                 }
 
@@ -298,28 +292,27 @@ namespace SimpleFFmpegGUI.Manager
                                 if (canDeleteToRecycleBin)
                                 {
                                     deleted = RecycleBin.DeleteToRecycleBin(file.FilePath);
-                                    logger.Info(task, $"已将输入文件{file.FilePath}移至回收站");
+                                    Logger.Info(task, $"已将输入文件{file.FilePath}移至回收站");
                                 }
                                 if (!deleted)
                                 {
                                     File.Delete(file.FilePath);
-                                    logger.Info(task, $"已彻底删除输入文件{file.FilePath}");
+                                    Logger.Info(task, $"已彻底删除输入文件{file.FilePath}");
                                 }
                             }
                             catch (Exception ex)
                             {
-                                logger.Error(task, $"删除输入文件{file.FilePath}失败：{ex.Message}");
+                                Logger.Error(task, $"删除输入文件{file.FilePath}失败：{ex.Message}");
                             }
                         }
                     }
                 }
 
-                logger.Info(task, "完成任务");
+                Logger.Info(task, "完成任务");
             }
             finally
             {
                 Progress = null;
-                logger.Dispose();
             }
         }
 
@@ -339,7 +332,7 @@ namespace SimpleFFmpegGUI.Manager
                 throw new Exception("进程还未启动或该任务不允许暂停");
             }
             Paused = true;
-            logger.Info(task, "暂停队列");
+            Logger.Info(task, "暂停队列");
             pauseStartTime = DateTime.Now;
             ProcessExtension.SuspendProcess(Process.Id);
             StatusChanged?.Invoke(this, EventArgs.Empty);
@@ -431,7 +424,7 @@ namespace SimpleFFmpegGUI.Manager
         private void Output(object sender, FFmpegOutputEventArgs e)
         {
             lastOutput = e.Data;
-            logger.Output(task, e.Data);
+            Logger.Output(task, e.Data);
             FFmpegOutput?.Invoke(this, new FFmpegOutputEventArgs(e.Data));
             StatusChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -448,10 +441,10 @@ namespace SimpleFFmpegGUI.Manager
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                logger.Info(task, "进程启动前就被要求取消");
+                Logger.Info(task, "进程启动前就被要求取消");
                 return;
             }
-            logger.Info(task, "FFmpeg参数为：" + arguments);
+            Logger.Info(task, "FFmpeg参数为：" + arguments);
             task.FFmpegArguments = string.IsNullOrEmpty(task.FFmpegArguments) ? arguments : task.FFmpegArguments + ";" + arguments;
             if (Progress != null)
             {
@@ -618,19 +611,19 @@ namespace SimpleFFmpegGUI.Manager
                 {
                     var match = rSSIM.Match(e.Data);
                     ssim = match.Value;
-                    logger.Info(task, "对比结果（SSIM）：" + match.Value);
+                    Logger.Info(task, "对比结果（SSIM）：" + match.Value);
                 }
                 if (rPSNR.IsMatch(e.Data))
                 {
                     var match = rPSNR.Match(e.Data);
                     psnr = match.Value;
-                    logger.Info(task, "对比结果（PSNR）：" + match.Value);
+                    Logger.Info(task, "对比结果（PSNR）：" + match.Value);
                 }
                 if (rVMAF.IsMatch(e.Data))
                 {
                     var match = rVMAF.Match(e.Data);
                     vmaf = match.Value;
-                    logger.Info(task, "对比结果（VMAF）：" + match.Value);
+                    Logger.Info(task, "对比结果（VMAF）：" + match.Value);
                 }
             }
         }

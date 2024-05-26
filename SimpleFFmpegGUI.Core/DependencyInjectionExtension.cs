@@ -8,8 +8,7 @@ namespace SimpleFFmpegGUI
     {
         public static void AddFFmpegServices(this IServiceCollection services)
         {
-            services.AddDbContext<FFmpegDbContext>(ServiceLifetime.Transient,ServiceLifetime.Transient)
-                .AddTransient<Logger>()
+            services.AddDbContext<FFmpegDbContext>()
                 .AddTransient<LogManager>()
                 .AddTransient<ConfigManager>()
                 .AddTransient<PresetManager>()

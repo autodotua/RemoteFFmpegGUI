@@ -13,7 +13,6 @@ namespace SimpleFFmpegGUI.Manager
     public class QueueManager
     {
         private readonly FFmpegDbContext db;
-        private readonly Logger logger;
         private bool cancelQueue = false;
 
         /// <summary>
@@ -25,10 +24,9 @@ namespace SimpleFFmpegGUI.Manager
         private DateTime? scheduleTime = null;
         private List<FFmpegManager> taskProcessManagers = new List<FFmpegManager>();
 
-        public QueueManager(FFmpegDbContext db, Logger logger, PowerManager powerManager)
+        public QueueManager(FFmpegDbContext db, PowerManager powerManager)
         {
             this.db = db;
-            this.logger = logger;
             PowerManager = powerManager;
         }
 
@@ -55,7 +53,7 @@ namespace SimpleFFmpegGUI.Manager
         /// <summary>
         /// 电源性能管理
         /// </summary>
-        public PowerManager PowerManager { get; } 
+        public PowerManager PowerManager { get; }
 
         /// <summary>
         /// 独立任务
@@ -137,12 +135,12 @@ namespace SimpleFFmpegGUI.Manager
         {
             if (running)
             {
-                logger.Warn("队列正在运行，开始队列失败");
+                Logger.Warn("队列正在运行，开始队列失败");
                 return;
             }
             running = true;
             scheduleTime = null;
-            logger.Info("开始队列");
+            Logger.Info("开始队列");
             List<TaskInfo> tasks;
             while (!cancelQueue && await GetQueueTasksQuery(db).AnyAsync())
             {
@@ -155,7 +153,7 @@ namespace SimpleFFmpegGUI.Manager
             running = false;
             bool cancelManually = cancelQueue;
             cancelQueue = false;
-            logger.Info("队列完成");
+            Logger.Info("队列完成");
             if (!cancelManually && PowerManager.ShutdownAfterQueueFinished)
             {
                 PowerManager.Shutdown();
@@ -178,9 +176,9 @@ namespace SimpleFFmpegGUI.Manager
             {
                 throw new Exception("任务正在进行中，但状态不是正在处理中");
             }
-            logger.Info(task, "开始独立任务");
+            Logger.Info(task, "开始独立任务");
             await ProcessTaskAsync(task, false);
-            logger.Info(task, "独立任务完成");
+            Logger.Info(task, "独立任务完成");
         }
 
         /// <summary>
@@ -237,14 +235,14 @@ namespace SimpleFFmpegGUI.Manager
             {
                 if (task.Status != TaskStatus.Cancel)
                 {
-                    logger.Error(task, "运行错误：" + ex.ToString());
+                    Logger.Error(task, "运行错误：" + ex.ToString());
                     task.Status = TaskStatus.Error;
                     task.Message = ex is FFmpegArgumentException ?
                         ex.Message : await ffmpegManager.GetErrorMessageAsync() ?? "运行错误，请查看日志";
                 }
                 else
                 {
-                    logger.Warn(task, "任务被取消");
+                    Logger.Warn(task, "任务被取消");
                 }
             }
             finally

@@ -177,6 +177,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
+            Logger.SaveAll();
         }
     }
 }

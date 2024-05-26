@@ -16,9 +16,9 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
     public class PresetController : FFmpegControllerBase
     {
-        public PresetController(ILogger<MediaInfoController> logger,
+        public PresetController(ILogger<MediaInfoController> Logger,
             IConfiguration config,
-        PipeClient pipeClient) : base(logger, config, pipeClient) { }
+        PipeClient pipeClient) : base(Logger, config, pipeClient) { }
 
         [HttpGet]
         [Route("List")]

@@ -30,10 +30,9 @@ namespace SimpleFFmpegGUI
                            QueueManager queueManager,
                            PresetManager presetManager,
                            ConfigManager configManager,
-                           LogManager logManager,
-                           Logger logger)
+                           LogManager logManager)
         {
-            logger.Info("已建立与客户端的连接");
+            Logger.Info("已建立与客户端的连接");
             this.taskManager = taskManager;
             this.queueManager = queueManager;
             this.presetManager = presetManager;

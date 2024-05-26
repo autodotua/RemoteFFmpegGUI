@@ -22,7 +22,7 @@ namespace SimpleFFmpegGUI.Manager
 
         private FFmpegProcess()
         {
-            Priority = new ConfigManager(new FFmpegDbContext(), null).DefaultProcessPriority;
+            Priority = new ConfigManager(new FFmpegDbContext()).DefaultProcessPriority;
         }
         public FFmpegProcess(string argument) : this()
         {

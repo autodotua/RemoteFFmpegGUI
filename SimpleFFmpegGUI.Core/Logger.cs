@@ -1,5 +1,6 @@
 ﻿using SimpleFFmpegGUI.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -34,94 +35,53 @@ namespace SimpleFFmpegGUI
 
         public Log Log { get; set; }
     }
-    public class Logger : IDisposable
+    public static class Logger
     {
-        private static HashSet<Logger> allLoggers = new HashSet<Logger>();
-        private readonly FFmpegDbContext db;
-        private bool disposed = false;
-        private object lockObj = new object();
-        private Timer timer;
-
-        public Logger(FFmpegDbContext db)
+        static Logger()
         {
-            this.db = db;
-            lock (lockObj)
-            {
-                StartTimer();
-                allLoggers.Add(this);
-            }
-        }
-
-        ~Logger()
-        {
-            Dispose();
+            StartTimer();
         }
 
         public static event EventHandler<LogEventArgs> Log;
 
         public static event EventHandler<ExceptionEventArgs> LogSaveFailed;
 
-        public static void SaveAll()
-        {
-            foreach (var logger in allLoggers.ToList())
-            {
-                logger.Save();
-            }
-        }
-
-        public void Dispose()
-        {
-            if (!disposed)
-            {
-                lock (lockObj)
-                {
-                    disposed = true;
-                    if (allLoggers.Contains(this))
-                    {
-                        allLoggers.Remove(this);
-                    }
-                    timer.Dispose();
-                    Save();
-                }
-            }
-        }
-
-        public void Error(string message)
+        public static void Error(string message)
         {
             AddLog('E', message);
         }
 
-        public void Error(TaskInfo task, string message)
+        public static void Error(TaskInfo task, string message)
         {
             AddLog('E', message, task);
         }
 
-        public void Info(TaskInfo task, string message)
+        public static void Info(TaskInfo task, string message)
         {
             AddLog('I', message, task);
         }
 
-        public void Info(string message)
+        public static void Info(string message)
         {
             AddLog('I', message);
         }
 
-        public void Output(TaskInfo task, string message)
+        public static void Output(TaskInfo task, string message)
         {
             AddLog('O', message, task);
         }
 
-        public void Warn(string message)
+        public static void Warn(string message)
         {
             AddLog('W', message);
         }
 
-        public void Warn(TaskInfo task, string message)
+        public static void Warn(TaskInfo task, string message)
         {
             AddLog('W', message, task);
         }
 
-        private void AddLog(char type, string message, TaskInfo task = null)
+        private static void AddLog(char type, string message, TaskInfo task = null)
         {
             Log log = new Log()
             {
@@ -131,35 +91,65 @@ namespace SimpleFFmpegGUI
                 TaskId = task?.Id
             };
             Log?.Invoke(null, new LogEventArgs(log));
-            db.Logs.Add(log);
+            queueLogs.Add(log);
             Debug.WriteLine($"[{type}] {message}");
         }
 
-        private void Save()
+        private static ConcurrentBag<Log> queueLogs = new ConcurrentBag<Log>();
+
+        public static async Task SaveAllAsync()
         {
+            if (queueLogs.IsEmpty)
+            {
+                return;
+            }
             try
             {
-                lock (lockObj)
-                {
-                    if (db.ChangeTracker.HasChanges())
-                    {
-                        db.SaveChanges();
-                    }   
-                }
+                await using var db = new FFmpegDbContext();
+                var logs = new Log[queueLogs.Count];
+                queueLogs.CopyTo(logs, 0);
+                queueLogs.Clear();
+                db.Logs.AddRange(logs);
+                await db.SaveChangesAsync();
+                Debug.WriteLine($"保存了{logs.Length}个日志");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("保存日志失败");
                 Debug.WriteLine(ex);
-                LogSaveFailed?.Invoke(this, new ExceptionEventArgs(ex, "保存日志失败"));
+                LogSaveFailed?.Invoke(null, new ExceptionEventArgs(ex, "保存日志失败"));
             }
         }
-        private void StartTimer()
+        public static void SaveAll()
         {
-            timer = new Timer(new TimerCallback(o =>
+            if (queueLogs.IsEmpty)
             {
-                Save();
-            }), null, 10000, 10000);
+                return;
+            }
+            try
+            {
+                using var db = new FFmpegDbContext();
+                var logs = new Log[queueLogs.Count];
+                queueLogs.CopyTo(logs, 0);
+                queueLogs.Clear();
+                db.Logs.AddRange(logs);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("保存日志失败");
+                Debug.WriteLine(ex);
+                LogSaveFailed?.Invoke(null, new ExceptionEventArgs(ex, "保存日志失败"));
+            }
+        }
+
+        private static async void StartTimer()
+        {
+            PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+            while (await timer.WaitForNextTickAsync())
+            {
+                await SaveAllAsync();
+            }
         }
     }
 }

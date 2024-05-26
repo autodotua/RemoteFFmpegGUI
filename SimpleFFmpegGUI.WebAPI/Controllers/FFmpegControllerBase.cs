@@ -14,15 +14,15 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
     [Route("[controller]")]
     public class FFmpegControllerBase : ControllerBase
     {
-        protected readonly ILogger<MediaInfoController> logger;
+        protected readonly ILogger<MediaInfoController> Logger;
         protected readonly IConfiguration config;
         protected readonly PipeClient pipeClient;
 
-        public FFmpegControllerBase(ILogger<MediaInfoController> logger,
+        public FFmpegControllerBase(ILogger<MediaInfoController> Logger,
         IConfiguration config,
         PipeClient pipeClient)
         {
-            this.logger = logger;
+            this.Logger = Logger;
             this.config = config;
             this.pipeClient = pipeClient;
             InputDir = config.GetValue<string>("InputDir") ?? throw Oops.Oh("没有配置输入文件夹");
