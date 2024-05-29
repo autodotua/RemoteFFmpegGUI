@@ -11,31 +11,43 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System;
 using System.Windows.Shell;
+using System.Threading.Tasks;
+using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using SimpleFFmpegGUI.WPF.Messages;
 
-namespace SimpleFFmpegGUI.WPF.Model
+namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public class TasksAndStatuses : TaskCollectionBase
+    public partial class CurrentTasksViewModel : TaskCollectionViewModelBase
     {
-        private List<UITaskInfo> processingTasks;
+        [ObservableProperty]
+        private List<TaskInfoViewModel> processingTasks;
 
-        public TasksAndStatuses(QueueManager queue)
+        private readonly TaskManager taskManager;
+
+        public CurrentTasksViewModel(QueueManager queue, TaskManager tm)
         {
-            Refresh();
             Queue = queue;
+            taskManager = tm;
             queue.TaskManagersChanged += Queue_TaskManagersChanged;
-        }
-
-        public List<UITaskInfo> ProcessingTasks
-        {
-            get => processingTasks;
-            private set => this.SetValueAndNotify(ref processingTasks, value, nameof(ProcessingTasks));
+            RefreshAsync();
+            WeakReferenceMessenger.Default.Register<SnapshotEnabledMessage>(this, async (_, m) =>
+            {
+                foreach (var task in Tasks)
+                {
+                    task.Snapshot.DisplayFrame = m.Options.DisplayFrame;
+                    task.Snapshot.CanUpdate = m.Options.CanUpdate;
+                    await task.UpdateSnapshotAsync();
+                }
+            });
         }
 
         public QueueManager Queue { get; }
 
         public ObservableCollection<StatusDto> Statuses { get; } = new ObservableCollection<StatusDto>();
 
-        public void NotifyTaskReseted(UITaskInfo task)
+        public void NotifyTaskReseted(TaskInfoViewModel task)
         {
             if (!Tasks.Any(p => p.Id == task.Id))
             {
@@ -43,10 +55,10 @@ namespace SimpleFFmpegGUI.WPF.Model
             }
         }
 
-        public override void Refresh()
+        public override async Task RefreshAsync()
         {
-            var tasks = TaskManager.GetCurrentTasks(App.AppStartTime);
-            Tasks = new ObservableCollection<UITaskInfo>(tasks.Adapt<List<UITaskInfo>>());
+            var tasks = await taskManager.GetCurrentTasksAsync(App.AppStartTime);
+            Tasks = new ObservableCollection<TaskInfoViewModel>(tasks.Adapt<List<TaskInfoViewModel>>());
         }
 
         private static void GetMainWindowAnd(Action<MainWindow> action)
@@ -92,15 +104,16 @@ namespace SimpleFFmpegGUI.WPF.Model
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Queue_TaskManagersChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private async void Queue_TaskManagersChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)//新增任务
             {
                 var manager = e.NewItems[0] as FFmpegManager;
                 var unstartStatus = new StatusDto(manager.Task); //先放入一个StatusDto进行占位，因为此时Status还未生成
-                var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);//找到对应的UITaskInfo
+
+                var task = Tasks.FirstOrDefault(p => p.Id == manager.Task.Id);//找到对应的TaskInfoViewModel
                 Debug.Assert(task != null);
-                task.UpdateSelf(); //用TaskInfo实体更新UITaskInfo
+                await task.UpdateSelfAsync(); //用TaskInfo实体更新TaskInfoViewModel
                 task.ProcessStatus = unstartStatus;
                 task.ProcessManager = manager;
                 if (manager == Queue.MainQueueManager)
@@ -123,7 +136,7 @@ namespace SimpleFFmpegGUI.WPF.Model
                 Debug.Assert(task != null);
                 task.ProcessManager = null;
                 task.ProcessStatus = null;
-                task.UpdateSelf();
+                await task.UpdateSelfAsync();
 
                 Statuses.Remove(status);
                 manager.StatusChanged -= Manager_StatusChanged;

@@ -10,9 +10,9 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
     public class PowerController : FFmpegControllerBase
     {
-        public PowerController(ILogger<MediaInfoController> logger,
+        public PowerController(ILogger<MediaInfoController> Logger,
             IConfiguration config,
-        PipeClient pipeClient) : base(logger, config, pipeClient) { }
+        PipeClient pipeClient) : base(Logger, config, pipeClient) { }
 
         [HttpPost]
         [Route("Shutdown")]

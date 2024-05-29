@@ -9,6 +9,7 @@
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
+    xmlns:system="clr-namespace:System;assembly=netstandard"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
@@ -71,45 +72,47 @@
             Margin="-8,-8,0,-8"
             MouseEnter="CommandBar_MouseEnter">
             <ui:AppBarButton
-                Click="AddInputButton_Click"
-                IsEnabled="{Binding CanAddFile}"
+                Command="{Binding AddInputCommand}"
                 Label="新增">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xECC8;" />
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
             <ui:AppBarButton
-                Click="BrowseAndAddInputButton_Click"
-                Icon="OpenFile"
-                IsEnabled="{Binding CanAddFile}"
-                Label="浏览" />
-            <ui:AppBarButton
-                Click="ClearFilesButton_Click"
+                Command="{Binding ClearInputsCommand}"
                 Icon="Clear"
                 Label="清空" />
             <ui:AppBarSeparator />
             <ui:AppBarButton
-                Click="SaveToPresetButton_Click"
+                Command="{Binding PresetsViewModel.SaveToPresetCommand}"
                 Icon="Save"
                 Label="保存为预设" />
             <ui:AppBarSeparator />
 
             <ui:AppBarButton
-                Click="AddToRemoteHostButton_Click"
+                Command="{Binding AddToRemoteHostCommand}"
                 Label="提交到远程">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE836;" />
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
             <ui:AppBarButton
-                Click="AddToQueueButton_Click"
+                Command="{Binding AddToQueueCommand}"
                 Icon="Add"
-                Label="创建任务" />
+                Label="创建任务">
+                <ui:AppBarButton.CommandParameter>
+                    <system:Boolean>false</system:Boolean>
+                </ui:AppBarButton.CommandParameter>
+            </ui:AppBarButton>
             <ui:AppBarButton
-                Click="AddToQueueButton_Click"
+                Command="{Binding AddToQueueCommand}"
                 Icon="Add"
                 Label="创建并启动"
-                Tag="queue" />
+                Tag="queue">
+                <ui:AppBarButton.CommandParameter>
+                    <system:Boolean>true</system:Boolean>
+                </ui:AppBarButton.CommandParameter>
+            </ui:AppBarButton>
             <ui:AppBarSeparator />
             <ui:CommandBar.SecondaryCommands>
                 <ui:AppBarToggleButton
@@ -117,7 +120,7 @@
                     IsChecked="{Binding Source={x:Static r:Config.Instance}, Path=ClearFilesAfterAddTask}"
                     Label="创建后清空文件" />
                 <ui:AppBarButton
-                    Click="FFmpegArgsButton_Click"
+                    Command="{Binding FFmpegArgsCommand}"
                     Label="查看当前的输出参数">
                     <ui:AppBarButton.Icon>
                         <ui:FontIcon Glyph="&#xE943;" />

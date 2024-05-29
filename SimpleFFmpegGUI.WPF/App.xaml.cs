@@ -6,9 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using ModernWpf.Controls;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF.Model;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.Pages;
-using SimpleFFmpegGUI.WPF.Panels;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -19,7 +18,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using static SimpleFFmpegGUI.DependencyInjectionExtension;
 using System.Windows.Interop;
+using SimpleFFmpegGUI.WPF.ViewModels;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
 
@@ -61,10 +62,18 @@ namespace SimpleFFmpegGUI.WPF
             {
                 if (e.Args[0] == "cut")
                 {
-                    MainWindow = new CutWindow(new CutWindowViewModel(), e.Args[2..]);
+                    MainWindow = new CutWindow(e.Args[2..]);
                     WindowInteropHelper helper = new WindowInteropHelper(MainWindow);
                     helper.Owner = IntPtr.Parse(e.Args[1]);
-                    MainWindow.ShowDialog();
+                    try
+                    {
+                        MainWindow.ShowDialog();
+                    }
+                    catch (System.ComponentModel.Win32Exception)
+                    {
+                        helper.Owner = 0;
+                        MainWindow.ShowDialog();
+                    }
                 }
                 else
                 {
@@ -81,11 +90,11 @@ namespace SimpleFFmpegGUI.WPF
 
         private void ConfigureServices(IServiceCollection services)
         {
+            services.AddFFmpegServices();
             services.AddSingleton<Config>();
 
-            services.AddSingleton<QueueManager>();
-            services.AddSingleton<TasksAndStatuses>();
-            services.AddSingleton<AllTasks>();
+            services.AddSingleton<CurrentTasksViewModel>();
+            services.AddSingleton<AllTasksViewModel>();
 
             services.AddSingleton<MainWindow>();
             services.AddTransient<MainWindowViewModel>();
@@ -113,6 +122,8 @@ namespace SimpleFFmpegGUI.WPF
 
             services.AddTransient<FFmpegOutputPage>();
             services.AddSingleton<FFmpegOutputPageViewModel>();
+
+            services.AddTransient<CutWindowViewModel>();
 
             services.AddTransient<TaskListViewModel>();
             services.AddTransient<CodeArgumentsPanelViewModel>();
@@ -166,6 +177,7 @@ namespace SimpleFFmpegGUI.WPF
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
+            Logger.SaveAll();
         }
     }
 }

@@ -14,9 +14,9 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
     public class MediaInfoController : FFmpegControllerBase
     {
-        public MediaInfoController(ILogger<MediaInfoController> logger,
+        public MediaInfoController(ILogger<MediaInfoController> Logger,
             IConfiguration config,
-        PipeClient pipeClient) : base(logger, config, pipeClient) { }
+        PipeClient pipeClient) : base(Logger, config, pipeClient) { }
 
         [HttpGet]
         public async Task<MediaInfoGeneral> GetAsync(string name)
@@ -24,7 +24,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             CheckNull(name, "文件");
             string path = await CheckAndGetInputFilePathAsync(name);
 
-            var result = await pipeClient.InvokeAsync(p => p.GetInfo(path));
+            var result = await pipeClient.InvokeAsync(p => p.GetInfoAsync(path));
             return result;
         }
 

@@ -8,10 +8,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:SimpleFFmpegGUI.Model;assembly=SimpleFFmpegGUI.Core"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    xmlns:uimodel="clr-namespace:SimpleFFmpegGUI.WPF.Model"
+    xmlns:uimodel="clr-namespace:SimpleFFmpegGUI.WPF.ViewModels"
     x:Name="root"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    IsEnabled="{Binding IsEnabled}"
     mc:Ignorable="d">
     <Grid>
         <ItemsControl
@@ -33,7 +34,7 @@
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type uimodel:UITaskInfo}">
+                <DataTemplate DataType="{x:Type uimodel:TaskInfoViewModel}">
                     <Border
                         Margin="4,8,20,8"
                         Padding="0"
@@ -53,14 +54,14 @@
                                 Width="360"
                                 Height="256"
                                 Margin="8"
-                                Visibility="{Binding ShowSnapshot, Converter={StaticResource Bool2VisibilityConverter}}">
+                                Visibility="{Binding Snapshot.DisplayFrame, Converter={StaticResource Bool2VisibilityConverter}}">
                                 <Border.Background>
                                     <SolidColorBrush
                                         Opacity="0.5"
                                         Color="Black" />
                                 </Border.Background>
                                 <Image
-                                    Source="{Binding SnapshotSource, IsAsync=True}"
+                                    Source="{Binding Snapshot.Source, IsAsync=True}"
                                     Stretch="UniformToFill" />
                             </Border>
                             <Border
@@ -222,16 +223,19 @@
                                 DockPanel.Dock="Bottom">
 
                                 <ui:AppBarButton
-                                    Click="CancelButton_Click"
+                                    Command="{Binding DataContext.CancelCommand, ElementName=root}"
+                                    CommandParameter="{Binding .}"
                                     Icon="Cancel"
                                     Label="取消" />
                                 <ui:AppBarButton
-                                    Click="ResumeButton_Click"
+                                    Command="{Binding DataContext.ResumeCommand, ElementName=root}"
+                                    CommandParameter="{Binding .}"
                                     Icon="Play"
                                     IsEnabled="{Binding ProcessManager.Paused}"
                                     Label="恢复" />
                                 <ui:AppBarButton
-                                    Click="PauseButton_Click"
+                                    Command="{Binding DataContext.PauseCommand, ElementName=root}"
+                                    CommandParameter="{Binding .}"
                                     Icon="Pause"
                                     IsEnabled="{Binding ProcessManager.Paused, Converter={StaticResource InverseBoolConverter}}"
                                     Label="暂停" />

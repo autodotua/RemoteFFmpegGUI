@@ -1,21 +1,30 @@
-﻿using SimpleFFmpegGUI.Dto;
+﻿using Microsoft.EntityFrameworkCore;
+using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.Manager
 {
-    public static class LogManager
+    public class LogManager
     {
-        public static PagedListDto<Log> GetLogs(char? type = null,
+        private readonly FFmpegDbContext db;
+
+        public LogManager(FFmpegDbContext db)
+        {
+            this.db = db;
+        }
+
+        public async Task<PagedListDto<Log>> GetLogsAsync(char? type = null,
             int taskId = 0,
             DateTime? from = null,
             DateTime? to = null,
             int skip = 0,
             int take = 0)
         {
-            Logger.SaveAll();
-            using var db = FFmpegDbContext.GetNew();
+            await Logger.SaveAllAsync();
+
             IQueryable<Log> logs = db.Logs;
             if (type.HasValue)
             {
@@ -34,7 +43,7 @@ namespace SimpleFFmpegGUI.Manager
                 logs = logs.Where(p => p.TaskId == taskId);
             }
             logs = logs.OrderByDescending(p => p.Time);
-            int count = logs.Count();
+            int count = await logs.CountAsync();
             if (skip > 0)
             {
                 logs = logs.Skip(skip);
@@ -43,7 +52,7 @@ namespace SimpleFFmpegGUI.Manager
             {
                 logs = logs.Take(take);
             }
-            return new PagedListDto<Log>(logs, count);
+            return new PagedListDto<Log>(await logs.ToListAsync(), count);
         }
     }
 }

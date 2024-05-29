@@ -1,4 +1,5 @@
-﻿using SimpleFFmpegGUI.Dto;
+﻿using Microsoft.EntityFrameworkCore;
+using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
@@ -8,22 +9,35 @@ using TaskStatus = SimpleFFmpegGUI.Model.TaskStatus;
 
 namespace SimpleFFmpegGUI.Manager
 {
-    public static class TaskManager
+    public class TaskManager
     {
-        static TaskManager()
+        private static bool taskChecked = false;
+        private static readonly object lockObj = new object();
+        private readonly FFmpegDbContext db;
+        private readonly QueueManager queue;
+
+        public TaskManager(FFmpegDbContext db,  QueueManager queueManager)
         {
-            using var db = FFmpegDbContext.GetNew();
-            foreach (var item in db.Tasks.Where(p => p.Status == TaskStatus.Processing))
+            this.db = db;
+            queue = queueManager;
+            if (!taskChecked)
             {
-                item.Status = TaskStatus.Error;
-                item.Message = "状态异常：启动时处于正在运行状态";
+                lock (lockObj)
+                {
+                    taskChecked = true;
+                    foreach (var item in db.Tasks.Where(p => p.Status == TaskStatus.Processing))
+                    {
+                        item.Status = TaskStatus.Error;
+                        item.Message = "状态异常：启动时处于正在运行状态";
+                    }
+                    db.SaveChanges();
+                }
             }
-            db.SaveChanges();
+
         }
 
-        public static TaskInfo AddTask(TaskType type, List<InputArguments> path, string outputPath, OutputArguments arg)
+        public async Task<TaskInfo> AddTaskAsync(TaskType type, List<InputArguments> path, string outputPath, OutputArguments arg)
         {
-            using FFmpegDbContext db = FFmpegDbContext.GetNew();
             var task = new TaskInfo()
             {
                 Type = type,
@@ -32,58 +46,41 @@ namespace SimpleFFmpegGUI.Manager
                 Arguments = arg
             };
             db.Tasks.Add(task);
-            db.SaveChanges();
-            using Logger logger = new Logger();
-            logger.Info(task, "新建任务");
+            await db.SaveChangesAsync();
+            Logger.Info(task, "新建任务");
             return task;
         }
 
-        public static List<TaskInfo> GetCurrentTasks(DateTime startTime)
+        public async Task<List<TaskInfo>> GetCurrentTasksAsync(DateTime startTime)
         {
-            using var db = FFmpegDbContext.GetNew();
             var tasks = db.Tasks.Where(p => p.IsDeleted == false);
-            var runningTasks = tasks.Where(p => p.Status == TaskStatus.Processing);
-            var queueTasks = tasks.Where(p => p.Status == TaskStatus.Queue);
-            var doneTasks = tasks.Where(p => p.Status == TaskStatus.Done).Where(p => p.StartTime > startTime);
-            var errorTasks = tasks.Where(p => p.Status == TaskStatus.Done).Where(p => p.StartTime > startTime);
-            var cancelTasks = tasks.Where(p => p.Status == TaskStatus.Done).Where(p => p.StartTime > startTime);
-            return runningTasks
-                .Concat(queueTasks)
-                .Concat(doneTasks)
-                .Concat(errorTasks)
-                .Concat(cancelTasks)
-                .ToList();
+            var runningTasks = await tasks.Where(p => p.Status == TaskStatus.Processing).ToListAsync();
+            var queueTasks = await tasks.Where(p => p.Status == TaskStatus.Queue).ToListAsync();
+            var doneTasks = await tasks.Where(p => p.Status == TaskStatus.Done).Where(p => p.StartTime > startTime).ToListAsync();
+            var errorTasks = await tasks.Where(p => p.Status == TaskStatus.Done).Where(p => p.StartTime > startTime).ToListAsync();
+            var cancelTasks = await tasks.Where(p => p.Status == TaskStatus.Done).Where(p => p.StartTime > startTime).ToListAsync();
+            return [.. runningTasks, .. queueTasks, .. doneTasks, .. errorTasks, .. cancelTasks];
         }
 
-        public static PagedListDto<TaskInfo> GetTasks(TaskStatus? status = null, int skip = 0, int take = 0)
+        public async Task<PagedListDto<TaskInfo>> GetTasksAsync(TaskStatus? status = null, int skip = 0, int take = 0)
         {
-            using var db = FFmpegDbContext.GetNew();
             IQueryable<TaskInfo> tasks = db.Tasks
                 .Where(p => p.IsDeleted == false);
             if (status.HasValue)
             {
                 tasks = tasks.Where(p => p.Status == status);
-                switch (status.Value)
+                tasks = status.Value switch
                 {
-                    case TaskStatus.Queue:
-                        tasks = tasks.OrderBy(p => p.CreateTime);
-                        break;
-
-                    case TaskStatus.Processing:
-                    case TaskStatus.Done:
-                        tasks = tasks.OrderByDescending(p => p.StartTime);
-                        break;
-
-                    default:
-                        tasks = tasks.OrderByDescending(p => p.CreateTime);
-                        break;
-                }
+                    TaskStatus.Queue => tasks.OrderBy(p => p.CreateTime),
+                    TaskStatus.Processing or TaskStatus.Done => tasks.OrderByDescending(p => p.StartTime),
+                    _ => tasks.OrderByDescending(p => p.CreateTime),
+                };
             }
             else
             {
                 tasks = tasks.OrderByDescending(p => p.CreateTime);
             }
-            int count = tasks.Count();
+            int count = await tasks.CountAsync();
             if (skip > 0)
             {
                 tasks = tasks.Skip(skip);
@@ -92,46 +89,38 @@ namespace SimpleFFmpegGUI.Manager
             {
                 tasks = tasks.Take(take);
             }
-            return new PagedListDto<TaskInfo>(tasks, count);
+            return new PagedListDto<TaskInfo>(await tasks.ToListAsync(), count);
         }
 
-        public static TaskInfo GetTask(int id)
+        public async Task<TaskInfo> GetTaskAsync(int id)
         {
-            using var db = FFmpegDbContext.GetNew();
-            var task = db.Tasks.Find(id);
+            var task = await db.Tasks.FindAsync(id);
             return task;
         }
 
-        public static bool HasQueueTasks()
+        public Task<bool> HasQueueTasksAsync()
         {
-            using var db = FFmpegDbContext.GetNew();
-            return db.Tasks.Any(p => p.IsDeleted == false && p.Status == TaskStatus.Queue);
+            return db.Tasks.AnyAsync(p => p.IsDeleted == false && p.Status == TaskStatus.Queue);
         }
 
-        public static void ResetTask(int id, QueueManager queue)
+        public async Task ResetTaskAsync(int id)
         {
-            using var db = FFmpegDbContext.GetNew();
-            TaskInfo task = db.Tasks.Find(id);
-            if (task == null)
-            {
-                throw new ArgumentException($"找不到ID为{id}的任务");
-            }
+            TaskInfo task = await db.Tasks.FindAsync(id) ?? throw new ArgumentException($"找不到ID为{id}的任务");
             if (queue.Tasks.Any(p => p.Id == id))
             {
-                throw new Exception("ID为{id}的任务正在进行中");
+                throw new Exception($"ID为{id}的任务正在进行中");
             }
             task.Status = TaskStatus.Queue;
             db.Update(task);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
 
-        public static int TryResetTasks(IEnumerable<int> ids, QueueManager queue)
+        public async Task<int> TryResetTasksAsync(IEnumerable<int> ids)
         {
-            using var db = FFmpegDbContext.GetNew();
             int count = 0;
             foreach (var id in ids)
             {
-                TaskInfo task = db.Tasks.Find(id);
+                TaskInfo task = await db.Tasks.FindAsync(id);
                 if (task == null)
                 {
                     continue;
@@ -145,18 +134,13 @@ namespace SimpleFFmpegGUI.Manager
                 count++;
             }
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             return count;
         }
 
-        public static void CancelTask(int id, QueueManager queue)
+        public async Task CancelTaskAsync(int id)
         {
-            using var db = FFmpegDbContext.GetNew();
-            TaskInfo task = db.Tasks.Find(id);
-            if (task == null)
-            {
-                throw new ArgumentException($"找不到ID为{id}的任务");
-            }
+            TaskInfo task = await db.Tasks.FindAsync(id) ?? throw new ArgumentException($"找不到ID为{id}的任务");
             CheckCancelingTask(task);
             if (queue.Tasks.Any(p => p.Id == task.Id))
             {
@@ -164,50 +148,32 @@ namespace SimpleFFmpegGUI.Manager
             }
             task.Status = TaskStatus.Cancel;
             db.Update(task);
-            db.SaveChanges();
-        }
-
-        public static async Task CancelTaskAsync(int id, QueueManager queue)
-        {
-            using var db = FFmpegDbContext.GetNew();
-            TaskInfo task = await db.Tasks.FindAsync(id);
-            if (task == null)
-            {
-                throw new ArgumentException($"找不到ID为{id}的任务");
-            }
-            CheckCancelingTask(task);
-            if (queue.Tasks.Any(p => p.Id == task.Id))
-            {
-                await queue.Managers.First(p => p.Task.Id == task.Id).CancelAsync();
-            }
-            task.Status = TaskStatus.Cancel;
-            db.Update(task);
             await db.SaveChangesAsync();
         }
 
-        private static void CheckCancelingTask(TaskInfo task)
+        private void CheckCancelingTask(TaskInfo task)
         {
+            int id = task.Id;
             if (task.Status == TaskStatus.Cancel)
             {
-                throw new Exception("ID为{id}的任务已被取消");
+                throw new Exception($"ID为{id}的任务已被取消");
             }
             if (task.Status == TaskStatus.Done)
             {
-                throw new Exception("ID为{id}的任务已完成");
+                throw new Exception($"ID为{id}的任务已完成");
             }
             if (task.Status == TaskStatus.Error)
             {
-                throw new Exception("ID为{id}的任务已完成并出现错误");
+                throw new Exception($"ID为{id}的任务已完成并出现错误");
             }
         }
 
-        public static int TryCancelTasks(IEnumerable<int> ids, QueueManager queue)
+        public async Task<int> TryCancelTasksAsync(IEnumerable<int> ids)
         {
-            using var db = FFmpegDbContext.GetNew();
             int count = 0;
             foreach (var id in ids)
             {
-                TaskInfo task = db.Tasks.Find(id);
+                TaskInfo task = await db.Tasks.FindAsync(id);
                 if (task == null)
                 {
                     continue;
@@ -236,30 +202,24 @@ namespace SimpleFFmpegGUI.Manager
             return count;
         }
 
-        public static void DeleteTask(int id, QueueManager queue)
+        public async Task DeleteTaskAsync(int id)
         {
-            using var db = FFmpegDbContext.GetNew();
-            TaskInfo task = db.Tasks.Find(id);
-            if (task == null)
-            {
-                throw new ArgumentException($"找不到ID为{id}的任务");
-            }
+            TaskInfo task = await db.Tasks.FindAsync(id) ?? throw new ArgumentException($"找不到ID为{id}的任务");
             if (queue.Tasks.Any(p => p.Id == task.Id))
             {
                 queue.Managers.First(p => p.Task.Id == task.Id).Cancel();
             }
             task.IsDeleted = true;
             db.Update(task);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
 
-        public static int TryDeleteTasks(IEnumerable<int> ids, QueueManager queue)
+        public async Task<int> TryDeleteTasks(IEnumerable<int> ids)
         {
-            using var db = FFmpegDbContext.GetNew();
             int count = 0;
             foreach (var id in ids)
             {
-                TaskInfo task = db.Tasks.Find(id);
+                TaskInfo task = await db.Tasks.FindAsync(id);
                 if (task == null)
                 {
                     continue;

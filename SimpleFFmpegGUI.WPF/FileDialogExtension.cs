@@ -8,7 +8,7 @@ namespace SimpleFFmpegGUI.WPF
     public static class FileDialogExtension
     {
         /// <summary>
-        /// 满足条件是加入文件筛选器
+        /// 满足条件时加入文件筛选器
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="b"></param>

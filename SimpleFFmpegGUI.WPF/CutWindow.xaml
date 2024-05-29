@@ -181,28 +181,29 @@
             Grid.Row="6"
             IsEnabled="{Binding IsBarEnabled}">
             <ui:AppBarButton
-                Click="JumpToFrom_Click"
+                Command="{Binding JumpToFromCommand}"
                 Icon="Undo"
                 Label="跳转到入点" />
             <ui:AppBarButton
-                Click="JumpToTo_Click"
+                Command="{Binding JumpToToCommand}"
                 Icon="Redo"
                 Label="跳转到出点" />
+            <ui:AppBarSeparator />
             <ui:AppBarButton
-                Click="SetFrom_Click"
+                Command="{Binding SetFromCommand}"
                 Icon="Previous"
                 Label="设置为入点" />
             <ui:AppBarButton
-                Click="SetTo_Click"
+                Command="{Binding SetToCommand}"
                 Icon="Next"
                 Label="设置为出点" />
             <ui:AppBarSeparator />
             <ui:AppBarButton
-                Click="CancelButton_Click"
+                Command="{Binding CancelCommand}"
                 Icon="Cancel"
                 Label="取消" />
             <ui:AppBarButton
-                Click="OKButton_Click"
+                Command="{Binding ApplyCommand}"
                 Label="完成">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE73E;" />

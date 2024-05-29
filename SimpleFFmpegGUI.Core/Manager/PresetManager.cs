@@ -1,14 +1,23 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SimpleFFmpegGUI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SimpleFFmpegGUI.Manager
 {
-    public static class PresetManager
+    public class PresetManager
     {
-        public static int AddOrUpdatePreset(string name, TaskType type, OutputArguments arguments)
+        private readonly FFmpegDbContext db;
+
+        public PresetManager(FFmpegDbContext db)
+        {
+            this.db = db;
+        }
+
+        public async Task<int> AddOrUpdatePresetAsync(string name, TaskType type, OutputArguments arguments)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -20,30 +29,31 @@ namespace SimpleFFmpegGUI.Manager
                 Type = type,
                 Arguments = arguments
             };
-            using var db = FFmpegDbContext.GetNew();
-            if (db.Presets.Where(p => p.IsDeleted == false).Any(p => p.Name == name && p.Type == type))
+            var presets = db.Presets.Where(p => p.IsDeleted == false
+                    && p.Name == name
+                    && p.Type == type);
+            if (await presets.AnyAsync())
             {
-                db.Presets.RemoveRange(db.Presets.Where(p => p.IsDeleted == false).Where(p => p.Name == name && p.Type == type).ToArray());
+                db.Presets.RemoveRange(presets);
             }
             db.Presets.Add(preset);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             return preset.Id;
         }
 
-        public static void UpdatePreset(CodePreset preset)
+        public async Task UpdatePresetAsync(CodePreset preset)
         {
-            using var db = FFmpegDbContext.GetNew();
             db.Presets.Update(preset);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
 
-        public static CodePreset AddPreset(string name, TaskType type, OutputArguments arguments)
+        public async Task<CodePreset> AddPresetAsync(string name, TaskType type, OutputArguments arguments)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentException("名称为空");
             }
-            if (ContainsPreset(name, type))
+            if (await ContainsPresetAsync(name, type))
             {
                 throw new Exception($"名为{name}的预设已存在");
             }
@@ -53,103 +63,83 @@ namespace SimpleFFmpegGUI.Manager
                 Type = type,
                 Arguments = arguments
             };
-            using var db = FFmpegDbContext.GetNew();
-
             db.Presets.Add(preset);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             return preset;
         }
 
-        public static bool ContainsPreset(string name, TaskType type)
+        public async Task<bool> ContainsPresetAsync(string name, TaskType type)
         {
-            using var db = FFmpegDbContext.GetNew();
-            if (db.Presets.Where(p => p.IsDeleted == false).Any(p => p.Name == name && p.Type == type))
-            {
-                return true;
-            }
-            return false;
+            return await db.Presets.Where(p => p.IsDeleted == false
+            && p.Name == name
+            && p.Type == type).AnyAsync();
         }
 
-        public static void DeletePresets()
+        public async Task DeletePresetsAsync()
         {
-            using var db = FFmpegDbContext.GetNew();
-            foreach (var preset in db.Presets)
+            foreach (var preset in db.Presets.Where(p => !p.IsDeleted))
             {
                 preset.IsDeleted = true;
-                db.Entry(preset).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                db.Entry(preset).State = EntityState.Modified;
             }
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
 
-        public static void DeletePreset(int id)
+        public async Task DeletePresetAsync(int id)
         {
-            using var db = FFmpegDbContext.GetNew();
-            CodePreset preset = db.Presets.Find(id);
-            if (preset == null)
-            {
-                throw new ArgumentException($"找不到ID为{id}的预设");
-            }
+            CodePreset preset = await db.Presets.FindAsync(id) ?? throw new ArgumentException($"找不到ID为{id}的预设");
             db.Presets.Remove(preset);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
 
-        public static List<CodePreset> GetPresets()
+        public Task<List<CodePreset>> GetPresetsAsync()
         {
-            using var db = FFmpegDbContext.GetNew();
             return db.Presets.Where(p => !p.IsDeleted)
                              .OrderBy(p => p.Type)
                              .ThenBy(p => p.Name)
-                             .ToList();
+                             .ToListAsync();
         }
 
-        public static List<CodePreset> GetPresets(TaskType type)
+        public Task<List<CodePreset>> GetPresetsAsync(TaskType type)
         {
-            using var db = FFmpegDbContext.GetNew();
             return db.Presets.Where(p => !p.IsDeleted)
                              .Where(p => p.Type == type)
                              .OrderBy(p => p.Name)
-                             .ToList();
+                             .ToListAsync();
         }
 
-        public static void SetDefaultPreset(int id)
+        public async Task SetDefaultPresetAsync(int id)
         {
-            using var db = FFmpegDbContext.GetNew();
-            CodePreset preset = db.Presets.Find(id);
-            if (preset == null)
-            {
-                throw new ArgumentException($"找不到ID为{id}的预设");
-            }
+            CodePreset preset = await db.Presets.FindAsync(id) ?? throw new ArgumentException($"找不到ID为{id}的预设");
             var type = preset.Type;
             if (db.Presets.Any(p => p.Type == type && p.Default && !p.IsDeleted))
             {
                 foreach (var p in db.Presets.Where(p => p.Type == type && p.Default).ToList())
                 {
                     p.Default = false;
-                    db.Entry(p).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                    db.Entry(p).State = EntityState.Modified;
                 }
             }
             preset.Default = true;
-            db.Entry(preset).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            db.SaveChanges();
+            db.Entry(preset).State = EntityState.Modified;
+            await db.SaveChangesAsync();
         }
 
-        public static CodePreset GetDefaultPreset(TaskType type)
+        public Task<CodePreset> GetDefaultPresetAsync(TaskType type)
         {
-            using var db = FFmpegDbContext.GetNew();
-            return db.Presets.FirstOrDefault(p => p.Type == type && p.Default && !p.IsDeleted);
+            return db.Presets.FirstOrDefaultAsync(p => p.Type == type && p.Default && !p.IsDeleted);
         }
 
-        public static string Export()
+        public async Task<string> ExportAsync()
         {
-            var presets = GetPresets();
+            var presets = await GetPresetsAsync();
             return JsonConvert.SerializeObject(presets, Formatting.Indented);
         }
 
-        public static void Import(string json)
+        public async Task ImportAsync(string json)
         {
             var presets = JsonConvert.DeserializeObject<List<CodePreset>>(json);
 
-            using var db = FFmpegDbContext.GetNew();
             foreach (var preset in presets)
             {
                 string name = preset.Name;
@@ -159,14 +149,16 @@ namespace SimpleFFmpegGUI.Manager
                     throw new ArgumentException("名称为空");
                 }
                 preset.Id = 0;
-                preset.Id = 0;
-                if (db.Presets.Where(p => p.IsDeleted == false).Any(p => p.Name == name && p.Type == type))
+                var existedPresets = db.Presets.Where(p => p.IsDeleted == false
+                 && p.Name == name
+                 && p.Type == type);
+                if (await existedPresets.AnyAsync())
                 {
-                    db.Presets.RemoveRange(db.Presets.Where(p => p.IsDeleted == false).Where(p => p.Name == name && p.Type == type).ToArray());
+                    db.Presets.RemoveRange(existedPresets);
                 }
                 db.Presets.Add(preset);
             }
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
     }
 }

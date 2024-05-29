@@ -8,9 +8,9 @@ namespace SimpleFFmpegGUI.WPF.Pages
 {
     public static class PageHelper
     {
-        public static string GetTitle<T>()
+        public static string GetTitle(Type type)
         {
-            return typeof(T).Name switch
+            return type.Name switch
             {
                 nameof(AddTaskPage) => "新增任务",
                 nameof(MediaInfoPage) => "媒体信息",

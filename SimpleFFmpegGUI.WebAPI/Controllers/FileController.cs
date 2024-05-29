@@ -21,10 +21,10 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
         public static ConcurrentDictionary<string, string> Guid2File { get; } = new ConcurrentDictionary<string, string>();
         private readonly IWebHostEnvironment hostingEnvironment;
 
-        public FileController(ILogger<MediaInfoController> logger,
+        public FileController(ILogger<MediaInfoController> Logger,
             IConfiguration config,
         PipeClient pipeClient,
-        IWebHostEnvironment hostingEnvironment) : base(logger, config, pipeClient)
+        IWebHostEnvironment hostingEnvironment) : base(Logger, config, pipeClient)
         {
             this.hostingEnvironment = hostingEnvironment;
         }

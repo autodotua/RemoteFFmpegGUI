@@ -1,8 +1,8 @@
-﻿using Enterwell.Clients.Wpf.Notifications;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Enterwell.Clients.Wpf.Notifications;
 using FFMpegCore;
 using FFMpegCore.Enums;
 using FFMpegCore.Pipes;
-using FzLib;
 using FzLib.WPF;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +11,8 @@ using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.Model.MediaInfo;
+using SimpleFFmpegGUI.WPF.Messages;
+using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,93 +39,6 @@ using Size = System.Drawing.Size;
 
 namespace SimpleFFmpegGUI.WPF
 {
-    public class CutWindowViewModel : INotifyPropertyChanged
-    {
-        public CutWindowViewModel()
-        {
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private double currentP;
-
-        public double CurrentP
-        {
-            get => currentP;
-            set
-            {
-                current = Length * value;
-                this.SetValueAndNotify(ref currentP, value, nameof(CurrentP), nameof(Current));
-            }
-        }
-
-        private TimeSpan current = TimeSpan.Zero;
-
-        public TimeSpan Current
-        {
-            get => current;
-            set
-            {
-                currentP = value / Length;
-                this.SetValueAndNotify(ref current, value, nameof(Current), nameof(CurrentP));
-            }
-        }
-
-        public double FromP => From / Length;
-        public double ToP => To / Length;
-
-        private TimeSpan from = TimeSpan.Zero;
-
-        public TimeSpan From
-        {
-            get => from;
-            set => this.SetValueAndNotify(ref from, value, nameof(From), nameof(FromP));
-        }
-
-        private TimeSpan to = TimeSpan.Zero;
-
-        public TimeSpan To
-        {
-            get => to;
-            set => this.SetValueAndNotify(ref to, value, nameof(To), nameof(ToP));
-        }
-
-        private string filePath;
-
-        public string FilePath
-        {
-            get => filePath;
-            set => this.SetValueAndNotify(ref filePath, value, nameof(FilePath));
-        }
-
-        private TimeSpan length;
-
-        public TimeSpan Length
-        {
-            get => length;
-            set
-            {
-                to = value;
-                this.SetValueAndNotify(ref length, value, nameof(Length), nameof(To), nameof(FromP), nameof(ToP));
-            }
-        }
-
-        private bool isBarEnabled = true;
-
-        public bool IsBarEnabled
-        {
-            get => isBarEnabled;
-            set => this.SetValueAndNotify(ref isBarEnabled, value, nameof(IsBarEnabled));
-        }
-
-        private long frame;
-
-        public long Frame
-        {
-            get => frame;
-            set => this.SetValueAndNotify(ref frame, value, nameof(Frame));
-        }
-    }
 
     /// <summary>
     /// Interaction logic for CutWindow.xaml
@@ -134,27 +49,44 @@ namespace SimpleFFmpegGUI.WPF
 
         public CutWindowViewModel ViewModel { get; set; }
 
-        public CutWindow(CutWindowViewModel viewModel, string[] args)
+        public CutWindow(string[] args)
         {
             InitializeComponent();
-            ViewModel = viewModel;
+            ViewModel = this.SetDataContext<CutWindowViewModel>();
             this.args = args;
-            DataContext = ViewModel;
-            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
             Unloaded += (s, e) => media.Close();
-            media.MessageLogged += async (s, e) =>
-            {
-                if (e.MessageType == Unosquare.FFME.Common.MediaLogMessageType.Error)
-                {
-                    await Dispatcher.Invoke(async () =>
-                    {
-                        await CommonDialog.ShowErrorDialogAsync("加载视频失败", e.Message);
-                        Close();
-                    });
-                }
-                Debug.WriteLine(e.Message);
-            };
+            media.MessageLogged += Media_MessageLogged;
 
+            WeakReferenceMessenger.Default.Register<QueueMessagesMessage>(this, (_, m) =>
+            {
+                switch (m.Type)
+                {
+                    case 'S':
+                        this.CreateMessage().QueueSuccess(m.Message);
+                        break;
+                    case 'E' when m.Exception == null:
+                        this.CreateMessage().QueueError(m.Message);
+                        break;
+                    case 'E' when m.Exception != null:
+                        this.CreateMessage().QueueError(m.Message, m.Exception);
+                        break;
+                    default:
+                        break;
+                }
+            });
+        }
+
+        private async void Media_MessageLogged(object sender, Unosquare.FFME.Common.MediaLogMessageEventArgs e)
+        {
+            if (e.MessageType == Unosquare.FFME.Common.MediaLogMessageType.Error)
+            {
+                await Dispatcher.Invoke(async () =>
+                {
+                    await CommonDialog.ShowErrorDialogAsync("加载视频失败", e.Message);
+                    Close();
+                });
+            }
+            Debug.WriteLine(e.Message);
         }
 
 
@@ -183,23 +115,7 @@ namespace SimpleFFmpegGUI.WPF
             {
                 ViewModel.To = to.Value;
             }
-            //fps = mediaInfo.VideoStreams[0].AvgFrameRate;
-
-            var r = await media.Open(new Uri(path));
-        }
-
-        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(ViewModel.CurrentP):
-
-                    break;
-            }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
+            await media.Open(new Uri(path));
         }
 
         private async void PauseButton_Click(object sender, RoutedEventArgs e)
@@ -238,54 +154,10 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        private void JumpToFrom_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.Current = ViewModel.From;
-        }
-
-        private void JumpToTo_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.Current = ViewModel.To;
-        }
-
-        private void SetFrom_Click(object sender, RoutedEventArgs e)
-        {
-            if (ViewModel.Current >= ViewModel.To)
-            {
-                this.CreateMessage().QueueError("开始时间不可晚于结束时间");
-                return;
-            }
-            ViewModel.From = ViewModel.Current;
-            this.CreateMessage().QueueSuccess("已将开始时间设置为" + ViewModel.From.ToString(FindResource("TimeSpanFormat") as string));
-        }
-
-        private void SetTo_Click(object sender, RoutedEventArgs e)
-        {
-            if (ViewModel.Current <= ViewModel.From)
-            {
-                this.CreateMessage().QueueError("结束时间不可早于开始时间");
-                return;
-            }
-            ViewModel.To = ViewModel.Current;
-            this.CreateMessage().QueueSuccess("已将结束时间设置为" + ViewModel.To.ToString(FindResource("TimeSpanFormat") as string));
-        }
-
         private void Slider_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
         }
-
-        private void OKButton_Click(object sender, RoutedEventArgs e)
-        {
-            Console.Write("{0},{1}", ViewModel.From, ViewModel.To);
-            Application.Current.Shutdown();
-        }
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-
 
         private async void JumpButton_Click(object sender, RoutedEventArgs e)
         {
@@ -377,29 +249,6 @@ namespace SimpleFFmpegGUI.WPF
                 await CommonDialog.ShowErrorDialogAsync(ex, "加载视频失败");
                 Application.Current.Shutdown();
                 return;
-            }
-        }
-    }
-
-    public static class AsyncEventExtension
-    {
-        public static Task WaitForEventAsync(this object obj, string eventName)
-        {
-            var e = obj.GetType().GetEvent(eventName);
-            if (e == null)
-            {
-                throw new ArgumentException($"找不到事件{eventName}");
-            }
-            TaskCompletionSource tcs = new TaskCompletionSource();
-            EventHandler handler = null;
-            handler = new EventHandler(Finish);
-            e.AddEventHandler(obj, handler);
-            return tcs.Task;
-
-            void Finish(object sender, EventArgs a)
-            {
-                e.RemoveEventHandler(obj, handler);
-                tcs.SetResult();
             }
         }
     }

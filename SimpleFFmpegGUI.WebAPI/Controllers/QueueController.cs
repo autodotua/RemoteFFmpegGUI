@@ -9,9 +9,9 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
     public class QueueController : FFmpegControllerBase
     {
-        public QueueController(ILogger<MediaInfoController> logger,
+        public QueueController(ILogger<MediaInfoController> Logger,
             IConfiguration config,
-        PipeClient pipeClient) : base(logger, config, pipeClient) { }
+        PipeClient pipeClient) : base(Logger, config, pipeClient) { }
 
         [HttpGet]
         [Route("Status")]

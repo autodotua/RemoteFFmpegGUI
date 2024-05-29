@@ -10,9 +10,9 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
 {
     public class LogController : FFmpegControllerBase
     {
-        public LogController(ILogger<MediaInfoController> logger,
+        public LogController(ILogger<MediaInfoController> Logger,
             IConfiguration config,
-        PipeClient pipeClient) : base(logger, config, pipeClient) { }
+        PipeClient pipeClient) : base(Logger, config, pipeClient) { }
 
         [HttpGet]
         [Route("List")]
@@ -26,7 +26,7 @@ namespace SimpleFFmpegGUI.WebAPI.Controllers
             {
                 to = to.Value.ToLocalTime();
             }
-            var result = await pipeClient.InvokeAsync(p => p.GetLogs(type, taskId, from, to, skip, take));
+            var result = await pipeClient.InvokeAsync(p => p.GetLogsAsync(type, taskId, from, to, skip, take));
             return result;
         }
     }

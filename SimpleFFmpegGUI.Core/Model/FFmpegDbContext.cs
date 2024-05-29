@@ -17,7 +17,7 @@ namespace SimpleFFmpegGUI.Model
 
         private const string CurrentVersion = "20230408";
 
-        private FFmpegDbContext()
+        public FFmpegDbContext()
         {
             Database.EnsureCreated();
         }
@@ -43,11 +43,6 @@ namespace SimpleFFmpegGUI.Model
             {
                 SaveChanges();
             }
-        }
-
-        internal static FFmpegDbContext GetNew()
-        {
-            return new FFmpegDbContext();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -114,7 +109,7 @@ namespace SimpleFFmpegGUI.Model
                 }
                 sqlite.Close();
             }
-            using var db = GetNew();
+            using var db = new FFmpegDbContext();
             var item = db.Configs.FirstOrDefault(p => p.Key == "Version");
             if (item == null)
             {

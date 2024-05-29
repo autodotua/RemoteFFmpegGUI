@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 
-namespace SimpleFFmpegGUI.WPF.Model
+namespace SimpleFFmpegGUI.WPF.ViewModels
 {
-    public interface ITempArguments : INotifyPropertyChanged
+    public interface IArgumentVideModel
     {
         /// <summary>
         /// 将原始数据更新到UI数据

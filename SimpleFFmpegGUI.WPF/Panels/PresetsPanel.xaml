@@ -12,7 +12,6 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <local:Int2StringConverter x:Key="Int2StringConverter" />
         <Style
             BasedOn="{StaticResource DefaultComboBoxStyle}"
             TargetType="{x:Type ComboBox}">
@@ -34,8 +33,13 @@
                         Padding="10,2"
                         BorderBrush="{DynamicResource SystemControlBackgroundListLowBrush}"
                         BorderThickness="0,1"
-                        Cursor="Hand"
-                        MouseLeftButtonDown="ApplyButton_Click">
+                        Cursor="Hand">
+                        <Border.InputBindings>
+                            <MouseBinding
+                                Command="{Binding DataContext.ApplyCommand, Source={x:Reference root}}"
+                                CommandParameter="{Binding .}"
+                                MouseAction="LeftClick" />
+                        </Border.InputBindings>
                         <Border.Style>
                             <Style TargetType="{x:Type Border}">
                                 <Style.Triggers>
@@ -66,15 +70,18 @@
                                 <ui:FlyoutService.Flyout>
                                     <ui:MenuFlyout>
                                         <MenuItem
-                                            Click="UpdateButton_Click"
+                                            Command="{Binding DataContext.UpdateCommand, Source={x:Reference root}}"
+                                            CommandParameter="{Binding .}"
                                             Header="更新参数"
                                             ToolTip="使用当前输出参数更新该预设" />
                                         <MenuItem
-                                            Click="DeleteButton_Click"
+                                            Command="{Binding DataContext.DeleteCommand, Source={x:Reference root}}"
+                                            CommandParameter="{Binding .}"
                                             Header="删除"
                                             ToolTip="删除该预设" />
                                         <MenuItem
-                                            Click="MakeDefaultButton_Click"
+                                            Command="{Binding DataContext.MakeDefaultCommand, Source={x:Reference root}}"
+                                            CommandParameter="{Binding .}"
                                             Header="设为默认"
                                             ToolTip="设置为当前任务类型的默认预设" />
                                     </ui:MenuFlyout>
