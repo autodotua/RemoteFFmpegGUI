@@ -13,6 +13,14 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style
+            x:Key="FlyoutButtonStyle"
+            BasedOn="{StaticResource DefaultButtonStyle}"
+            TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </UserControl.Resources>
     <Grid Margin="8,8,0,8">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -66,6 +74,7 @@
                 <panels:CodeArgumentsPanel x:Name="argumentsPanel" />
             </GroupBox>
         </Grid>
+
         <ui:CommandBar
             Grid.Row="4"
             Grid.ColumnSpan="99"
@@ -89,29 +98,51 @@
                 Label="保存为预设" />
             <ui:AppBarSeparator />
 
-            <ui:AppBarButton
-                Command="{Binding AddToRemoteHostCommand}"
-                Label="提交到远程">
+            <ui:AppBarButton Label="创建远程任务">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xE836;" />
                 </ui:AppBarButton.Icon>
+                <ui:AppBarButton.Flyout>
+                    <ui:MenuFlyout>
+                        <MenuItem
+                            Command="{Binding AddToRemoteHostCommand}"
+                            Header="仅创建任务">
+                            <MenuItem.CommandParameter>
+                                <system:Boolean>false</system:Boolean>
+                            </MenuItem.CommandParameter>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding AddToRemoteHostCommand}"
+                            Header="创建并启动队列">
+                            <MenuItem.CommandParameter>
+                                <system:Boolean>true</system:Boolean>
+                            </MenuItem.CommandParameter>
+                        </MenuItem>
+                    </ui:MenuFlyout>
+                </ui:AppBarButton.Flyout>
             </ui:AppBarButton>
+
             <ui:AppBarButton
-                Command="{Binding AddToQueueCommand}"
                 Icon="Add"
-                Label="创建任务">
-                <ui:AppBarButton.CommandParameter>
-                    <system:Boolean>false</system:Boolean>
-                </ui:AppBarButton.CommandParameter>
-            </ui:AppBarButton>
-            <ui:AppBarButton
-                Command="{Binding AddToQueueCommand}"
-                Icon="Add"
-                Label="创建并启动"
-                Tag="queue">
-                <ui:AppBarButton.CommandParameter>
-                    <system:Boolean>true</system:Boolean>
-                </ui:AppBarButton.CommandParameter>
+                Label="创建本地任务">
+                <ui:AppBarButton.Flyout>
+                    <ui:MenuFlyout>
+                        <MenuItem
+                            Command="{Binding AddToQueueCommand}"
+                            Header="仅创建任务">
+                            <MenuItem.CommandParameter>
+                                <system:Boolean>false</system:Boolean>
+                            </MenuItem.CommandParameter>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding AddToQueueCommand}"
+                            Header="创建并启动队列">
+                            <MenuItem.CommandParameter>
+                                <system:Boolean>true</system:Boolean>
+                            </MenuItem.CommandParameter>
+                        </MenuItem>
+                    </ui:MenuFlyout>
+                </ui:AppBarButton.Flyout>
             </ui:AppBarButton>
             <ui:AppBarSeparator />
             <ui:CommandBar.SecondaryCommands>

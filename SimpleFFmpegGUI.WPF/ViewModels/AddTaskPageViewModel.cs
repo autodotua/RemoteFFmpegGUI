@@ -148,7 +148,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         }
 
         [RelayCommand]
-        private async Task AddToRemoteHost()
+        private async Task AddToRemoteHost(bool addToQueue)
         {
             var args = CodeArgumentsViewModel.GetArguments();
             try
@@ -191,7 +191,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                     Inputs = inputs,
                     Output = output,
                     Argument = args,
-                    Start = false
+                    Start = addToQueue
                 };
                 await PostAsync(host, "Task/Add/" + Type.ToString(), data);
 
