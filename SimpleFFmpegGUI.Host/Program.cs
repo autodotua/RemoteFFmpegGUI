@@ -25,8 +25,20 @@ namespace SimpleFFmpegGUI
         private const string DefaultPipeName = "ffpipe";
 
         public static ILog AppLog { get; private set; }
-
-        public static IHostBuilder CreateHostBuilder(string pipeName)
+       public static void StartAsService(IHostBuilder builder)
+        {
+            InitializeLogs();
+#if !DEBUG
+            UnhandledExceptionCatcher catcher = new UnhandledExceptionCatcher();
+            catcher.RegisterTaskCatcher();
+            catcher.RegisterThreadsCatcher();
+            catcher.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
+#endif
+            string pipeName = DefaultPipeName;
+            ConsoleLogger.StartListen();
+            CreateHostBuilder(pipeName, builder);
+        }
+        private static IHostBuilder CreateHostBuilder(string pipeName, IHostBuilder builder = null)
         {
             try
             {
@@ -41,8 +53,13 @@ namespace SimpleFFmpegGUI
                 return null;
             }
 
-            return Host.CreateDefaultBuilder()
-                    .ConfigureServices(services =>
+            builder = builder ?? Host.CreateDefaultBuilder();
+            //builder.Services.AddFFmpegServices();
+            //builder.Services.AddSingleton<IPipeService, PipeService>();
+            //builder
+            //  builder.Configuration.add;
+            return builder
+                .ConfigureServices(services =>
                     {
                         services.AddFFmpegServices();
                         services.AddSingleton<IPipeService, PipeService>();
@@ -72,6 +89,13 @@ namespace SimpleFFmpegGUI
             catcher.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
 #endif
             string pipeName = DefaultPipeName;
+            pipeName = ProcessArgs(args, pipeName);
+            ConsoleLogger.StartListen();
+            CreateHostBuilder(pipeName).Build().Run();
+        }
+
+        private static string ProcessArgs(string[] args, string pipeName)
+        {
             Parser.Default.ParseArguments<Options>(args)
                      .WithParsed(o =>
                      {
@@ -138,8 +162,7 @@ namespace SimpleFFmpegGUI
                              Console.WriteLine("工作目录设置为程序目录：" + FzLib.Program.App.ProgramDirectoryPath);
                          }
                      });
-            ConsoleLogger.StartListen();
-            CreateHostBuilder(pipeName).Build().Run();
+            return pipeName;
         }
 
         private static void InitializeLogs()

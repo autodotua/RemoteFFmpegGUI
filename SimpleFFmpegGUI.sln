@@ -13,9 +13,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleFFmpegGUI.WebAPI", "S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{80558D25-AA8A-4B93-BA65-B25C8A5BF836}"
 	ProjectSection(SolutionItems) = preProject
+		build.ps1 = build.ps1
+		clean.ps1 = clean.ps1
 		ReadMe.md = ReadMe.md
 		日志.md = 日志.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFFmpegGUI.Host.Service", "SimpleFFmpegGUI.Host.Service\SimpleFFmpegGUI.Host.Service.csproj", "{AD930286-CAB2-4CB2-B87A-C7E6F85A1F9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +61,14 @@ Global
 		{3FA65787-B01F-4490-A662-990B7D46B1FE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3FA65787-B01F-4490-A662-990B7D46B1FE}.Release|x64.ActiveCfg = Release|Any CPU
 		{3FA65787-B01F-4490-A662-990B7D46B1FE}.Release|x64.Build.0 = Release|Any CPU
+		{AD930286-CAB2-4CB2-B87A-C7E6F85A1F9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD930286-CAB2-4CB2-B87A-C7E6F85A1F9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD930286-CAB2-4CB2-B87A-C7E6F85A1F9B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AD930286-CAB2-4CB2-B87A-C7E6F85A1F9B}.Debug|x64.Build.0 = Debug|Any CPU
+		{AD930286-CAB2-4CB2-B87A-C7E6F85A1F9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD930286-CAB2-4CB2-B87A-C7E6F85A1F9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD930286-CAB2-4CB2-B87A-C7E6F85A1F9B}.Release|x64.ActiveCfg = Release|Any CPU
+		{AD930286-CAB2-4CB2-B87A-C7E6F85A1F9B}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
