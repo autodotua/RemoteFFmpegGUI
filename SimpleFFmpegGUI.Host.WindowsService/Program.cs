@@ -1,5 +1,6 @@
 using SimpleFFmpegGUI;
 using SimpleFFmpegGUI.Host.Service;
+using System.Diagnostics;
 
 var builder = Host.CreateDefaultBuilder(args);
 builder.ConfigureServices(services =>
@@ -10,7 +11,7 @@ builder.ConfigureServices(services =>
         options.ServiceName = "SimpleFFmpegHost";
     });
 });
-
+Directory.SetCurrentDirectory(Path.GetDirectoryName(Environment.ProcessPath));
 Startup.InitializeServices(builder);
 builder.Build().Run();
 
