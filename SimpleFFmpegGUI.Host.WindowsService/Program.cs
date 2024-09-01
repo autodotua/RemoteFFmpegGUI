@@ -11,7 +11,6 @@ builder.ConfigureServices(services =>
     });
 });
 
-SimpleFFmpegGUI.Program.StartAsService(builder);
-var host = builder.Build();
-host.Run();
+Startup.InitializeServices(builder);
+builder.Build().Run();
 

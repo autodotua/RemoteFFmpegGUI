@@ -68,6 +68,9 @@ try {
 
         Write-Output "正在发布Host"
         dotnet publish SimpleFFmpegGUI.Host -c Release -o Generation/Publish/WebPackage/host
+        dotnet publish SimpleFFmpegGUI.Host.Console -c Release -o Generation/Publish/WebPackage/host
+        dotnet publish SimpleFFmpegGUI.Host.WindowsService -c Release -o Generation/Publish/WebPackage/host
+        Copy-Item SimpleFFmpegGUI.Host.WindowsService/*.bat Generation/Publish/WebPackage/host
 
         
         Write-Output "正在复制二进制库"

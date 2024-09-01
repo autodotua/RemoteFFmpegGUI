@@ -21,4 +21,12 @@
   <ItemGroup>
     <ProjectReference Include="..\SimpleFFmpegGUI.Host\SimpleFFmpegGUI.Host.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="CreateWindowsService.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DeleteWindowsService.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
