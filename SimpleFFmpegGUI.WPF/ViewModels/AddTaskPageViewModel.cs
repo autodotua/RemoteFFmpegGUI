@@ -73,10 +73,43 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             }
         }
 
-        [RelayCommand(CanExecute = nameof(CanAddFile))]
-        private void AddInput()
+        [RelayCommand]
+        private async Task AddInputAsync()
         {
-            FileIOViewModel.AddInput();
+            try
+            {
+                FileIOViewModel.AddInput();
+            }
+            catch (Exception ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync(ex);
+            }
+        }
+
+        [RelayCommand]
+        private async Task AddInputFilesAsync()
+        {
+            try
+            {
+                FileIOViewModel.BrowseFiles();
+            }
+            catch (Exception ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync(ex);
+            }
+        }
+
+        [RelayCommand]
+        private async Task AddInputFolderAsync()
+        {
+            try
+            {
+                FileIOViewModel.BrowseFolder();
+            }
+            catch (Exception ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync(ex);
+            }
         }
 
         [RelayCommand]
@@ -238,6 +271,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             await CodeArgumentsViewModel.UpdateTypeAsync(value);
             await PresetsViewModel.UpdateTypeAsync(value);
         }
+
         private void SaveAsLastOutputArguments(OutputArguments arguments)
         {
             if (!Config.Instance.RememberLastArguments)

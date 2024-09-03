@@ -81,11 +81,24 @@
             Margin="-8,-8,0,-8"
             MouseEnter="CommandBar_MouseEnter">
             <ui:AppBarButton
-                Command="{Binding AddInputCommand}"
+                IsEnabled="{Binding CanAddFile}"
                 Label="新增">
                 <ui:AppBarButton.Icon>
                     <ui:FontIcon Glyph="&#xECC8;" />
                 </ui:AppBarButton.Icon>
+                <ui:AppBarButton.Flyout>
+                    <ui:MenuFlyout>
+                        <MenuItem
+                            Command="{Binding AddInputCommand}"
+                            Header="新增空文件" />
+                        <MenuItem
+                            Command="{Binding AddInputFilesCommand}"
+                            Header="批量添加文件" />
+                        <MenuItem
+                            Command="{Binding AddInputFolderCommand}"
+                            Header="添加文件夹" />
+                    </ui:MenuFlyout>
+                </ui:AppBarButton.Flyout>
             </ui:AppBarButton>
             <ui:AppBarButton
                 Command="{Binding ClearInputsCommand}"
