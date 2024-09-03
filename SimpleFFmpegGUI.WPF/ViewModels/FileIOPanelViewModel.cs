@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using WinRT;
 using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
 using Path = System.IO.Path;
 
@@ -38,6 +39,7 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         [ObservableProperty]
         private int maxInputsCount = int.MaxValue;
 
+        [ObservableProperty]
         private int minInputsCount = 1;
 
         /// <summary>
@@ -83,22 +85,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
         public ObservableCollection<InputArgumentsViewModel> Inputs { get; } = new ObservableCollection<InputArgumentsViewModel>();
 
         /// <summary>
-        /// 最少输入文件的个数
-        /// </summary>
-        public int MinInputsCount
-        {
-            get => minInputsCount;
-            set
-            {
-                this.SetValueAndNotify(ref minInputsCount, value, nameof(MinInputsCount));
-                while (value > Inputs.Count)
-                {
-                    Inputs.Add(new InputArgumentsViewModel());
-                }
-            }
-        }
-
-        /// <summary>
         /// 输出目录的提示
         /// </summary>
         public string OutputDirPlaceholder => "若为空，则保存到" +
@@ -110,13 +96,58 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 _ => throw new NotImplementedException()
             };
 
-        public void AddInput()
+        public InputArgumentsViewModel AddInput()
         {
             if (Inputs.Count >= MaxInputsCount)
             {
-                throw new NotSupportedException("无法继续增加输入文件");
+                throw new ArgumentException("无法继续增加输入文件");
             }
-            Inputs.Add(new InputArgumentsViewModel());
+            var input = new InputArgumentsViewModel();
+            Inputs.Add(input);
+            return input;
+        }
+
+        public void BrowseFiles()
+        {
+            var dialog = new OpenFileDialog().AddAllFilesFilter();
+            dialog.Multiselect = true;
+            SendMessage(new FileDialogMessage(dialog));
+            List<string> paths = dialog.FileNames.Where(p => !string.IsNullOrWhiteSpace(p)).ToList();
+            if (Inputs.Count + paths.Count > MaxInputsCount)
+            {
+                throw new ArgumentException("欲加入的文件数量超过可加入的文件数");
+            }
+            foreach (var path in paths)
+            {
+                Inputs.Add(new InputArgumentsViewModel()
+                {
+                    FilePath = path,
+                });
+            }
+        }
+
+        public void BrowseFolder()
+        {
+            var dialog = new OpenFolderDialog();
+            dialog.Multiselect = true;
+            SendMessage(new FileDialogMessage(dialog));
+            if (!string.IsNullOrWhiteSpace(dialog.FolderName))
+            {
+                var files = Directory.EnumerateFiles(dialog.FolderName, "*", new EnumerationOptions()).ToList();
+
+                if (Inputs.Count + files.Count > MaxInputsCount)
+                {
+                    throw new ArgumentException("欲加入的文件数量超过可加入的文件数");
+                }
+                foreach (var path in files)
+                {
+                    Inputs.Add(new InputArgumentsViewModel()
+                    {
+                        FilePath = path,
+                    });
+                }
+            }
+
         }
 
         public List<InputArguments> GetInputs()
@@ -153,6 +184,27 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             }
             return Path.Combine(dir, Path.GetFileName(input));
         }
+
+        /// <summary>
+        /// 用于添加到远程主机，获取输出文件名
+        /// </summary>
+        /// <returns></returns>
+        public string GetOutputFileName()
+        {
+            if (CanSetOutputFileName)//需要可以设置输出文件名
+            {
+                if (!string.IsNullOrWhiteSpace(OutputFileName))//如果手动指定
+                {
+                    return OutputFileName;
+                }
+                if (Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath)).Any())//如果未手动指定并且存在输入文件
+                {
+                    return Path.GetFileName(Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath)).First().FilePath);
+                }
+            }
+            return null;
+        }
+
         /// <summary>
         /// 重置
         /// </summary>
@@ -234,10 +286,11 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
                 _ => false
             };
         }
+
         [RelayCommand]
-        private async Task BrowseFile(InputArgumentsViewModel input)
+        private async Task BrowseFileAsync(InputArgumentsViewModel input)
         {
-            var dialog = new Microsoft.Win32.OpenFileDialog().AddAllFilesFilter();
+            var dialog = new OpenFileDialog().AddAllFilesFilter();
             SendMessage(new FileDialogMessage(dialog));
             string path = dialog.FileName;
             if (!string.IsNullOrEmpty(path))
@@ -344,30 +397,26 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
             }
             this.Notify(nameof(CanSetOutputFileName));
         }
+
+        partial void OnMaxInputsCountChanged(int value)
+        {
+            while (Inputs.Count > value)
+            {
+                Inputs.RemoveAt(Inputs.Count - 1);
+            }
+        }
+
+        partial void OnMinInputsCountChanged(int value)
+        {
+            while (value > Inputs.Count)
+            {
+                Inputs.Add(new InputArgumentsViewModel());
+            }
+        }
         [RelayCommand]
         private void RemoveFile(InputArgumentsViewModel input)
         {
             Inputs.Remove(input);
-        }
-
-        /// <summary>
-        /// 用于添加到远程主机，获取输出文件名
-        /// </summary>
-        /// <returns></returns>
-        public string GetOutputFileName()
-        {
-            if (CanSetOutputFileName)//需要可以设置输出文件名
-            {
-                if (!string.IsNullOrWhiteSpace(OutputFileName))//如果手动指定
-                {
-                    return OutputFileName;
-                }
-                if (Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath)).Any())//如果未手动指定并且存在输入文件
-                {
-                    return Path.GetFileName(Inputs.Where(p => !string.IsNullOrEmpty(p.FilePath)).First().FilePath);
-                }
-            }
-            return null;
         }
     }
 }
