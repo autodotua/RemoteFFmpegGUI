@@ -23,15 +23,7 @@ namespace SimpleFFmpegGUI.WebAPI
         public PipeClient(IConfiguration config)
         {
             pipeName = Program.PipeName ?? config.GetValue<string>("PipeName") ?? throw new Exception("不存在PipeName配置项");
-            hostName = config.GetValue<string>("HostName", null);
-            hostPath = config.GetValue<string>("HostPath", null);
-            try
-            {
-                EnsureHost();
-            }
-            catch (Exception ex)
-            {
-            }
+          
             ServiceProvider serviceProvider = new ServiceCollection()
                 .AddNamedPipeIpcClient<IPipeService>("m", pipeName: pipeName)
                 .BuildServiceProvider();
@@ -90,29 +82,6 @@ namespace SimpleFFmpegGUI.WebAPI
             catch (IpcFaultException ex)
             {
                 throw (ex.InnerException ?? ex).InnerException ?? ex.InnerException ?? ex;
-            }
-        }
-
-        private void EnsureHost()
-        {
-            if (hostName != null)
-            {
-                var hosts = Process.GetProcessesByName(hostName);
-                if (hosts.Length == 0)
-                {
-                    if (hostPath == null)
-                    {
-                        throw new Exception("服务提供进程未运行且没有配置路径");
-                    }
-                    Process p = new Process()
-                    {
-                        StartInfo = new ProcessStartInfo(hostPath, "-p " + pipeName)
-                        {
-                            UseShellExecute = true,
-                        },
-                    };
-                    p.Start();
-                }
             }
         }
     }

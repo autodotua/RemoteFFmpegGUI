@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@types/js-cookie": "^2.2.7",
+    "@types/node": "^22.5.4",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "@vue/cli-plugin-babel": "^5.0.8",

@@ -12,7 +12,7 @@
             远程FFmpeg工具箱
           </h2>
           <a
-            v-show="netError"
+            v-if="netError"
             style="
               color: red;
               display: inline-block;

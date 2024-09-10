@@ -60,7 +60,7 @@
         >
           <el-option
             v-for="item in formats"
-            :key="item.name"
+            :key="item.extension"
             :label="item.extension"
             :value="item.name"
           >
@@ -555,7 +555,6 @@ export default Vue.component("code-arguments", {
         .getPresets(this.type)
         .then((r) => {
           this.presets = r.data;
-
           action(r.data);
         })
         .catch(showError);

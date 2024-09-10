@@ -1,4 +1,3 @@
-
 <template>
   <div class="status-bar" v-if="status != null && status.isProcessing">
     <div v-if="status.hasDetail">
@@ -6,118 +5,60 @@
         <el-row>
           <el-col style="width: 108px; height: 64px">
             <div style="background-color: #7dd07d; width: 100%; height: 100%">
-              <img
-                width="108"
-                height="64"
-                style="cursor: pointer"
-                :src="snapshotSrc"
-                v-show="snapshotSrc != ''"
-                @click="clickSnapshot"
-              />
+              <img width="108" height="64" style="cursor: pointer" :src="snapshotSrc" v-show="snapshotSrc != ''"
+                @click="clickSnapshot" />
             </div>
           </el-col>
           <el-col style="width: calc(100% - 120px); padding-left: 12px">
             <el-row>
               <el-col :span="7">
                 <el-row><b>码率：</b>{{ status.bitrate }}</el-row>
-                <el-row
-                  ><b>已用：</b
-                  >{{ formatDoubleTimeSpan(status.progress.duration) }}</el-row
-                >
+                <el-row><b>已用：</b>{{ formatDoubleTimeSpan(status.progress.duration) }}</el-row>
               </el-col>
               <el-col :span="7">
-                <el-row
-                  ><b>速度：</b>{{ status.fps }}FPS{{ "   " }}
-                  {{ status.speed }}X</el-row
-                >
-                <el-row
-                  ><b>剩余：</b
-                  >{{ formatDoubleTimeSpan(status.progress.lastTime) }}</el-row
-                >
+                <el-row><b>速度：</b>{{ status.fps }}FPS{{ " " }}
+                  {{ status.speed }}X</el-row>
+                <el-row><b>剩余：</b>{{ formatDoubleTimeSpan(status.progress.lastTime) }}</el-row>
               </el-col>
               <el-col :span="7">
-                <el-row
-                  ><b>进度：</b>{{ status.frame }}帧
+                <el-row><b>进度：</b>{{ status.frame }}帧
                   {{ formatDoubleTimeSpan(status.time, true) }}
                 </el-row>
-                <el-row
-                  ><b>预计：</b>
-                  {{ formatDateTime(finishTime(), true, true, false) }}</el-row
-                >
+                <el-row><b>预计：</b>
+                  {{ formatDateTime(finishTime(), true, true, false) }}</el-row>
               </el-col>
 
               <el-col :span="3">
                 <el-popconfirm title="真的要取消任务吗？" @confirm="cancel">
-                  <el-button
-                    type="text"
-                    style="color: red"
-                    slot="reference"
-                    size="big"
-                    >取消</el-button
-                  ></el-popconfirm
-                >
+                  <el-button type="text" style="color: red" slot="reference" size="big">取消</el-button></el-popconfirm>
               </el-col>
             </el-row>
             <el-row class="right24">
-              <el-col :span="8" class="one-line"
-                ><b>任务：</b
-                >{{ status.isPaused ? "暂停中" : status.progress.name }}</el-col
-              >
+              <el-col :span="8" class="one-line"><b>任务：</b>{{ status.isPaused ? "暂停中" : status.progress.name }}</el-col>
               <el-col :span="16">
-                <el-progress
-                  :text-inside="true"
-                  class="unknown-progress"
-                  :stroke-width="20"
-                  color="transparent"
-                  :percentage="100"
-                  v-show="status.progress.isIndeterminate"
-                  style="margin-right: 24px; margin-top: 4px"
-                  :show-text="true"
-                  text-color="black"
-                  :format="(p) => '进度未知'"
-                  define-back-color="#CCCA"
-                ></el-progress>
-                <el-progress
-                  :text-inside="true"
-                  v-show="status.progress.isIndeterminate == false"
-                  :stroke-width="20"
-                  :color="progressColor"
-                  style="margin-right: 24px; margin-top: 4px"
-                  :percentage="status.progress.percent * 100"
-                  :format="(p) => p.toFixed(2) + '%'"
-                  text-color="white"
-                  define-back-color="#CCCA"
-                ></el-progress
-              ></el-col>
-            </el-row> </el-col
-        ></el-row>
+                <el-progress :text-inside="true" class="unknown-progress" :stroke-width="20" color="transparent"
+                  :percentage="100" v-show="status.progress.isIndeterminate" style="margin-right: 24px; margin-top: 4px"
+                  :show-text="true" text-color="black" :format="(p) => '进度未知'" define-back-color="#CCCA"></el-progress>
+                <el-progress :text-inside="true" v-show="status.progress.isIndeterminate == false" :stroke-width="20"
+                  :color="progressColor" style="margin-right: 24px; margin-top: 4px"
+                  :percentage="status.progress.percent * 100" :format="(p) => p.toFixed(2) + '%'" text-color="white"
+                  define-back-color="#CCCA"></el-progress></el-col>
+            </el-row> </el-col></el-row>
       </div>
       <div v-else>
         <el-row>
           <el-col :span="12">
             <el-row><b>码率：</b>{{ status.bitrate }}</el-row>
-            <el-row
-              ><b>速度：</b>{{ status.fps }}FPS{{ "   " }}
-              {{ status.speed }}X</el-row
-            >
-            <el-row
-              ><b>进度：</b>{{ status.frame }}帧
+            <el-row><b>速度：</b>{{ status.fps }}FPS{{ " " }}
+              {{ status.speed }}X</el-row>
+            <el-row><b>进度：</b>{{ status.frame }}帧
               {{ formatDoubleTimeSpan(status.time, true) }}
             </el-row>
           </el-col>
           <el-col :span="12">
-            <el-row
-              ><b>已用：</b
-              >{{ formatDoubleTimeSpan(status.progress.duration) }}</el-row
-            >
-            <el-row
-              ><b>剩余：</b
-              >{{ formatDoubleTimeSpan(status.progress.lastTime) }}</el-row
-            >
-            <el-row
-              ><b>预计：</b
-              >{{ formatDateTime(finishTime(), true, true, false) }}</el-row
-            >
+            <el-row><b>已用：</b>{{ formatDoubleTimeSpan(status.progress.duration) }}</el-row>
+            <el-row><b>剩余：</b>{{ formatDoubleTimeSpan(status.progress.lastTime) }}</el-row>
+            <el-row><b>预计：</b>{{ formatDateTime(finishTime(), true, true, false) }}</el-row>
           </el-col>
         </el-row>
         <el-row class="single-line">
@@ -125,63 +66,25 @@
         </el-row>
         <el-row>
           <el-col :span="20">
-            <el-progress
-              :text-inside="true"
-              class="unknown-progress"
-              :stroke-width="20"
-              color="transparent"
-              :percentage="100"
-              style="margin-right: 24px; margin-top: 4px"
-              :show-text="true"
-              v-show="status.progress.isIndeterminate"
-              text-color="black"
-              :format="(p) => '进度未知'"
-              define-back-color="#CCCA"
-            ></el-progress>
-            <el-progress
-              :text-inside="true"
-              :stroke-width="20"
-              :color="progressColor"
-              style="margin-top: 10px"
-              v-show="status.progress.isIndeterminate == false"
-              :percentage="status.progress.percent * 100"
-              :format="(p) => p.toFixed(2) + '%'"
-              text-color="white"
-              define-back-color="#CCCA"
-            ></el-progress></el-col
-          ><el-col :span="4">
+            <el-progress :text-inside="true" class="unknown-progress" :stroke-width="20" color="transparent"
+              :percentage="100" style="margin-right: 24px; margin-top: 4px" :show-text="true"
+              v-show="status.progress.isIndeterminate" text-color="black" :format="(p) => '进度未知'"
+              define-back-color="#CCCA"></el-progress>
+            <el-progress :text-inside="true" :stroke-width="20" :color="progressColor" style="margin-top: 10px"
+              v-show="status.progress.isIndeterminate == false" :percentage="status.progress.percent * 100"
+              :format="(p) => p.toFixed(2) + '%'" text-color="white"
+              define-back-color="#CCCA"></el-progress></el-col><el-col :span="4">
             <el-popconfirm title="真的要取消任务吗？" @confirm="cancel">
-              <el-button
-                style="width: 75%; color: red"
-                type="text"
-                slot="reference"
-                size="big"
-                >取消</el-button
-              ></el-popconfirm
-            ></el-col
-          >
+              <el-button style="width: 75%; color: red" type="text" slot="reference"
+                size="big">取消</el-button></el-popconfirm></el-col>
         </el-row>
       </div>
     </div>
     <div v-else style="height: 60px">
-      <i
-        v-if="windowWidth > 988"
-        class="el-icon-loading"
-        style="float: left; font-size: 2em; margin-top: 12px"
-      ></i>
-      <el-popconfirm
-        title="真的要取消任务吗？"
-        style="float: right; margin-right: 36px; margin-top: 8px"
-        @confirm="cancel"
-      >
-        <el-button type="text" style="color: red" slot="reference" size="big"
-          >取消</el-button
-        ></el-popconfirm
-      >
-      <div
-        v-if="windowWidth > 988"
-        style="margin-left: 48px; text-align: center; padding-top: 16px"
-      >
+      <i v-if="windowWidth > 988" class="el-icon-loading" style="float: left; font-size: 2em; margin-top: 12px"></i>
+      <el-popconfirm title="真的要取消任务吗？" style="float: right; margin-right: 36px; margin-top: 8px" @confirm="cancel">
+        <el-button type="text" style="color: red" slot="reference" size="big">取消</el-button></el-popconfirm>
+      <div v-if="windowWidth > 988" style="margin-left: 48px; text-align: center; padding-top: 16px">
         {{ status.lastOutput }}
       </div>
       <div v-else style="text-align: center; transform: translate(0, -4px)">
@@ -190,7 +93,7 @@
     </div>
   </div>
 </template>
-<script >
+<script>
 import Vue from "vue";
 import Cookies from "js-cookie";
 import * as net from "../net";
@@ -243,7 +146,7 @@ export default Vue.component("status-bar", {
       );
     },
     updateSnapshot() {
-      if (this.status.isPaused) {
+      if (this.status == null || this.status.isPaused) {
         return;
       }
       if (
@@ -311,9 +214,10 @@ export default Vue.component("status-bar", {
 </style>
 
 <style>
-.unknown-progress > div > div > div {
+.unknown-progress>div>div>div {
   text-align: center;
 }
+
 .el-message-box {
   width: 80% !important;
 }
