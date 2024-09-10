@@ -15,6 +15,7 @@
 | WPF                 | 桌面GUI             | 桌面端的GUI实现                                              |
 | WebApp              | 桌面客户端          | 对WebAPI、Web和Host进行包装的、使用内置浏览器显示的、基于WinForms的桌面客户端（不再使用） |
 
+![](imgs/软件架构图.png)
 
 ## 截图
 
