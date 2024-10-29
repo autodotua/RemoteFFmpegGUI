@@ -261,19 +261,6 @@ namespace SimpleFFmpegGUI.WPF
             }
         }
 
-        private void CloseTabButton_Click(object sender, RoutedEventArgs e)
-        {
-            DependencyObject obj = e.Source as DependencyObject;
-            while (obj != null)
-            {
-                obj = VisualTreeHelper.GetParent(obj);
-                if (obj is TabItem item)
-                {
-                    tab.Items.Remove(item);
-                }
-            }
-        }
-
         private void RegisterMessages()
         {
             WeakReferenceMessenger.Default.Register<FileDialogMessage>(this, (_, m) =>

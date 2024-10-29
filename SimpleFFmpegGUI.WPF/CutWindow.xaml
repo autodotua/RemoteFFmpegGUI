@@ -16,7 +16,7 @@
     Title="FFmpeg 工具箱 - 视频裁剪"
     Width="1400"
     Height="800"
-    ui:WindowHelper.SystemBackdropType="Mica"
+    ui:WindowHelper.SystemBackdropType="None"
     ui:WindowHelper.UseModernWindowStyle="True"
     Loaded="Window_Loaded"
     WindowStartupLocation="CenterScreen"
@@ -183,31 +183,46 @@
             IsEnabled="{Binding IsBarEnabled}">
             <ui:AppBarButton
                 Command="{Binding JumpToFromCommand}"
-                Icon="Undo"
-                Label="跳转到入点" />
+                Label="跳转到入点">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Undo}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarButton
                 Command="{Binding JumpToToCommand}"
-                Icon="Redo"
-                Label="跳转到出点" />
+                Label="跳转到出点">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Redo}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Command="{Binding SetFromCommand}"
-                Icon="Previous"
-                Label="设置为入点" />
+                Label="设置为入点">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Preview}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarButton
                 Command="{Binding SetToCommand}"
-                Icon="Next"
-                Label="设置为出点" />
+                Label="设置为出点">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Next}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Command="{Binding CancelCommand}"
-                Icon="Cancel"
-                Label="取消" />
+                Label="取消">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Cancel}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarButton
                 Command="{Binding ApplyCommand}"
                 Label="完成">
                 <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE73E;" />
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.CheckMark}" />
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
         </ui:CommandBar>

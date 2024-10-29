@@ -84,7 +84,7 @@
                 IsEnabled="{Binding CanAddFile}"
                 Label="新增">
                 <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xECC8;" />
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.AddTo}" />
                 </ui:AppBarButton.Icon>
                 <ui:AppBarButton.Flyout>
                     <ui:MenuFlyout>
@@ -102,18 +102,26 @@
             </ui:AppBarButton>
             <ui:AppBarButton
                 Command="{Binding ClearInputsCommand}"
-                Icon="Clear"
-                Label="清空" />
+                Label="清空">
+
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Clear}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Command="{Binding PresetsViewModel.SaveToPresetCommand}"
-                Icon="Save"
-                Label="保存为预设" />
+                Label="保存为预设">
+
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Save}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarSeparator />
 
             <ui:AppBarButton Label="创建远程任务">
                 <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE836;" />
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.AddRemoteDevice}" />
                 </ui:AppBarButton.Icon>
                 <ui:AppBarButton.Flyout>
                     <ui:MenuFlyout>
@@ -135,9 +143,10 @@
                 </ui:AppBarButton.Flyout>
             </ui:AppBarButton>
 
-            <ui:AppBarButton
-                Icon="Add"
-                Label="创建本地任务">
+            <ui:AppBarButton Label="创建本地任务">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Add}" />
+                </ui:AppBarButton.Icon>
                 <ui:AppBarButton.Flyout>
                     <ui:MenuFlyout>
                         <MenuItem
@@ -160,14 +169,17 @@
             <ui:AppBarSeparator />
             <ui:CommandBar.SecondaryCommands>
                 <ui:AppBarToggleButton
-                    Icon="Clear"
                     IsChecked="{Binding Source={x:Static r:Config.Instance}, Path=ClearFilesAfterAddTask}"
-                    Label="创建后清空文件" />
+                    Label="创建后清空文件">
+                    <ui:AppBarToggleButton.Icon>
+                        <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.ClearAllInk}" />
+                    </ui:AppBarToggleButton.Icon>
+                </ui:AppBarToggleButton>
                 <ui:AppBarButton
                     Command="{Binding FFmpegArgsCommand}"
                     Label="查看当前的输出参数">
                     <ui:AppBarButton.Icon>
-                        <ui:FontIcon Glyph="&#xE943;" />
+                        <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Code}" />
                     </ui:AppBarButton.Icon>
                 </ui:AppBarButton>
             </ui:CommandBar.SecondaryCommands>
