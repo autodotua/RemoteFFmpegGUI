@@ -17,7 +17,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using static SimpleFFmpegGUI.WPF.ViewModels.PerformanceTestLine;
-using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
+using CommonDialog = iNKORE.Extension.CommonDialog.CommonDialog;
 
 namespace SimpleFFmpegGUI.WPF.ViewModels
 {

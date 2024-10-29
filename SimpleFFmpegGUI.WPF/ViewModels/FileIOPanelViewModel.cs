@@ -5,7 +5,7 @@ using FzLib;
 using FzLib.WPF.Converters;
 using Mapster;
 using Microsoft.Win32;
-using ModernWpf.FzExtension.CommonDialog;
+using iNKORE.Extension.CommonDialog;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Messages;
 using SimpleFFmpegGUI.WPF.ViewModels;
@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using WinRT;
-using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
+using CommonDialog = iNKORE.Extension.CommonDialog.CommonDialog;
 using Path = System.IO.Path;
 
 namespace SimpleFFmpegGUI.WPF.ViewModels

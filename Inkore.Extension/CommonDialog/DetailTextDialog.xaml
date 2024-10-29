@@ -1,0 +1,49 @@
+﻿<local:CommonDialog
+    x:Class="iNKORE.Extension.CommonDialog.DetailTextDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cvt="clr-namespace:FzLib.WPF.Converters;assembly=FzCoreLib.Windows"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:iNKORE.Extension.CommonDialog"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    mc:Ignorable="d">
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBlock
+            Text="{Binding Message}"
+            TextWrapping="Wrap"
+            Visibility="{Binding Message, Converter={StaticResource NotNullConverter}}" />
+        <Expander
+            Grid.Row="2" Margin="0,16,0,0"
+            HorizontalAlignment="Stretch"
+            Header="详情"
+            Visibility="{Binding Detail, Converter={StaticResource NotNullConverter}}">
+            <ScrollViewer
+                MaxHeight="320"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <TextBox
+                    Margin="0,8,0,0" BorderThickness="0"
+                    IsReadOnly="True"
+                    Text="{Binding Detail}"
+                    TextWrapping="Wrap" />
+            </ScrollViewer>
+        </Expander>
+        <ui:FontIcon
+            Grid.RowSpan="99" Grid.Column="2"
+            VerticalAlignment="Top" FontSize="30"
+            Foreground="{Binding IconBrush}"
+            Glyph="{Binding Icon}"
+            Visibility="{Binding Icon, Converter={StaticResource NotNullConverter}}" />
+    </Grid>
+</local:CommonDialog>

@@ -4,10 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="clr-namespace:FzLib.WPF.Converters;assembly=FzCoreLib.Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
     x:Name="root"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -68,7 +69,7 @@
                                     <TextBox
                                         Text="{Binding FilePath}"
                                         TextWrapping="Wrap" />
-                                    <ui:SimpleStackPanel
+                                    <ikw:SimpleStackPanel
                                         Grid.Column="2"
                                         VerticalAlignment="Center"
                                         Orientation="Horizontal"
@@ -91,7 +92,7 @@
                                             Visibility="{Binding ElementName=root, Path=DataContext.CanChangeInputsCount, Converter={StaticResource Bool2VisibilityConverter}}">
                                             <ui:SymbolIcon Symbol="Delete" />
                                         </Button>
-                                    </ui:SimpleStackPanel>
+                                    </ikw:SimpleStackPanel>
                                 </Grid>
                                 <Grid
                                     Grid.Row="4"

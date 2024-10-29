@@ -14,8 +14,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using ModernWpf.FzExtension.CommonDialog;
-using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
+using iNKORE.Extension.CommonDialog;
+using CommonDialog = iNKORE.Extension.CommonDialog.CommonDialog;
 
 namespace SimpleFFmpegGUI.WPF.ViewModels
 {

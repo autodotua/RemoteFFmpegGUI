@@ -3,7 +3,6 @@ using log4net;
 using log4net.Appender;
 using log4net.Layout;
 using Microsoft.Extensions.DependencyInjection;
-using ModernWpf.Controls;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.ViewModels;
@@ -20,7 +19,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using static SimpleFFmpegGUI.DependencyInjectionExtension;
 using System.Windows.Interop;
-using SimpleFFmpegGUI.WPF.ViewModels;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
 

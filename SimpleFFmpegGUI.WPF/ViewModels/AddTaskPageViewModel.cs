@@ -17,7 +17,7 @@ using SimpleFFmpegGUI.WPF.Messages;
 using FzLib.Collection;
 using CommunityToolkit.Mvvm.Input;
 using System.Linq;
-using ModernWpf.FzExtension.CommonDialog;
+using iNKORE.Extension.CommonDialog;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Text;

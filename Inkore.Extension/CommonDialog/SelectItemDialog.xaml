@@ -1,0 +1,41 @@
+﻿<local:CommonDialog
+    x:Class="iNKORE.Extension.CommonDialog.SelectItemDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cvt="clr-namespace:FzLib.WPF.Converters;assembly=FzCoreLib.Windows"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:iNKORE.Extension.CommonDialog"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
+    CloseButtonText="取消"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    mc:Ignorable="d">
+    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <ListView ItemsSource="{Binding Items}" SelectionChanged="ListView_SelectionChanged">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="0,8">
+                        <Grid
+                            Width="300" MinHeight="32"
+                            VerticalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Style="{DynamicResource BaseTextBlockStyle}"
+                                Text="{Binding Title}" />
+                            <TextBlock
+                                Grid.Row="2" Margin="0,4"
+                                VerticalAlignment="Center" Opacity="0.8"
+                                Text="{Binding Detail}"
+                                TextWrapping="Wrap"
+                                Visibility="{Binding Detail, Converter={StaticResource NotNullConverter}}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackPanel>
+</local:CommonDialog>

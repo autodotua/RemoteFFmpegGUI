@@ -1,31 +1,12 @@
-﻿using FzLib;
-using FzLib.WPF;
-using FzLib.WPF.Converters;
-using Microsoft.Win32;
-using ModernWpf.Controls;
-using ModernWpf.FzExtension.CommonDialog;
+﻿using FzLib.WPF.Converters;
 using SimpleFFmpegGUI.FFmpegLib;
-using SimpleFFmpegGUI.Manager;
-using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Converters;
 using SimpleFFmpegGUI.WPF.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using static SimpleFFmpegGUI.WPF.ViewModels.PerformanceTestLine;
-using static SimpleFFmpegGUI.WPF.ViewModels.TestWindowViewModel;
-using static System.Net.Mime.MediaTypeNames;
-using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
 
 namespace SimpleFFmpegGUI.WPF
 {

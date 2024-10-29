@@ -2,7 +2,7 @@
 using FzLib.WPF;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
-using ModernWpf.FzExtension.CommonDialog;
+using iNKORE.Extension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Converters;
@@ -10,7 +10,6 @@ using SimpleFFmpegGUI.WPF.Messages;
 using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.Pages;
 using SimpleFFmpegGUI.WPF.Panels;
-using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,7 +30,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
+using CommonDialog = iNKORE.Extension.CommonDialog.CommonDialog;
 using Task = System.Threading.Tasks.Task;
 
 namespace SimpleFFmpegGUI.WPF

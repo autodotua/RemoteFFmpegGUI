@@ -5,13 +5,14 @@
     xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
     xmlns:converters="clr-namespace:FzLib.WPF.Converters;assembly=FzCoreLib.Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:mext="clr-namespace:ModernWpf.FzExtension;assembly=ModernWpf.FzExtension"
+    xmlns:ixt="clr-namespace:iNKORE.Extension;assembly=Inkore.Extension"
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
     mc:Ignorable="d">
     <Grid Margin="8">
         <Grid.RowDefinitions>
@@ -22,14 +23,14 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <GroupBox Header="基本">
-            <ui:SimpleStackPanel
+            <ikw:SimpleStackPanel
                 Orientation="Vertical"
                 Spacing="8">
                 <CheckBox
                     Content="平滑滚动"
                     IsChecked="{Binding Configs.SmoothScroll}" />
 
-                <ui:SimpleStackPanel
+                <ikw:SimpleStackPanel
                     Orientation="Horizontal"
                     Spacing="8">
                     <CheckBox
@@ -41,8 +42,8 @@
                         Opacity="0.5"
                         Text="开启该选项时，默认预设功能将不可用"
                         Visibility="{Binding Configs.RememberLastArguments, Converter={StaticResource Bool2VisibilityConverter}}" />
-                </ui:SimpleStackPanel>
-                <ui:SimpleStackPanel
+                </ikw:SimpleStackPanel>
+                <ikw:SimpleStackPanel
                     Orientation="Horizontal"
                     Spacing="8">
                     <ComboBox
@@ -72,7 +73,7 @@
                         Visibility="{Binding Configs.DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=SpecialDir}">
                         <ui:SymbolIcon Symbol="OpenFile" />
                     </Button>
-                </ui:SimpleStackPanel>
+                </ikw:SimpleStackPanel>
 
                 <Grid Margin="8">
                     <Grid.ColumnDefinitions>
@@ -100,7 +101,7 @@
                         Text="{Binding DefaultProcessPriority, Converter={StaticResource Index2StringConverter}, ConverterParameter=低;低于正常;正常;高于正常;高}" />
                 </Grid>
 
-            </ui:SimpleStackPanel>
+            </ikw:SimpleStackPanel>
         </GroupBox>
         <GroupBox
             Grid.Row="2"

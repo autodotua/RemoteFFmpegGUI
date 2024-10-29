@@ -10,7 +10,7 @@
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:system="clr-namespace:System;assembly=netstandard"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
     <UserControl.Resources>

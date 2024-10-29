@@ -1,13 +1,12 @@
 ﻿using FzLib.WPF;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
-using ModernWpf.FzExtension.CommonDialog;
+using iNKORE.Extension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF;
 using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.Pages;
-using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
