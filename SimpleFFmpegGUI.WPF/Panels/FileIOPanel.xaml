@@ -142,9 +142,8 @@
                                         Text="{Binding To, Converter={StaticResource TimeSpanMMConverter}}"
                                         ToolTip="{StaticResource tooltip}" />
 
-                                    <ToggleButton
-                                        Grid.Column="8"
-                                        Content="…">
+                                    <ToggleButton Grid.Column="8">
+                                        <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.More}" />
                                         <ToggleButton.Triggers>
                                             <EventTrigger RoutedEvent="ToggleButton.Unchecked">
                                                 <BeginStoryboard>

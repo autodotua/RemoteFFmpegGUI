@@ -65,8 +65,6 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
         public OutputArguments Arguments { get; set; }
 
-        public CodeArgumentDescriptions Descriptions { get; } = new CodeArgumentDescriptions();
-
         public IEnumerable AspectRatios { get; } = new[] { "16:9", "4:3", "1:1", "3:4", "16:9", "2.35" };
 
         public AudioArgumentsViewModel Audio

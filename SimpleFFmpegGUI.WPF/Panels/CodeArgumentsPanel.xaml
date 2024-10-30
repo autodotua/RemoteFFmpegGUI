@@ -31,6 +31,11 @@
             <ikw:SimpleStackPanel
                 Margin="8"
                 Spacing="8">
+                <ikw:SimpleStackPanel.Resources>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                </ikw:SimpleStackPanel.Resources>
                 <!--  输出  -->
                 <Grid
                     HorizontalAlignment="Center"
@@ -176,7 +181,8 @@
                     <ListBox
                         Grid.Row="2"
                         ItemsSource="{Binding ChannelOutputStrategies}"
-                        SelectedItem="{Binding VideoOutputStrategy}" />
+                        SelectedItem="{Binding VideoOutputStrategy}"
+                        ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.VideoOutput}}" />
                     <TextBlock
                         Grid.Column="2"
                         Text="音频输出" />
@@ -184,7 +190,8 @@
                         Grid.Row="2"
                         Grid.Column="2"
                         ItemsSource="{Binding ChannelOutputStrategies}"
-                        SelectedItem="{Binding AudioOutputStrategy}" />
+                        SelectedItem="{Binding AudioOutputStrategy}"
+                        ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.AudioOutput}}" />
                 </Grid>
                 <!--  容器  -->
                 <GroupBox
@@ -199,7 +206,8 @@
 
                         <CheckBox
                             Content="指定格式"
-                            IsChecked="{Binding Format.EnableFormat}" />
+                            IsChecked="{Binding Format.EnableFormat}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.Format}}" />
                         <ComboBox
                             Grid.Column="2"
                             IsEditable="True"
@@ -207,7 +215,8 @@
                             ItemsSource="{Binding Formats}"
                             SelectedValue="{Binding Format.Format}"
                             SelectedValuePath="Extension"
-                            TextSearch.TextPath="Extension">
+                            TextSearch.TextPath="Extension"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.Format}}">
 
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -244,6 +253,8 @@
                             <ColumnDefinition Width="120" />
                             <ColumnDefinition Width="8" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -269,25 +280,28 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <!--  编码  -->
-                        <Label Content="编码" />
+                        <TextBlock
+                            Text="编码"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.VideoCode}}" />
                         <ComboBox
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             IsEditable="True"
                             ItemsSource="{Binding VideoCodecs}"
                             SelectedIndex="1"
-                            Text="{Binding Video.Code}" />
+                            Text="{Binding Video.Code}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.VideoCode}}" />
                         <!--  预设  -->
-                        <Label
+                        <TextBlock
                             Grid.Row="2"
-                            VerticalAlignment="Center">
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Text="{Binding Video.Preset, Mode=OneWay, StringFormat=速度预设： {0}}" />
-                        </Label>
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.Preset}}">
+                            <TextBlock Text="{Binding Video.Preset, Mode=OneWay, StringFormat=速度预设： {0}}" />
+                        </TextBlock>
                         <Slider
                             x:Name="sldPreset"
                             Grid.Row="2"
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             Margin="36,0,36,0"
                             AutoToolTipPlacement="TopLeft"
                             IsSnapToTickEnabled="True"
@@ -295,28 +309,31 @@
                             Minimum="0"
                             TickFrequency="1"
                             TickPlacement="BottomRight"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.Preset}}"
                             Value="{Binding Video.Preset}" />
-                        <Label
+                        <TextBlock
                             Grid.Row="2"
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Content="慢" />
-                        <Label
+                            Text="慢" />
+                        <TextBlock
                             Grid.Row="2"
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Content="快" />
+                            Text="快" />
                         <!--  CRF  -->
                         <CheckBox
                             Grid.Row="4"
-                            IsChecked="{Binding Video.EnableCrf}">
+                            IsChecked="{Binding Video.EnableCrf}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.CRF}}">
                             <TextBlock Text="{Binding Video.Crf, Mode=OneWay, StringFormat=CRF： {0}}" />
                         </CheckBox>
                         <Slider
                             Grid.Row="4"
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             Margin="36,0,36,0"
                             AutoToolTipPlacement="TopLeft"
                             IsEnabled="{Binding Video.EnableCrf}"
@@ -324,113 +341,149 @@
                             Minimum="0"
                             TickFrequency="5"
                             TickPlacement="BottomRight"
-                            ToolTip="{Binding Descriptions.CRF}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.CRF}}"
                             Value="{Binding Video.Crf}" />
-                        <Label
+                        <TextBlock
                             Grid.Row="4"
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Content="清晰"
-                            IsEnabled="{Binding Video.EnableCrf}" />
-                        <Label
+                            IsEnabled="{Binding Video.EnableCrf}"
+                            Text="清晰" />
+                        <TextBlock
                             Grid.Row="4"
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Content="模糊"
-                            IsEnabled="{Binding Video.EnableCrf}" />
+                            IsEnabled="{Binding Video.EnableCrf}"
+                            Text="模糊" />
                         <!--  2Pass  -->
                         <CheckBox
                             Grid.Row="6"
+                            Grid.ColumnSpan="9"
                             Content="二次编码"
-                            IsChecked="{Binding Video.TwoPass}" />
+                            IsChecked="{Binding Video.TwoPass}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.TwoPass}}" />
 
                         <!--  平均码率  -->
                         <CheckBox
                             Grid.Row="8"
                             Content="平均码率"
-                            IsChecked="{Binding Video.EnableAverageBitrate}" />
+                            IsChecked="{Binding Video.EnableAverageBitrate}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.VideoAverageBitrate}}" />
                         <ui:NumberBox
                             Grid.Row="8"
                             Grid.Column="2"
                             IsEnabled="{Binding Video.EnableAverageBitrate}"
                             Maximum="800"
                             Minimum="0.1"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.VideoAverageBitrate}}"
                             Value="{Binding Video.AverageBitrate}" />
+                        <TextBlock
+                            Grid.Row="8"
+                            Grid.Column="4"
+                            Text="Mbps" />
                         <!--  最大码率  -->
                         <CheckBox
                             Grid.Row="10"
                             Content="最大码率"
-                            IsChecked="{Binding Video.EnableMaxBitrate}" />
+                            IsChecked="{Binding Video.EnableMaxBitrate}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.MaxBitrate}}" />
                         <ui:NumberBox
                             Grid.Row="10"
                             Grid.Column="2"
                             IsEnabled="{Binding Video.EnableMaxBitrate}"
                             Maximum="800"
                             Minimum="0.1"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.MaxBitrate}}"
                             Value="{Binding Video.MaxBitrate}" />
-                        <Label
+
+                        <TextBlock
+                            Grid.Row="10"
+                            Grid.Column="4"
+                            Text="Mbps" />
+                        <TextBlock
                             Grid.Row="12"
-                            VerticalAlignment="Center"
-                            Content="倍率"
-                            IsEnabled="{Binding Video.EnableMaxBitrate}" />
+                            IsEnabled="{Binding Video.EnableMaxBitrate}"
+                            Text="倍率"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.MaxBitrateBuffer}}" />
                         <ui:NumberBox
                             Grid.Row="12"
                             Grid.Column="2"
                             IsEnabled="{Binding Video.EnableMaxBitrate}"
                             Maximum="10"
                             Minimum="0.5"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.MaxBitrateBuffer}}"
                             Value="{Binding Video.MaxBitrateBuffer}" />
+                        <TextBlock
+                            Grid.Row="12"
+                            Grid.Column="4"
+                            Text="×" />
                         <!--  分辨率  -->
                         <CheckBox
                             Grid.Row="14"
                             Content="分辨率"
-                            IsChecked="{Binding Video.EnableSize}" />
+                            IsChecked="{Binding Video.EnableSize}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.Size}}" />
                         <ComboBox
                             Grid.Row="14"
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             ui:ControlHelper.PlaceholderText="示例：640:480 或 640:-1 或 iw/2:ih/2"
                             IsEditable="True"
                             IsEnabled="{Binding Video.EnableSize}"
                             ItemsSource="{Binding Sizes}"
-                            Text="{Binding Video.Size}" />
+                            Text="{Binding Video.Size}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.Size}}" />
                         <!--  比例  -->
                         <CheckBox
                             Grid.Row="16"
                             Content="画面比例"
-                            IsChecked="{Binding Video.EnableAspectRatio}" />
+                            IsChecked="{Binding Video.EnableAspectRatio}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.AspectRatio}}" />
                         <ComboBox
                             Grid.Row="16"
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             ui:ControlHelper.PlaceholderText="示例：4:3 或 1.3333"
                             IsEditable="True"
                             IsEnabled="{Binding Video.EnableAspectRatio}"
                             ItemsSource="{Binding AspectRatios}"
-                            Text="{Binding Video.AspectRatio}" />
+                            Text="{Binding Video.AspectRatio}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.AspectRatio}}" />
                         <!--  帧率  -->
                         <CheckBox
                             Grid.Row="18"
                             Content="帧率"
-                            IsChecked="{Binding Video.EnableFps}" />
+                            IsChecked="{Binding Video.EnableFps}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.FPS}}" />
                         <ComboBox
                             Grid.Row="18"
                             Grid.Column="2"
                             IsEditable="True"
                             IsEnabled="{Binding Video.EnableFps}"
                             ItemsSource="{Binding Fpses}"
-                            Text="{Binding Video.Fps}" />
+                            Text="{Binding Video.Fps}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.FPS}}" />
+                        <TextBlock
+                            Grid.Row="18"
+                            Grid.Column="4"
+                            Text="帧/秒" />
+                        <!--  像素格式  -->
                         <CheckBox
                             Grid.Row="20"
                             Content="像素格式"
-                            IsChecked="{Binding Video.EnablePixelFormat}" />
+                            IsChecked="{Binding Video.EnablePixelFormat}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.PixelFormat}}" />
                         <ComboBox
                             Grid.Row="20"
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             IsEditable="True"
                             IsEnabled="{Binding Video.EnablePixelFormat}"
                             ItemsSource="{Binding PixelFormats}"
-                            Text="{Binding Video.PixelFormat}" />
+                            Text="{Binding Video.PixelFormat}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.PixelFormat}}" />
                     </Grid>
                 </GroupBox>
                 <!--  音频  -->
@@ -440,8 +493,10 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />
-                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="8" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -451,38 +506,52 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <!--  编码  -->
-                        <Label
-                            VerticalAlignment="Center"
-                            Content="编码" />
+                        <TextBlock
+                            Text="编码"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.AudioCode}}" />
                         <ComboBox
                             Grid.Column="2"
+                            Grid.ColumnSpan="9"
                             IsEditable="True"
                             ItemsSource="{Binding AudioCodecs}"
                             SelectedIndex="1"
-                            Text="{Binding Audio.Code}" />
+                            Text="{Binding Audio.Code}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.AudioCode}}" />
 
                         <!--  平均码率  -->
                         <CheckBox
                             Grid.Row="2"
                             Content="平均码率"
-                            IsChecked="{Binding Audio.EnableBitrate}" />
+                            IsChecked="{Binding Audio.EnableBitrate}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.AudioAverageBitrate}}" />
                         <ComboBox
                             Grid.Row="2"
                             Grid.Column="2"
                             IsEnabled="{Binding Audio.EnableBitrate}"
                             ItemsSource="{Binding AudioBitrates}"
-                            SelectedItem="{Binding Audio.Bitrate}" />
+                            SelectedItem="{Binding Audio.Bitrate}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.AudioAverageBitrate}}" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="4"
+                            Text="Kbps" />
                         <!--  采样率  -->
                         <CheckBox
                             Grid.Row="4"
                             Content="采样率"
-                            IsChecked="{Binding Audio.EnableSamplingRate}" />
+                            IsChecked="{Binding Audio.EnableSamplingRate}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.SampleRate}}" />
                         <ComboBox
                             Grid.Row="4"
                             Grid.Column="2"
                             IsEnabled="{Binding Audio.EnableSamplingRate}"
                             ItemsSource="{Binding AudioSamplingRates}"
-                            SelectedItem="{Binding Audio.SamplingRate}" />
+                            SelectedItem="{Binding Audio.SamplingRate}"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.SampleRate}}" />
+                        <TextBlock
+                            Grid.Row="4"
+                            Grid.Column="4"
+                            Text="Hz" />
                     </Grid>
                 </GroupBox>
                 <!--  合并参数  -->
@@ -503,15 +572,16 @@
                             MaxLines="3"
                             MinLines="3"
                             Text="{Binding Extra, UpdateSourceTrigger=PropertyChanged}"
-                            TextWrapping="Wrap" />
+                            TextWrapping="Wrap"
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.Extra}}" />
                         <CheckBox
                             Content="同步文件修改时间"
                             IsChecked="{Binding ProcessedOptions.SyncModifiedTime}"
-                            ToolTip="将输出文件的修改时间设置为最后一个输入文件的修改时间" />
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.SyncModifiedTime}}" />
                         <CheckBox
                             Content="完成后删除输入文件"
                             IsChecked="{Binding ProcessedOptions.DeleteInputFiles}"
-                            ToolTip="在处理完成后删除所有输入文件（优先删除到回收站）" />
+                            ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.DeleteInputFiles}}" />
                     </ikw:SimpleStackPanel>
                 </GroupBox>
             </ikw:SimpleStackPanel>
