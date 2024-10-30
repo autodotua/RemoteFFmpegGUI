@@ -26,8 +26,6 @@
 
 ![](imgs/tasks.png)
 
-![](imgs/logs.png)
-
 ### WPF桌面版
 
 ![](imgs/wpf_main.png)
@@ -36,13 +34,41 @@
 
 ![](imgs/wpf_info.png)
 
+## 部署/运行
+
+### 获取程序包
+
+在[Github的Release](https://github.com/autodotua/RemoteFFmpegGUI/releases)下载最新的包（Web包的地址不能含有子路径），或根据下节进行构建。
+
+### 部署基于Windows +IIS的Web版本
+
+1. 进入 `Generation/Publish/WebPackage`
+2. 编辑 `api`的 `appsettings.json`，主要修改 `InputDir`和 `OutputDir`项，指定输入和输出目录。其它修改项详见文件内的注释。
+3. 在合适的位置新建一个网站文件夹，将 `Generation/Publish/WebPackage`内的所有内容复制到新建的文件夹之中。
+4. 确保安装了.NET 8 Hosting Bundle，并在Windows中启用了IIS。
+5. 在IIS中新建网站，指定物理目录为之前新建的目录。右键其中的api目录，设置为虚拟应用程序。
+6. 启动Host。共有两种方式：
+   - 运行`SimpleFFmpegGUI.Host.Console.exe`，将打开一个控制台程序。
+   - 在Windows系统中，可以运行`CreateWindowsService.bat`（将自动申请管理员权限），将Host注册为自启动服务并立即启动。
+7. 打开IIS中设置的Url，检查网站运行是否正常。
+
+**注意：**
+
+- 若输入或输出文件夹位于网络位置等IIS无权限的位置，则需要：
+  1. 设置 `appsettings.json`中的 `InputDirAccessable`和/或 `OutputDirAccessable`为 `false`，告知程序无权限访问，那么后端将通过Host对文件进行访问。
+  2. 这种模式下，HTTP上传和下载功能将不可用（可以实现，但暂未实现）。
+
+### 运行Windows客户端版本
+
+双击`SimpleFFmpegGUI.WPF.exe`运行即可。
+
 ## 构建
 
 ### 准备工作
 
 1. 确保安装了 .NET 8 SDK：
 2. 确保安装了npm（Node.js）：
-3. 确保在根目录下（与ReadMe同级目录）的 `bin`目录中放置了ffmpeg二进制文件（shared版）：[下载](https://www.ffmpeg.org/download.html) 。共有三个exe文件和若干个dll文件。已测试版本：6.1.1
+3. 确保在根目录下（与ReadMe同级目录）的 `bin`目录中放置了ffmpeg二进制文件（shared版）：[下载](https://www.ffmpeg.org/download.html) 。共有三个exe文件和若干个dll文件。已测试版本：6.1.1。新版本可能导致视频裁剪功能无法使用，但不影响视频编码。
 4. 若要使用媒体信息查询功能，应在根目录（与ReadMe同级目录）下的 `bin`目录中放置了MediaInfo CLI可执行文件（如`MediaInfo.exe`）：[下载](https://mediaarea.net/en/MediaInfo/Download)
 5. 若要使用编码测试功能，应在根目录（与ReadMe同级目录）下的 `bin`目录中放置了测试视频 `test.mp4`和VMAF模型（[下载](https://github.com/Netflix/vmaf/blob/master/model/vmaf_v0.6.1.json)。选取的视频宜为4K分辨率，30秒以上的长度。
 
@@ -67,33 +93,7 @@
 若提示`无法加载文件 ******.ps1，因为在此系统中禁止执行脚本`，需要首先在管理员模式下运行PowerShell并执行 `set-executionpolicy remotesigned`，然后按Y确认。
 生成文件位于 `Generation/Publish`下，其中 `WebPackage`为Web部署包，`WPF`前缀的为Windows桌面客户端。
 
-## 部署
 
-### 获取程序包
-
-在[Github的Release](https://github.com/autodotua/RemoteFFmpegGUI/releases)下载最新的包（Web包的地址不能含有子路径），或根据上文进行构建。
-
-### 部署基于Windows +IIS的Web版本
-
-1. 进入 `Generation/Publish/WebPackage`
-2. 编辑 `api`的 `appsettings.json`，主要修改 `InputDir`和 `OutputDir`项，指定输入和输出目录。其它修改项详见文件内的注释。
-3. 在合适的位置新建一个网站文件夹，将 `Generation/Publish/WebPackage`内的所有内容复制到新建的文件夹之中。
-4. 确保安装了.NET 8 Hosting Bundle，并在Windows中启用了IIS。
-5. 在IIS中新建网站，指定物理目录为之前新建的目录。右键其中的api目录，设置为虚拟应用程序。
-6. 启动Host。共有两种方式：
-   - 运行`SimpleFFmpegGUI.Host.Console.exe`，将打开一个控制台程序。
-   - 在Windows系统中，可以运行`CreateWindowsService.bat`（将自动申请管理员权限），将Host注册为自启动服务并立即启动。
-7. 打开IIS中设置的Url，检查网站运行是否正常。
-
-**注意：**
-
-- 若输入或输出文件夹位于网络位置等IIS无权限的位置，则需要：
-  1. 设置 `appsettings.json`中的 `InputDirAccessable`和/或 `OutputDirAccessable`为 `false`，告知程序无权限访问，那么后端将通过Host对文件进行访问。
-  2. 这种模式下，HTTP上传和下载功能将不可用（可以实现，但暂未实现）。
-
-### 运行Windows客户端版本
-
-双击`SimpleFFmpegGUI.WPF.exe`运行即可。
 
 ## 开发
 
