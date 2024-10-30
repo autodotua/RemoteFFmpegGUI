@@ -209,8 +209,8 @@ namespace SimpleFFmpegGUI.WPF
             {
                 if (!File.Exists(file))
                 {
-                    await CommonDialog.ShowErrorDialogAsync("程序目录中缺少文件：" + file);
-                    Close();
+                    await CommonDialog.ShowErrorDialogAsync("程序目录中缺少文件，将无法正确运行：" + file);
+                    //Close();
                     return;
                 }
             }

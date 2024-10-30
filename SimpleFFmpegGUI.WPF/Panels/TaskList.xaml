@@ -18,9 +18,9 @@
     <Grid>
         <Grid.Resources />
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
+            <RowDefinition Height="3*" />
             <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
         <ListView
             xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
@@ -151,7 +151,6 @@
         <Border
             x:Name="bdDetail"
             Grid.Row="2"
-            Height="192"
             BorderBrush="{DynamicResource TextControlBorderBrush}"
             BorderThickness="0,1,0,0"
             Visibility="{Binding Tasks.SelectedTask, Converter={StaticResource NotNullConverter}}">
@@ -203,14 +202,13 @@
                             Orientation="Horizontal"
                             Spacing="16">
                             <TextBlock Text="{Binding Type, Converter={StaticResource NameDescriptionAttributeValueConverter}}" />
-                            <Button
+                            <ui:HyperlinkButton
                                 Margin="-8,-4"
                                 Padding="8,4"
                                 Background="Transparent"
                                 Command="{Binding DataContext.ShowArgumentsCommand, ElementName=root}"
-                                Cursor="Hand">
-                                <TextBlock TextDecorations="Underline">详细参数</TextBlock>
-                            </Button>
+                                Content="详细参数"
+                                Cursor="Hand" />
                         </ikw:SimpleStackPanel>
                         <TextBlock
                             Grid.Row="2"
@@ -265,82 +263,70 @@
                             Grid.Row="12"
                             FontWeight="Bold"
                             Text="信息" />
-                        <TextBox
+                        <TextBlock
                             Grid.Row="12"
                             Grid.Column="2"
-                            BorderThickness="0"
-                            IsReadOnly="True"
                             Text="{Binding Message}"
                             TextWrapping="Wrap" />
                         <TextBlock
                             Grid.Row="14"
                             FontWeight="Bold"
                             Text="FFmpeg参数" />
-                        <TextBox
+                        <TextBlock
                             Grid.Row="14"
                             Grid.Column="2"
-                            BorderThickness="0"
-                            IsReadOnly="True"
                             Text="{Binding FFmpegArguments}"
                             TextWrapping="Wrap" />
                     </Grid>
                 </ScrollViewer>
-                <ikw:SimpleStackPanel
-                    Grid.Row="2"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal"
-                    Spacing="8">
-                    <ikw:SimpleStackPanel.Resources>
-                        <Style
-                            BasedOn="{StaticResource DefaultButtonStyle}"
-                            TargetType="{x:Type Button}">
-                            <Setter Property="Width" Value="84" />
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                        </Style>
-                    </ikw:SimpleStackPanel.Resources>
-                    <Button
+                <ui:CommandBar Grid.Row="2">
+
+                    <ui:AppBarButton
                         Command="{Binding StartStandaloneCommand}"
-                        Content="独立执行"
                         IsEnabled="{Binding CanStart}"
-                        Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
-                    <Button
+                        Label="独立执行"
+                        Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}">
+                        <ui:AppBarButton.Icon>
+                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Play}" />
+                        </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>
+                    <ui:AppBarButton
                         Command="{Binding CancelCommand}"
-                        Content="取消"
                         IsEnabled="{Binding CanCancel}"
+                        Label="取消"
                         ToolTip="取消执行任务，正在执行的任务会被停止"
-                        Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
-                    <Button
+                        Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}">
+                        <ui:AppBarButton.Icon>
+                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Cancel}" />
+                        </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>
+                    <ui:AppBarButton
                         Command="{Binding ResetCommand}"
-                        Content="重置"
                         IsEnabled="{Binding CanReset}"
+                        Label="重置"
                         ToolTip="将任务设置为排队状态"
-                        Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
-                    <Button
-                        VerticalAlignment="Center"
-                        Background="Transparent"
-                        Visibility="{Binding ElementName=lvwTasks, Path=SelectedItems.Count, Converter={StaticResource CountEqualsOneValueConverter}}">
-                        <ui:SymbolIcon Symbol="More" />
-                        <ui:FlyoutService.Flyout>
-                            <ui:MenuFlyout>
-                                <MenuItem
-                                    Command="{Binding CloneCommand}"
-                                    Header="建立副本" />
-                                <MenuItem
-                                    Command="{Binding ShowLogsCommand}"
-                                    Header="查看日志" />
-                                <Separator Visibility="{Binding Inputs, Converter={StaticResource CountMoreThanZeroConverter}}" />
-                                <MenuItem
-                                    Command="{Binding OpenOutputFileCommand}"
-                                    Header="打开目标文件"
-                                    Visibility="{Binding Status, Converter={StaticResource EqualConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
-                                <MenuItem
-                                    Command="{Binding OpenOutputDirCommand}"
-                                    Header="打开目标文件目录"
-                                    Visibility="{Binding Status, Converter={StaticResource EqualConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
-                            </ui:MenuFlyout>
-                        </ui:FlyoutService.Flyout>
-                    </Button>
-                </ikw:SimpleStackPanel>
+                        Visibility="{Binding ShowAllTasks, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}">
+                        <ui:AppBarButton.Icon>
+                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Refresh}" />
+                        </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>
+                    <ui:CommandBar.SecondaryCommands>
+                        <ui:AppBarButton
+                            Command="{Binding CloneCommand}"
+                            Label="建立副本" />
+                        <ui:AppBarButton
+                            Command="{Binding ShowLogsCommand}"
+                            Label="查看日志" />
+                        <ui:AppBarButton
+                            Command="{Binding OpenOutputFileCommand}"
+                            Label="打开目标文件"
+                            Visibility="{Binding Status, Converter={StaticResource EqualConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
+                        <ui:AppBarButton
+                            Command="{Binding OpenOutputDirCommand}"
+                            Label="打开目标文件目录"
+                            Visibility="{Binding Status, Converter={StaticResource EqualConverter}, ConverterParameter={x:Static model:TaskStatus.Done}}" />
+                    </ui:CommandBar.SecondaryCommands>
+                </ui:CommandBar>
             </Grid>
         </Border>
     </Grid>

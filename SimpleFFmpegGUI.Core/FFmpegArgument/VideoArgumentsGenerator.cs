@@ -11,7 +11,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         /// 最大码率
         /// </summary>
         private double? maxBitrate;
-        
+
         /// <summary>
         /// 视频编码
         /// </summary>
@@ -86,7 +86,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
             codec = codec.ToLower();
             foreach (var c in VideoCodec.VideoCodecs)
             {
-                if (c.Name.ToLower() == codec || c.Lib.ToLower() == codec)
+                if (c.Name.Equals(codec, System.StringComparison.OrdinalIgnoreCase) || c.Lib.Equals(codec, System.StringComparison.OrdinalIgnoreCase))
                 {
                     VideoCodec = c;
                     arguments.Add(new FFmpegArgumentItem("c:v", c.Lib));
@@ -118,7 +118,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         /// <returns></returns>
         public VideoArgumentsGenerator CRF(int? crf)
         {
-            if (crf.HasValue)
+            if (crf.HasValue && crf.Value > 0)
             {
                 arguments.Add(VideoCodec.CRF(crf.Value));
             }
@@ -142,7 +142,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         /// <returns></returns>
         public VideoArgumentsGenerator MaxBitrate(double? mb)
         {
-            if (mb.HasValue)
+            if (mb.HasValue && !double.IsNaN(mb.Value))
             {
                 maxBitrate = mb;
                 arguments.Add(VideoCodec.MaxBitrate(mb.Value));
@@ -201,7 +201,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         /// <returns></returns>
         public VideoArgumentsGenerator Speed(int? speed)
         {
-            if (speed.HasValue)
+            if (speed.HasValue && speed.Value > 0)
             {
                 arguments.Add(VideoCodec.Speed(speed.Value));
             }
@@ -215,7 +215,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         /// <returns></returns>
         public VideoArgumentsGenerator FrameRate(double? fps)
         {
-            if (fps.HasValue)
+            if (fps.HasValue && !double.IsNaN(fps.Value))
             {
                 arguments.Add(VideoCodec.FrameRate(fps.Value));
             }

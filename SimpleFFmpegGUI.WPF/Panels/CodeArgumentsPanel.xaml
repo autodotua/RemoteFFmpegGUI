@@ -43,26 +43,36 @@
                         <RowDefinition Height="8" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
+                    <Grid.Resources>
+                        <Style
+                            BasedOn="{StaticResource DefaultListBoxStyle}"
+                            TargetType="{x:Type ListBox}">
+                            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundListLowBrush}" />
+                            <Setter Property="ItemTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="ItemsPanel">
+                                <Setter.Value>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal"
+                                            ScrollOwner="{x:Null}"
+                                            ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
+                                    </ItemsPanelTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Grid.Resources>
                     <TextBlock Text="视频输出" />
                     <ListBox
                         Grid.Row="2"
                         Height="40"
                         ItemsSource="{Binding ChannelOutputStrategies}"
-                        SelectedItem="{Binding VideoOutputStrategy}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel
-                                    Orientation="Horizontal"
-                                    ScrollOwner="{x:Null}"
-                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                    </ListBox>
+                        SelectedItem="{Binding VideoOutputStrategy}" />
                     <TextBlock
                         Grid.Column="2"
                         Text="音频输出" />
@@ -70,21 +80,7 @@
                         Grid.Row="2"
                         Grid.Column="2"
                         ItemsSource="{Binding ChannelOutputStrategies}"
-                        SelectedItem="{Binding AudioOutputStrategy}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel
-                                    Orientation="Horizontal"
-                                    ScrollOwner="{x:Null}"
-                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                    </ListBox>
+                        SelectedItem="{Binding AudioOutputStrategy}" />
                 </Grid>
                 <!--  容器  -->
                 <GroupBox

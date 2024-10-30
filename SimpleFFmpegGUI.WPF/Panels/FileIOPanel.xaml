@@ -23,7 +23,14 @@
             TargetType="{x:Type ComboBox}">
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
+        <Style
+            BasedOn="{StaticResource DefaultButtonStyle}"
+            TargetType="{x:Type Button}">
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="Height" Value="32" />
+        </Style>
     </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -58,6 +65,7 @@
                                     <RowDefinition Height="*" />
                                     <!--  如果是Auto会抖动  -->
                                 </Grid.RowDefinitions>
+
                                 <TextBlock Text="{Binding Index, StringFormat=输入文件 {0}}" />
                                 <Grid Grid.Row="2">
                                     <Grid.ColumnDefinitions>
@@ -67,6 +75,7 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBox
+                                        x:Name="txtFileInput"
                                         Text="{Binding FilePath}"
                                         TextWrapping="Wrap" />
                                     <ikw:SimpleStackPanel
@@ -74,23 +83,24 @@
                                         VerticalAlignment="Center"
                                         Orientation="Horizontal"
                                         Spacing="8">
+
                                         <Button
                                             Command="{Binding DataContext.BrowseFileCommand, Source={x:Reference root}}"
                                             CommandParameter="{Binding .}">
-                                            <ui:SymbolIcon Symbol="OpenFile" />
+                                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.OpenFile}" />
                                         </Button>
                                         <Button
                                             Command="{Binding DataContext.ClipCommand, Source={x:Reference root}}"
                                             CommandParameter="{Binding .}"
                                             Visibility="{Binding ElementName=root, Path=DataContext.ShowTimeClip, Converter={StaticResource Bool2VisibilityConverter}}">
-                                            <ui:SymbolIcon Symbol="Cut" />
+                                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Cut}" />
                                         </Button>
                                         <Button
                                             Command="{Binding DataContext.RemoveFileCommand, Source={x:Reference root}}"
                                             CommandParameter="{Binding .}"
                                             IsEnabled="{Binding CanDelete}"
                                             Visibility="{Binding ElementName=root, Path=DataContext.CanChangeInputsCount, Converter={StaticResource Bool2VisibilityConverter}}">
-                                            <ui:SymbolIcon Symbol="Delete" />
+                                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Delete}" />
                                         </Button>
                                     </ikw:SimpleStackPanel>
                                 </Grid>

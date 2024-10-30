@@ -37,7 +37,7 @@ namespace SimpleFFmpegGUI.FFmpegArgument
         /// <param name="fps"></param>
         public void Framerate(double? fps)
         {
-            if (!fps.HasValue)
+            if (!fps.HasValue || double.IsNaN(fps.Value))
             {
                 return;
             }
