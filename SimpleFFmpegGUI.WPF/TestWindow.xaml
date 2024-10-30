@@ -4,12 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:SimpleFFmpegGUI.WPF.ViewModels"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
     x:Name="root"
     Title="编码测试 - FFmpeg 工具箱"
     Width="1400"
@@ -29,7 +30,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <ScrollViewer c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}">
-            <ui:SimpleStackPanel
+            <ikw:SimpleStackPanel
                 Orientation="Vertical"
                 Spacing="12">
                 <Expander
@@ -53,7 +54,7 @@
                     x:Name="grpOutputSize"
                     Header="输出大小（MB）"
                     IsExpanded="True" />
-            </ui:SimpleStackPanel>
+            </ikw:SimpleStackPanel>
         </ScrollViewer>
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
@@ -62,13 +63,13 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <ScrollViewer c:SmoothScrollViewerHelper.SmoothScroll="{Binding Source={x:Static r:Config.Instance}, Path=SmoothScroll}">
-                <ui:SimpleStackPanel
+                <ikw:SimpleStackPanel
                     IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
                     Spacing="8">
                     <GroupBox x:Name="grpTestItems">
                         <GroupBox.HeaderTemplate>
                             <DataTemplate>
-                                <ui:SimpleStackPanel
+                                <ikw:SimpleStackPanel
                                     Orientation="Horizontal"
                                     Spacing="16">
                                     <TextBlock Text="测试项目" />
@@ -82,7 +83,7 @@
                                         Command="{Binding SelectNoneCommand}"
                                         Content="全不选"
                                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
-                                </ui:SimpleStackPanel>
+                                </ikw:SimpleStackPanel>
                             </DataTemplate>
                         </GroupBox.HeaderTemplate>
                     </GroupBox>
@@ -191,18 +192,19 @@
                             Text="{Binding TestVideo}" />
                         <Button
                             Grid.Column="4"
+                            Height="32"
                             VerticalAlignment="Bottom"
                             Command="{Binding BrowseTestVideoCommand}"
                             DockPanel.Dock="Right">
                             <Button.Content>
-                                <ui:SymbolIcon Symbol="BrowsePhotos" />
+                                <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.OpenFile}" />
                             </Button.Content>
                         </Button>
                     </Grid>
 
-                </ui:SimpleStackPanel>
+                </ikw:SimpleStackPanel>
             </ScrollViewer>
-            <ui:SimpleStackPanel
+            <ikw:SimpleStackPanel
                 Grid.Row="2"
                 VerticalAlignment="Bottom"
                 Spacing="8">
@@ -281,7 +283,7 @@
                         Visibility="{Binding IsTesting, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}" />
 
                 </Grid>
-            </ui:SimpleStackPanel>
+            </ikw:SimpleStackPanel>
         </Grid>
     </Grid>
 </Window>

@@ -4,10 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="clr-namespace:FzLib.WPF.Converters;assembly=FzCoreLib.Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
     x:Name="root"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -22,7 +23,14 @@
             TargetType="{x:Type ComboBox}">
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
+        <Style
+            BasedOn="{StaticResource DefaultButtonStyle}"
+            TargetType="{x:Type Button}">
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="Height" Value="32" />
+        </Style>
     </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -57,6 +65,7 @@
                                     <RowDefinition Height="*" />
                                     <!--  如果是Auto会抖动  -->
                                 </Grid.RowDefinitions>
+
                                 <TextBlock Text="{Binding Index, StringFormat=输入文件 {0}}" />
                                 <Grid Grid.Row="2">
                                     <Grid.ColumnDefinitions>
@@ -66,32 +75,34 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBox
+                                        x:Name="txtFileInput"
                                         Text="{Binding FilePath}"
                                         TextWrapping="Wrap" />
-                                    <ui:SimpleStackPanel
+                                    <ikw:SimpleStackPanel
                                         Grid.Column="2"
                                         VerticalAlignment="Center"
                                         Orientation="Horizontal"
                                         Spacing="8">
+
                                         <Button
                                             Command="{Binding DataContext.BrowseFileCommand, Source={x:Reference root}}"
                                             CommandParameter="{Binding .}">
-                                            <ui:SymbolIcon Symbol="OpenFile" />
+                                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.OpenFile}" />
                                         </Button>
                                         <Button
                                             Command="{Binding DataContext.ClipCommand, Source={x:Reference root}}"
                                             CommandParameter="{Binding .}"
                                             Visibility="{Binding ElementName=root, Path=DataContext.ShowTimeClip, Converter={StaticResource Bool2VisibilityConverter}}">
-                                            <ui:SymbolIcon Symbol="Cut" />
+                                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Cut}" />
                                         </Button>
                                         <Button
                                             Command="{Binding DataContext.RemoveFileCommand, Source={x:Reference root}}"
                                             CommandParameter="{Binding .}"
                                             IsEnabled="{Binding CanDelete}"
                                             Visibility="{Binding ElementName=root, Path=DataContext.CanChangeInputsCount, Converter={StaticResource Bool2VisibilityConverter}}">
-                                            <ui:SymbolIcon Symbol="Delete" />
+                                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Delete}" />
                                         </Button>
-                                    </ui:SimpleStackPanel>
+                                    </ikw:SimpleStackPanel>
                                 </Grid>
                                 <Grid
                                     Grid.Row="4"
@@ -131,9 +142,8 @@
                                         Text="{Binding To, Converter={StaticResource TimeSpanMMConverter}}"
                                         ToolTip="{StaticResource tooltip}" />
 
-                                    <ToggleButton
-                                        Grid.Column="8"
-                                        Content="…">
+                                    <ToggleButton Grid.Column="8">
+                                        <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.More}" />
                                         <ToggleButton.Triggers>
                                             <EventTrigger RoutedEvent="ToggleButton.Unchecked">
                                                 <BeginStoryboard>
@@ -248,7 +258,7 @@
                 Grid.Column="2"
                 VerticalAlignment="Bottom"
                 Command="{Binding BrowseOutputFileCommand}">
-                <ui:SymbolIcon Symbol="OpenFile" />
+                <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.OpenFile}" />
             </Button>
         </Grid>
 

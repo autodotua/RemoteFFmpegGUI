@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
     x:Name="root"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -65,8 +65,9 @@
                             <Button
                                 Grid.Column="2"
                                 Background="Transparent"
+                                BorderThickness="0"
                                 Cursor="Arrow">
-                                <ui:SymbolIcon Symbol="More" />
+                                <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.More}" />
                                 <ui:FlyoutService.Flyout>
                                     <ui:MenuFlyout>
                                         <MenuItem

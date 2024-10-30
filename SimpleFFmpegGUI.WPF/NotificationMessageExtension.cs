@@ -1,7 +1,7 @@
 ﻿using Enterwell.Clients.Wpf.Notifications;
 using Enterwell.Clients.Wpf.Notifications.Controls;
 using FzLib.WPF;
-using ModernWpf.FzExtension.CommonDialog;
+using iNKORE.Extension.CommonDialog;
 using SimpleFFmpegGUI.WPF;
 using System;
 using System.Linq;

@@ -5,17 +5,18 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:f="clr-namespace:FzLib.WPF;assembly=FzCoreLib.Windows"
     xmlns:ffme="clr-namespace:Unosquare.FFME;assembly=ffme.win"
+    xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
     xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
     x:Name="root"
     Title="FFmpeg 工具箱 - 视频裁剪"
     Width="1400"
     Height="800"
-    ui:TitleBar.IsIconVisible="True"
+    ui:WindowHelper.SystemBackdropType="None"
     ui:WindowHelper.UseModernWindowStyle="True"
     Loaded="Window_Loaded"
     WindowStartupLocation="CenterScreen"
@@ -95,12 +96,21 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <ui:SimpleStackPanel
+            <Grid.Resources>
+                <Style
+                    BasedOn="{StaticResource DefaultButtonStyle}"
+                    TargetType="{x:Type Button}">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                </Style>
+            </Grid.Resources>
+            <ikw:SimpleStackPanel
                 Orientation="Horizontal"
                 Spacing="8">
-                <ui:SymbolIcon
+                <ui:FontIcon
                     Margin="0,2,0,0"
-                    Symbol="Volume" />
+                    Icon="{x:Static ui:SegoeFluentIcons.Volume}" />
+
                 <Slider
                     Width="90"
                     Margin="0,3,0,0"
@@ -112,10 +122,9 @@
                     SmallChange="0.05"
                     Value="{Binding ElementName=media, Path=Volume}" />
                 <TextBlock Text="{Binding Volume}" />
-            </ui:SimpleStackPanel>
+            </ikw:SimpleStackPanel>
             <Button
                 Grid.Column="1"
-                Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="-2"
                 ToolTip="快退5秒&#x0a;按住Shift时快退20秒&#x0a;按住Ctrl时快退1秒">
@@ -123,7 +132,6 @@
             </Button>
             <Button
                 Grid.Column="5"
-                Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="2"
                 ToolTip="快进5秒&#x0a;按住Shift时快进20秒&#x0a;按住Ctrl时快进1秒">
@@ -131,7 +139,6 @@
             </Button>
             <Button
                 Grid.Column="2"
-                Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="-1"
                 ToolTip="切换到前一帧&#x0a;按住Ctrl向前5帧&#x0a;按住Shift向前10帧">
@@ -139,7 +146,6 @@
             </Button>
             <Button
                 Grid.Column="4"
-                Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="1"
                 ToolTip="切换到后一帧&#x0a;按住Ctrl向后5帧&#x0a;按住Shift向后10帧">
@@ -147,21 +153,19 @@
             </Button>
             <Button
                 Grid.Column="3"
-                Background="Transparent"
                 Click="PlayButton_Click"
                 ToolTip="播放"
                 Visibility="{Binding ElementName=media, Path=IsPaused, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=h}">
-                <ui:SymbolIcon Symbol="Play" />
+                <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Play}" />
             </Button>
             <Button
                 Grid.Column="3"
-                Background="Transparent"
                 Click="PauseButton_Click"
                 ToolTip="暂停"
                 Visibility="{Binding ElementName=media, Path=IsPlaying, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=h}">
-                <ui:SymbolIcon Symbol="Pause" />
+                <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Pause}" />
             </Button>
-            <ui:SimpleStackPanel
+            <ikw:SimpleStackPanel
                 Grid.Column="99"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal"
@@ -175,38 +179,53 @@
                     ui:TextBoxHelper.IsDeleteButtonVisible="False"
                     BorderThickness="0"
                     Text="{Binding Current, StringFormat={StaticResource TimeSpanFormat}, UpdateSourceTrigger=PropertyChanged}" />
-            </ui:SimpleStackPanel>
+            </ikw:SimpleStackPanel>
         </Grid>
         <ui:CommandBar
             Grid.Row="6"
             IsEnabled="{Binding IsBarEnabled}">
             <ui:AppBarButton
                 Command="{Binding JumpToFromCommand}"
-                Icon="Undo"
-                Label="跳转到入点" />
+                Label="跳转到入点">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Undo}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarButton
                 Command="{Binding JumpToToCommand}"
-                Icon="Redo"
-                Label="跳转到出点" />
+                Label="跳转到出点">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Redo}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Command="{Binding SetFromCommand}"
-                Icon="Previous"
-                Label="设置为入点" />
+                Label="设置为入点">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Preview}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarButton
                 Command="{Binding SetToCommand}"
-                Icon="Next"
-                Label="设置为出点" />
+                Label="设置为出点">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Next}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Command="{Binding CancelCommand}"
-                Icon="Cancel"
-                Label="取消" />
+                Label="取消">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Cancel}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarButton
                 Command="{Binding ApplyCommand}"
                 Label="完成">
                 <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE73E;" />
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.CheckMark}" />
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
         </ui:CommandBar>

@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <RootNamespace>iNKORE.Extension</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\Release\AnyCPU\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="iNKORE.UI.WPF.Modern" Version="0.9.30" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="FzCoreLib.Windows">
+      <HintPath>..\libs\FzCoreLib.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="FzStandardLib">
+      <HintPath>..\libs\FzStandardLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

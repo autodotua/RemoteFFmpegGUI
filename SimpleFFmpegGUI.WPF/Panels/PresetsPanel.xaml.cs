@@ -1,7 +1,7 @@
 ﻿using FzLib;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
-using ModernWpf.FzExtension.CommonDialog;
+using iNKORE.Extension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.ViewModels;

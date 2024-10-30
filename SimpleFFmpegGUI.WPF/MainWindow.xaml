@@ -3,191 +3,23 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ixt="clr-namespace:iNKORE.Extension;assembly=Inkore.Extension"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:mext="clr-namespace:ModernWpf.FzExtension;assembly=ModernWpf.FzExtension"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
     Title="FFmpeg 工具箱"
     Width="1400"
     Height="720"
     MinWidth="1400"
     MinHeight="600"
-    ui:TitleBar.IsIconVisible="True"
+    ui:WindowHelper.SystemBackdropType="None"
     ui:WindowHelper.UseModernWindowStyle="True"
     AllowDrop="True"
     Closing="Window_Closing"
     Loaded="Window_Loaded"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <Window.Resources>
-        <Style
-            x:Key="TabItemStyle"
-            BasedOn="{StaticResource DefaultTabItemStyle}"
-            TargetType="{x:Type TabItem}">
-            <Setter Property="OverridesDefaultStyle" Value="True" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Stretch" />
-            <Setter Property="FocusVisualStyle" Value="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <!--  This item will cover the separator on its left side.  -->
-                        <ui:ThemeShadowChrome
-                            x:Name="Shadow"
-                            CornerRadius="{Binding ElementName=TabContainer, Path=CornerRadius}"
-                            Depth="{DynamicResource TabViewShadowDepth}"
-                            IsShadowEnabled="False">
-                            <Border
-                                x:Name="LayoutRoot"
-                                Margin="-1,0,0,0"
-                                Padding="{TemplateBinding Padding}"
-                                SnapsToDevicePixels="True">
-                                <Grid>
-
-                                    <Border
-                                        x:Name="TabSeparator"
-                                        Width="1"
-                                        Margin="{DynamicResource TabViewItemSeparatorMargin}"
-                                        HorizontalAlignment="Right"
-                                        BorderBrush="{DynamicResource TabViewItemSeparator}"
-                                        BorderThickness="1" />
-
-                                    <Border
-                                        x:Name="TabContainer"
-                                        Grid.Column="1"
-                                        Margin="8"
-                                        Padding="6,4"
-                                        ui:FocusVisualHelper.IsTemplateFocusTarget="True"
-                                        Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
-                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{TemplateBinding BorderThickness}"
-                                        CornerRadius="4">
-                                        <Grid>
-
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="4" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-
-                                            <Viewbox
-                                                x:Name="IconBox"
-                                                MaxWidth="{DynamicResource TabViewItemHeaderIconSize}"
-                                                MaxHeight="{DynamicResource TabViewItemHeaderIconSize}"
-                                                Margin="{DynamicResource TabViewItemHeaderIconMargin}">
-                                                <ContentControl
-                                                    x:Name="IconControl"
-                                                    Content="{TemplateBinding ui:TabItemHelper.Icon}"
-                                                    Foreground="{DynamicResource TabViewItemIconForeground}"
-                                                    IsTabStop="False" />
-                                            </Viewbox>
-
-                                            <ContentPresenter
-                                                x:Name="ContentPresenter"
-                                                Grid.Column="1"
-                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                ContentSource="Header"
-                                                Focusable="False"
-                                                Opacity="0.9"
-                                                RecognizesAccessKey="True"
-                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                                TextElement.FontSize="{DynamicResource TabViewItemHeaderFontSize}"
-                                                TextElement.FontWeight="{TemplateBinding FontWeight}"
-                                                TextElement.Foreground="{DynamicResource TabViewItemHeaderForeground}" />
-                                            <Button
-                                                x:Name="CloseButton"
-                                                Grid.Column="4"
-                                                Padding="3"
-                                                Background="Transparent"
-                                                Click="CloseTabButton_Click"
-                                                FocusVisualStyle="{x:Null}"
-                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
-                                                Opacity="0.8">
-                                                <Button.Template>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Border
-                                                            x:Name="Border"
-                                                            Padding="{TemplateBinding Padding}"
-                                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                                            CornerRadius="8">
-                                                            <ContentPresenter
-                                                                x:Name="ContentPresenter"
-                                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                Focusable="False"
-                                                                RecognizesAccessKey="True"
-                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter TargetName="Border" Property="Background" Value="Red" />
-                                                            </Trigger>
-                                                            <Trigger Property="IsPressed" Value="True">
-                                                                <Setter TargetName="Border" Property="Opacity" Value="0.5" />
-                                                                <Setter TargetName="Border" Property="Background" Value="Red" />
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Button.Template>
-                                                <ui:FontIcon
-                                                    FontSize="8"
-                                                    Glyph="&#xE8BB;" />
-                                            </Button>
-                                        </Grid>
-                                    </Border>
-                                </Grid>
-                            </Border>
-                        </ui:ThemeShadowChrome>
-
-                        <ControlTemplate.Triggers>
-                            <!--  PointerOver  -->
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="TabContainer" Property="Background" Value="{DynamicResource SystemControlBackgroundBaseMediumLowBrush}" />
-                                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource TabViewItemHeaderForegroundPointerOver}" />
-                                <Setter TargetName="IconControl" Property="Foreground" Value="{DynamicResource TabViewItemIconForegroundPointerOver}" />
-                            </Trigger>
-                            <!--  Selected  -->
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="CloseButton" Property="Foreground" Value="White" />
-                                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="White" />
-                                <Setter TargetName="TabContainer" Property="Background" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
-                                <Setter TargetName="IconControl" Property="Foreground" Value="{DynamicResource TabViewItemIconForegroundSelected}" />
-                                <Setter Property="Panel.ZIndex" Value="1" />
-                            </Trigger>
-                            <Trigger Property="ui:TabItemHelper.Icon" Value="{x:Null}">
-                                <Setter TargetName="IconBox" Property="Visibility" Value="Collapsed" />
-                            </Trigger>
-                            <Trigger Property="Header" Value="任务状态">
-                                <Setter TargetName="CloseButton" Property="Visibility" Value="Collapsed" />
-                            </Trigger>
-                            <DataTrigger
-                                Binding="{Binding TabStripPlacement, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
-                                Value="Bottom">
-                                <Setter TargetName="TabContainer" Property="CornerRadius" Value="{Binding Path=(ui:ControlHelper.CornerRadius), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BottomCornerRadiusFilterConverter}}" />
-                            </DataTrigger>
-                            <DataTrigger
-                                Binding="{Binding TabStripPlacement, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
-                                Value="Left">
-                                <Setter TargetName="TabSeparator" Property="BorderBrush" Value="{x:Null}" />
-                                <Setter TargetName="TabContainer" Property="CornerRadius" Value="{Binding Path=(ui:ControlHelper.CornerRadius), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource LeftCornerRadiusFilterConverter}}" />
-                            </DataTrigger>
-                            <DataTrigger
-                                Binding="{Binding TabStripPlacement, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
-                                Value="Right">
-                                <Setter TargetName="TabSeparator" Property="BorderBrush" Value="{x:Null}" />
-                                <Setter TargetName="TabContainer" Property="CornerRadius" Value="{Binding Path=(ui:ControlHelper.CornerRadius), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource RightCornerRadiusFilterConverter}}" />
-                            </DataTrigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="FFmpeg 工具箱" />
     </Window.TaskbarItemInfo>
@@ -196,7 +28,7 @@
             <ColumnDefinition
                 Width="480"
                 MinWidth="480" />
-            <ColumnDefinition Width="24" />
+            <ColumnDefinition Width="04" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid x:Name="grdLeft">
@@ -225,71 +57,84 @@
 
                 <ui:AppBarButton
                     Command="{Binding ShowMediaInfoCommand}"
-                    Icon="Zoom"
-                    Label="查询媒体信息" />
+                    Label="查询媒体信息">
+
+                    <ui:AppBarButton.Icon>
+                        <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Zoom}" />
+                    </ui:AppBarButton.Icon>
+                </ui:AppBarButton>
 
                 <ui:AppBarSeparator />
                 <ui:AppBarButton
                     Command="{Binding StartQueueCommand}"
-                    Icon="Play"
                     Label="开始队列"
-                    Visibility="{Binding StartMainQueueButtonVisibility}" />
+                    Visibility="{Binding StartMainQueueButtonVisibility}">
+
+                    <ui:AppBarButton.Icon>
+                        <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Play}" />
+                    </ui:AppBarButton.Icon>
+                </ui:AppBarButton>
                 <ui:AppBarButton
                     Command="{Binding StopQueueCommand}"
-                    Icon="Stop"
                     Label="终止队列"
-                    Visibility="{Binding StopMainQueueButtonVisibility}" />
+                    Visibility="{Binding StopMainQueueButtonVisibility}">
+                    <ui:AppBarButton.Icon>
+                        <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Stop}" />
+                    </ui:AppBarButton.Icon>
+                </ui:AppBarButton>
                 <ui:AppBarButton
                     Command="{Binding ShowAddTaskCommand}"
-                    Icon="Add"
-                    Label="创建任务" />
+                    Label="创建任务">
+                    <ui:AppBarButton.Icon>
+                        <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Add}" />
+                    </ui:AppBarButton.Icon>
+                </ui:AppBarButton>
                 <ui:CommandBar.SecondaryCommands>
                     <ui:AppBarButton
                         Command="{Binding ShowSettingsCommand}"
-                        Icon="Setting"
-                        Label="设置" />
+                        Label="设置">
+                        <ui:AppBarButton.Icon>
+                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Settings}" />
+                        </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>
                     <ui:AppBarButton
                         Command="{Binding ShowTasksCommand}"
-                        Icon="List"
-                        Label="查看所有任务" />
+                        Label="查看所有任务">
+                        <ui:AppBarButton.Icon>
+                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.List}" />
+                        </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>
                     <ui:AppBarButton
                         Command="{Binding ShowPresetsCommand}"
                         Label="查看预设">
                         <ui:AppBarButton.Icon>
-                            <ui:FontIcon Glyph="&#xE179;" />
+                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Shop}" />
                         </ui:AppBarButton.Icon>
                     </ui:AppBarButton>
                     <ui:AppBarButton
                         Command="{Binding ShowLogsCommand}"
                         Label="查看日志">
                         <ui:AppBarButton.Icon>
-                            <ui:FontIcon Glyph="&#xE81C;" />
+                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.History}" />
                         </ui:AppBarButton.Icon>
                     </ui:AppBarButton>
                     <ui:AppBarButton
                         Command="{Binding ShowTestsCommand}"
                         Label="编码性能测试">
                         <ui:AppBarButton.Icon>
-                            <ui:FontIcon Glyph="&#xE916;" />
+                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Stopwatch}" />
                         </ui:AppBarButton.Icon>
                     </ui:AppBarButton>
                     <ui:AppBarButton
                         Command="{Binding ShowFFmpegOutputsCommand}"
                         Label="FFmpeg输出命令行">
                         <ui:AppBarButton.Icon>
-                            <ui:FontIcon Glyph="&#xE1A2;" />
+                            <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.CommandPrompt}" />
                         </ui:AppBarButton.Icon>
                     </ui:AppBarButton>
                 </ui:CommandBar.SecondaryCommands>
             </ui:CommandBar>
         </Grid>
-        <GridSplitter
-            Grid.Column="1"
-            Width="2"
-            Margin="0,36,0,76"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Stretch"
-            Background="{DynamicResource TextControlBorderBrush}" />
         <Border
             Grid.Column="1"
             Height="40"
@@ -303,8 +148,8 @@
             x:Name="tab"
             Grid.RowSpan="99"
             Grid.Column="2"
+            ui:TabControlHelper.AddTabButtonCommand="{Binding ShowAddTaskCommand}"
             Background="Transparent"
-            ItemContainerStyle="{StaticResource TabItemStyle}"
             SelectionChanged="Tab_SelectionChanged"
             Visibility="{Binding TabControlVisibility}">
             <TabItem Header="任务状态" />
@@ -315,7 +160,15 @@
             Grid.Column="2"
             Background="{DynamicResource SystemControlBackgroundChromeBlackHighBrush}"
             Visibility="{Binding TopTabVisibility}" />
-        <mext:ProgressRingOverlay
+        <GridSplitter
+            Grid.Column="1"
+            Width="4"
+            Margin="0,32,0,-36"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch"
+            Background="{DynamicResource TabViewItemHeaderBackgroundSelected}" />
+
+        <ixt:ProgressRingOverlay
             x:Name="ring"
             Grid.RowSpan="99"
             Grid.ColumnSpan="99"

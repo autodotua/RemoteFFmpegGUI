@@ -4,11 +4,10 @@ using FzLib.WPF;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
-using ModernWpf.FzExtension.CommonDialog;
+using iNKORE.Extension.CommonDialog;
 using Newtonsoft.Json;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
-using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -26,7 +25,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
 
 namespace SimpleFFmpegGUI.WPF.Pages
 {

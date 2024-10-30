@@ -1,0 +1,54 @@
+﻿<local:CommonDialog
+    x:Class="iNKORE.Extension.CommonDialog.CheckBoxDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cvt="clr-namespace:FzLib.WPF.Converters;assembly=FzCoreLib.Windows"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:iNKORE.Extension.CommonDialog"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
+    CloseButtonText="取消"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    PrimaryButtonText="确定"
+    mc:Ignorable="d">
+    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <ItemsControl ItemsSource="{Binding Items}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="0,8">
+                        <CheckBox
+                            VerticalContentAlignment="Center"
+                            Checked="CheckBox_Checked"
+                            IsChecked="{Binding IsChecked}"
+                            IsEnabled="{Binding IsEnabled}"
+                            Unchecked="CheckBox_Unchecked">
+                            <CheckBox.Resources>
+                                <Style TargetType="{x:Type Grid}">
+                                    <Setter Property="VerticalAlignment" Value="Bottom" />
+                                </Style>
+                            </CheckBox.Resources>
+                            <Grid Width="300" VerticalAlignment="Center">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Style="{DynamicResource BaseTextBlockStyle}"
+                                    Text="{Binding Title}" />
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Margin="0,4"
+                                    VerticalAlignment="Center"
+                                    Opacity="0.8"
+                                    Text="{Binding Detail}"
+                                    TextWrapping="Wrap"
+                                    Visibility="{Binding Detail, Converter={StaticResource NotNullConverter}}" />
+                            </Grid>
+                        </CheckBox>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</local:CommonDialog>

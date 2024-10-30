@@ -1,0 +1,43 @@
+﻿<local:CommonDialog
+    x:Class="iNKORE.Extension.CommonDialog.InputDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:iNKORE.Extension.CommonDialog"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    IsPrimaryButtonEnabled="True"
+    IsSecondaryButtonEnabled="True"
+    Loaded="CommonDialog_Loaded"
+    PrimaryButtonClick="CommonDialog_PrimaryButtonClick"
+    PrimaryButtonText="确定"
+    SecondaryButtonText="取消"
+    mc:Ignorable="d">
+    <Grid
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        FocusManager.FocusedElement="{Binding ElementName=txt}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBox
+            x:Name="txt"
+            VerticalAlignment="Center"
+            AcceptsReturn="{Binding MultiLines}"
+            MaxLines="{Binding MaxLines}"
+            PreviewTextInput="txt_TextInput"
+            Text="{Binding InputContent, UpdateSourceTrigger=PropertyChanged}" />
+        <ui:FontIcon
+            x:Name="errorIcon"
+            Grid.Column="2"
+            Margin="16,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            FontSize="18"
+            Foreground="Red"
+            Glyph="&#xE783;"
+            Visibility="Collapsed" />
+    </Grid>
+</local:CommonDialog>

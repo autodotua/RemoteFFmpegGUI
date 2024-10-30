@@ -6,7 +6,7 @@ using FFMpegCore.Pipes;
 using FzLib.WPF;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
-using ModernWpf.FzExtension.CommonDialog;
+using iNKORE.Extension.CommonDialog;
 using SimpleFFmpegGUI.Dto;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;

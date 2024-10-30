@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using FzLib;
 using Microsoft.Extensions.DependencyInjection;
-using ModernWpf.FzExtension.CommonDialog;
+using iNKORE.Extension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Messages;

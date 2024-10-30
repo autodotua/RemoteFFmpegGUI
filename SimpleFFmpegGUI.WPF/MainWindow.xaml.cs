@@ -2,7 +2,7 @@
 using FzLib.WPF;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
-using ModernWpf.FzExtension.CommonDialog;
+using iNKORE.Extension.CommonDialog;
 using SimpleFFmpegGUI.Manager;
 using SimpleFFmpegGUI.Model;
 using SimpleFFmpegGUI.WPF.Converters;
@@ -10,7 +10,6 @@ using SimpleFFmpegGUI.WPF.Messages;
 using SimpleFFmpegGUI.WPF.ViewModels;
 using SimpleFFmpegGUI.WPF.Pages;
 using SimpleFFmpegGUI.WPF.Panels;
-using SimpleFFmpegGUI.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,7 +30,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using CommonDialog = ModernWpf.FzExtension.CommonDialog.CommonDialog;
+using CommonDialog = iNKORE.Extension.CommonDialog.CommonDialog;
 using Task = System.Threading.Tasks.Task;
 
 namespace SimpleFFmpegGUI.WPF
@@ -210,8 +209,8 @@ namespace SimpleFFmpegGUI.WPF
             {
                 if (!File.Exists(file))
                 {
-                    await CommonDialog.ShowErrorDialogAsync("程序目录中缺少文件：" + file);
-                    Close();
+                    await CommonDialog.ShowErrorDialogAsync("程序目录中缺少文件，将无法正确运行：" + file);
+                    //Close();
                     return;
                 }
             }
@@ -258,19 +257,6 @@ namespace SimpleFFmpegGUI.WPF
                 else if (index == typeCount)
                 {
                     AddNewTab<MediaInfoPage>().SetFile(files.First());
-                }
-            }
-        }
-
-        private void CloseTabButton_Click(object sender, RoutedEventArgs e)
-        {
-            DependencyObject obj = e.Source as DependencyObject;
-            while (obj != null)
-            {
-                obj = VisualTreeHelper.GetParent(obj);
-                if (obj is TabItem item)
-                {
-                    tab.Items.Remove(item);
                 }
             }
         }
