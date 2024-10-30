@@ -45,9 +45,112 @@
                     </Grid.RowDefinitions>
                     <Grid.Resources>
                         <Style
+                            BasedOn="{StaticResource DefaultListBoxItemStyle}"
+                            TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="8,4" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border
+                                            x:Name="LayoutRoot"
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="4"
+                                            SnapsToDevicePixels="True">
+                                            <Grid>
+                                                <Border
+                                                    x:Name="PressedBackground"
+                                                    Background="Transparent"
+                                                    CornerRadius="4" />
+                                                <ui:ContentPresenterEx
+                                                    x:Name="ContentPresenter"
+                                                    Margin="{TemplateBinding Padding}"
+                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                    FontSize="{DynamicResource ControlContentThemeFontSize}"
+                                                    FontWeight="Normal"
+                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                    TextWrapping="NoWrap" />
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Foreground" Value="{DynamicResource ListBoxItemForegroundDisabled}" />
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="PressedBackground" Property="Background" Value="{DynamicResource ListBoxItemBackgroundPointerOver}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource ListBoxItemForeground}" />
+                                            </Trigger>
+                                            <Trigger SourceName="LayoutRoot" Property="ui:PressHelper.IsPressed" Value="True">
+                                                <Setter TargetName="PressedBackground" Property="Background" Value="{DynamicResource ListBoxItemBackgroundPressed}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource ListBoxItemForeground}" />
+                                            </Trigger>
+                                            <!--  Selected  -->
+                                            <MultiTrigger>
+                                                <MultiTrigger.Conditions>
+                                                    <Condition Property="Selector.IsSelectionActive" Value="True" />
+                                                    <Condition Property="IsSelected" Value="True" />
+                                                    <Condition Property="IsMouseOver" Value="False" />
+                                                </MultiTrigger.Conditions>
+                                                <Setter TargetName="PressedBackground" Property="Background" Value="{DynamicResource ListBoxItemBackgroundSelected}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource ListBoxItemForeground}" />
+                                            </MultiTrigger>
+                                            <!--  SelectedUnfocused  -->
+                                            <MultiTrigger>
+                                                <MultiTrigger.Conditions>
+                                                    <Condition Property="Selector.IsSelectionActive" Value="False" />
+                                                    <Condition Property="IsSelected" Value="True" />
+                                                    <Condition Property="IsMouseOver" Value="False" />
+                                                </MultiTrigger.Conditions>
+                                                <Setter TargetName="PressedBackground" Property="Background" Value="{DynamicResource ListBoxItemBackgroundSelected}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource ListBoxItemForeground}" />
+                                            </MultiTrigger>
+                                            <!--  SelectedPointerOver  -->
+                                            <MultiTrigger>
+                                                <MultiTrigger.Conditions>
+                                                    <Condition Property="IsSelected" Value="True" />
+                                                    <Condition Property="IsMouseOver" Value="True" />
+                                                </MultiTrigger.Conditions>
+                                                <Setter TargetName="PressedBackground" Property="Background" Value="{DynamicResource ListBoxItemBackgroundSelectedPointerOver}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource ListBoxItemForeground}" />
+                                            </MultiTrigger>
+                                            <!--  SelectedPressed  -->
+                                            <MultiTrigger>
+                                                <MultiTrigger.Conditions>
+                                                    <Condition Property="IsSelected" Value="True" />
+                                                    <Condition SourceName="LayoutRoot" Property="ui:PressHelper.IsPressed" Value="True" />
+                                                </MultiTrigger.Conditions>
+                                                <Setter TargetName="PressedBackground" Property="Background" Value="{DynamicResource ListBoxItemBackgroundSelectedPressed}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource ListBoxItemForeground}" />
+                                            </MultiTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                        <Style
                             BasedOn="{StaticResource DefaultListBoxStyle}"
-                            TargetType="{x:Type ListBox}">
+                            TargetType="ListBox">
+                            <Setter Property="Height" Value="32" />
                             <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundListLowBrush}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBox">
+                                        <Border
+                                            x:Name="LayoutRoot"
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="4"
+                                            SnapsToDevicePixels="true">
+                                            <ItemsPresenter
+                                                Grid.Row="1"
+                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
                             <Setter Property="ItemTemplate">
                                 <Setter.Value>
                                     <DataTemplate>
@@ -70,7 +173,6 @@
                     <TextBlock Text="视频输出" />
                     <ListBox
                         Grid.Row="2"
-                        Height="40"
                         ItemsSource="{Binding ChannelOutputStrategies}"
                         SelectedItem="{Binding VideoOutputStrategy}" />
                     <TextBlock

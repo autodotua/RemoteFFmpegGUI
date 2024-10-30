@@ -96,12 +96,21 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <Style
+                    BasedOn="{StaticResource DefaultButtonStyle}"
+                    TargetType="{x:Type Button}">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                </Style>
+            </Grid.Resources>
             <ikw:SimpleStackPanel
                 Orientation="Horizontal"
                 Spacing="8">
-                <ui:SymbolIcon
+                <ui:FontIcon
                     Margin="0,2,0,0"
-                    Symbol="Volume" />
+                    Icon="{x:Static ui:SegoeFluentIcons.Volume}" />
+
                 <Slider
                     Width="90"
                     Margin="0,3,0,0"
@@ -116,7 +125,6 @@
             </ikw:SimpleStackPanel>
             <Button
                 Grid.Column="1"
-                Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="-2"
                 ToolTip="快退5秒&#x0a;按住Shift时快退20秒&#x0a;按住Ctrl时快退1秒">
@@ -124,7 +132,6 @@
             </Button>
             <Button
                 Grid.Column="5"
-                Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="2"
                 ToolTip="快进5秒&#x0a;按住Shift时快进20秒&#x0a;按住Ctrl时快进1秒">
@@ -132,7 +139,6 @@
             </Button>
             <Button
                 Grid.Column="2"
-                Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="-1"
                 ToolTip="切换到前一帧&#x0a;按住Ctrl向前5帧&#x0a;按住Shift向前10帧">
@@ -140,7 +146,6 @@
             </Button>
             <Button
                 Grid.Column="4"
-                Background="Transparent"
                 Click="JumpButton_Click"
                 Tag="1"
                 ToolTip="切换到后一帧&#x0a;按住Ctrl向后5帧&#x0a;按住Shift向后10帧">
@@ -148,19 +153,17 @@
             </Button>
             <Button
                 Grid.Column="3"
-                Background="Transparent"
                 Click="PlayButton_Click"
                 ToolTip="播放"
                 Visibility="{Binding ElementName=media, Path=IsPaused, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=h}">
-                <ui:SymbolIcon Symbol="Play" />
+                <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Play}" />
             </Button>
             <Button
                 Grid.Column="3"
-                Background="Transparent"
                 Click="PauseButton_Click"
                 ToolTip="暂停"
                 Visibility="{Binding ElementName=media, Path=IsPlaying, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=h}">
-                <ui:SymbolIcon Symbol="Pause" />
+                <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Pause}" />
             </Button>
             <ikw:SimpleStackPanel
                 Grid.Column="99"

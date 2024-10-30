@@ -5,9 +5,9 @@
     xmlns:c="clr-namespace:FzLib.WPF.Controls;assembly=FzCoreLib.Windows"
     xmlns:converters="clr-namespace:FzLib.WPF.Converters;assembly=FzCoreLib.Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ixt="clr-namespace:iNKORE.Extension;assembly=Inkore.Extension"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ixt="clr-namespace:iNKORE.Extension;assembly=Inkore.Extension"
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
@@ -21,12 +21,18 @@
             DockPanel.Dock="Bottom">
             <ui:AppBarButton
                 Command="{Binding ClearAllCommand}"
-                Icon="Clear"
-                Label="清空" />
+                Label="清空">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Clear}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
             <ui:AppBarButton
                 Command="{Binding CopyAllCommand}"
-                Icon="Copy"
-                Label="复制全部内容" />
+                Label="复制全部内容">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Copy}" />
+                </ui:AppBarButton.Icon>
+            </ui:AppBarButton>
 
 
         </ui:CommandBar>

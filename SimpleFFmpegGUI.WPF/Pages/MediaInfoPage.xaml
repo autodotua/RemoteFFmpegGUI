@@ -4,9 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
+    xmlns:ixt="clr-namespace:iNKORE.Extension;assembly=Inkore.Extension"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ixt="clr-namespace:iNKORE.Extension;assembly=Inkore.Extension"
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
@@ -42,8 +42,9 @@
             <TextBox Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}" />
             <Button
                 Grid.Column="2"
+                Height="32"
                 Command="{Binding BrowseFileCommand}">
-                <ui:SymbolIcon Symbol="BrowsePhotos" />
+                <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.OpenFile}" />
             </Button>
         </Grid>
         <ScrollViewer
@@ -305,6 +306,7 @@
                     </DataTemplate>
                 </GroupBox.HeaderTemplate>
                 <TextBox
+                    Background="Transparent"
                     BorderThickness="0"
                     FontFamily="consolas"
                     MouseLeave="TextBox_MouseLeave"

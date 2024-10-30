@@ -259,7 +259,7 @@
                 Grid.Column="2"
                 VerticalAlignment="Bottom"
                 Command="{Binding BrowseOutputFileCommand}">
-                <ui:SymbolIcon Symbol="OpenFile" />
+                <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.OpenFile}" />
             </Button>
         </Grid>
 

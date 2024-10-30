@@ -10,7 +10,9 @@
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     mc:Ignorable="d">
 
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Grid
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -24,7 +26,8 @@
             TextWrapping="Wrap"
             Visibility="{Binding Message, Converter={StaticResource NotNullConverter}}" />
         <Expander
-            Grid.Row="2" Margin="0,16,0,0"
+            Grid.Row="2"
+            Margin="0,16,0,0"
             HorizontalAlignment="Stretch"
             Header="详情"
             Visibility="{Binding Detail, Converter={StaticResource NotNullConverter}}">
@@ -33,15 +36,19 @@
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
                 <TextBox
-                    Margin="0,8,0,0" BorderThickness="0"
+                    Margin="0,8,0,0"
+                    BorderThickness="0"
                     IsReadOnly="True"
                     Text="{Binding Detail}"
+                    TextAlignment="Left"
                     TextWrapping="Wrap" />
             </ScrollViewer>
         </Expander>
         <ui:FontIcon
-            Grid.RowSpan="99" Grid.Column="2"
-            VerticalAlignment="Top" FontSize="30"
+            Grid.RowSpan="99"
+            Grid.Column="2"
+            VerticalAlignment="Top"
+            FontSize="30"
             Foreground="{Binding IconBrush}"
             Glyph="{Binding Icon}"
             Visibility="{Binding Icon, Converter={StaticResource NotNullConverter}}" />

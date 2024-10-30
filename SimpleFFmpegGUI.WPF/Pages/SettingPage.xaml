@@ -6,9 +6,9 @@
     xmlns:converters="clr-namespace:FzLib.WPF.Converters;assembly=FzCoreLib.Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
+    xmlns:ixt="clr-namespace:iNKORE.Extension;assembly=Inkore.Extension"
     xmlns:local="clr-namespace:SimpleFFmpegGUI.WPF.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ixt="clr-namespace:iNKORE.Extension;assembly=Inkore.Extension"
     xmlns:n="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:panels="clr-namespace:SimpleFFmpegGUI.WPF.Panels"
     xmlns:r="clr-namespace:SimpleFFmpegGUI.WPF"
@@ -68,10 +68,11 @@
                         Text="{Binding Configs.DefaultOutputDirSpecialDirPath}"
                         Visibility="{Binding Configs.DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=SpecialDir}" />
                     <Button
+                        Height="32"
                         VerticalAlignment="Bottom"
                         Command="{Binding BrowseSpecialDirPathCommand}"
                         Visibility="{Binding Configs.DefaultOutputDirType, Converter={StaticResource EqualConverter}, ConverterParameter=SpecialDir}">
-                        <ui:SymbolIcon Symbol="OpenFile" />
+                        <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.OpenFile}" />
                     </Button>
                 </ikw:SimpleStackPanel>
 
@@ -131,21 +132,24 @@
             MouseEnter="CommandBar_MouseEnter">
             <ui:AppBarButton
                 Command="{Binding AddRemoteHostCommand}"
-                Icon="Add"
-                Label="新增远程主机" />
+                Label="新增远程主机">
+                <ui:AppBarButton.Icon>
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Add}" />
+                </ui:AppBarButton.Icon>            
+            </ui:AppBarButton>
             <ui:AppBarSeparator />
             <ui:AppBarButton
                 Command="{Binding CancelCommand}"
                 Label="取消">
                 <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE106;" />
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Cancel}" />
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
             <ui:AppBarButton
                 Command="{Binding SaveCommand}"
                 Label="保存">
                 <ui:AppBarButton.Icon>
-                    <ui:FontIcon Glyph="&#xE73E;" />
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Save}" />
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
         </ui:CommandBar>

@@ -192,11 +192,12 @@
                             Text="{Binding TestVideo}" />
                         <Button
                             Grid.Column="4"
+                            Height="32"
                             VerticalAlignment="Bottom"
                             Command="{Binding BrowseTestVideoCommand}"
                             DockPanel.Dock="Right">
                             <Button.Content>
-                                <ui:SymbolIcon Symbol="BrowsePhotos" />
+                                <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.OpenFile}" />
                             </Button.Content>
                         </Button>
                     </Grid>
