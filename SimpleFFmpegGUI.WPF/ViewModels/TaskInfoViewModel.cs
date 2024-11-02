@@ -230,7 +230,9 @@ namespace SimpleFFmpegGUI.WPF.ViewModels
 
         public async Task UpdateSelfAsync()
         {
-            (await GetTaskAsync()).Adapt(this);
+            var task = await GetTaskAsync();
+            task.Adapt(this);
+            FfmpegArguments = task.FFmpegArguments;
         }
 
         public async Task UpdateSnapshotAsync()

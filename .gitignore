@@ -23,7 +23,12 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
+[Bb]in/*.dll
+[Bb]in/*.exe
+[Bb]in/*/*.dll
+[Bb]in/*/*.exe
+[Bb]in/*.mp4
+[Bb]in/*.json
 [Oo]bj/
 [Ll]og/
 

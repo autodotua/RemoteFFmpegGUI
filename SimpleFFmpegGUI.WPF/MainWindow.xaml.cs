@@ -196,24 +196,24 @@ namespace SimpleFFmpegGUI.WPF
         protected override async void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
-            await Task.Yield();
-            string[] files =
-            [
-                "ffmpeg.exe",
-                "ffprobe.exe",
-                "ffplay.exe",
-                "mediainfo.exe"
-            ];
+            //await Task.Yield();
+            //string[] files =
+            //[
+            //    "ffmpeg.exe",
+            //    "ffprobe.exe",
+            //    "ffplay.exe",
+            //    "mediainfo.exe"
+            //];
 
-            foreach (var file in files)
-            {
-                if (!File.Exists(file))
-                {
-                    await CommonDialog.ShowErrorDialogAsync("程序目录中缺少文件，将无法正确运行：" + file);
-                    //Close();
-                    return;
-                }
-            }
+            //foreach (var file in files)
+            //{
+            //    if (!File.Exists(file))
+            //    {
+            //        this.CreateMessage().QueueError("程序目录中缺少文件，将无法正确运行：" + file);
+            //        //Close();
+            //        return;
+            //    }
+            //}
         }
 
         protected override void OnDragOver(DragEventArgs e)
@@ -383,10 +383,11 @@ namespace SimpleFFmpegGUI.WPF
             }
             SendSnapshotEnabledMessage();
 
-            grdLeft.RowDefinitions[2].Height = new GridLength(IsUiCompressMode ? 384 : 0);
-            grdLeft.RowDefinitions[2].MinHeight = IsUiCompressMode ? 384 : 0;
+            grdLeft.RowDefinitions[2].Height = new GridLength(IsUiCompressMode ? 316 : 0);
+            grdLeft.RowDefinitions[2].MinHeight = IsUiCompressMode ? 316 : 0;
             leftSplitter.Visibility = IsUiCompressMode ? Visibility.Visible : Visibility.Collapsed;
             statusPanel.Margin = new Thickness(12, IsUiCompressMode ? 12 : 44, 12, IsUiCompressMode ? 12 : 42);
+
             void RemoveFromGrid()
             {
                 if (taskPanel.Parent != null)

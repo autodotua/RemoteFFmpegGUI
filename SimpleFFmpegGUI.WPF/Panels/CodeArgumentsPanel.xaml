@@ -360,7 +360,6 @@
                         <!--  2Pass  -->
                         <CheckBox
                             Grid.Row="6"
-                            Grid.ColumnSpan="9"
                             Content="二次编码"
                             IsChecked="{Binding Video.TwoPass}"
                             ToolTip="{Binding Source={x:Static vm:ArgumentDescriptions.TwoPass}}" />
@@ -428,8 +427,6 @@
                         <ComboBox
                             Grid.Row="14"
                             Grid.Column="2"
-                            Grid.ColumnSpan="9"
-                            ui:ControlHelper.PlaceholderText="示例：640:480 或 640:-1 或 iw/2:ih/2"
                             IsEditable="True"
                             IsEnabled="{Binding Video.EnableSize}"
                             ItemsSource="{Binding Sizes}"
@@ -444,8 +441,6 @@
                         <ComboBox
                             Grid.Row="16"
                             Grid.Column="2"
-                            Grid.ColumnSpan="9"
-                            ui:ControlHelper.PlaceholderText="示例：4:3 或 1.3333"
                             IsEditable="True"
                             IsEnabled="{Binding Video.EnableAspectRatio}"
                             ItemsSource="{Binding AspectRatios}"
@@ -478,7 +473,6 @@
                         <ComboBox
                             Grid.Row="20"
                             Grid.Column="2"
-                            Grid.ColumnSpan="9"
                             IsEditable="True"
                             IsEnabled="{Binding Video.EnablePixelFormat}"
                             ItemsSource="{Binding PixelFormats}"

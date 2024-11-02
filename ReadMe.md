@@ -66,11 +66,51 @@
 
 ### 准备工作
 
-1. 确保安装了 .NET 8 SDK：
+1. 确保安装了 .NET 8 SDK （v8.0.403及以上）：
 2. 确保安装了npm（Node.js）：
-3. 确保在根目录下（与ReadMe同级目录）的 `bin`目录中放置了ffmpeg二进制文件（shared版）：[下载](https://www.ffmpeg.org/download.html) 。共有三个exe文件和若干个dll文件。已测试版本：6.1.1。新版本可能导致视频裁剪功能无法使用，但不影响视频编码。
+3. 确保在根目录下（与ReadMe同级目录）的 `bin`目录中放置了ffmpeg二进制文件（shared版）：[下载](https://www.ffmpeg.org/download.html) ，具体层级见`bin`目录内的`files.txt`。
 4. 若要使用媒体信息查询功能，应在根目录（与ReadMe同级目录）下的 `bin`目录中放置了MediaInfo CLI可执行文件（如`MediaInfo.exe`）：[下载](https://mediaarea.net/en/MediaInfo/Download)
 5. 若要使用编码测试功能，应在根目录（与ReadMe同级目录）下的 `bin`目录中放置了测试视频 `test.mp4`和VMAF模型（[下载](https://github.com/Netflix/vmaf/blob/master/model/vmaf_v0.6.1.json)。选取的视频宜为4K分辨率，30秒以上的长度。
+
+`bin`目录的结构（示例中，`ffmpeg`目录中的ffmpeg为版本7.1，`ffmpeg_FFME`目录中的ffmpeg版本为6.1.1）：
+
+```
+bin
+│  files.txt
+│  MediaInfo.exe
+│  test.mp4
+│  vmaf_float_v0.6.1.json
+│
+├─ffmpeg
+│      avcodec-61.dll
+│      avdevice-61.dll
+│      avfilter-10.dll
+│      avformat-61.dll
+│      avutil-59.dll
+│      ffmpeg.exe
+│      ffplay.exe
+│      ffprobe.exe
+│      files.txt
+│      postproc-58.dll
+│      swresample-5.dll
+│      swscale-8.dll
+│
+└─ffmpeg_FFME
+        avcodec-60.dll
+        avdevice-60.dll
+        avfilter-9.dll
+        avformat-60.dll
+        avutil-58.dll
+        ffmpeg.exe
+        ffplay.exe
+        ffprobe.exe
+        files.txt
+        postproc-57.dll
+        swresample-4.dll
+        swscale-7.dll
+```
+
+
 
 ### 配置
 

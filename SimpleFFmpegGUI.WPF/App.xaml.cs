@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using static SimpleFFmpegGUI.DependencyInjectionExtension;
 using System.Windows.Interop;
+using FFMpegCore;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
 
@@ -51,7 +52,8 @@ namespace SimpleFFmpegGUI.WPF
                 throw new Exception("数据库迁移失败", ex);
             }
 
-            Unosquare.FFME.Library.FFmpegDirectory = FzLib.Program.App.ProgramDirectoryPath;
+            Unosquare.FFME.Library.FFmpegDirectory = Path.Combine(FzLib.Program.App.ProgramDirectoryPath,"ffmpeg_FFME");
+            GlobalFFOptions.Configure(new FFOptions { BinaryFolder = Path.Combine(FzLib.Program.App.ProgramDirectoryPath, "ffmpeg") });
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
             ServiceProvider = serviceCollection.BuildServiceProvider();

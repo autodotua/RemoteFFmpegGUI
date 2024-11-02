@@ -1,0 +1,4 @@
+在此处放置：
+查询媒体信息的MediaInfo.exe，下载地址：https://mediaarea.net/en/MediaInfo/Download
+编码测试功能的VMAF模型vmaf_v0.6.1.json，下载地址：https://github.com/Netflix/vmaf/blob/master/model/vmaf_v0.6.1.json
+一段测试视频test.mp4。

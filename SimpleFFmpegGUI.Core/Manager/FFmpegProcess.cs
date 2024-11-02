@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,9 +27,15 @@ namespace SimpleFFmpegGUI.Manager
         }
         public FFmpegProcess(string argument) : this()
         {
+            string ffmpeg = "ffmpeg";
+            string fileFFmpeg = Path.Combine(FzLib.Program.App.ProgramDirectoryPath, "ffmpeg", "ffmpeg.exe");
+            if (File.Exists(fileFFmpeg))
+            {
+                ffmpeg = fileFFmpeg;
+            }
             process.StartInfo = new ProcessStartInfo()
             {
-                FileName = "ffmpeg",
+                FileName = ffmpeg,
                 Arguments = argument,
                 CreateNoWindow = true,
                 UseShellExecute = false,

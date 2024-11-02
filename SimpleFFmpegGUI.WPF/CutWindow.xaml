@@ -31,7 +31,6 @@
         </Style>
     </Window.Resources>
     <Grid>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="8" />
@@ -203,7 +202,7 @@
                 Command="{Binding SetFromCommand}"
                 Label="设置为入点">
                 <ui:AppBarButton.Icon>
-                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Preview}" />
+                    <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Previous}" />
                 </ui:AppBarButton.Icon>
             </ui:AppBarButton>
             <ui:AppBarButton

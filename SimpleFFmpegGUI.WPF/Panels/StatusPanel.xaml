@@ -219,10 +219,23 @@
                             <ui:CommandBar
                                 Grid.Row="2"
                                 Grid.Column="2"
-                                Margin="0"
                                 Background="Transparent"
                                 DockPanel.Dock="Bottom">
-
+                                <ui:AppBarButton
+                                    Label="输出">
+                                    <ui:FlyoutService.Flyout>
+                                        <ui:Flyout>
+                                            <TextBlock
+                                                Width="360"
+                                                FontFamily="Consolas"
+                                                Text="{Binding ProcessStatus.LastOutput}"
+                                                TextWrapping="Wrap" />
+                                        </ui:Flyout>
+                                    </ui:FlyoutService.Flyout>
+                                    <ui:AppBarButton.Icon>
+                                        <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.CommandPrompt}" />
+                                    </ui:AppBarButton.Icon>
+                                </ui:AppBarButton>
                                 <ui:AppBarButton
                                     Command="{Binding DataContext.CancelCommand, ElementName=root}"
                                     CommandParameter="{Binding .}"
@@ -249,20 +262,7 @@
                                         <ui:FontIcon Icon="{x:Static ui:SegoeFluentIcons.Pause}" />
                                     </ui:AppBarButton.Icon>
                                 </ui:AppBarButton>
-                                <ui:AppBarButton
-                                    Margin="32,0,0,0"
-                                    Label="输出"
-                                    Visibility="{Binding IsIndeterminate, Converter={StaticResource Bool2VisibilityConverter}, ConverterParameter=i}">
-                                    <ui:FlyoutService.Flyout>
-                                        <ui:Flyout>
-                                            <TextBlock
-                                                Width="360"
-                                                FontFamily="Consolas"
-                                                Text="{Binding ProcessStatus.LastOutput}"
-                                                TextWrapping="Wrap" />
-                                        </ui:Flyout>
-                                    </ui:FlyoutService.Flyout>
-                                </ui:AppBarButton>
+
 
                             </ui:CommandBar>
 
